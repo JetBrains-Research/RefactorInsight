@@ -1,0 +1,52 @@
+image: gradle:6.0-jdk13
+
+stages:
+  - build
+  - validate
+#  - test
+#  - coverage
+
+variables:
+  # Disable the Gradle daemon to ensure isolated runs of the CI pipeline.
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+build:
+  stage: build
+  script:
+    gradle --build-cache assemble
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - build/
+      - .gradle/
+
+checkStyle:
+  stage: validate
+  script: gradle checkstyleMain checkstyleTest
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build/
+      - .gradle/
+#
+#test:
+#  stage: test
+#  artifacts:
+#    untracked: true
+#  script:
+#    gradle check
+#
+#coverage:
+#  stage: coverage
+#  dependencies:
+#    - test
+#  script:
+#    - coverage=$(awk -F"," '{ branches += $6 + $7; covered += $7 } END { print "Total" ,int(100*covered/branches), "%% covered" }' build/JaCoCo/test/jacocoTestReport.csv)
+#    # - aggregate=$(awk -F"," '{ branches += $6 + $7; covered += $7 } END { print "\nAGGREGATE COVERAGE REPORT"; print covered, "/", branches, "branches covered"; print int(100*covered/branches), "%% covered\n---------------------------\n" }' target/site/jacoco-aggregate/jacoco.csv)
+#    - printf "$coverage"
+#  coverage: '/Total *?([0-9]{1,3}) %/'
