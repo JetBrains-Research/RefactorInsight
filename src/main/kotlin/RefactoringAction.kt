@@ -45,9 +45,9 @@ class RefactoringAction : AnAction() {
             val gitService: GitService = GitServiceImpl()
             val miner: GitHistoryRefactoringMiner = GitHistoryRefactoringMinerImpl()
 
-            println(gitService.openRepository(currentProject!!.basePath))
+            println(gitService.openRepository(currentProject.basePath))
             miner.detectAll(
-                gitService.openRepository(currentProject!!.basePath),
+                gitService.openRepository(currentProject.basePath),
                 branch,
                 object : RefactoringHandler() {
                     override fun handle(

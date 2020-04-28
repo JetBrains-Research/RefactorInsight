@@ -38,6 +38,7 @@ dependencies {
 intellij {
     version '2020.1'
     plugins 'java', 'git4idea'
+    downloadSources true
 }
 
 
