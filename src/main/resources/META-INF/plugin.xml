@@ -20,5 +20,9 @@
 
     <actions>
         <!-- Add your actions here -->
+        <action id="RefactoringAction" class="RefactoringAction" text="Refactoring"
+                description="Detect the refactorings">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+        </action>
     </actions>
 </idea-plugin>
