@@ -28,6 +28,7 @@ jacocoTestReport {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
@@ -37,7 +38,7 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version '2020.1'
-    plugins 'java', 'git4idea'
+    plugins 'java', 'git4idea', 'Kotlin'
     downloadSources true
 }
 
@@ -46,12 +47,15 @@ checkstyle {
     toolVersion "8.25"
     configFile = rootProject.file('config/checkstyle/checkstyle.xml')
 }
+
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
+
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
+
 kotlin {
     /* Targets configuration omitted. 
     *  To find out how to configure the targets, please follow the link:
@@ -71,6 +75,7 @@ kotlin {
         }
     }
 }
+
 patchPluginXml {
     changeNotes """
       Add change notes here.<br>
