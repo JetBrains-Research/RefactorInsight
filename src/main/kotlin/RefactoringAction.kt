@@ -12,6 +12,7 @@ import org.refactoringminer.api.RefactoringHandler
 import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl
 import org.refactoringminer.util.GitServiceImpl
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class RefactoringAction : AnAction() {
@@ -23,6 +24,8 @@ class RefactoringAction : AnAction() {
      */
     override fun actionPerformed(e: AnActionEvent) {
         var currentProject = e.project
+        val map = currentProject!!.service<StoringService>().state!!.map
+
         val instance =
             ProjectLevelVcsManager.getInstance(currentProject) as ProjectLevelVcsManagerImpl
         val gitRootPath = Arrays.stream(instance.allVcsRoots)
@@ -31,11 +34,6 @@ class RefactoringAction : AnAction() {
                 x.vcs!!.name.equals("git", ignoreCase = true)
             }
             .findAny().orElse(null)
-
-        val myService = currentProject!!.service<MyService>()
-        println("before "+myService.state!!.persistentState)
-        myService.state!!.persistentState = currentProject.name
-        println("after "+myService.state!!.persistentState)
 
         if (gitRootPath == null) {
             println("no repo")
@@ -60,9 +58,10 @@ class RefactoringAction : AnAction() {
                         commitId: String,
                         refactorings: List<Refactoring>
                     ) {
-                        println("Refactorings at $commitId")
+                        val refs = ArrayList<String>()
+                        map[commitId] = refs
                         for (ref in refactorings) {
-                            println(ref.name)
+                            refs.add(ref.name)
                         }
                     }
                 })

@@ -3,8 +3,8 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.project.Project
 
-@State(name = "MyService")
-class MyService(project: Project?) : PersistentStateComponent<MyService.MyState?> {
+@State(name = "StoringService")
+class StoringService(project: Project?) : PersistentStateComponent<StoringService.MyState?> {
     private var innerState = MyState()
     override fun getState(): MyState? {
         return innerState
@@ -15,12 +15,12 @@ class MyService(project: Project?) : PersistentStateComponent<MyService.MyState?
     }
 
     class MyState internal constructor() {
-        var persistentState = "bla"
+        var map = HashMap<String, List<String>>()
     }
 
     companion object {
-        fun getInstance(project: Project): MyService {
-            return ServiceManager.getService(project, MyService::class.java)
+        fun getInstance(project: Project): StoringService {
+            return ServiceManager.getService(project, StoringService::class.java)
         }
     }
 }
