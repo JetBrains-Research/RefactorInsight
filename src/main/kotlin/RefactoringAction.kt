@@ -1,5 +1,6 @@
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.components.service
 import com.intellij.openapi.vcs.ProjectLevelVcsManager
 import com.intellij.openapi.vcs.VcsRoot
 import com.intellij.openapi.vcs.impl.ProjectLevelVcsManagerImpl
@@ -30,6 +31,11 @@ class RefactoringAction : AnAction() {
                 x.vcs!!.name.equals("git", ignoreCase = true)
             }
             .findAny().orElse(null)
+
+        val myService = currentProject!!.service<MyService>()
+        println("before "+myService.state!!.persistentState)
+        myService.state!!.persistentState = currentProject.name
+        println("after "+myService.state!!.persistentState)
 
         if (gitRootPath == null) {
             println("no repo")
