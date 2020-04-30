@@ -80,9 +80,9 @@ public class GitWindow extends ToggleAction {
             int endIndex = selectionModel.getMaxSelectionIndex();
 
             if (beginIndex != -1 || endIndex != -1) {
-                StringBuilder builder = new StringBuilder();
+                StringBuilder builder  = new StringBuilder();
                 builder.append("<html>");
-                for (int index = beginIndex; index <= endIndex; index++) {
+                for(int index = beginIndex; index <= endIndex; index++) {
                     String id = table.getModel().getCommitId(index).getHash().asString();
                     builder.append(id).append("<br/><ul>");
                     if (map.get(id) == null) {
@@ -92,6 +92,8 @@ public class GitWindow extends ToggleAction {
                     }
                     builder.append("</ul>");
                 }
+                builder.append("</html>");
+                test.setText(builder.toString());
             }
         }
     }
