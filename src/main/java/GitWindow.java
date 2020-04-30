@@ -79,20 +79,20 @@ public class GitWindow extends ToggleAction {
             int beginIndex = selectionModel.getMinSelectionIndex();
             int endIndex = selectionModel.getMaxSelectionIndex();
 
-            StringBuilder builder  = new StringBuilder();
-            builder.append("<html>");
-            for(int index = beginIndex; index <= endIndex; index++) {
-                String id = table.getModel().getCommitId(index).getHash().asString();
-                builder.append(id).append("<br/><ul>");
-                if(map.get(id) == null) {
-                    builder.append("<li>").append("no refactorings detected").append("</li>");
-                }else {
-                    map.get(id).forEach(r -> builder.append("<li>").append(r).append("</li>"));
+            if (beginIndex != -1 || endIndex != -1) {
+                StringBuilder builder = new StringBuilder();
+                builder.append("<html>");
+                for (int index = beginIndex; index <= endIndex; index++) {
+                    String id = table.getModel().getCommitId(index).getHash().asString();
+                    builder.append(id).append("<br/><ul>");
+                    if (map.get(id) == null) {
+                        builder.append("<li>").append("no refactorings detected").append("</li>");
+                    } else {
+                        map.get(id).forEach(r -> builder.append("<li>").append(r).append("</li>"));
+                    }
+                    builder.append("</ul>");
                 }
-                builder.append("</ul>");
             }
-            builder.append("</html>");
-            test.setText(builder.toString());
         }
     }
 
