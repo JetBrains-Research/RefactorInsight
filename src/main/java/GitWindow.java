@@ -71,15 +71,16 @@ public class GitWindow extends ToggleAction {
 
             int beginIndex = selectionModel.getMinSelectionIndex();
             int endIndex = selectionModel.getMaxSelectionIndex();
-
-            StringBuilder builder  = new StringBuilder();
-            builder.append("<html>");
-            for(int index = beginIndex; index <= endIndex; index++) {
+            if (beginIndex != -1 || endIndex != -1) {
+                StringBuilder builder = new StringBuilder();
+                builder.append("<html>");
+                for (int index = beginIndex; index <= endIndex; index++) {
                 Hash hash = table.getModel().getCommitId(index).getHash();
-                builder.append(hash.asString()).append("<br/>");
+                    builder.append(hash.toString()).append("<br/>");
+                }
+                builder.append("</html>");
+                test.setText(builder.toString());
             }
-            builder.append("</html>");
-            test.setText(builder.toString());
         }
     }
 
