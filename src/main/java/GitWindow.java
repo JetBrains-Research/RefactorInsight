@@ -1,6 +1,7 @@
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.vcs.log.Hash;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
@@ -19,7 +20,7 @@ public class GitWindow extends ToggleAction {
     private JBViewport viewport;
     private boolean selected = false;
     private VcsLogGraphTable table;
-    private JLabel test;
+    private JBLabel test;
 
 
     private void setUp(@NotNull AnActionEvent e) {
@@ -33,7 +34,8 @@ public class GitWindow extends ToggleAction {
 
         changesTree = changesBrowser.getViewer();
         viewport = (JBViewport) changesTree.getParent();
-        test = new JLabel("TEST LABEL");
+        test = new JBLabel("TEST LABEL");
+        test.setVerticalAlignment(JBLabel.CENTER);
     }
 
     private void toRefactoringView(@NotNull AnActionEvent e) {
@@ -66,9 +68,18 @@ public class GitWindow extends ToggleAction {
         public void valueChanged(ListSelectionEvent listSelectionEvent) {
             if (listSelectionEvent.getValueIsAdjusting()) return;
             DefaultListSelectionModel selectionModel = (DefaultListSelectionModel) listSelectionEvent.getSource();
-            int index = selectionModel.getMinSelectionIndex();
-            Hash hash = table.getModel().getCommitId(index).getHash();
-            test.setText(hash.asString());
+
+            int beginIndex = selectionModel.getMinSelectionIndex();
+            int endIndex = selectionModel.getMaxSelectionIndex();
+
+            StringBuilder builder  = new StringBuilder();
+            builder.append("<html>");
+            for(int index = beginIndex; index <= endIndex; index++) {
+                Hash hash = table.getModel().getCommitId(index).getHash();
+                builder.append(hash.asString()).append("<br/>");
+            }
+            builder.append("</html>");
+            test.setText(builder.toString());
         }
     }
 
