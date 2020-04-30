@@ -2,29 +2,43 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
 import com.intellij.ui.components.JBViewport;
+import com.intellij.vcs.log.Hash;
+import com.intellij.vcs.log.ui.MainVcsLogUi;
+import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
+import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 public class GitWindow extends ToggleAction {
 
     private ChangesTree changesTree;
     private JBViewport viewport;
     private boolean selected = false;
+    private VcsLogGraphTable table;
+    private JLabel test;
+
 
     private void setUp(@NotNull AnActionEvent e) {
         VcsLogChangesBrowser changesBrowser = (VcsLogChangesBrowser) e.getData(VcsLogChangesBrowser.DATA_KEY);
+        MainVcsLogUi logUI = e.getData(VcsLogInternalDataKeys.MAIN_UI);
+
+
+        table = logUI.getTable();
+        table.getSelectionModel().addListSelectionListener(new CommitSelectionListener());
+
 
         changesTree = changesBrowser.getViewer();
         viewport = (JBViewport) changesTree.getParent();
+        test = new JLabel("TEST LABEL");
     }
 
     private void toRefactoringView(@NotNull AnActionEvent e) {
         System.out.println("Button ON");
-        JLabel test = new JLabel("TEST LABEL");
         viewport.setView(test);
-
     }
 
     private void toChangesView(@NotNull AnActionEvent e) {
@@ -39,13 +53,23 @@ public class GitWindow extends ToggleAction {
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
         if (changesTree == null) setUp(e);
-
         if (state) {
             toRefactoringView(e);
         } else {
             toChangesView(e);
         }
         selected = state;
+    }
+
+    class CommitSelectionListener implements ListSelectionListener {
+        @Override
+        public void valueChanged(ListSelectionEvent listSelectionEvent) {
+            if (listSelectionEvent.getValueIsAdjusting()) return;
+            DefaultListSelectionModel selectionModel = (DefaultListSelectionModel) listSelectionEvent.getSource();
+            int index = selectionModel.getMinSelectionIndex();
+            Hash hash = table.getModel().getCommitId(index).getHash();
+            test.setText(hash.asString());
+        }
     }
 
 }
