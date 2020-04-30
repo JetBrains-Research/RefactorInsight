@@ -1,11 +1,11 @@
 <idea-plugin>
     <id>org.example.detecting-refactorings-in-code-changes</id>
-    <name>Plugin display name here</name>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <name>Refactoring detection</name>
+    <vendor email="bobbrockbernd@gmail.com" url="http://www.tudelft.nl">TUDelft</vendor>
 
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+    Enter short description for your plugin her.<br>
+    <em>most HTML tag may be used</em>
     ]]></description>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
@@ -17,9 +17,13 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <projectService serviceImplementation="StoringService"/>
+
     </extensions>
 
     <actions>
+        <action id="GitWindow" class="GitWindow" text="Refactorings" description="GitWindow">
+            <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>
+        </action>
         <!-- Add your actions here -->
         <action id="RefactoringAction" class="RefactoringAction" text="Refactoring"
                 description="Detect the refactorings">
