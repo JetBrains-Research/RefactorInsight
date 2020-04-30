@@ -17,7 +17,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <projectService serviceImplementation="StoringService"/>
-
     </extensions>
 
     <actions>
