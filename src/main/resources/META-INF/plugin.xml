@@ -21,4 +21,10 @@
     <actions>
         <!-- Add your actions here -->
     </actions>
+
+    <projectListeners>
+        <listener class="CommitListener" topic="git4idea.repo.GitRepositoryChangeListener"/>
+    </projectListeners>
+
+
 </idea-plugin>
