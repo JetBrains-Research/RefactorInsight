@@ -83,4 +83,10 @@ public class GitWindow extends ToggleAction {
         }
     }
 
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        e.getPresentation().setVisible(true);
+        super.update(e);
+    }
+
 }
