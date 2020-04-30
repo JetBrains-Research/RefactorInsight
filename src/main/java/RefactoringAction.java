@@ -1,5 +1,6 @@
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.ProjectLevelVcsManager;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.VcsRoot;
@@ -15,15 +16,16 @@ import org.jetbrains.annotations.NotNull;
 import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
 import org.refactoringminer.util.GitServiceImpl;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class RefactoringAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        var currentProject = e.getProject();
+        Project currentProject = e.getProject();
+        StoringService storingService = currentProject.getService(StoringService.class);
+        Map map = storingService.getState().map;
+        map.clear();
         final ProjectLevelVcsManagerImpl instance = (ProjectLevelVcsManagerImpl) ProjectLevelVcsManager.getInstance(currentProject);
         final VcsRoot gitRootPath = Arrays.stream(instance.getAllVcsRoots()).filter(x -> x.getVcs() != null)
                 .filter(x -> x.getVcs().getName().equalsIgnoreCase("git"))
@@ -45,9 +47,12 @@ public class RefactoringAction extends AnAction {
             miner.detectAll(gitService.openRepository(currentProject.getBasePath()), branch, new RefactoringHandler() {
                 @Override
                 public void handle(String commitId, List<Refactoring> refactorings) {
-                    System.out.println("Refactorings at " + commitId);
-                    for (Refactoring ref : refactorings) {
-                        System.out.println(ref.toString());
+                    if(!refactorings.isEmpty()) {
+                        List refs = new ArrayList<String>();
+                        map.put(commitId, refs);
+                        for (Refactoring ref : refactorings) {
+                            refs.add(ref.getName());
+                        }
                     }
                 }
             });

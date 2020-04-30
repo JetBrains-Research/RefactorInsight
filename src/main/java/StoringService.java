@@ -1,8 +1,6 @@
-import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.components.State;
-import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.xmlb.annotations.MapAnnotation;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -10,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 @State(name = "ChangesState",
         storages = {@Storage("refactorings.xml")})
+@Service
 public class StoringService implements PersistentStateComponent<StoringService.MyState> {
     public StoringService(Project project) {
     }
@@ -29,7 +28,13 @@ public class StoringService implements PersistentStateComponent<StoringService.M
         innerState = state;
     }
 
-    static class MyState {
-        public Map map = new HashMap<String, List<String>>();
+
+    public static class MyState {
+        @NotNull
+        @MapAnnotation
+        public Map<String, List<String>> map;
+        MyState() {
+            map = new HashMap<String, List<String>>();
+        }
     }
 }

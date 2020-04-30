@@ -1,5 +1,6 @@
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBViewport;
@@ -13,6 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import java.util.List;
+import java.util.Map;
 
 public class GitWindow extends ToggleAction {
 
@@ -21,12 +24,16 @@ public class GitWindow extends ToggleAction {
     private boolean selected = false;
     private VcsLogGraphTable table;
     private JBLabel test;
+    private Map<String, List<String>> map;
 
 
     private void setUp(@NotNull AnActionEvent e) {
         VcsLogChangesBrowser changesBrowser = (VcsLogChangesBrowser) e.getData(VcsLogChangesBrowser.DATA_KEY);
         MainVcsLogUi logUI = e.getData(VcsLogInternalDataKeys.MAIN_UI);
 
+        Project currentProject = e.getProject();
+        StoringService storingService = currentProject.getService(StoringService.class);
+        map = storingService.getState().map;
 
         table = logUI.getTable();
         table.getSelectionModel().addListSelectionListener(new CommitSelectionListener());
@@ -75,8 +82,14 @@ public class GitWindow extends ToggleAction {
             StringBuilder builder  = new StringBuilder();
             builder.append("<html>");
             for(int index = beginIndex; index <= endIndex; index++) {
-                Hash hash = table.getModel().getCommitId(index).getHash();
-                builder.append(hash.asString()).append("<br/>");
+                String id = table.getModel().getCommitId(index).getHash().asString();
+                builder.append(id).append("<br/><ul>");
+                if(map.get(id) == null) {
+                    builder.append("<li>").append("no refactorings detected").append("</li>");
+                }else {
+                    map.get(id).forEach(r -> builder.append("<li>").append(r).append("</li>"));
+                }
+                builder.append("</ul>");
             }
             builder.append("</html>");
             test.setText(builder.toString());
