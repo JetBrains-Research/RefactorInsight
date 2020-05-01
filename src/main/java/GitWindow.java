@@ -1,5 +1,6 @@
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBViewport;
@@ -21,9 +22,11 @@ public class GitWindow extends ToggleAction {
     private boolean selected = false;
     private VcsLogGraphTable table;
     private JBLabel test;
+    private Project project;
 
 
     private void setUp(@NotNull AnActionEvent e) {
+        project = e.getProject();
         VcsLogChangesBrowser changesBrowser = (VcsLogChangesBrowser) e.getData(VcsLogChangesBrowser.DATA_KEY);
         MainVcsLogUi logUI = e.getData(VcsLogInternalDataKeys.MAIN_UI);
 
@@ -71,6 +74,10 @@ public class GitWindow extends ToggleAction {
 
             int beginIndex = selectionModel.getMinSelectionIndex();
             int endIndex = selectionModel.getMaxSelectionIndex();
+            if(new SampleDialogWrapper(project).showAndGet()) {
+                System.out.println("Hello");
+            }
+
             if (beginIndex != -1 || endIndex != -1) {
                 StringBuilder builder = new StringBuilder();
                 builder.append("<html>");
