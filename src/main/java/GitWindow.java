@@ -24,6 +24,7 @@ public class GitWindow extends ToggleAction {
     private boolean selected = false;
     private VcsLogGraphTable table;
     private JBLabel test;
+    private Project project;
     private Map<String, List<String>> map;
 
 
@@ -78,6 +79,9 @@ public class GitWindow extends ToggleAction {
 
             int beginIndex = selectionModel.getMinSelectionIndex();
             int endIndex = selectionModel.getMaxSelectionIndex();
+            if(new SampleDialogWrapper(project).showAndGet()) {
+                System.out.println("Hello");
+            }
 
             if (beginIndex != -1 || endIndex != -1) {
                 StringBuilder builder  = new StringBuilder();
