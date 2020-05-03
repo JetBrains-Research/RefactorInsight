@@ -15,7 +15,8 @@
     <depends>Git4Idea</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-
+        <!-- Add your extensions here -->
+        <projectService serviceImplementation="StoringService"/>
     </extensions>
 
     <actions>
@@ -23,5 +24,9 @@
             <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>
         </action>
         <!-- Add your actions here -->
+        <action id="RefactoringAction" class="RefactoringAction" text="Refactoring"
+                description="Detect the refactorings">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+        </action>
     </actions>
 </idea-plugin>
