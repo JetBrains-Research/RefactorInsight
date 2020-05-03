@@ -29,4 +29,10 @@
             <add-to-group group-id="ToolsMenu" anchor="first"/>
         </action>
     </actions>
+
+    <projectListeners>
+        <listener class="CommitListener" topic="git4idea.repo.GitRepositoryChangeListener"/>
+    </projectListeners>
+
+
 </idea-plugin>
