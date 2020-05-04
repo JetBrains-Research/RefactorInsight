@@ -16,7 +16,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <projectService serviceImplementation="StoringService"/>
+        <projectService serviceImplementation="MiningService"/>
     </extensions>
 
     <actions>
