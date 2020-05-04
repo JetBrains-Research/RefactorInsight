@@ -24,6 +24,7 @@ import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
 import org.refactoringminer.util.GitServiceImpl;
 
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @State(name = "ChangesState",
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
     private boolean loaded = false;
+    private boolean first = true;
     private boolean mining = false;
     private MyState innerState = new MyState();
 
@@ -58,31 +60,24 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             public void run(@NotNull ProgressIndicator progressIndicator) {
                 mining = true;
                 progressIndicator.setText("Mining refactorings");
-                GitService gitService = new GitServiceImpl();
-                GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
+                ExecutorService pool = Executors.newFixedThreadPool(8);
                 try {
-                    GitHistoryUtils.loadDetails(repository.getProject(), repository.getRoot(), gitCommit -> {
-                        String commitId = gitCommit.getId().asString();
-                        if (!innerState.map.containsKey(commitId)) {
-                            try {
-                                miner.detectAtCommit(gitService.openRepository(repository.getProject().getBasePath()), null, commitId, new RefactoringHandler() {
-                                    @Override
-                                    public void handle(String commitId, List<Refactoring> refactorings) {
-                                        System.out.println(commitId);
-                                        innerState.map.put(commitId, refactorings.stream().map(Refactoring::getName).collect(Collectors.toList()));
-                                    }
-                                });
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, "--all");
-                    System.out.println("done");
+                    GitHistoryUtils.loadDetails(repository.getProject(), repository.getRoot(),
+                            new CommitMiner(pool, innerState.map, repository),
+                             "--all");
+
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 } finally {
                     mining = false;
                 }
+                pool.shutdown();
+                try {
+                    pool.awaitTermination(5, TimeUnit.MINUTES);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("done");
                 progressIndicator.setText("Finished");
             }
         });
@@ -99,7 +94,8 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     public static class MyState {
         @NotNull
         @MapAnnotation
-        public Map<String, List<String>> map = new HashMap<String, List<String>>();
+        public Map<String, List<String>> map = new ConcurrentHashMap<>();
     }
+
 
 }
