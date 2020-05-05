@@ -83,7 +83,7 @@ public class GitWindow extends ToggleAction {
                 for(int index = beginIndex; index <= endIndex; index++) {
                     String id = table.getModel().getCommitId(index).getHash().asString();
                     builder.append(id).append("<br/><ul>");
-                    miningService.getRefactorings(id).forEach(r -> builder.append("<li>").append(r).append("</li>"));;
+                    miningService.getRefactorings(id).forEach(r -> builder.append("<li>").append(RefactoringInfo.fromString(r).getText()).append("</li>"));;
                     builder.append("</ul>");
                 }
                 builder.append("</html>");

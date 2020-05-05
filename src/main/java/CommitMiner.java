@@ -8,7 +8,6 @@ import org.refactoringminer.api.RefactoringHandler;
 import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
 import org.refactoringminer.util.GitServiceImpl;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -34,11 +33,11 @@ public class CommitMiner implements Consumer<GitCommit> {
                 GitService gitService = new GitServiceImpl();
                 GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
                 try {
-                    miner.detectAtCommit(gitService.openRepository(repository.getProject().getBasePath()), null, commitId, new RefactoringHandler() {
+                    miner.detectAtCommit(gitService.openRepository(repository.getProject().getBasePath()), commitId, new RefactoringHandler() {
                         @Override
                         public void handle(String commitId, List<Refactoring> refactorings) {
                             System.out.println(commitId);
-                            map.put(commitId, refactorings.stream().map(Refactoring::getName).collect(Collectors.toList()));
+                            map.put(commitId, refactorings.stream().map(RefactoringInfo::convert).collect(Collectors.toList()));
                         }
                     });
                 } catch (Exception e) {
