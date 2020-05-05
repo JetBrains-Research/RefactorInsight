@@ -16,7 +16,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <projectService serviceImplementation="StoringService"/>
+        <projectService serviceImplementation="MiningService"/>
     </extensions>
 
     <actions>
@@ -29,4 +29,10 @@
             <add-to-group group-id="ToolsMenu" anchor="first"/>
         </action>
     </actions>
+
+    <projectListeners>
+        <listener class="CommitListener" topic="git4idea.repo.GitRepositoryChangeListener"/>
+    </projectListeners>
+
+
 </idea-plugin>

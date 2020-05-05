@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBViewport;
-import com.intellij.vcs.log.Hash;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
@@ -24,7 +23,7 @@ public class GitWindow extends ToggleAction {
     private boolean selected = false;
     private VcsLogGraphTable table;
     private JBLabel test;
-    private Map<String, List<String>> map;
+    private MiningService miningService;
 
 
     private void setUp(@NotNull AnActionEvent e) {
@@ -32,8 +31,7 @@ public class GitWindow extends ToggleAction {
         MainVcsLogUi logUI = e.getData(VcsLogInternalDataKeys.MAIN_UI);
 
         Project currentProject = e.getProject();
-        StoringService storingService = currentProject.getService(StoringService.class);
-        map = storingService.getState().map;
+        miningService = currentProject.getService(MiningService.class);
 
         table = logUI.getTable();
         table.getSelectionModel().addListSelectionListener(new CommitSelectionListener());
@@ -85,11 +83,7 @@ public class GitWindow extends ToggleAction {
                 for(int index = beginIndex; index <= endIndex; index++) {
                     String id = table.getModel().getCommitId(index).getHash().asString();
                     builder.append(id).append("<br/><ul>");
-                    if (map.get(id) == null) {
-                        builder.append("<li>").append("no refactorings detected").append("</li>");
-                    } else {
-                        map.get(id).forEach(r -> builder.append("<li>").append(r).append("</li>"));
-                    }
+                    miningService.getRefactorings(id).forEach(r -> builder.append("<li>").append(r).append("</li>"));;
                     builder.append("</ul>");
                 }
                 builder.append("</html>");
@@ -101,6 +95,7 @@ public class GitWindow extends ToggleAction {
     @Override
     public void update(@NotNull AnActionEvent e) {
         e.getPresentation().setVisible(true);
+        e.getProject().getService(MiningService.class).loaded();
         super.update(e);
     }
 
