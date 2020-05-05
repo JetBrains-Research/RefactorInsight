@@ -25,6 +25,7 @@ import org.refactoringminer.util.GitServiceImpl;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @State(name = "ChangesState",
@@ -60,10 +61,13 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             public void run(@NotNull ProgressIndicator progressIndicator) {
                 mining = true;
                 progressIndicator.setText("Mining refactorings");
-                ExecutorService pool = Executors.newFixedThreadPool(8);
+                int nCores = Runtime.getRuntime().availableProcessors();
+                ExecutorService pool = Executors.newFixedThreadPool(nCores);
+                System.out.println("Mining started on " + nCores + " cores");
+                AtomicInteger commitsDone = new AtomicInteger(0);
                 try {
                     GitHistoryUtils.loadDetails(repository.getProject(), repository.getRoot(),
-                            new CommitMiner(pool, innerState.map, repository),
+                            new CommitMiner(pool, innerState.map, repository, commitsDone),
                              "--all");
 
                 } catch (Exception exception) {
@@ -72,6 +76,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
                     mining = false;
                 }
                 pool.shutdown();
+
                 try {
                     pool.awaitTermination(5, TimeUnit.MINUTES);
                 } catch (InterruptedException e) {
