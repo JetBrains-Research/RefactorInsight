@@ -1,7 +1,7 @@
 import com.intellij.util.Consumer;
 import git4idea.GitCommit;
 import git4idea.repo.GitRepository;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -53,42 +53,51 @@ public class CommitMiner implements Consumer<GitCommit> {
                 public void handle(String commitId, List<Refactoring> refactorings) {
                   System.out.println(commitId);
                   map.put(commitId,
-                      refactorings.stream().map(Refactoring::getName).collect(Collectors.toList()));
+                      refactorings.stream().map(Refactoring::getRefactoringType)
+                              .map(RefactoringType::toString).collect(Collectors.toList()));
 
                   //add methods refactoring types inside the methodsMap
                   List<MethodRefactoringData> refs = refactorings.stream()
                           .map(processor::process).filter(Objects::nonNull)
                           .collect(Collectors.toList());
+                  addMethodsRefactorings(methodsMap, refs);
 
-                  for (MethodRefactoringData ref : refs) {
-                    if (!ref.getType().equals(RefactoringType.RENAME_METHOD)) {
-                      if (methodsMap.get(ref.getMethodAfter().getName()) == null) {
-                        methodsMap.put(ref.getMethodAfter().getName(),
-                                Arrays.asList(ref.getType().toString()));
-                      } else {
-                        List<String> types = methodsMap.get(ref.getMethodAfter().getName());
-                        types.add(ref.getType().toString());
-                        methodsMap.put(ref.getMethodAfter().getName(), types);
-                      }
-                    } else {
-                      List<String> types =  methodsMap.get(ref.getMethodBefore().getName());
-                      methodsMap.remove(ref.getMethodBefore().getName());
-                      if (types != null) {
-                        types.add(ref.getType().toString());
-                        methodsMap.put(ref.getMethodAfter().getName(), types);
-                      } else {
-                        methodsMap.put(ref.getMethodAfter().getName(),
-                                Arrays.asList(ref.getType().toString()));
-                      }
-
-                    }
-                  }
                 }
               });
         } catch (Exception e) {
           e.printStackTrace();
         }
       });
+    }
+  }
+
+  public void addMethodsRefactorings(Map<String, List<String>> methodsMap, List<MethodRefactoringData> refs) {
+    for (MethodRefactoringData ref : refs) {
+      if (!ref.getType().equals(RefactoringType.RENAME_METHOD)) {
+        if (methodsMap.get(ref.getMethodAfter().getName()) == null) {
+          List<String> list = new ArrayList<>();
+          list.add(ref.getType().toString());
+          methodsMap.put(ref.getMethodAfter().getName(), list);
+        } else {
+          List<String> types = methodsMap.get(ref.getMethodAfter().getName());
+          types.add(ref.getType().toString());
+          methodsMap.put(ref.getMethodAfter().getName(), types);
+        }
+      } else {
+        List<String> types =  methodsMap.get(ref.getMethodBefore().getName());
+        System.out.println(ref.getMethodBefore().getName());
+        System.out.println(ref.getMethodAfter().getName());
+        System.out.println("\n");
+        if (types != null) {
+          types.add(ref.getType().toString());
+          methodsMap.put(ref.getMethodAfter().getName(), types);
+        } else {
+          List<String> list = new ArrayList<>();
+          list.add(ref.getType().toString());
+          methodsMap.put(ref.getMethodAfter().getName(), list);
+        }
+
+      }
     }
   }
 }
