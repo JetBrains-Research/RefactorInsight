@@ -25,8 +25,6 @@ import org.jetbrains.annotations.NotNull;
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
   private boolean loaded = false;
-  private boolean first = true;
-  private boolean mining = false;
   private MyState innerState = new MyState();
 
   public MiningService(Project project) {
@@ -51,36 +49,34 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    *
    * @param repository Git repository
    */
-  public void mineRepo(GitRepository repository) {
+  public void mineRepo(GitRepository repository,
+                       ConcurrentHashMap<String, List<String>> methodMap) {
     if (!loaded) {
       return;
     }
     ProgressManager.getInstance()
-        .run(new Task.Backgroundable(repository.getProject(), "Mining refactorings") {
-          public void run(@NotNull ProgressIndicator progressIndicator) {
-            mining = true;
-            progressIndicator.setText("Mining refactorings");
-            ExecutorService pool = Executors.newFixedThreadPool(8);
-            try {
-              GitHistoryUtils.loadDetails(repository.getProject(), repository.getRoot(),
-                  new CommitMiner(pool, innerState.map, repository),
-                  "--all");
+            .run(new Task.Backgroundable(repository.getProject(), "Mining refactorings") {
+              public void run(@NotNull ProgressIndicator progressIndicator) {
+                progressIndicator.setText("Mining refactorings");
+                ExecutorService pool = Executors.newFixedThreadPool(8);
+                try {
+                  GitHistoryUtils.loadDetails(repository.getProject(), repository.getRoot(),
+                          new CommitMiner(pool, innerState.map, methodMap, repository),
+                          "--all");
 
-            } catch (Exception exception) {
-              exception.printStackTrace();
-            } finally {
-              mining = false;
-            }
-            pool.shutdown();
-            try {
-              pool.awaitTermination(5, TimeUnit.MINUTES);
-            } catch (InterruptedException e) {
-              e.printStackTrace();
-            }
-            System.out.println("done");
-            progressIndicator.setText("Finished");
-          }
-        });
+                } catch (Exception exception) {
+                  exception.printStackTrace();
+                }
+                pool.shutdown();
+                try {
+                  pool.awaitTermination(5, TimeUnit.MINUTES);
+                } catch (InterruptedException e) {
+                  e.printStackTrace();
+                }
+                System.out.println("done");
+                progressIndicator.setText("Finished");
+              }
+            });
   }
 
   public List<String> getRefactorings(String commitHash) {
