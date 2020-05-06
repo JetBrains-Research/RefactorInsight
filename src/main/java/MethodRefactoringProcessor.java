@@ -146,7 +146,8 @@ public class MethodRefactoringProcessor {
 
     @Override
     public MethodRefactoringData apply(Refactoring refactoring) {
-      final ExtractAndMoveOperationRefactoring ref = (ExtractAndMoveOperationRefactoring) refactoring;
+      final ExtractAndMoveOperationRefactoring ref = (ExtractAndMoveOperationRefactoring)
+              refactoring;
       CodeRange before = ref.getSourceOperationBeforeExtraction().codeRange();
       CodeRange after = ref.getSourceOperationAfterExtraction().codeRange();
       return new MethodRefactoringData(RefactoringType.EXTRACT_AND_MOVE_OPERATION,

@@ -71,7 +71,14 @@ public class CommitMiner implements Consumer<GitCommit> {
     }
   }
 
-  public void addMethodsRefactorings(Map<String, List<String>> methodsMap, List<MethodRefactoringData> refs) {
+  /**
+   * Helper method for storing the refactorings for methods using the refactoring
+   * processor.
+   * @param methodsMap the service that stores the methods refactoring history.
+   * @param refs the refactorings to be stored.
+   */
+  public void addMethodsRefactorings(Map<String, List<String>> methodsMap,
+                                     List<MethodRefactoringData> refs) {
     for (MethodRefactoringData ref : refs) {
       if (!ref.getType().equals(RefactoringType.RENAME_METHOD)) {
         if (methodsMap.get(ref.getMethodAfter().getName()) == null) {
@@ -84,13 +91,10 @@ public class CommitMiner implements Consumer<GitCommit> {
           methodsMap.put(ref.getMethodAfter().getName(), types);
         }
       } else {
-        List<String> types =  methodsMap.get(ref.getMethodBefore().getName());
-        System.out.println(ref.getMethodBefore().getName());
-        System.out.println(ref.getMethodAfter().getName());
-        System.out.println("\n");
-        if (types != null) {
-          types.add(ref.getType().toString());
-          methodsMap.put(ref.getMethodAfter().getName(), types);
+        List<String> typesBefore =  methodsMap.get(ref.getMethodBefore().getName());
+        if (typesBefore != null) {
+          typesBefore.add(ref.getType().toString());
+          methodsMap.put(ref.getMethodAfter().getName(), typesBefore);
         } else {
           List<String> list = new ArrayList<>();
           list.add(ref.getType().toString());
