@@ -47,7 +47,7 @@ public class MethodHistory extends AnAction {
           System.out.println(signature);
 
           System.out.println(map.get(signature));
-          getToolWindow(project).show(map.get(signature));
+          getToolWindow(project).show(map.get(signature), signature);
         }
       }
     }
