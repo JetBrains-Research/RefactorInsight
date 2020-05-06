@@ -14,6 +14,12 @@ public class CommitMiner implements Consumer<GitCommit> {
   private GitRepository repository;
   private AtomicInteger commitsDone;
 
+    /**
+     * CommitMiner for mining a single commit.
+     * @param pool ThreadPool to submit to.
+     * @param map Map to add mined commit data to.
+     * @param repository GitRepository.
+     */
   public CommitMiner(Executor pool, Map<String, List<String>> map, GitRepository repository,
                      AtomicInteger commitsDone) {
     this.pool = pool;

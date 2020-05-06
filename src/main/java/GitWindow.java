@@ -26,6 +26,7 @@ public class GitWindow extends ToggleAction {
   private void setUp(@NotNull AnActionEvent e) {
     VcsLogChangesBrowser changesBrowser =
         (VcsLogChangesBrowser) e.getData(VcsLogChangesBrowser.DATA_KEY);
+    changesTree = changesBrowser.getViewer();
     MainVcsLogUi logUI = e.getData(VcsLogInternalDataKeys.MAIN_UI);
 
     Project currentProject = e.getProject();
@@ -35,7 +36,7 @@ public class GitWindow extends ToggleAction {
     table.getSelectionModel().addListSelectionListener(new CommitSelectionListener());
 
 
-    changesTree = changesBrowser.getViewer();
+
     viewport = (JBViewport) changesTree.getParent();
     test = new JBLabel("TEST LABEL");
     test.setVerticalAlignment(JBLabel.CENTER);
@@ -57,9 +58,9 @@ public class GitWindow extends ToggleAction {
 
   @Override
   public void setSelected(@NotNull AnActionEvent e, boolean state) {
-      if (changesTree == null) {
-          setUp(e);
-      }
+    if (changesTree == null) {
+      setUp(e);
+    }
     if (state) {
       toRefactoringView(e);
     } else {
@@ -78,9 +79,9 @@ public class GitWindow extends ToggleAction {
   class CommitSelectionListener implements ListSelectionListener {
     @Override
     public void valueChanged(ListSelectionEvent listSelectionEvent) {
-        if (listSelectionEvent.getValueIsAdjusting()) {
-            return;
-        }
+      if (listSelectionEvent.getValueIsAdjusting()) {
+        return;
+      }
       DefaultListSelectionModel selectionModel =
           (DefaultListSelectionModel) listSelectionEvent.getSource();
 
@@ -103,5 +104,12 @@ public class GitWindow extends ToggleAction {
       }
     }
   }
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        e.getPresentation().setVisible(true);
+        e.getProject().getService(MiningService.class).loaded();
+        super.update(e);
+    }
 
 }
