@@ -6,9 +6,10 @@ import org.jetbrains.annotations.NotNull;
 
 public class RefactoringAction extends AnAction {
 
-    @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        GitRepository repository = GitRepositoryManager.getInstance(e.getProject()).getRepositories().get(0);
-        e.getProject().getService(MiningService.class).mineRepo(repository);
-    }
+  @Override
+  public void actionPerformed(@NotNull AnActionEvent e) {
+    GitRepository repository =
+        GitRepositoryManager.getInstance(e.getProject()).getRepositories().get(0);
+    e.getProject().getService(MiningService.class).mineRepo(repository);
+  }
 }
