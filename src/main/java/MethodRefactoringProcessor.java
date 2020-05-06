@@ -9,15 +9,16 @@ import gr.uom.java.xmi.diff.PushDownOperationRefactoring;
 import gr.uom.java.xmi.diff.RenameOperationRefactoring;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
 
 public class MethodRefactoringProcessor {
 
   private final String projectPath;
-  private final Map<RefactoringType, Function<Refactoring, MethodRefactoringData>> handlers =
-      new HashMap<RefactoringType, Function<Refactoring, MethodRefactoringData>>() {{
+  private final Map<RefactoringType, BiFunction<Refactoring,
+          Long, MethodRefactoringData>> handlers =
+      new HashMap<RefactoringType, BiFunction<Refactoring, Long, MethodRefactoringData>>() {{
       put(RefactoringType.RENAME_METHOD, new RenameMethodRefactoringHandler());
       put(RefactoringType.MOVE_OPERATION, new MoveRefactoringHandler());
       put(RefactoringType.PULL_UP_OPERATION, new PullUpRefactoringHandler());
@@ -55,15 +56,15 @@ public class MethodRefactoringProcessor {
     return builder.toString();
   }
 
-  public MethodRefactoringData process(Refactoring refactoring) {
+  public MethodRefactoringData process(Refactoring refactoring, Long timeOfCommit) {
     return handlers.getOrDefault(refactoring.getRefactoringType(),
-      x -> null).apply(refactoring);
+      (x, y) -> null).apply(refactoring, timeOfCommit);
   }
 
   private class MoveRefactoringHandler
-          implements Function<Refactoring, MethodRefactoringData> {
+          implements BiFunction<Refactoring, Long, MethodRefactoringData> {
     @Override
-    public MethodRefactoringData apply(Refactoring refactoring) {
+    public MethodRefactoringData apply(Refactoring refactoring, Long timeOfCommit) {
       final MoveOperationRefactoring ref = (MoveOperationRefactoring) refactoring;
       final CodeRange before = ref.getSourceOperationCodeRangeBeforeMove();
       final CodeRange after = ref.getTargetOperationCodeRangeAfterMove();
@@ -71,15 +72,15 @@ public class MethodRefactoringProcessor {
               new MethodData(calculateSignature(ref.getOriginalOperation()),
                       before.getStartLine(), before.getEndLine()),
               new MethodData(calculateSignature(ref.getMovedOperation()),
-                      after.getStartLine(), before.getEndLine()));
+                      after.getStartLine(), before.getEndLine()), timeOfCommit);
     }
   }
 
   private class PullUpRefactoringHandler
-          implements Function<Refactoring, MethodRefactoringData> {
+          implements BiFunction<Refactoring, Long, MethodRefactoringData> {
 
     @Override
-    public MethodRefactoringData apply(Refactoring refactoring) {
+    public MethodRefactoringData apply(Refactoring refactoring, Long timeOfCommit) {
       final PullUpOperationRefactoring ref = (PullUpOperationRefactoring) refactoring;
       final CodeRange before = ref.getSourceOperationCodeRangeBeforeMove();
       final CodeRange after = ref.getTargetOperationCodeRangeAfterMove();
@@ -87,15 +88,15 @@ public class MethodRefactoringProcessor {
               new MethodData(calculateSignature(ref.getOriginalOperation()),
                       before.getStartLine(), before.getEndLine()),
               new MethodData(calculateSignature(ref.getMovedOperation()),
-                      after.getStartLine(), before.getEndLine()));
+                      after.getStartLine(), before.getEndLine()), timeOfCommit);
     }
   }
 
   private class PushDownRefactoringHandler
-          implements Function<Refactoring, MethodRefactoringData> {
+          implements BiFunction<Refactoring, Long, MethodRefactoringData> {
 
     @Override
-    public MethodRefactoringData apply(Refactoring refactoring) {
+    public MethodRefactoringData apply(Refactoring refactoring, Long timeOfCommit) {
       final PushDownOperationRefactoring ref = (PushDownOperationRefactoring) refactoring;
       final CodeRange before = ref.getSourceOperationCodeRangeBeforeMove();
       final CodeRange after = ref.getTargetOperationCodeRangeAfterMove();
@@ -103,15 +104,15 @@ public class MethodRefactoringProcessor {
               new MethodData(calculateSignature(ref.getOriginalOperation()),
                       before.getStartLine(), before.getEndLine()),
               new MethodData(calculateSignature(ref.getMovedOperation()),
-                      after.getStartLine(), before.getEndLine()));
+                      after.getStartLine(), before.getEndLine()), timeOfCommit);
     }
   }
 
   private class RenameMethodRefactoringHandler
-          implements Function<Refactoring, MethodRefactoringData> {
+          implements BiFunction<Refactoring, Long, MethodRefactoringData> {
 
     @Override
-    public MethodRefactoringData apply(Refactoring refactoring) {
+    public MethodRefactoringData apply(Refactoring refactoring, Long timeOfCommit) {
       final RenameOperationRefactoring ref = (RenameOperationRefactoring) refactoring;
       final int startLineBefore = ref.getSourceOperationCodeRangeBeforeRename().getStartLine();
       final int endLineBefore = ref.getSourceOperationCodeRangeBeforeRename().getEndLine();
@@ -121,15 +122,15 @@ public class MethodRefactoringProcessor {
               new MethodData(calculateSignature(ref.getOriginalOperation()),
                       startLineBefore, endLineBefore),
               new MethodData(calculateSignature(ref.getRenamedOperation()),
-                      startLine, endLine));
+                      startLine, endLine), timeOfCommit);
     }
   }
 
   private class ExtractRefactoringHandler
-          implements Function<Refactoring, MethodRefactoringData> {
+          implements BiFunction<Refactoring, Long, MethodRefactoringData> {
 
     @Override
-    public MethodRefactoringData apply(Refactoring refactoring) {
+    public MethodRefactoringData apply(Refactoring refactoring, Long timeOfCommit) {
       final ExtractOperationRefactoring ref = (ExtractOperationRefactoring) refactoring;
       CodeRange before = ref.getSourceOperationCodeRangeBeforeExtraction();
       CodeRange after  = ref.getSourceOperationCodeRangeAfterExtraction();
@@ -137,15 +138,15 @@ public class MethodRefactoringProcessor {
               new MethodData(calculateSignature(ref.getSourceOperationBeforeExtraction()),
                       before.getStartLine(), before.getEndLine()),
               new MethodData(calculateSignature(ref.getSourceOperationAfterExtraction()),
-                      after.getStartLine(), after.getEndLine()));
+                      after.getStartLine(), after.getEndLine()), timeOfCommit);
     }
   }
 
   private class ExtractAndMoveRefactoringHandler
-          implements Function<Refactoring, MethodRefactoringData> {
+          implements BiFunction<Refactoring, Long, MethodRefactoringData> {
 
     @Override
-    public MethodRefactoringData apply(Refactoring refactoring) {
+    public MethodRefactoringData apply(Refactoring refactoring, Long timeOfCommit) {
       final ExtractAndMoveOperationRefactoring ref = (ExtractAndMoveOperationRefactoring)
               refactoring;
       CodeRange before = ref.getSourceOperationBeforeExtraction().codeRange();
@@ -154,15 +155,15 @@ public class MethodRefactoringProcessor {
               new MethodData(calculateSignature(ref.getSourceOperationBeforeExtraction()),
                       before.getStartLine(), before.getEndLine()),
               new MethodData(calculateSignature(ref.getSourceOperationAfterExtraction()),
-                      after.getStartLine(), after.getEndLine()));
+                      after.getStartLine(), after.getEndLine()), timeOfCommit);
     }
   }
 
   private class InLineRefactoringHandler
-          implements Function<Refactoring, MethodRefactoringData> {
+          implements BiFunction<Refactoring, Long, MethodRefactoringData> {
 
     @Override
-    public MethodRefactoringData apply(Refactoring refactoring) {
+    public MethodRefactoringData apply(Refactoring refactoring, Long timeOfCommit) {
       final InlineOperationRefactoring ref = (InlineOperationRefactoring) refactoring;
       CodeRange before = ref.getTargetOperationBeforeInline().codeRange();
       CodeRange after = ref.getTargetOperationAfterInline().codeRange();
@@ -170,7 +171,7 @@ public class MethodRefactoringProcessor {
               new MethodData(calculateSignature(ref.getTargetOperationBeforeInline()),
                       before.getStartLine(), before.getEndLine()),
               new MethodData(calculateSignature(ref.getTargetOperationAfterInline()),
-                      after.getStartLine(), after.getEndLine()));
+                      after.getStartLine(), after.getEndLine()), timeOfCommit);
     }
   }
 

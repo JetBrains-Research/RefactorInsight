@@ -5,6 +5,7 @@ public class MethodRefactoringData {
   private RefactoringType type;
   private MethodData methodBefore;
   private MethodData methodAfter;
+  private long timeOfCommit;
 
   /**
    * Constructor for the methods refactoring class.
@@ -13,10 +14,11 @@ public class MethodRefactoringData {
    * @param methodAfter method after the refactoring.
    */
   public MethodRefactoringData(RefactoringType type,
-                               MethodData methodBefore, MethodData methodAfter) {
+                               MethodData methodBefore, MethodData methodAfter, long timeOfCommit) {
     this.type = type;
     this.methodBefore = methodBefore;
     this.methodAfter = methodAfter;
+    this.timeOfCommit = timeOfCommit;
   }
 
   public MethodData getMethodAfter() {
@@ -29,5 +31,9 @@ public class MethodRefactoringData {
 
   public RefactoringType getType() {
     return type;
+  }
+
+  public long getTimeOfCommit() {
+    return timeOfCommit;
   }
 }

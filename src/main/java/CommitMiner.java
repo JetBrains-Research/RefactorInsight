@@ -22,6 +22,7 @@ public class CommitMiner implements Consumer<GitCommit> {
   private Map<String, List<String>> methodsMap;
   private GitRepository repository;
   private MethodRefactoringProcessor processor;
+  public List<MethodRefactoringData> renameOperations;
 
   /**
    * CommitMiner for mining a single commit.
@@ -37,6 +38,7 @@ public class CommitMiner implements Consumer<GitCommit> {
     this.methodsMap = methodsMap;
     this.repository = repository;
     this.processor = new MethodRefactoringProcessor(repository.getProject().getBasePath());
+    this.renameOperations = new ArrayList<>();
   }
 
   @Override
@@ -58,7 +60,8 @@ public class CommitMiner implements Consumer<GitCommit> {
 
                   //add methods refactoring types inside the methodsMap
                   List<MethodRefactoringData> refs = refactorings.stream()
-                          .map(processor::process).filter(Objects::nonNull)
+                          .map(x -> processor.process(x, gitCommit.getCommitTime()))
+                          .filter(Objects::nonNull)
                           .collect(Collectors.toList());
                   addMethodsRefactorings(methodsMap, refs);
 
@@ -77,7 +80,7 @@ public class CommitMiner implements Consumer<GitCommit> {
    * @param methodsMap the service that stores the methods refactoring history.
    * @param refs the refactorings to be stored.
    */
-  public void addMethodsRefactorings(Map<String, List<String>> methodsMap,
+  private void addMethodsRefactorings(Map<String, List<String>> methodsMap,
                                      List<MethodRefactoringData> refs) {
     for (MethodRefactoringData ref : refs) {
       if (!ref.getType().equals(RefactoringType.RENAME_METHOD)) {
@@ -91,16 +94,7 @@ public class CommitMiner implements Consumer<GitCommit> {
           methodsMap.put(ref.getMethodAfter().getName(), types);
         }
       } else {
-        List<String> typesBefore =  methodsMap.get(ref.getMethodBefore().getName());
-        if (typesBefore != null) {
-          typesBefore.add(ref.getType().toString());
-          methodsMap.put(ref.getMethodAfter().getName(), typesBefore);
-        } else {
-          List<String> list = new ArrayList<>();
-          list.add(ref.getType().toString());
-          methodsMap.put(ref.getMethodAfter().getName(), list);
-        }
-
+        renameOperations.add(ref);
       }
     }
   }
