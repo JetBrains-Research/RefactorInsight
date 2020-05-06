@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 public class MethodHistory extends AnAction {
 
   ConcurrentHashMap<String, List<String>> map;
-  MethodRefactoringToolWindow toolWindow;
+  MethodRefactoringPopup methodRefactoringPopup;
 
   /**
    * Implement this method to provide your action handler.
@@ -47,7 +47,7 @@ public class MethodHistory extends AnAction {
           System.out.println(signature);
 
           System.out.println(map.get(signature));
-          getToolWindow(project).show(map.get(signature), signature);
+          getToolWindow(project).show(map.get(signature), signature, dataContext);
         }
       }
     }
@@ -65,11 +65,11 @@ public class MethodHistory extends AnAction {
    * @param project the current project.
    * @return a new method refactorings tool window.
    */
-  public MethodRefactoringToolWindow getToolWindow(Project project) {
-    if (toolWindow == null) {
-      toolWindow =  new MethodRefactoringToolWindow(project);
+  public MethodRefactoringPopup getToolWindow(Project project) {
+    if (methodRefactoringPopup == null) {
+      methodRefactoringPopup =  new MethodRefactoringPopup(project);
     }
-    return toolWindow;
+    return methodRefactoringPopup;
 
   }
 
