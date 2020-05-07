@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBViewport;
-import com.intellij.vcs.log.Hash;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
@@ -31,6 +30,8 @@ public class GitWindow extends ToggleAction {
     private void setUp(@NotNull AnActionEvent e) {
         VcsLogChangesBrowser changesBrowser = (VcsLogChangesBrowser) e.getData(VcsLogChangesBrowser.DATA_KEY);
         MainVcsLogUi logUI = e.getData(VcsLogInternalDataKeys.MAIN_UI);
+
+        project = e.getProject();
 
         Project currentProject = e.getProject();
         StoringService storingService = currentProject.getService(StoringService.class);
@@ -79,11 +80,13 @@ public class GitWindow extends ToggleAction {
 
             int beginIndex = selectionModel.getMinSelectionIndex();
             int endIndex = selectionModel.getMaxSelectionIndex();
-            if(new SampleDialogWrapper(project).showAndGet()) {
-                System.out.println("Hello");
-            }
 
             if (beginIndex != -1 || endIndex != -1) {
+                /////////////////////// Diff window:
+                if(new SampleDialogWrapper(project, null, null).showAndGet()) {
+                    System.out.println("Hello");
+                }
+                //////////////////////
                 StringBuilder builder  = new StringBuilder();
                 builder.append("<html>");
                 for(int index = beginIndex; index <= endIndex; index++) {
