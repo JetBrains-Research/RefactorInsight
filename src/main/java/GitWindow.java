@@ -83,9 +83,9 @@ public class GitWindow extends ToggleAction {
 
             if (beginIndex != -1 || endIndex != -1) {
                 /////////////////////// Diff window:
-                if(new SampleDialogWrapper(project, null, null).showAndGet()) {
-                    System.out.println("Hello");
-                }
+//                if(new SampleDialogWrapper(project, null, null).showAndGet()) {
+//                    System.out.println("Hello");
+//                }
                 //////////////////////
                 StringBuilder builder  = new StringBuilder();
                 builder.append("<html>");

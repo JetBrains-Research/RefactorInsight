@@ -28,7 +28,7 @@ public class SampleDialogWrapper extends DialogWrapper {
     public SampleDialogWrapper(Project project, PsiElement before, PsiElement after) {
         super(true); // use current window as parent
         this.project = project;
-        final File file = new File("/home/matei/IdeaProjects/template/src/main/java/calculators/FoodCalculator.java");
+        final File file = new File("/Users/dan/method_statistics/src/main/java/core/markdownStats/LinkSummary.java");
         virtualFile = LocalFileSystem.getInstance().findFileByIoFile(file);
         this.before = PsiManager.getInstance(project).findFile(virtualFile);
         this.after = PsiManager.getInstance(project).findFile(virtualFile);
@@ -39,9 +39,6 @@ public class SampleDialogWrapper extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-
-        //final PsiFile[] psiFile = FilenameIndex.getFilesByName(project, "/home/matei/IdeaProjects/template/src/main/java/calculators/FoodCalculator.java", GlobalSearchScope.allScope(project));
-
 
         DiffContentFactory contentFactory = DiffContentFactory.getInstance();
         DocumentContent oldContent = contentFactory.create("Before Refactoring" + before.getText(), virtualFile);
