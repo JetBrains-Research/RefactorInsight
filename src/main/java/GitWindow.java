@@ -24,11 +24,15 @@ public class GitWindow extends ToggleAction {
     private VcsLogGraphTable table;
     private JBLabel test;
     private MiningService miningService;
+    private Project project;
+    private Map<String, List<String>> map;
 
 
     private void setUp(@NotNull AnActionEvent e) {
         VcsLogChangesBrowser changesBrowser = (VcsLogChangesBrowser) e.getData(VcsLogChangesBrowser.DATA_KEY);
         MainVcsLogUi logUI = e.getData(VcsLogInternalDataKeys.MAIN_UI);
+
+        project = e.getProject();
 
         Project currentProject = e.getProject();
         miningService = currentProject.getService(MiningService.class);
@@ -78,6 +82,11 @@ public class GitWindow extends ToggleAction {
             int endIndex = selectionModel.getMaxSelectionIndex();
 
             if (beginIndex != -1 || endIndex != -1) {
+                /////////////////////// Diff window:
+                if(new SampleDialogWrapper(project, null, null).showAndGet()) {
+                    System.out.println("Hello");
+                }
+                //////////////////////
                 StringBuilder builder  = new StringBuilder();
                 builder.append("<html>");
                 for(int index = beginIndex; index <= endIndex; index++) {
