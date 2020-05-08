@@ -26,7 +26,7 @@ build:
 
 checkStyle:
   stage: validate
-  script: gradle checkstyleMain checkstyleTest
+  script: gradle checkstyleMain
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
