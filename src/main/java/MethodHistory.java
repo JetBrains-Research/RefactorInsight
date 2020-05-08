@@ -7,9 +7,9 @@ import com.intellij.psi.PsiTypeParameter;
 import com.intellij.usages.PsiElementUsageTarget;
 import com.intellij.usages.UsageTarget;
 import com.intellij.usages.UsageView;
+import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import org.jetbrains.annotations.NotNull;
 
 
 public class MethodHistory extends AnAction {
@@ -47,7 +47,7 @@ public class MethodHistory extends AnAction {
           System.out.println(signature);
 
           System.out.println(map.get(signature));
-          getToolWindow(project).show(map.get(signature), signature, dataContext);
+          getToolWindow(project).show(map.get(signature), signature, dataContext, e);
         }
       }
     }

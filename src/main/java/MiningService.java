@@ -1,3 +1,4 @@
+import com.google.gson.Gson;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.ServiceManager;
@@ -56,7 +57,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     if (!loaded) {
       return;
     }
-    List<MethodRefactoringData> renameOperations = new ArrayList<>();
+    List<MethodRefactoring> renameOperations = new ArrayList<>();
     ProgressManager.getInstance()
             .run(new Task.Backgroundable(repository.getProject(), "Mining refactorings") {
               public void run(@NotNull ProgressIndicator progressIndicator) {
@@ -83,28 +84,34 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             });
   }
 
-  private void processRenameOperations(List<MethodRefactoringData> renameOperations,
-                                       Map<String, List<String>> methodsMap) {
+  private void processRenameOperations(List<MethodRefactoring> renameOperations,
+                                       ConcurrentHashMap<String, List<String>> methodsMap) {
 
-    renameOperations.sort(new Comparator<MethodRefactoringData>() {
+    renameOperations.sort(new Comparator<>() {
       @Override
-      public int compare(MethodRefactoringData o1, MethodRefactoringData o2) {
-        return Long.compare(o1.getTimeOfCommit(), o2.getTimeOfCommit());
+      public int compare(MethodRefactoring o1, MethodRefactoring o2) {
+        return Long.compare(o1.getData().getTimeOfCommit(), o2.getData().getTimeOfCommit());
       }
     });
 
-    for (MethodRefactoringData ref :renameOperations) {
+    for (MethodRefactoring ref :renameOperations) {
+      System.out.println(ref.getData().getMethodBefore().getName());
+      System.out.println(ref.getData().getMethodAfter().getName());
+      System.out.println("\n");
       //get the refactorings before renaming and add into them the new RENAME operation refactoring
-      List<String> typesBefore =  methodsMap.getOrDefault(ref.getMethodBefore().getName(), null);
-      if (typesBefore != null) {
-        typesBefore.add(ref.getType().toString());
-        methodsMap.put(ref.getMethodAfter().getName(), typesBefore);
+      List<String> refsBefore =  methodsMap.getOrDefault(ref.getData()
+              .getMethodBefore().getName(), null);
+      if (refsBefore != null) {
+        Gson gson = new Gson();
+        refsBefore.add(gson.toJson(ref));
+        methodsMap.put(ref.getData().getMethodAfter().getName(), refsBefore);
         //remove the refactorings for the old method's name since it does not exist anymore
-        methodsMap.remove(ref.getMethodBefore().getName());
+        //methodsMap.remove(ref.getData().getMethodBefore().getName());
       } else {
+        Gson gson = new Gson();
         List<String> list = new ArrayList<>();
-        list.add(ref.getType().toString());
-        methodsMap.put(ref.getMethodAfter().getName(), list);
+        list.add(gson.toJson(ref));
+        methodsMap.put(ref.getData().getMethodAfter().getName(), list);
       }
     }
   }

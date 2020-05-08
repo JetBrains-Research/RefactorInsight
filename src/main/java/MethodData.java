@@ -1,4 +1,6 @@
-public class MethodData {
+import java.io.Serializable;
+
+public class MethodData implements Serializable {
 
   private String name;
   private int startOffset;

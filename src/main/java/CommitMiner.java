@@ -1,3 +1,4 @@
+import com.google.gson.Gson;
 import com.intellij.util.Consumer;
 import git4idea.GitCommit;
 import git4idea.repo.GitRepository;
@@ -22,7 +23,7 @@ public class CommitMiner implements Consumer<GitCommit> {
   private Map<String, List<String>> methodsMap;
   private GitRepository repository;
   private MethodRefactoringProcessor processor;
-  public List<MethodRefactoringData> renameOperations;
+  public List<MethodRefactoring> renameOperations;
 
   /**
    * CommitMiner for mining a single commit.
@@ -38,7 +39,7 @@ public class CommitMiner implements Consumer<GitCommit> {
     this.methodsMap = methodsMap;
     this.repository = repository;
     this.processor = new MethodRefactoringProcessor(repository.getProject().getBasePath());
-    this.renameOperations = new ArrayList<>();
+    this.renameOperations = new ArrayList<MethodRefactoring>();
   }
 
   @Override
@@ -59,9 +60,11 @@ public class CommitMiner implements Consumer<GitCommit> {
                               .map(RefactoringType::toString).collect(Collectors.toList()));
 
                   //add methods refactoring types inside the methodsMap
-                  List<MethodRefactoringData> refs = refactorings.stream()
+                  List<MethodRefactoring> refs = refactorings.stream()
                           .map(x -> processor.process(x, gitCommit.getCommitTime()))
-                          .filter(Objects::nonNull)
+                          .filter(Objects::nonNull).map(x -> new MethodRefactoring(x,
+                                  gitCommit.getId().asString(),
+                                  gitCommit.getRoot().getUrl()))
                           .collect(Collectors.toList());
                   addMethodsRefactorings(methodsMap, refs);
 
@@ -81,17 +84,19 @@ public class CommitMiner implements Consumer<GitCommit> {
    * @param refs the refactorings to be stored.
    */
   private void addMethodsRefactorings(Map<String, List<String>> methodsMap,
-                                     List<MethodRefactoringData> refs) {
-    for (MethodRefactoringData ref : refs) {
-      if (!ref.getType().equals(RefactoringType.RENAME_METHOD)) {
-        if (methodsMap.get(ref.getMethodAfter().getName()) == null) {
+                                      List<MethodRefactoring> refs) {
+    for (MethodRefactoring ref : refs) {
+      if (!ref.getData().getType().equals(RefactoringType.RENAME_METHOD)) {
+        if (methodsMap.get(ref.getData().getMethodAfter().getName()) == null) {
           List<String> list = new ArrayList<>();
-          list.add(ref.getType().toString());
-          methodsMap.put(ref.getMethodAfter().getName(), list);
+          Gson gson = new Gson();
+          list.add(gson.toJson(ref));
+          methodsMap.put(ref.getData().getMethodAfter().getName(), list);
         } else {
-          List<String> types = methodsMap.get(ref.getMethodAfter().getName());
-          types.add(ref.getType().toString());
-          methodsMap.put(ref.getMethodAfter().getName(), types);
+          List<String> types = methodsMap.get(ref.getData().getMethodAfter().getName());
+          Gson gson = new Gson();
+          types.add(gson.toJson(ref));
+          methodsMap.put(ref.getData().getMethodAfter().getName(), types);
         }
       } else {
         renameOperations.add(ref);

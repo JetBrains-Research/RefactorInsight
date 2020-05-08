@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import org.refactoringminer.api.RefactoringType;
 
-public class MethodRefactoringData {
+public class MethodRefactoringData implements Serializable {
 
   private RefactoringType type;
   private MethodData methodBefore;
@@ -36,4 +37,5 @@ public class MethodRefactoringData {
   public long getTimeOfCommit() {
     return timeOfCommit;
   }
+
 }
