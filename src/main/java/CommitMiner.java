@@ -20,8 +20,9 @@ public class CommitMiner implements Consumer<GitCommit> {
 
   /**
    * CommitMiner for mining a single commit.
-   * @param pool ThreadPool to submit to.
-   * @param map Map to add mined commit data to.
+   *
+   * @param pool       ThreadPool to submit to.
+   * @param map        Map to add mined commit data to.
    * @param repository GitRepository.
    */
   public CommitMiner(Executor pool, Map<String, List<String>> map, GitRepository repository) {
@@ -30,25 +31,27 @@ public class CommitMiner implements Consumer<GitCommit> {
     this.repository = repository;
   }
 
-    @Override
-    public void consume(GitCommit gitCommit) {
-        String commitId = gitCommit.getId().asString();
-        if (!map.containsKey(commitId)) {
-            pool.execute(() -> {
-                GitService gitService = new GitServiceImpl();
-                GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
-                try {
-                    miner.detectAtCommit(gitService.openRepository(repository.getProject().getBasePath()), commitId, new RefactoringHandler() {
-                        @Override
-                        public void handle(String commitId, List<Refactoring> refactorings) {
-                            System.out.println(commitId);
-                            map.put(commitId, refactorings.stream().map(RefactoringInfo::convert).collect(Collectors.toList()));
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
+  @Override
+  public void consume(GitCommit gitCommit) {
+    String commitId = gitCommit.getId().asString();
+    if (!map.containsKey(commitId)) {
+      pool.execute(() -> {
+        GitService gitService = new GitServiceImpl();
+        GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
+        try {
+          miner.detectAtCommit(gitService.openRepository(repository.getProject().getBasePath()),
+              commitId, new RefactoringHandler() {
+                @Override
+                public void handle(String commitId, List<Refactoring> refactorings) {
+                  System.out.println(commitId);
+                  map.put(commitId, refactorings.stream().map(RefactoringInfo::convert)
+                      .collect(Collectors.toList()));
                 }
               });
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      });
     }
   }
 }
