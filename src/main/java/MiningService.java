@@ -95,9 +95,6 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     });
 
     for (MethodRefactoring ref :renameOperations) {
-      System.out.println(ref.getData().getMethodBefore().getName());
-      System.out.println(ref.getData().getMethodAfter().getName());
-      System.out.println("\n");
       //get the refactorings before renaming and add into them the new RENAME operation refactoring
       List<String> refsBefore =  methodsMap.getOrDefault(ref.getData()
               .getMethodBefore().getName(), null);

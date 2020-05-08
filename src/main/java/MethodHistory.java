@@ -7,10 +7,9 @@ import com.intellij.psi.PsiTypeParameter;
 import com.intellij.usages.PsiElementUsageTarget;
 import com.intellij.usages.UsageTarget;
 import com.intellij.usages.UsageView;
-import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-
+import org.jetbrains.annotations.NotNull;
 
 public class MethodHistory extends AnAction {
 
