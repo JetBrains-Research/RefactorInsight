@@ -84,7 +84,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     }
 
     public List<String> getRefactorings(String commitHash) {
-        return innerState.map.getOrDefault(commitHash, Arrays.asList("Commit not mined"));
+        return innerState.map.getOrDefault(commitHash, Arrays.asList(""));
     }
 
     public void loaded() {

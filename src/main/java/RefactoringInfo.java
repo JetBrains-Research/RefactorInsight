@@ -9,15 +9,21 @@ import java.util.List;
 public class RefactoringInfo {
 
     private String text;
+    private String name;
     private RefactoringType type;
     private List<CodeRange> leftSide;
     private List<CodeRange> rightSide;
 
     public RefactoringInfo(Refactoring refactoring) {
+        name = refactoring.getName();
         type = refactoring.getRefactoringType();
         text = refactoring.toString();
         leftSide = refactoring.leftSide();
         rightSide = refactoring.rightSide();
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getText() {
@@ -40,8 +46,25 @@ public class RefactoringInfo {
     public String toString() {
         return new Gson().toJson(this);
     }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public RefactoringInfo() {
+    }
+
     public static RefactoringInfo fromString(String value){
-        return new Gson().fromJson(value, RefactoringInfo.class);
+        if(value == null || value.equals(""))
+            return null;
+        try {
+            return new Gson().fromJson(value, RefactoringInfo.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            RefactoringInfo ri = new RefactoringInfo();
+            ri.setText("wtf: " + value);
+            return ri;
+        }
     }
 
     public static String convert(Refactoring refactoring) {
