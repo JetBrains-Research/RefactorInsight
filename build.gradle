@@ -29,7 +29,13 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
-    implementation files('lib/RefactoringMiner.jar')
+    implementation files('lib/RefactoringMiner-1.0.jar')
+    compile 'org.eclipse.jgit:org.eclipse.jgit:5.2.1.201812262042-r'
+    compile 'org.slf4j:slf4j-log4j12:1.7.7'
+    compile 'org.eclipse.jdt:org.eclipse.jdt.core:3.16.0'
+    compile 'org.apache.commons:commons-text:1.6'
+    compile 'org.kohsuke:github-api:1.95'
+
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
 }

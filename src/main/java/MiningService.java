@@ -59,29 +59,29 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     }
     List<MethodRefactoring> renameOperations = new ArrayList<>();
     ProgressManager.getInstance()
-            .run(new Task.Backgroundable(repository.getProject(), "Mining refactorings") {
-              public void run(@NotNull ProgressIndicator progressIndicator) {
-                progressIndicator.setText("Mining refactorings");
-                ExecutorService pool = Executors.newFixedThreadPool(8);
-                CommitMiner miner =  new CommitMiner(pool, innerState.map, methodMap, repository);
-                try {
-                  GitHistoryUtils.loadDetails(repository.getProject(), repository.getRoot(),
-                          miner, "--all");
-                } catch (Exception exception) {
-                  exception.printStackTrace();
-                }
-                pool.shutdown();
-                try {
-                  pool.awaitTermination(5, TimeUnit.MINUTES);
-                } catch (InterruptedException e) {
-                  e.printStackTrace();
-                }
-                renameOperations.addAll(miner.renameOperations);
-                processRenameOperations(renameOperations, methodMap);
-                System.out.println("done");
-                progressIndicator.setText("Finished");
-              }
-            });
+        .run(new Task.Backgroundable(repository.getProject(), "Mining refactorings") {
+          public void run(@NotNull ProgressIndicator progressIndicator) {
+            progressIndicator.setText("Mining refactorings");
+            ExecutorService pool = Executors.newFixedThreadPool(8);
+            CommitMiner miner = new CommitMiner(pool, innerState.map, methodMap, repository);
+            try {
+              GitHistoryUtils.loadDetails(repository.getProject(), repository.getRoot(),
+                  miner, "--all");
+            } catch (Exception exception) {
+              exception.printStackTrace();
+            }
+            pool.shutdown();
+            try {
+              pool.awaitTermination(5, TimeUnit.MINUTES);
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
+            renameOperations.addAll(miner.renameOperations);
+            processRenameOperations(renameOperations, methodMap);
+            System.out.println("done");
+            progressIndicator.setText("Finished");
+          }
+        });
   }
 
   private void processRenameOperations(List<MethodRefactoring> renameOperations,
@@ -94,22 +94,15 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
       }
     });
 
-    for (MethodRefactoring ref :renameOperations) {
+    for (MethodRefactoring ref : renameOperations) {
       //get the refactorings before renaming and add into them the new RENAME operation refactoring
-      List<String> refsBefore =  methodsMap.getOrDefault(ref.getData()
-              .getMethodBefore().getName(), null);
-      if (refsBefore != null) {
-        Gson gson = new Gson();
-        refsBefore.add(gson.toJson(ref));
-        methodsMap.put(ref.getData().getMethodAfter().getName(), refsBefore);
-        //remove the refactorings for the old method's name since it does not exist anymore
-        //methodsMap.remove(ref.getData().getMethodBefore().getName());
-      } else {
-        Gson gson = new Gson();
-        List<String> list = new ArrayList<>();
-        list.add(gson.toJson(ref));
-        methodsMap.put(ref.getData().getMethodAfter().getName(), list);
-      }
+      List<String> refsBefore = new ArrayList<>();
+      refsBefore
+          .addAll(methodsMap.getOrDefault(ref.getData().getMethodBefore(), new ArrayList<>()));
+
+      Gson gson = new Gson();
+      refsBefore.add(gson.toJson(ref));
+      methodsMap.put(ref.getData().getMethodAfter(), refsBefore);
     }
   }
 

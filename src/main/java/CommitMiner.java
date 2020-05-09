@@ -18,17 +18,18 @@ import org.refactoringminer.util.GitServiceImpl;
 
 public class CommitMiner implements Consumer<GitCommit> {
 
+  public List<MethodRefactoring> renameOperations;
   private Executor pool;
   private Map<String, List<String>> map;
   private Map<String, List<String>> methodsMap;
   private GitRepository repository;
   private MethodRefactoringProcessor processor;
-  public List<MethodRefactoring> renameOperations;
 
   /**
    * CommitMiner for mining a single commit.
-   * @param pool ThreadPool to submit to.
-   * @param map Map to add mined commit data to.
+   *
+   * @param pool       ThreadPool to submit to.
+   * @param map        Map to add mined commit data to.
    * @param repository GitRepository.
    */
   public CommitMiner(Executor pool, Map<String, List<String>> map,
@@ -51,21 +52,19 @@ public class CommitMiner implements Consumer<GitCommit> {
         GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
         try {
           miner.detectAtCommit(gitService.openRepository(repository.getProject().getBasePath()),
-              null, commitId, new RefactoringHandler() {
+              commitId, new RefactoringHandler() {
                 @Override
                 public void handle(String commitId, List<Refactoring> refactorings) {
                   System.out.println(commitId);
                   map.put(commitId,
-                      refactorings.stream().map(Refactoring::getRefactoringType)
-                              .map(RefactoringType::toString).collect(Collectors.toList()));
+                      refactorings.stream().map(Refactoring::getName).collect(Collectors.toList()));
 
                   //add methods refactoring types inside the methodsMap
                   List<MethodRefactoring> refs = refactorings.stream()
-                          .map(x -> processor.process(x, gitCommit.getCommitTime()))
-                          .filter(Objects::nonNull).map(x -> new MethodRefactoring(x,
-                                  gitCommit.getId().asString(),
-                                  gitCommit.getRoot().getUrl()))
-                          .collect(Collectors.toList());
+                      .map(x -> processor.process(x, gitCommit.getCommitTime()))
+                      .filter(Objects::nonNull)
+                      .map(x -> new MethodRefactoring(x, gitCommit.getId().asString()))
+                      .collect(Collectors.toList());
                   addMethodsRefactorings(methodsMap, refs);
 
                 }
@@ -80,24 +79,20 @@ public class CommitMiner implements Consumer<GitCommit> {
   /**
    * Helper method for storing the refactorings for methods using the refactoring
    * processor.
+   *
    * @param methodsMap the service that stores the methods refactoring history.
-   * @param refs the refactorings to be stored.
+   * @param refs       the refactorings to be stored.
    */
   private void addMethodsRefactorings(Map<String, List<String>> methodsMap,
                                       List<MethodRefactoring> refs) {
     for (MethodRefactoring ref : refs) {
-      if (!ref.getData().getType().equals(RefactoringType.RENAME_METHOD)) {
-        if (methodsMap.get(ref.getData().getMethodAfter().getName()) == null) {
-          List<String> list = new ArrayList<>();
-          Gson gson = new Gson();
-          list.add(gson.toJson(ref));
-          methodsMap.put(ref.getData().getMethodAfter().getName(), list);
-        } else {
-          List<String> types = methodsMap.get(ref.getData().getMethodAfter().getName());
-          Gson gson = new Gson();
-          types.add(gson.toJson(ref));
-          methodsMap.put(ref.getData().getMethodAfter().getName(), types);
-        }
+      if (!ref.getData().getType().equals(RefactoringType.RENAME_METHOD)
+          && !ref.getData().getType().equals(RefactoringType.MOVE_AND_RENAME_OPERATION)) {
+        List<String> refBefore = new ArrayList<>();
+        refBefore
+            .addAll(methodsMap.getOrDefault(ref.getData().getMethodAfter(), new ArrayList<>()));
+        refBefore.add(new Gson().toJson(ref));
+        methodsMap.put(ref.getData().getMethodAfter(), refBefore);
       } else {
         renameOperations.add(ref);
       }

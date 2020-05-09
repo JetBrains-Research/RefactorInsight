@@ -41,12 +41,15 @@ public class MethodHistory extends AnAction {
             signature += p.getName() + ",";
           }
 
-          signature.substring(0, signature.length() - 1);
+          if (method.getTypeParameters() != null && method.getTypeParameters().length > 0) {
+            signature = signature.substring(0, signature.length() - 1);
+          }
+
           signature += ")";
           System.out.println(signature);
 
           System.out.println(map.get(signature));
-          getToolWindow(project).show(map.get(signature), signature, dataContext, e);
+          getPopupWindow(project).show(map.get(signature), signature, dataContext, e);
         }
       }
     }
@@ -61,12 +64,13 @@ public class MethodHistory extends AnAction {
 
   /**
    * Create or get a method refactorings tool window.
+   *
    * @param project the current project.
    * @return a new method refactorings tool window.
    */
-  public MethodRefactoringPopup getToolWindow(Project project) {
+  public MethodRefactoringPopup getPopupWindow(Project project) {
     if (methodRefactoringPopup == null) {
-      methodRefactoringPopup =  new MethodRefactoringPopup(project);
+      methodRefactoringPopup = new MethodRefactoringPopup(project);
     }
     return methodRefactoringPopup;
 

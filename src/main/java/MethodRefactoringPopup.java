@@ -26,6 +26,7 @@ public class MethodRefactoringPopup {
 
   /**
    * Constructor for the tool window.
+   *
    * @param project the current project.
    */
   public MethodRefactoringPopup(Project project) {
@@ -34,6 +35,7 @@ public class MethodRefactoringPopup {
 
   /**
    * Show the list of refactorings in a tool window.
+   *
    * @param refactorings list of refactorings that should be
    *                     displayed.
    */
@@ -53,11 +55,11 @@ public class MethodRefactoringPopup {
         Gson gson = new Gson();
         MethodRefactoring s = gson.fromJson(str, MethodRefactoring.class);
         String string = s.getData().getType().getDisplayName();
-        if (s.getData().getType() == RefactoringType.RENAME_METHOD) {
-          string += "    " + s.getData().getMethodBefore().getName()
-                  + " -> " + s.getData().getMethodAfter().getName();
+        if (s.getData().getType() == RefactoringType.RENAME_METHOD
+            || s.getData().getType() == RefactoringType.MOVE_AND_RENAME_OPERATION) {
+          string += "    " + s.getData().getMethodBefore()
+              + " -> " + s.getData().getMethodAfter();
         }
-
 
 
         JBLabel label = new JBLabel(string);
@@ -70,7 +72,7 @@ public class MethodRefactoringPopup {
             VcsLogManager.LogWindowKind kind = VcsLogManager.LogWindowKind.TOOL_WINDOW;
             kind = VcsLogManager.LogWindowKind.TOOL_WINDOW;
             VcsProjectLog.getInstance(project).openLogTab(filters, kind)
-                    .getVcsLog().jumpToReference(s.getCommmitId());
+                .getVcsLog().jumpToReference(s.getCommmitId());
           }
 
           @Override
@@ -98,12 +100,12 @@ public class MethodRefactoringPopup {
         panel.add(label);
       }
       panel.setBorder(BorderFactory.createTitledBorder(
-              BorderFactory.createEtchedBorder(), "Refactoring history"));
+          BorderFactory.createEtchedBorder(), "Refactoring history"));
     }
 
 
     JBPopup popup = JBPopupFactory.getInstance()
-            .createComponentPopupBuilder(panel, null).createPopup();
+        .createComponentPopupBuilder(panel, null).createPopup();
     popup.showInBestPositionFor(datacontext);
   }
 }
