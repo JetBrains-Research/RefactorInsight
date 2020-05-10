@@ -3,7 +3,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiTypeParameter;
+import com.intellij.psi.PsiParameterList;
 import com.intellij.usages.PsiElementUsageTarget;
 import com.intellij.usages.UsageTarget;
 import com.intellij.usages.UsageView;
@@ -37,19 +37,21 @@ public class MethodHistory extends AnAction {
           PsiMethod method = (PsiMethod) ((PsiElementUsageTarget) target).getElement();
           String signature = method.getName();
           signature = method.getContainingClass().getQualifiedName() + "." + signature + "(";
-          for (PsiTypeParameter p : method.getTypeParameters()) {
-            signature += p.getName() + ",";
-          }
 
-          if (method.getTypeParameters() != null && method.getTypeParameters().length > 0) {
-            signature = signature.substring(0, signature.length() - 1);
+          PsiParameterList parameterList = method.getParameterList();
+          for (int i = 0; i < parameterList.getParametersCount(); i++) {
+            if (i != parameterList.getParametersCount() - 1) {
+              signature += parameterList.getParameter(i).getType().getPresentableText() + ",";
+            } else {
+              signature += parameterList.getParameter(i).getType().getPresentableText();
+            }
           }
 
           signature += ")";
           System.out.println(signature);
-
           System.out.println(map.get(signature));
-          getPopupWindow(project).show(map.get(signature), signature, dataContext, e);
+
+          getPopupWindow(project).show(map.get(signature), signature, dataContext);
         }
       }
     }

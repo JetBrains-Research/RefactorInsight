@@ -1,5 +1,4 @@
 import com.google.gson.Gson;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
@@ -17,7 +16,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
 import javax.swing.BorderFactory;
-import org.refactoringminer.api.RefactoringType;
 
 
 public class MethodRefactoringPopup {
@@ -39,8 +37,7 @@ public class MethodRefactoringPopup {
    * @param refactorings list of refactorings that should be
    *                     displayed.
    */
-  public void show(List<String> refactorings, String methodName,
-                   DataContext datacontext, AnActionEvent event) {
+  public void show(List<String> refactorings, String methodName, DataContext datacontext) {
 
     JBPanel panel;
     Font font = new Font(".SFNS-Regular", Font.PLAIN, 13);
@@ -50,17 +47,12 @@ public class MethodRefactoringPopup {
       panel.add(new JBLabel("No refactorings for this method."));
     } else {
       panel = new JBPanel(new GridLayout(refactorings.size(), 1));
-
       for (String str : refactorings) {
         Gson gson = new Gson();
         MethodRefactoring s = gson.fromJson(str, MethodRefactoring.class);
         String string = s.getData().getType().getDisplayName();
-        if (s.getData().getType() == RefactoringType.RENAME_METHOD
-            || s.getData().getType() == RefactoringType.MOVE_AND_RENAME_OPERATION) {
-          string += "    " + s.getData().getMethodBefore()
-              + " -> " + s.getData().getMethodAfter();
-        }
 
+        string += "    " + s.getData().getMethodBefore() + " -> " + s.getData().getMethodAfter();
 
         JBLabel label = new JBLabel(string);
         label.setFont(font);
@@ -100,7 +92,8 @@ public class MethodRefactoringPopup {
         panel.add(label);
       }
       panel.setBorder(BorderFactory.createTitledBorder(
-          BorderFactory.createEtchedBorder(), "Refactoring history"));
+          BorderFactory.createEtchedBorder(), "Refactoring history for "
+              + methodName.substring(methodName.lastIndexOf(".") + 1)));
     }
 
 
