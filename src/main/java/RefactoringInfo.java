@@ -1,6 +1,14 @@
+import com.google.common.collect.Streams;
 import com.google.gson.Gson;
+import com.intellij.diff.fragments.LineFragmentImpl;
 import gr.uom.java.xmi.diff.CodeRange;
+import gr.uom.java.xmi.diff.MoveAndRenameClassRefactoring;
+import gr.uom.java.xmi.diff.MoveClassRefactoring;
+import gr.uom.java.xmi.diff.RenameClassRefactoring;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
 
@@ -11,9 +19,11 @@ public class RefactoringInfo {
   private RefactoringType type;
   private List<CodeRange> leftSide;
   private List<CodeRange> rightSide;
+  private Map<String, String> renames;
 
   /**
    * Constructor for refactoring info data structure.
+   *
    * @param refactoring to extract the info from
    */
   public RefactoringInfo(Refactoring refactoring) {
@@ -22,6 +32,12 @@ public class RefactoringInfo {
     text = refactoring.toString();
     leftSide = refactoring.leftSide();
     rightSide = refactoring.rightSide();
+    renames = new HashMap<>();
+    processType(type, refactoring);
+  }
+
+  public Map<String, String> getRenames() {
+    return renames;
   }
 
   public String getName() {
@@ -58,6 +74,7 @@ public class RefactoringInfo {
 
   /**
    * Deserialize a refactoring info json.
+   *
    * @param value json string
    * @return a new RefactoringInfo object
    */
@@ -79,11 +96,25 @@ public class RefactoringInfo {
     return new RefactoringInfo(refactoring).toString();
   }
 
-  private void processType(RefactoringType type) {
+  private void processType(RefactoringType type, Refactoring refactoring) {
     switch (type) {
       case RENAME_CLASS:
+        RenameClassRefactoring renameClassRefactoring =
+            (RenameClassRefactoring) refactoring;
+        renames.put(renameClassRefactoring.getOriginalClassName(),
+            renameClassRefactoring.getRenamedClassName());
         break;
       case MOVE_CLASS:
+        MoveClassRefactoring moveClassRefactoring =
+            (MoveClassRefactoring) refactoring;
+        renames.put(moveClassRefactoring.getOriginalClassName(),
+            moveClassRefactoring.getMovedClassName());
+        break;
+      case MOVE_RENAME_CLASS:
+        MoveAndRenameClassRefactoring moveAndRenameClassRefactoring =
+            (MoveAndRenameClassRefactoring) refactoring;
+        renames.put(moveAndRenameClassRefactoring.getOriginalClassName(),
+            moveAndRenameClassRefactoring.getRenamedClassName());
         break;
       case MOVE_SOURCE_FOLDER:
         break;
@@ -118,8 +149,6 @@ public class RefactoringInfo {
       case EXTRACT_CLASS:
         break;
       case EXTRACT_AND_MOVE_OPERATION:
-        break;
-      case MOVE_RENAME_CLASS:
         break;
       case RENAME_PACKAGE:
         break;
