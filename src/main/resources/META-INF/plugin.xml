@@ -16,7 +16,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <projectService serviceImplementation="StoringService"/>
+        <projectService serviceImplementation="MiningService"/>
     </extensions>
 
     <actions>
@@ -24,9 +24,15 @@
             <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>
         </action>
         <!-- Add your actions here -->
-        <action id="RefactoringAction" class="RefactoringAction" text="Refactoring"
-                description="Detect the refactorings">
+        <action id="ClearRefactoringCacheAction" class="ClearRefactoringCacheAction" text="Clear Refactorings"
+                description="Clear refactoring cache">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
         </action>
     </actions>
+
+    <projectListeners>
+        <listener class="CommitListener" topic="git4idea.repo.GitRepositoryChangeListener"/>
+    </projectListeners>
+
+
 </idea-plugin>
