@@ -10,9 +10,10 @@ public class MethodRefactoringData implements Serializable {
 
   /**
    * Constructor for the methods refactoring class.
-   * @param type of the refactoring.
+   *
+   * @param type         of the refactoring.
    * @param methodBefore method before the refactoring.
-   * @param methodAfter method after the refactoring.
+   * @param methodAfter  method after the refactoring.
    */
   public MethodRefactoringData(RefactoringType type,
                                String methodBefore, String methodAfter, long timeOfCommit) {

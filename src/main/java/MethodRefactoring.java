@@ -7,7 +7,8 @@ public class MethodRefactoring implements Serializable {
 
   /**
    * Constructor for method refactoring.
-   * @param data the refactoring data.
+   *
+   * @param data      the refactoring data.
    * @param commmitId the commit id as a Hash.
    */
   public MethodRefactoring(MethodRefactoringData data, String commmitId) {

@@ -2,6 +2,9 @@ import com.google.gson.Gson;
 import com.intellij.util.Consumer;
 import git4idea.GitCommit;
 import git4idea.repo.GitRepository;
+import gr.uom.java.xmi.diff.MoveAndRenameClassRefactoring;
+import gr.uom.java.xmi.diff.MoveClassRefactoring;
+import gr.uom.java.xmi.diff.RenameClassRefactoring;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +22,7 @@ import org.refactoringminer.util.GitServiceImpl;
 public class CommitMiner implements Consumer<GitCommit> {
 
   public List<MethodRefactoring> renameOperations;
+  public List<ClassRename> classRenames;
   private Executor pool;
   private Map<String, List<String>> map;
   private Map<String, List<String>> methodsMap;
@@ -41,6 +45,7 @@ public class CommitMiner implements Consumer<GitCommit> {
     this.repository = repository;
     this.processor = new MethodRefactoringProcessor(repository.getProject().getBasePath());
     this.renameOperations = new ArrayList<MethodRefactoring>();
+    this.classRenames = new ArrayList<>();
   }
 
   @Override
@@ -66,6 +71,30 @@ public class CommitMiner implements Consumer<GitCommit> {
                       .map(x -> new MethodRefactoring(x, gitCommit.getId().asString()))
                       .collect(Collectors.toList());
                   addMethodsRefactorings(methodsMap, refs);
+
+                  refactorings
+                      .stream()
+                      .filter(x -> x.getRefactoringType() == RefactoringType.MOVE_CLASS)
+                      .forEach(x -> classRenames
+                          .add(new ClassRename(((MoveClassRefactoring) x).getOriginalClassName(),
+                              ((MoveClassRefactoring) x).getMovedClassName(),
+                              gitCommit.getCommitTime())));
+
+                  refactorings
+                      .stream()
+                      .filter(x -> x.getRefactoringType() == RefactoringType.MOVE_RENAME_CLASS)
+                      .forEach(x -> classRenames.add(new ClassRename(
+                          ((MoveAndRenameClassRefactoring) x).getOriginalClassName(),
+                          ((MoveAndRenameClassRefactoring) x).getRenamedClassName(),
+                          gitCommit.getCommitTime())));
+
+                  refactorings
+                      .stream()
+                      .filter(x -> x.getRefactoringType() == RefactoringType.RENAME_CLASS)
+                      .forEach(x -> classRenames
+                          .add(new ClassRename(((RenameClassRefactoring) x).getOriginalClassName(),
+                              ((RenameClassRefactoring) x).getRenamedClassName(),
+                              gitCommit.getCommitTime())));
 
                 }
               });

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @State(name = "MethodsState",
-        storages = {@Storage("refactoringsMethods.xml")})
+    storages = {@Storage("refactoringsMethods.xml")})
 @Service
 public class MethodService implements PersistentStateComponent<MethodService.MyState> {
 

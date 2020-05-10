@@ -14,12 +14,14 @@ import git4idea.repo.GitRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
 @State(name = "ChangesState",
@@ -78,10 +80,40 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             }
             renameOperations.addAll(miner.renameOperations);
             processRenameOperations(renameOperations, methodMap);
+            changeMethodsNames(miner.classRenames, methodMap);
             System.out.println("done");
             progressIndicator.setText("Finished");
           }
         });
+  }
+
+  private void changeMethodsNames(List<ClassRename> classRenames,
+                                  ConcurrentHashMap<String, List<String>> methodsMap) {
+    classRenames.sort(new Comparator<ClassRename>() {
+      @Override
+      public int compare(ClassRename o1, ClassRename o2) {
+        return Long.compare(o1.getCommitTime(), o2.getCommitTime());
+      }
+    });
+
+    List<String> keys = new ArrayList<>();
+    Enumeration<String> ks = methodsMap.keys();
+    while (ks.hasMoreElements()) {
+      keys.add(ks.nextElement());
+    }
+
+    for (ClassRename classRename : classRenames) {
+      List<String> methods = keys.stream()
+          .filter(x -> x.substring(0, x.lastIndexOf("."))
+              .equals(classRename.getClassBefore())).collect(Collectors.toList());
+      for (String m : methods) {
+        List<String> refs = new ArrayList<>();
+        refs.addAll(methodsMap.getOrDefault(m, new ArrayList<>()));
+        String newKey = classRename.getClassAfter() + m.substring(m.lastIndexOf("."));
+        methodsMap.put(newKey, refs);
+        //methodsMap.remove(m);
+      }
+    }
   }
 
   private void processRenameOperations(List<MethodRefactoring> renameOperations,
