@@ -36,7 +36,6 @@ public class GitWindow extends ToggleAction {
     table.getSelectionModel().addListSelectionListener(new CommitSelectionListener());
 
 
-
     viewport = (JBViewport) changesTree.getParent();
     test = new JBLabel("TEST LABEL");
     test.setVerticalAlignment(JBLabel.CENTER);
@@ -104,12 +103,5 @@ public class GitWindow extends ToggleAction {
       }
     }
   }
-
-    @Override
-    public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setVisible(true);
-        e.getProject().getService(MiningService.class).loaded();
-        super.update(e);
-    }
 
 }
