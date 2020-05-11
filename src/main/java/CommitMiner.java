@@ -50,10 +50,10 @@ public class CommitMiner implements Consumer<GitCommit> {
         GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
         try {
           miner.detectAtCommit(gitService.openRepository(repository.getProject().getBasePath()),
-              null, commitId, new RefactoringHandler() {
+              commitId, new RefactoringHandler() {
                 @Override
                 public void handle(String commitId, List<Refactoring> refactorings) {
-                  map.put(commitId, refactorings.stream().map(Refactoring::getName).collect(
+                  map.put(commitId, refactorings.stream().map(RefactoringInfo::convert).collect(
                       Collectors.toList()));
                   incrementProgress();
                 }
