@@ -129,7 +129,7 @@ public class MethodRefactoringProcessor {
     public MethodRefactoringData apply(Refactoring refactoring, Long timeOfCommit) {
       final ExtractOperationRefactoring ref = (ExtractOperationRefactoring) refactoring;
       if (!ref.getSourceOperationBeforeExtraction().getClassName().equals(ref
-          .getSourceOperationAfterExtraction().getClassName())) {
+          .getExtractedOperation().getClassName())) {
         return new MethodRefactoringData(RefactoringType.EXTRACT_AND_MOVE_OPERATION,
             calculateSignature(ref.getSourceOperationBeforeExtraction()),
             calculateSignature(ref.getSourceOperationAfterExtraction()), timeOfCommit);
