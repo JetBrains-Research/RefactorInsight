@@ -17,6 +17,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <projectService serviceImplementation="MiningService"/>
+        <projectService serviceImplementation="MethodService"/>
     </extensions>
 
     <actions>
@@ -27,6 +28,10 @@
         <action id="ClearRefactoringCacheAction" class="ClearRefactoringCacheAction" text="Clear Refactorings"
                 description="Clear refactoring cache">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
+        </action>
+        <action id="MethodHistory" class="MethodHistory" text="Check method&#39;s history"
+                description="Retrieve refactorings history for this method">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
     </actions>
 
