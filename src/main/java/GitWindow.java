@@ -22,7 +22,6 @@ public class GitWindow extends ToggleAction {
   private JBLabel test;
   private MiningService miningService;
 
-
   private void setUp(@NotNull AnActionEvent e) {
     VcsLogChangesBrowser changesBrowser =
         (VcsLogChangesBrowser) e.getData(VcsLogChangesBrowser.DATA_KEY);
@@ -34,8 +33,6 @@ public class GitWindow extends ToggleAction {
 
     table = logUI.getTable();
     table.getSelectionModel().addListSelectionListener(new CommitSelectionListener());
-
-
     viewport = (JBViewport) changesTree.getParent();
     test = new JBLabel("TEST LABEL");
     test.setVerticalAlignment(JBLabel.CENTER);
@@ -76,6 +73,7 @@ public class GitWindow extends ToggleAction {
   }
 
   class CommitSelectionListener implements ListSelectionListener {
+    @SuppressWarnings("checkstyle:CommentsIndentation")
     @Override
     public void valueChanged(ListSelectionEvent listSelectionEvent) {
       if (listSelectionEvent.getValueIsAdjusting()) {
@@ -100,6 +98,7 @@ public class GitWindow extends ToggleAction {
         }
         builder.append("</html>");
         test.setText(builder.toString());
+
       }
     }
   }

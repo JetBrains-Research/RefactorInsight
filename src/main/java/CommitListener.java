@@ -8,6 +8,7 @@ public class CommitListener implements GitRepositoryChangeListener {
   @Override
   public void repositoryChanged(@NotNull GitRepository repository) {
     System.out.println("COMMIT");
-    repository.getProject().getService(MiningService.class).mineRepo(repository);
+    repository.getProject().getService(MiningService.class).mineRepo(repository,
+        repository.getProject().getService(MethodService.class).getState().map);
   }
 }

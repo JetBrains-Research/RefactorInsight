@@ -10,6 +10,7 @@ public class RefactoringAction extends AnAction {
   public void actionPerformed(@NotNull AnActionEvent e) {
     GitRepository repository =
         GitRepositoryManager.getInstance(e.getProject()).getRepositories().get(0);
-    e.getProject().getService(MiningService.class).mineRepo(repository);
+    e.getProject().getService(MiningService.class)
+        .mineRepo(repository, e.getProject().getService(MethodService.class).getState().map);
   }
 }
