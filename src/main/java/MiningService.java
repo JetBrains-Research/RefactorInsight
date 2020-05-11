@@ -11,6 +11,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.annotations.MapAnnotation;
 import git4idea.history.GitHistoryUtils;
 import git4idea.repo.GitRepository;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -21,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +35,8 @@ import org.jetbrains.annotations.NotNull;
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
   private boolean loaded = false;
+  private boolean first = true;
+  private boolean mining = false;
   private MyState innerState = new MyState();
 
   public MiningService(Project project) {
@@ -50,37 +57,72 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   }
 
   /**
-   * Start mining the git repository.
+   * Mine compelete git repo for refactorings.
    *
-   * @param repository Git repository
+   * @param repository GitRepository
    */
   public void mineRepo(GitRepository repository,
-                       ConcurrentHashMap<String, List<String>> methodMap) {
+                       ConcurrentHashMap<String, List<String>> methodsMap) {
     if (!loaded) {
       return;
     }
-    List<MethodRefactoring> renameOperations = new ArrayList<>();
+
+    int limit = 100;
+    try {
+      limit = getCommitCount(repository);
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      mineRepo(repository, methodsMap, limit);
+    }
+
+  }
+
+  /**
+   * Mine repo with limit.
+   *
+   * @param repository GitRepository
+   * @param limit      int
+   */
+  public void mineRepo(GitRepository repository,
+                       ConcurrentHashMap<String, List<String>> methodsMap, int limit) {
+    if (!loaded) {
+      return;
+    }
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(repository.getProject(), "Mining refactorings") {
           public void run(@NotNull ProgressIndicator progressIndicator) {
+            mining = true;
             progressIndicator.setText("Mining refactorings");
-            ExecutorService pool = Executors.newFixedThreadPool(8);
-            CommitMiner miner = new CommitMiner(pool, innerState.map, methodMap, repository);
+            progressIndicator.setIndeterminate(false);
+            int cores = 8; //Runtime.getRuntime().availableProcessors();
+            ExecutorService pool = Executors.newFixedThreadPool(cores);
+            System.out.println("Mining started on " + cores + " cores");
+            AtomicInteger commitsDone = new AtomicInteger(0);
+            CommitMiner miner =
+                new CommitMiner(pool, innerState.map, methodsMap, repository, commitsDone,
+                    progressIndicator,
+                    limit);
             try {
+              String logArgs = "--max-count=" + limit;
               GitHistoryUtils.loadDetails(repository.getProject(), repository.getRoot(),
-                  miner, "--all");
+                  miner, logArgs);
             } catch (Exception exception) {
               exception.printStackTrace();
+            } finally {
+              mining = false;
             }
             pool.shutdown();
+
             try {
               pool.awaitTermination(5, TimeUnit.MINUTES);
             } catch (InterruptedException e) {
               e.printStackTrace();
             }
+            List<MethodRefactoring> renameOperations = new ArrayList<>();
             renameOperations.addAll(miner.renameOperations);
-            processRenameOperations(renameOperations, methodMap);
-            changeMethodsNames(miner.classRenames, methodMap);
+            processRenameOperations(renameOperations, methodsMap);
+            changeMethodsNames(miner.classRenames, methodsMap);
             System.out.println("done");
             progressIndicator.setText("Finished");
           }
@@ -146,11 +188,26 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     loaded = true;
   }
 
+  /**
+   * Get the total ammount of commits in a repository.
+   *
+   * @param repository GitRepository
+   * @return int, ammount of commits
+   * @throws IOException bla
+   */
+  public int getCommitCount(GitRepository repository) throws IOException {
+    Process process = Runtime.getRuntime().exec("git rev-list --all --count", null,
+        new File(repository.getRoot().getCanonicalPath()));
+    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+    String output = reader.readLine();
+    System.out.println(output);
+    return Integer.parseInt(output);
+  }
+
   public static class MyState {
     @NotNull
     @MapAnnotation
     public Map<String, List<String>> map = new ConcurrentHashMap<>();
   }
-
 
 }

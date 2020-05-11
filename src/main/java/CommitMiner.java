@@ -1,4 +1,5 @@
 import com.google.gson.Gson;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.util.Consumer;
 import git4idea.GitCommit;
 import git4idea.repo.GitRepository;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.refactoringminer.api.GitHistoryRefactoringMiner;
 import org.refactoringminer.api.GitService;
@@ -21,13 +23,18 @@ import org.refactoringminer.util.GitServiceImpl;
 
 public class CommitMiner implements Consumer<GitCommit> {
 
+
+  private final Executor pool;
+  private final Map<String, List<String>> map;
+  private final GitRepository repository;
+  private final AtomicInteger commitsDone;
+  private final ProgressIndicator progressIndicator;
+  private final int limit;
   public List<MethodRefactoring> renameOperations;
   public List<ClassRename> classRenames;
-  private Executor pool;
-  private Map<String, List<String>> map;
   private Map<String, List<String>> methodsMap;
-  private GitRepository repository;
   private MethodRefactoringProcessor processor;
+
 
   /**
    * CommitMiner for mining a single commit.
@@ -37,8 +44,9 @@ public class CommitMiner implements Consumer<GitCommit> {
    * @param repository GitRepository.
    */
   public CommitMiner(Executor pool, Map<String, List<String>> map,
-                     Map<String, List<String>> methodsMap,
-                     GitRepository repository) {
+                     Map<String, List<String>> methodsMap, GitRepository repository,
+                     AtomicInteger commitsDone, ProgressIndicator progressIndicator, int limit) {
+
     this.pool = pool;
     this.map = map;
     this.methodsMap = methodsMap;
@@ -46,6 +54,10 @@ public class CommitMiner implements Consumer<GitCommit> {
     this.processor = new MethodRefactoringProcessor(repository.getProject().getBasePath());
     this.renameOperations = new ArrayList<MethodRefactoring>();
     this.classRenames = new ArrayList<>();
+    this.commitsDone = commitsDone;
+    this.progressIndicator = progressIndicator;
+    this.limit = limit;
+
   }
 
   @Override
@@ -61,8 +73,6 @@ public class CommitMiner implements Consumer<GitCommit> {
                 @Override
                 public void handle(String commitId, List<Refactoring> refactorings) {
                   System.out.println(commitId);
-                  map.put(commitId,
-                      refactorings.stream().map(Refactoring::getName).collect(Collectors.toList()));
 
                   //add methods refactoring types inside the methodsMap
                   List<MethodRefactoring> refs = refactorings.stream()
@@ -96,12 +106,17 @@ public class CommitMiner implements Consumer<GitCommit> {
                               ((RenameClassRefactoring) x).getRenamedClassName(),
                               gitCommit.getCommitTime())));
 
+                  map.put(commitId, refactorings.stream().map(Refactoring::getName).collect(
+                      Collectors.toList()));
+                  incrementProgress();
                 }
               });
         } catch (Exception e) {
           e.printStackTrace();
         }
       });
+    } else {
+      incrementProgress();
     }
   }
 
@@ -126,5 +141,13 @@ public class CommitMiner implements Consumer<GitCommit> {
         renameOperations.add(ref);
       }
     }
+  }
+
+  private void incrementProgress() {
+    final int nCommits = commitsDone.incrementAndGet();
+    progressIndicator.setText("Mining refactoring: " + nCommits + "/" + limit);
+    progressIndicator.setFraction(
+        (float) nCommits / limit);
+
   }
 }

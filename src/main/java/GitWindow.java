@@ -33,7 +33,6 @@ public class GitWindow extends ToggleAction {
 
     table = logUI.getTable();
     table.getSelectionModel().addListSelectionListener(new CommitSelectionListener());
-
     viewport = (JBViewport) changesTree.getParent();
     test = new JBLabel("TEST LABEL");
     test.setVerticalAlignment(JBLabel.CENTER);
