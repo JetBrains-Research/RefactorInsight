@@ -3,6 +3,7 @@ import com.intellij.diff.DiffManager;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.util.DiffUserDataKeysEx;
+import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.project.Project;
@@ -177,7 +178,7 @@ public class GitWindow extends ToggleAction {
     List<FileDiffInfo> diffInfos = leftDiffs
         .stream()
         .flatMap(left -> rightDiffs.stream()
-          .map(right -> new FileDiffInfo(left, right)))
+            .map(right -> new FileDiffInfo(left, right)))
         .collect(Collectors.toList());
 
     diffInfos.forEach(diffInfo -> {
@@ -185,11 +186,11 @@ public class GitWindow extends ToggleAction {
       String contentAfter = diffInfo.getRightContent();
 
       DiffContent d1 = contentBefore != null
-          ? myDiffContentFactory.create(project, contentBefore)
+          ? myDiffContentFactory.create(project, contentBefore, JavaClassFileType.INSTANCE)
           : myDiffContentFactory.createEmpty();
 
       DiffContent d2 = contentAfter != null
-          ? myDiffContentFactory.create(project, contentAfter)
+          ? myDiffContentFactory.create(project, contentAfter, JavaClassFileType.INSTANCE)
           : myDiffContentFactory.createEmpty();
 
       SimpleDiffRequest request = new SimpleDiffRequest("Refactorings",
