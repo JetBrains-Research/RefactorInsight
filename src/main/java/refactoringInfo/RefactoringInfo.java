@@ -1,6 +1,6 @@
-import com.google.common.collect.Streams;
+package refactoringInfo;
+
 import com.google.gson.Gson;
-import com.intellij.diff.fragments.LineFragmentImpl;
 import gr.uom.java.xmi.diff.CodeRange;
 import gr.uom.java.xmi.diff.MoveAndRenameClassRefactoring;
 import gr.uom.java.xmi.diff.MoveClassRefactoring;
@@ -8,7 +8,6 @@ import gr.uom.java.xmi.diff.RenameClassRefactoring;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
 
@@ -76,7 +75,7 @@ public class RefactoringInfo {
    * Deserialize a refactoring info json.
    *
    * @param value json string
-   * @return a new RefactoringInfo object
+   * @return a new refactoringInfo.RefactoringInfo object
    */
   public static RefactoringInfo fromString(String value) {
     if (value == null || value.equals("")) {

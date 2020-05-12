@@ -28,6 +28,7 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.jetbrains.annotations.NotNull;
+import refactoringInfo.RefactoringInfo;
 
 public class GitWindow extends ToggleAction {
 

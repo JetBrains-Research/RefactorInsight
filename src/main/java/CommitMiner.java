@@ -20,6 +20,7 @@ import org.refactoringminer.api.RefactoringHandler;
 import org.refactoringminer.api.RefactoringType;
 import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
 import org.refactoringminer.util.GitServiceImpl;
+import refactoringInfo.RefactoringInfo;
 
 public class CommitMiner implements Consumer<GitCommit> {
 
