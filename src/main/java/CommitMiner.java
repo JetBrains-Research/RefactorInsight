@@ -106,7 +106,7 @@ public class CommitMiner implements Consumer<GitCommit> {
                               ((RenameClassRefactoring) x).getRenamedClassName(),
                               gitCommit.getCommitTime())));
 
-                  map.put(commitId, refactorings.stream().map(Refactoring::getName).collect(
+                  map.put(commitId, refactorings.stream().map(RefactoringInfo::convert).collect(
                       Collectors.toList()));
                   incrementProgress();
                 }
