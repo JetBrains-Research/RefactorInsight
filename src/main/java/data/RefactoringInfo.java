@@ -1,14 +1,20 @@
-import com.google.common.collect.Streams;
+package data;
+
 import com.google.gson.Gson;
-import com.intellij.diff.fragments.LineFragmentImpl;
 import gr.uom.java.xmi.diff.CodeRange;
 import gr.uom.java.xmi.diff.MoveAndRenameClassRefactoring;
 import gr.uom.java.xmi.diff.MoveClassRefactoring;
 import gr.uom.java.xmi.diff.RenameClassRefactoring;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import misc.MethodRefactoringProcessor;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
 
@@ -42,6 +48,28 @@ public class RefactoringInfo {
     signatureBefore = ref == null ? "" : ref.getMethodBefore();
     signatureAfter = ref == null ? "" : ref.getMethodAfter();
     processType(type, refactoring);
+  }
+
+  /**
+   * Adds this refactoring to the method history map.
+   * Note that it should be called in chronological order.
+   * @param map for method history
+   */
+  public void addToHistory(Map<String, List<RefactoringInfo>> map) {
+    if (signatureAfter.equals("")) {
+      renames.forEach((before, after) -> map.keySet().stream()
+          .filter(x -> x.substring(0, x.lastIndexOf("."))
+              .equals(before))
+          .forEach(signature -> {
+            String newKey = after + signature.substring(signature.lastIndexOf("."));
+            map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
+          }));
+      return;
+    }
+    List<RefactoringInfo> refs = map.getOrDefault(signatureBefore, new LinkedList<>());
+    map.remove(signatureBefore);
+    refs.add(0, this);
+    map.put(signatureAfter, refs);
   }
 
   public Map<String, String> getRenames() {
@@ -88,7 +116,7 @@ public class RefactoringInfo {
    * Deserialize a refactoring info json.
    *
    * @param value json string
-   * @return a new RefactoringInfo object
+   * @return a new data.RefactoringInfo object
    */
   public static RefactoringInfo fromString(String value) {
     if (value == null || value.equals("")) {

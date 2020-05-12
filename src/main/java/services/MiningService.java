@@ -1,4 +1,5 @@
-import com.google.gson.Gson;
+package services;
+
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.ServiceManager;
@@ -9,17 +10,22 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.annotations.MapAnnotation;
+import com.intellij.vcsUtil.VcsUtil;
+import data.RefactoringEntry;
+import data.RefactoringInfo;
+import git4idea.commands.Git;
+import git4idea.commands.GitCommand;
+import git4idea.commands.GitLineHandler;
 import git4idea.history.GitHistoryUtils;
 import git4idea.repo.GitRepository;
+import git4idea.repo.GitRepositoryManager;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Ref;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Enumeration;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,7 +33,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
+import misc.CommitMiner;
 import org.jetbrains.annotations.NotNull;
 
 @State(name = "ChangesState",
@@ -38,9 +44,13 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   private boolean loaded = false;
   private boolean first = true;
   private boolean mining = false;
+  private Project project;
+  public static ConcurrentHashMap<String, List<RefactoringInfo>> methodHistory
+      = new ConcurrentHashMap<>();
   private MyState innerState = new MyState();
 
   public MiningService(Project project) {
+    this.project = project;
   }
 
   public static MiningService getInstance(@NotNull Project project) {
@@ -62,8 +72,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    *
    * @param repository GitRepository
    */
-  public void mineRepo(GitRepository repository,
-                       ConcurrentHashMap<String, List<String>> methodsMap) {
+  public void mineRepo(GitRepository repository) {
     if (!loaded) {
       return;
     }
@@ -74,7 +83,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     } catch (IOException e) {
       e.printStackTrace();
     } finally {
-      mineRepo(repository, methodsMap, limit);
+      mineRepo(repository, limit);
     }
 
   }
@@ -85,8 +94,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    * @param repository GitRepository
    * @param limit      int
    */
-  public void mineRepo(GitRepository repository,
-                       ConcurrentHashMap<String, List<String>> methodsMap, int limit) {
+  public void mineRepo(GitRepository repository, int limit) {
     if (!loaded) {
       return;
     }
@@ -101,7 +109,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             System.out.println("Mining started on " + cores + " cores");
             AtomicInteger commitsDone = new AtomicInteger(0);
             CommitMiner miner =
-                new CommitMiner(pool, innerState.map, methodsMap, repository, commitsDone,
+                new CommitMiner(pool, innerState.map, repository, commitsDone,
                     progressIndicator,
                     limit);
             try {
@@ -120,45 +128,29 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             } catch (InterruptedException e) {
               e.printStackTrace();
             }
-            List<RefactoringInfo> renameOperations = new ArrayList<>();
-            renameOperations.addAll(miner.renameOperations);
 
-            //changeMethodsNames(miner.classRenames, methodsMap);
+            getOrderedRefactorings(innerState.map).forEach(r
+                -> r.addToHistory(methodHistory));
+
             System.out.println("done");
             progressIndicator.setText("Finished");
           }
         });
   }
 
-  private void changeMethodsNames(List<ClassRename> classRenames,
-                                  ConcurrentHashMap<String, List<String>> methodsMap) {
-
-    List<String> keys = new ArrayList<>();
-    Enumeration<String> ks = methodsMap.keys();
-    while (ks.hasMoreElements()) {
-      keys.add(ks.nextElement());
-    }
-
-    for (ClassRename classRename : classRenames) {
-      List<String> methods = keys.stream()
-          .filter(x -> x.substring(0, x.lastIndexOf("."))
-              .equals(classRename.getClassBefore())).collect(Collectors.toList());
-      for (String m : methods) {
-        List<String> refs = new ArrayList<>();
-        refs.addAll(methodsMap.getOrDefault(m, new ArrayList<>()));
-        String newKey = classRename.getClassAfter() + m.substring(m.lastIndexOf("."));
-        methodsMap.put(newKey, refs);
-        //methodsMap.remove(m);
-      }
-    }
-  }
-
   public String getRefactorings(String commitHash) {
     return innerState.map.getOrDefault(commitHash, "");
   }
 
+  /**
+   * Sets loaded = true, which allows refactoring miner to run.
+   */
   public void loaded() {
+    if (loaded) {
+      return;
+    }
     loaded = true;
+    mineRepo(GitRepositoryManager.getInstance(project).getRepositories().get(0));
   }
 
   /**
@@ -175,6 +167,26 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     String output = reader.readLine();
     System.out.println(output);
     return Integer.parseInt(output);
+  }
+
+  public Map<String, List<RefactoringInfo>> getMethodHistory() {
+    return methodHistory;
+  }
+
+  private Collection<RefactoringInfo> getOrderedRefactorings(Map<String, String> map) {
+    GitLineHandler handler = new GitLineHandler(project,
+        VcsUtil.getVirtualFile(project.getBasePath()), GitCommand.REV_PARSE);
+    handler.addParameters("HEAD");
+    String commitId = Git.getInstance().runCommand(handler).getOutput().get(0);
+
+    List<RefactoringInfo> refs = new ArrayList<>();
+    while (map.containsKey(commitId)) {
+      RefactoringEntry refactoringEntry = RefactoringEntry.fromString(map.get(commitId));
+      refs.addAll(refactoringEntry.getRefactorings());
+      commitId = refactoringEntry.getParentCommit();
+    }
+    Collections.reverse(refs);
+    return refs;
   }
 
   public static class MyState {

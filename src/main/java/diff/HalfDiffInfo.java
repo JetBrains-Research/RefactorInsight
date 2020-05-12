@@ -1,3 +1,5 @@
+package diff;
+
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import java.util.List;
 

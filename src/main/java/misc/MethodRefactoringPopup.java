@@ -1,4 +1,5 @@
-import com.google.gson.Gson;
+package misc;
+
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
@@ -10,6 +11,7 @@ import com.intellij.vcs.log.VcsLogFilterCollection;
 import com.intellij.vcs.log.impl.VcsLogManager;
 import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.visible.filters.VcsLogFilterObject;
+import data.RefactoringInfo;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
@@ -37,7 +39,7 @@ public class MethodRefactoringPopup {
    * @param refactorings list of refactorings that should be
    *                     displayed.
    */
-  public void show(List<String> refactorings, String methodName, DataContext datacontext) {
+  public void show(List<RefactoringInfo> refactorings, String methodName, DataContext datacontext) {
 
     JBPanel panel;
     Font font = new Font(".SFNS-Regular", Font.PLAIN, 13);
@@ -47,9 +49,7 @@ public class MethodRefactoringPopup {
       panel.add(new JBLabel("No refactorings for this method."));
     } else {
       panel = new JBPanel(new GridLayout(refactorings.size(), 1));
-      for (String str : refactorings) {
-        Gson gson = new Gson();
-        RefactoringInfo s = gson.fromJson(str, RefactoringInfo.class);
+      for (RefactoringInfo s : refactorings) {
         String string = s.getType().getDisplayName();
 
         string += "    " + s.getSignatureBefore() + " -> " + s.getSignatureAfter();

@@ -1,3 +1,5 @@
+package actions;
+
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -7,13 +9,16 @@ import com.intellij.psi.PsiParameterList;
 import com.intellij.usages.PsiElementUsageTarget;
 import com.intellij.usages.UsageTarget;
 import com.intellij.usages.UsageView;
+import data.RefactoringInfo;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
+import misc.MethodRefactoringPopup;
 import org.jetbrains.annotations.NotNull;
+import services.MiningService;
 
-public class MethodHistory extends AnAction {
+public class MethodAction extends AnAction {
 
-  ConcurrentHashMap<String, List<String>> map;
+  Map<String, List<RefactoringInfo>> map;
   MethodRefactoringPopup methodRefactoringPopup;
 
   /**
@@ -27,7 +32,7 @@ public class MethodHistory extends AnAction {
     if (project == null) {
       return;
     }
-    map = project.getService(MethodService.class).getState().map;
+    map = e.getProject().getService(MiningService.class).getMethodHistory();
     DataContext dataContext = e.getDataContext();
     UsageTarget[] usageTarget = dataContext.getData(UsageView.USAGE_TARGETS_KEY);
     if (usageTarget != null) {

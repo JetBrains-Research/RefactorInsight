@@ -1,3 +1,5 @@
+package actions;
+
 import com.intellij.diff.DiffContentFactoryEx;
 import com.intellij.diff.DiffManager;
 import com.intellij.diff.contents.DiffContent;
@@ -17,6 +19,11 @@ import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
+import data.RefactoringEntry;
+import data.RefactoringInfo;
+import diff.FileDiffInfo;
+import diff.HalfDiffInfo;
+import diff.LineRange;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -28,6 +35,7 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.jetbrains.annotations.NotNull;
+import services.MiningService;
 
 public class GitWindow extends ToggleAction {
 

@@ -1,3 +1,5 @@
+package diff;
+
 import com.google.common.collect.Streams;
 import com.intellij.diff.fragments.LineFragment;
 import com.intellij.diff.fragments.LineFragmentImpl;
@@ -14,10 +16,10 @@ public class FileDiffInfo {
   private List<LineFragment> diffFragments;
 
   /**
-   * Constructor for FileDifInfo from two HalfDiffInfo's.
+   * Constructor for FileDifInfo from two diff.HalfDiffInfo's.
    *
-   * @param left  HalfDiffInfo
-   * @param right HalfDiffInfo
+   * @param left  diff.HalfDiffInfo
+   * @param right diff.HalfDiffInfo
    */
   public FileDiffInfo(HalfDiffInfo left, HalfDiffInfo right) {
     this.leftPath = left.getRevision().getFile().getPath();

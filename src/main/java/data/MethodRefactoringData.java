@@ -1,3 +1,5 @@
+package data;
+
 import java.io.Serializable;
 import org.refactoringminer.api.RefactoringType;
 

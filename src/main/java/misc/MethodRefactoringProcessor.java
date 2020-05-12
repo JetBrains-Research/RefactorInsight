@@ -1,3 +1,6 @@
+package misc;
+
+import data.MethodRefactoringData;
 import gr.uom.java.xmi.UMLOperation;
 import gr.uom.java.xmi.diff.AddMethodAnnotationRefactoring;
 import gr.uom.java.xmi.diff.ExtractOperationRefactoring;
@@ -10,7 +13,6 @@ import gr.uom.java.xmi.diff.RemoveMethodAnnotationRefactoring;
 import gr.uom.java.xmi.diff.RenameOperationRefactoring;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
@@ -19,7 +21,7 @@ public class MethodRefactoringProcessor {
 
   private final String projectPath;
   private final Map<RefactoringType, Function<Refactoring, MethodRefactoringData>> handlers =
-      new HashMap<RefactoringType, Function<Refactoring, MethodRefactoringData>>() {
+      new HashMap<>() {
         {
           put(RefactoringType.RENAME_METHOD, new RenameMethodRefactoringHandler());
           put(RefactoringType.MOVE_OPERATION, new MoveRefactoringHandler());

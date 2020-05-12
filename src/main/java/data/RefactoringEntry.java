@@ -1,3 +1,5 @@
+package data;
+
 import com.google.gson.Gson;
 import java.io.Serializable;
 import java.util.List;
@@ -24,7 +26,7 @@ public class RefactoringEntry implements Serializable {
    * Deserialize a refactoring info json.
    *
    * @param value json string
-   * @return a new RefactoringInfo object
+   * @return a new data.RefactoringInfo object
    */
   public static RefactoringEntry fromString(String value) {
     if (value == null || value.equals("")) {
