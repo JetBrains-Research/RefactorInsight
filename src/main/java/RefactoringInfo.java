@@ -16,6 +16,9 @@ public class RefactoringInfo {
 
   private String text;
   private String name;
+  private String commitId;
+  private String signatureBefore;
+  private String signatureAfter;
   private RefactoringType type;
   private List<CodeRange> leftSide;
   private List<CodeRange> rightSide;
@@ -26,13 +29,18 @@ public class RefactoringInfo {
    *
    * @param refactoring to extract the info from
    */
-  public RefactoringInfo(Refactoring refactoring) {
+  public RefactoringInfo(Refactoring refactoring, String commitId) {
     name = refactoring.getName();
     type = refactoring.getRefactoringType();
     text = refactoring.toString();
     leftSide = refactoring.leftSide();
     rightSide = refactoring.rightSide();
     renames = new HashMap<>();
+    this.commitId = commitId;
+    MethodRefactoringProcessor processor = new MethodRefactoringProcessor("");
+    MethodRefactoringData ref = processor.process(refactoring);
+    signatureBefore = ref == null ? "" : ref.getMethodBefore();
+    signatureAfter = ref == null ? "" : ref.getMethodAfter();
     processType(type, refactoring);
   }
 
@@ -46,6 +54,10 @@ public class RefactoringInfo {
 
   public String getText() {
     return text;
+  }
+
+  public String getCommitId() {
+    return commitId;
   }
 
   public RefactoringType getType() {
@@ -92,8 +104,16 @@ public class RefactoringInfo {
     }
   }
 
-  public static String convert(Refactoring refactoring) {
-    return new RefactoringInfo(refactoring).toString();
+  public String getSignatureBefore() {
+    return signatureBefore;
+  }
+
+  public String getSignatureAfter() {
+    return signatureAfter;
+  }
+
+  public static String convert(Refactoring refactoring, String commitId) {
+    return new RefactoringInfo(refactoring, commitId).toString();
   }
 
   private void processType(RefactoringType type, Refactoring refactoring) {

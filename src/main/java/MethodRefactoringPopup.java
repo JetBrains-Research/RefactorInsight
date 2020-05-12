@@ -49,10 +49,10 @@ public class MethodRefactoringPopup {
       panel = new JBPanel(new GridLayout(refactorings.size(), 1));
       for (String str : refactorings) {
         Gson gson = new Gson();
-        MethodRefactoring s = gson.fromJson(str, MethodRefactoring.class);
-        String string = s.getData().getType().getDisplayName();
+        RefactoringInfo s = gson.fromJson(str, RefactoringInfo.class);
+        String string = s.getType().getDisplayName();
 
-        string += "    " + s.getData().getMethodBefore() + " -> " + s.getData().getMethodAfter();
+        string += "    " + s.getSignatureBefore() + " -> " + s.getSignatureAfter();
 
         JBLabel label = new JBLabel(string);
         label.setFont(font);
@@ -64,7 +64,7 @@ public class MethodRefactoringPopup {
             VcsLogManager.LogWindowKind kind = VcsLogManager.LogWindowKind.TOOL_WINDOW;
             kind = VcsLogManager.LogWindowKind.TOOL_WINDOW;
             VcsProjectLog.getInstance(project).openLogTab(filters, kind)
-                .getVcsLog().jumpToReference(s.getCommmitId());
+                .getVcsLog().jumpToReference(s.getCommitId());
           }
 
           @Override
