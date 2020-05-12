@@ -1,13 +1,48 @@
 package refactoringInfo.types;
 
+import com.intellij.psi.JavaPsiFacade;
+import gr.uom.java.xmi.diff.RenameClassRefactoring;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import javassist.NotFoundException;
 import org.refactoringminer.api.Refactoring;
 import refactoringInfo.RefactoringInfo;
 
-public class RenameClassHandler implements Handler{
-
+public class RenameClassHandler implements Handler {
 
   @Override
   public RefactoringInfo handle(Refactoring refactoring) {
-    RenameClass
+    RenameClassRefactoring ref = (RenameClassRefactoring) refactoring;
+    RefactoringInfo refactoringInfo = new RefactoringInfo(ref);
+    refactoringInfo.getRenames().put(ref.getOriginalClassName(),
+        ref.getRenamedClassName());
+    try {
+      int[] nameIndeces = getNameIndex(refactoringInfo.getText(), refactoringInfo.getName());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return refactoringInfo;
   }
+
+  private int[] getNameIndex(String text, String name) throws IOException, NotFoundException {
+    BufferedReader reader = new BufferedReader(new StringReader(text));
+    int[] startIndeces = {0, -1};
+    String line = reader.readLine();
+    while (line != null) {
+      if(line.contains(name)) {
+        startIndeces[1] = line.indexOf(name);
+        break;
+      } else {
+        line = reader.readLine();
+        startIndeces[0]++;
+      }
+    }
+    if(startIndeces[1] == -1) {
+      throw new NotFoundException(name);
+    }
+    return startIndeces;
+  }
+
 }

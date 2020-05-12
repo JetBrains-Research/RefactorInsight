@@ -19,6 +19,7 @@ public class RefactoringInfo {
   private List<CodeRange> leftSide;
   private List<CodeRange> rightSide;
   private Map<String, String> renames;
+  private int[] nameIndeces = {0, 0};
 
   /**
    * Constructor for refactoring info data structure.
@@ -57,6 +58,14 @@ public class RefactoringInfo {
 
   public List<CodeRange> getRightSide() {
     return rightSide;
+  }
+
+  public int[] getNameIndeces() {
+    return nameIndeces;
+  }
+
+  public void setNameIndeces(int[] nameIndeces) {
+    this.nameIndeces = nameIndeces;
   }
 
   @Override
