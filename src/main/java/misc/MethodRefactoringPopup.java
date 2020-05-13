@@ -12,6 +12,7 @@ import com.intellij.vcs.log.impl.VcsLogManager;
 import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.visible.filters.VcsLogFilterObject;
 import data.RefactoringInfo;
+import java.awt.Cursor;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -51,6 +52,7 @@ public class MethodRefactoringPopup {
           .map(s -> new String(s.getType().getDisplayName() + ":  "
               + s.getSignatureBefore() + " -> " + s.getSignatureAfter()))
           .collect(Collectors.toList()));
+
       MouseAdapter mouseAdapter = new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -63,6 +65,17 @@ public class MethodRefactoringPopup {
               .jumpToReference(refactorings.get(list.locationToIndex(e.getPoint())).getCommitId());
         }
       };
+
+      MouseAdapter mouseSelection = new MouseAdapter() {
+        @Override
+        public void mouseMoved(MouseEvent e) {
+          super.mouseMoved(e);
+          e.getComponent().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+          list.setSelectedIndex(list.locationToIndex(e.getPoint()));
+        }
+      };
+
+      list.addMouseMotionListener(mouseSelection);
       list.addMouseListener(mouseAdapter);
       panel.add(list);
 
