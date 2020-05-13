@@ -10,13 +10,8 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.annotations.MapAnnotation;
-import com.intellij.vcsUtil.VcsUtil;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
-import git4idea.changes.GitChangeUtils;
-import git4idea.commands.Git;
-import git4idea.commands.GitCommand;
-import git4idea.commands.GitLineHandler;
 import git4idea.history.GitHistoryUtils;
 import git4idea.repo.GitRepository;
 import git4idea.repo.GitRepositoryManager;
@@ -38,20 +33,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import misc.CommitMiner;
 import org.jetbrains.annotations.NotNull;
+import processors.CommitMiner;
 
 @State(name = "ChangesState",
     storages = {@Storage("refactorings.xml")})
 @Service
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
+  public static ConcurrentHashMap<String, List<RefactoringInfo>> methodHistory
+      = new ConcurrentHashMap<>();
   private boolean loaded = false;
   private boolean first = true;
   private boolean mining = false;
   private Project project;
-  public static ConcurrentHashMap<String, List<RefactoringInfo>> methodHistory
-      = new ConcurrentHashMap<>();
   private MyState innerState = new MyState();
 
   public MiningService(Project project) {

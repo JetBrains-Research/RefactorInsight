@@ -1,4 +1,4 @@
-package misc;
+package processors;
 
 import git4idea.repo.GitRepository;
 import git4idea.repo.GitRepositoryChangeListener;

@@ -1,4 +1,4 @@
-package misc;
+package processors;
 
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.util.Consumer;

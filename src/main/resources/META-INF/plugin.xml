@@ -20,7 +20,7 @@
     </extensions>
 
     <actions>
-        <action id="actions.GitWindow" class="actions.GitWindow" text="Refactorings" description="actions.GitWindow">
+        <action id="ui.GitWindow" class="ui.GitWindow" text="Refactorings" description="ui.GitWindow">
             <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>
         </action>
         <!-- Add your actions here -->
@@ -40,7 +40,7 @@
     </actions>
 
     <projectListeners>
-        <listener class="misc.CommitListener" topic="git4idea.repo.GitRepositoryChangeListener"/>
+        <listener class="processors.CommitListener" topic="git4idea.repo.GitRepositoryChangeListener"/>
     </projectListeners>
 
 

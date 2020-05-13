@@ -6,17 +6,13 @@ import gr.uom.java.xmi.diff.MoveAndRenameClassRefactoring;
 import gr.uom.java.xmi.diff.MoveClassRefactoring;
 import gr.uom.java.xmi.diff.RenameClassRefactoring;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import misc.MethodRefactoringProcessor;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
+import processors.MethodRefactoringProcessor;
 
 public class RefactoringInfo {
 
@@ -50,9 +46,37 @@ public class RefactoringInfo {
     processType(type, refactoring);
   }
 
+  public RefactoringInfo() {
+  }
+
+  /**
+   * Deserialize a refactoring info json.
+   *
+   * @param value json string
+   * @return a new data.RefactoringInfo object
+   */
+  public static RefactoringInfo fromString(String value) {
+    if (value == null || value.equals("")) {
+      return null;
+    }
+    try {
+      return new Gson().fromJson(value, RefactoringInfo.class);
+    } catch (Exception e) {
+      e.printStackTrace();
+      RefactoringInfo ri = new RefactoringInfo();
+      ri.setText("wtf: " + value);
+      return ri;
+    }
+  }
+
+  public static String convert(Refactoring refactoring, String commitId) {
+    return new RefactoringInfo(refactoring, commitId).toString();
+  }
+
   /**
    * Adds this refactoring to the method history map.
    * Note that it should be called in chronological order.
+   *
    * @param map for method history
    */
   public void addToHistory(Map<String, List<RefactoringInfo>> map) {
@@ -84,6 +108,10 @@ public class RefactoringInfo {
     return text;
   }
 
+  public void setText(String text) {
+    this.text = text;
+  }
+
   public String getCommitId() {
     return commitId;
   }
@@ -105,43 +133,12 @@ public class RefactoringInfo {
     return new Gson().toJson(this);
   }
 
-  public void setText(String text) {
-    this.text = text;
-  }
-
-  public RefactoringInfo() {
-  }
-
-  /**
-   * Deserialize a refactoring info json.
-   *
-   * @param value json string
-   * @return a new data.RefactoringInfo object
-   */
-  public static RefactoringInfo fromString(String value) {
-    if (value == null || value.equals("")) {
-      return null;
-    }
-    try {
-      return new Gson().fromJson(value, RefactoringInfo.class);
-    } catch (Exception e) {
-      e.printStackTrace();
-      RefactoringInfo ri = new RefactoringInfo();
-      ri.setText("wtf: " + value);
-      return ri;
-    }
-  }
-
   public String getSignatureBefore() {
     return signatureBefore;
   }
 
   public String getSignatureAfter() {
     return signatureAfter;
-  }
-
-  public static String convert(Refactoring refactoring, String commitId) {
-    return new RefactoringInfo(refactoring, commitId).toString();
   }
 
   private void processType(RefactoringType type, Refactoring refactoring) {

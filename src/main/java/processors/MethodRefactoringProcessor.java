@@ -1,4 +1,4 @@
-package misc;
+package processors;
 
 import data.MethodRefactoringData;
 import gr.uom.java.xmi.UMLOperation;

@@ -1,4 +1,4 @@
-package actions;
+package ui;
 
 import com.intellij.diff.DiffContentFactoryEx;
 import com.intellij.diff.DiffManager;

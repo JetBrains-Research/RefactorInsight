@@ -12,9 +12,9 @@ import com.intellij.usages.UsageView;
 import data.RefactoringInfo;
 import java.util.List;
 import java.util.Map;
-import misc.MethodRefactoringPopup;
 import org.jetbrains.annotations.NotNull;
 import services.MiningService;
+import ui.MethodRefactoringPopup;
 
 public class MethodAction extends AnAction {
 
