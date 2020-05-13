@@ -17,6 +17,12 @@ import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
+import org.jetbrains.annotations.NotNull;
+import refactoringInfo.RefactoringInfo;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -24,11 +30,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.swing.DefaultListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import org.jetbrains.annotations.NotNull;
-import refactoringInfo.RefactoringInfo;
 
 public class GitWindow extends ToggleAction {
 
@@ -154,7 +155,7 @@ public class GitWindow extends ToggleAction {
           List<LineRange> ranges = new ArrayList<>();
           ri.getLeftSide().forEach(cr -> {
             if ((project.getBasePath() + "/" + cr.getFilePath()).equals(c.getFile().getPath())) {
-              ranges.add(new LineRange(cr.getStartLine() - 1, cr.getEndLine()));
+              ranges.add(new LineRange(cr.getTrueStartLine() - 1, cr.getTrueEndLine()));
             }
           });
           return new HalfDiffInfo(ranges, c);
@@ -169,7 +170,7 @@ public class GitWindow extends ToggleAction {
           List<LineRange> ranges = new ArrayList<>();
           ri.getRightSide().forEach(cr -> {
             if ((project.getBasePath() + "/" + cr.getFilePath()).equals(c.getFile().getPath())) {
-              ranges.add(new LineRange(cr.getStartLine() - 1, cr.getEndLine()));
+              ranges.add(new LineRange(cr.getTrueStartLine() - 1, cr.getTrueEndLine()));
             }
           });
           return new HalfDiffInfo(ranges, c);

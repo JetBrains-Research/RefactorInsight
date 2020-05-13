@@ -1,23 +1,24 @@
 package refactoringInfo;
 
 import com.google.gson.Gson;
-import gr.uom.java.xmi.diff.CodeRange;
 import gr.uom.java.xmi.diff.MoveAndRenameClassRefactoring;
 import gr.uom.java.xmi.diff.MoveClassRefactoring;
 import gr.uom.java.xmi.diff.RenameClassRefactoring;
+import org.refactoringminer.api.Refactoring;
+import org.refactoringminer.api.RefactoringType;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
+import java.util.stream.Collectors;
 
 public class RefactoringInfo {
 
   private String text;
   private String name;
   private RefactoringType type;
-  private List<CodeRange> leftSide;
-  private List<CodeRange> rightSide;
+  private List<TrueCodeRange> leftSide;
+  private List<TrueCodeRange> rightSide;
   private Map<String, String> renames;
   private int[] nameIndeces = {0, 0};
 
@@ -30,8 +31,8 @@ public class RefactoringInfo {
     name = refactoring.getName();
     type = refactoring.getRefactoringType();
     text = refactoring.toString();
-    leftSide = refactoring.leftSide();
-    rightSide = refactoring.rightSide();
+    leftSide = refactoring.leftSide().stream().map(TrueCodeRange::new).collect(Collectors.toList());
+    rightSide = refactoring.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList());
     renames = new HashMap<>();
     processType(type, refactoring);
   }
@@ -52,11 +53,11 @@ public class RefactoringInfo {
     return type;
   }
 
-  public List<CodeRange> getLeftSide() {
+  public List<TrueCodeRange> getLeftSide() {
     return leftSide;
   }
 
-  public List<CodeRange> getRightSide() {
+  public List<TrueCodeRange> getRightSide() {
     return rightSide;
   }
 
