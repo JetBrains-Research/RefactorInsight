@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import org.refactoringminer.api.GitHistoryRefactoringMiner;
 import org.refactoringminer.api.GitService;
 import org.refactoringminer.api.Refactoring;
@@ -63,12 +64,16 @@ public class CommitMiner implements Consumer<GitCommit> {
                 public void handle(String commitId, List<Refactoring> refactorings) {
                   System.out.println(commitId);
 
-                  List<Hash> parents = gitCommit.getParents();
+                  long time = gitCommit.getCommitTime();
+                  List<String> parents = gitCommit.getParents()
+                      .stream()
+                      .map(Hash::asString)
+                      .collect(Collectors.toList());
                   map.put(commitId,
                       RefactoringEntry
-                          .convert(refactorings, commitId, parents.get(0).asString()));
+                          .convert(refactorings, commitId, parents, time));
 
-                  if (parents.size() != 1) {
+                  if (parents.size() != 1 && parents.size() != 2) {
                     System.out.println(parents.toString());
                   }
 

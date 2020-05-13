@@ -13,6 +13,7 @@ import com.intellij.util.xmlb.annotations.MapAnnotation;
 import com.intellij.vcsUtil.VcsUtil;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
+import git4idea.changes.GitChangeUtils;
 import git4idea.commands.Git;
 import git4idea.commands.GitCommand;
 import git4idea.commands.GitLineHandler;
@@ -26,8 +27,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -129,8 +134,9 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
               e.printStackTrace();
             }
 
-            getOrderedRefactorings(innerState.map).forEach(r
-                -> r.addToHistory(methodHistory));
+            System.out.println("done");
+            getOrderedRefactorings(repository.getCurrentRevision())
+                .forEach(r -> r.addToHistory(methodHistory));
 
             System.out.println("done");
             progressIndicator.setText("Finished");
@@ -173,17 +179,22 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     return methodHistory;
   }
 
-  private Collection<RefactoringInfo> getOrderedRefactorings(Map<String, String> map) {
-    GitLineHandler handler = new GitLineHandler(project,
-        VcsUtil.getVirtualFile(project.getBasePath()), GitCommand.REV_PARSE);
-    handler.addParameters("HEAD");
-    String commitId = Git.getInstance().runCommand(handler).getOutput().get(0);
-
+  private Collection<RefactoringInfo> getOrderedRefactorings(String commitId) {
     List<RefactoringInfo> refs = new ArrayList<>();
-    while (map.containsKey(commitId)) {
-      RefactoringEntry refactoringEntry = RefactoringEntry.fromString(map.get(commitId));
+    PriorityQueue<RefactoringEntry> queue = new PriorityQueue<>(
+        Comparator.comparingLong(RefactoringEntry::getTimeStamp).reversed());
+    queue.add(RefactoringEntry.fromString(innerState.map.get(commitId)));
+    Set<String> visited = new HashSet<>();
+    while (!queue.isEmpty()) {
+      RefactoringEntry refactoringEntry = queue.remove();
       refs.addAll(refactoringEntry.getRefactorings());
-      commitId = refactoringEntry.getParentCommit();
+      visited.add(refactoringEntry.getCommitId());
+      refactoringEntry.getParents().forEach(e -> {
+        if (innerState.map.containsKey(e) && !visited.contains(e)) {
+          queue.add(RefactoringEntry.fromString(innerState.map.get(e)));
+          visited.add(e);
+        }
+      });
     }
     Collections.reverse(refs);
     return refs;

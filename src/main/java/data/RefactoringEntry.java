@@ -9,17 +9,23 @@ import org.refactoringminer.api.Refactoring;
 public class RefactoringEntry implements Serializable {
 
   private List<RefactoringInfo> data;
-  private String parentCommit;
+  private List<String> parents;
+  private String commitId;
+  private long time;
 
   /**
    * Constructor for method refactoring.
    *
-   * @param data         the refactoring data.
-   * @param parentCommit the commit id as a Hash.
+   * @param data    the refactoring data.
+   * @param parents the commit ids of the parents.
+   * @param time    timestamp of the commit.
    */
-  public RefactoringEntry(List<RefactoringInfo> data, String parentCommit) {
+  public RefactoringEntry(List<RefactoringInfo> data, String commitId, List<String> parents,
+                          long time) {
     this.data = data;
-    this.parentCommit = parentCommit;
+    this.parents = parents;
+    this.time = time;
+    this.commitId = commitId;
   }
 
   /**
@@ -42,26 +48,28 @@ public class RefactoringEntry implements Serializable {
 
   /**
    * Converter to Json.
+   *
    * @param refactorings to be processed.
-   * @param commitId current commit.
-   * @param parentCommit parent id of the current commit.
+   * @param commitId     current commit.
+   * @param parents      parent ids of the current commit.
+   * @param time         timestamp of the current commit.
    * @return Json string.
    */
   public static String convert(List<Refactoring> refactorings, String commitId,
-                               String parentCommit) {
+                               List<String> parents, long time) {
     return new RefactoringEntry(
         refactorings.stream()
             .map(refactoring -> new RefactoringInfo(refactoring, commitId))
             .collect(Collectors.toList()),
-        parentCommit).toString();
+        commitId, parents, time).toString();
   }
 
   public List<RefactoringInfo> getRefactorings() {
     return data;
   }
 
-  public String getParentCommit() {
-    return parentCommit;
+  public List<String> getParents() {
+    return parents;
   }
 
   @Override
@@ -69,4 +77,11 @@ public class RefactoringEntry implements Serializable {
     return new Gson().toJson(this);
   }
 
+  public long getTimeStamp() {
+    return time;
+  }
+
+  public String getCommitId() {
+    return commitId;
+  }
 }
