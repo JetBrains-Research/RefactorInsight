@@ -1,14 +1,14 @@
 package refactoringInfo.types;
 
-import com.intellij.psi.JavaPsiFacade;
 import gr.uom.java.xmi.diff.RenameClassRefactoring;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import javassist.NotFoundException;
 import org.refactoringminer.api.Refactoring;
 import refactoringInfo.RefactoringInfo;
+import refactoringInfo.TrueCodeRange;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 
 public class RenameClassHandler implements Handler {
 
@@ -19,10 +19,14 @@ public class RenameClassHandler implements Handler {
     refactoringInfo.getRenames().put(ref.getOriginalClassName(),
         ref.getRenamedClassName());
     try {
-      int[] nameIndeces = getNameIndex(refactoringInfo.getText(), refactoringInfo.getName());
+      TrueCodeRange leftCodeRange = refactoringInfo.getLeftSide().get(0);
+      int[] nameIndeces = getNameIndex(leftCodeRange.getCodeElement(), ref.getOriginalClassName());
+
+      refactoringInfo.getLeftSide().get(0).incrementTrueStartLine(nameIndeces[0]);
     } catch (Exception e) {
       e.printStackTrace();
     }
+
     return refactoringInfo;
   }
 
