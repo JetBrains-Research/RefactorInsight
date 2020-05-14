@@ -76,7 +76,7 @@ public class GitWindow extends ToggleAction {
     System.out.println("Button ON");
     e.getProject().getService(MiningService.class).loaded();
     int index = table.getSelectionModel().getAnchorSelectionIndex();
-    if(index != -1) {
+    if (index != -1) {
       scrollPane.getViewport().setView(buildList(index));
     }
     viewport.setView(scrollPane);
