@@ -36,10 +36,8 @@ checkStyle:
 
 test:
   stage: test
-  artifacts:
-    untracked: true
   script:
-    gradle check
+    gradle test
 
 #coverage:
 #  stage: coverage
