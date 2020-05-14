@@ -1,7 +1,6 @@
 package data;
 
 import com.google.gson.Gson;
-import gr.uom.java.xmi.diff.CodeRange;
 import gr.uom.java.xmi.diff.MoveAndRenameClassRefactoring;
 import gr.uom.java.xmi.diff.MoveClassRefactoring;
 import gr.uom.java.xmi.diff.RenameClassRefactoring;
@@ -12,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
-import processors.MethodRefactoringProcessor;
 
 public class RefactoringInfo {
 
@@ -22,56 +20,59 @@ public class RefactoringInfo {
   private String signatureBefore;
   private String signatureAfter;
   private RefactoringType type;
-  private List<CodeRange> leftSide;
-  private List<CodeRange> rightSide;
+  private List<TrueCodeRange> leftSide;
+  private List<TrueCodeRange> rightSide;
   private Map<String, String> renames;
+  private int[] nameIndeces = {0, 0};
 
-  /**
-   * Constructor for refactoring info data structure.
-   *
-   * @param refactoring to extract the info from
-   */
-  public RefactoringInfo(Refactoring refactoring, String commitId) {
-    name = refactoring.getName();
-    type = refactoring.getRefactoringType();
-    text = refactoring.toString();
-    leftSide = refactoring.leftSide();
-    rightSide = refactoring.rightSide();
-    renames = new HashMap<>();
+  public RefactoringInfo setName(String name) {
+    this.name = name;
+    return this;
+  }
+
+  public RefactoringInfo setCommitId(String commitId) {
     this.commitId = commitId;
-    MethodRefactoringProcessor processor = new MethodRefactoringProcessor("");
-    MethodRefactoringData ref = processor.process(refactoring);
-    signatureBefore = ref == null ? "" : ref.getMethodBefore();
-    signatureAfter = ref == null ? "" : ref.getMethodAfter();
-    processType(type, refactoring);
+    return this;
+  }
+
+  public RefactoringInfo setSignatureBefore(String signatureBefore) {
+    this.signatureBefore = signatureBefore;
+    return this;
+  }
+
+  public RefactoringInfo setSignatureAfter(String signatureAfter) {
+    this.signatureAfter = signatureAfter;
+    return this;
+  }
+
+  public RefactoringInfo setType(RefactoringType type) {
+    this.type = type;
+    return this;
+  }
+
+  public RefactoringInfo setLeftSide(List<TrueCodeRange> leftSide) {
+    this.leftSide = leftSide;
+    return this;
+  }
+
+  public RefactoringInfo setRightSide(List<TrueCodeRange> rightSide) {
+    this.rightSide = rightSide;
+    return this;
+  }
+
+  public RefactoringInfo setRenames(Map<String, String> renames) {
+    this.renames = renames;
+    return this;
+  }
+
+  public RefactoringInfo setNameIndeces(int[] nameIndeces) {
+    this.nameIndeces = nameIndeces;
+    return this;
   }
 
   public RefactoringInfo() {
   }
 
-  /**
-   * Deserialize a refactoring info json.
-   *
-   * @param value json string
-   * @return a new data.RefactoringInfo object
-   */
-  public static RefactoringInfo fromString(String value) {
-    if (value == null || value.equals("")) {
-      return null;
-    }
-    try {
-      return new Gson().fromJson(value, RefactoringInfo.class);
-    } catch (Exception e) {
-      e.printStackTrace();
-      RefactoringInfo ri = new RefactoringInfo();
-      ri.setText("wtf: " + value);
-      return ri;
-    }
-  }
-
-  public static String convert(Refactoring refactoring, String commitId) {
-    return new RefactoringInfo(refactoring, commitId).toString();
-  }
 
   /**
    * Adds this refactoring to the method history map.
@@ -108,8 +109,9 @@ public class RefactoringInfo {
     return text;
   }
 
-  public void setText(String text) {
+  public RefactoringInfo setText(String text) {
     this.text = text;
+    return this;
   }
 
   public String getCommitId() {
@@ -120,11 +122,11 @@ public class RefactoringInfo {
     return type;
   }
 
-  public List<CodeRange> getLeftSide() {
+  public List<TrueCodeRange> getLeftSide() {
     return leftSide;
   }
 
-  public List<CodeRange> getRightSide() {
+  public List<TrueCodeRange> getRightSide() {
     return rightSide;
   }
 

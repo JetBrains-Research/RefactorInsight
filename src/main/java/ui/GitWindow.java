@@ -37,6 +37,7 @@ import javax.swing.event.ListSelectionListener;
 import org.jetbrains.annotations.NotNull;
 import services.MiningService;
 
+
 public class GitWindow extends ToggleAction {
 
   Project project;
@@ -140,7 +141,7 @@ public class GitWindow extends ToggleAction {
           List<LineRange> ranges = new ArrayList<>();
           ri.getLeftSide().forEach(cr -> {
             if ((project.getBasePath() + "/" + cr.getFilePath()).equals(c.getFile().getPath())) {
-              ranges.add(new LineRange(cr.getStartLine() - 1, cr.getEndLine()));
+              ranges.add(new LineRange(cr.getTrueStartLine() - 1, cr.getTrueEndLine()));
             }
           });
           return new HalfDiffInfo(ranges, c);
@@ -155,7 +156,7 @@ public class GitWindow extends ToggleAction {
           List<LineRange> ranges = new ArrayList<>();
           ri.getRightSide().forEach(cr -> {
             if ((project.getBasePath() + "/" + cr.getFilePath()).equals(c.getFile().getPath())) {
-              ranges.add(new LineRange(cr.getStartLine() - 1, cr.getEndLine()));
+              ranges.add(new LineRange(cr.getTrueStartLine() - 1, cr.getTrueEndLine()));
             }
           });
           return new HalfDiffInfo(ranges, c);
