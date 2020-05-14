@@ -70,7 +70,8 @@ public class RefactoringInfo {
     return this;
   }
 
-  public RefactoringInfo() {
+  public RefactoringInfo(Refactoring refactoring) {
+    processType(refactoring);
   }
 
 
@@ -143,8 +144,8 @@ public class RefactoringInfo {
     return signatureAfter;
   }
 
-  private void processType(RefactoringType type, Refactoring refactoring) {
-    switch (type) {
+  private void processType(Refactoring refactoring) {
+    switch (refactoring.getRefactoringType()) {
       case RENAME_CLASS:
         RenameClassRefactoring renameClassRefactoring =
             (RenameClassRefactoring) refactoring;

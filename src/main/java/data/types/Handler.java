@@ -30,7 +30,7 @@ public interface Handler {
     String signatureBefore = ref == null ? "" : ref.getMethodBefore();
     String signatureAfter = ref == null ? "" : ref.getMethodAfter();
 
-    return new RefactoringInfo()
+    return new RefactoringInfo(refactoring)
         .setName(refactoring.getName())
         .setText(refactoring.toString())
         .setType(refactoring.getRefactoringType())
