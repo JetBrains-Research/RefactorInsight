@@ -12,7 +12,7 @@ public class RefactoringEntry implements Serializable {
   private List<String> parents;
   private String commitId;
   private long time;
-  private static InfoFactory factory = new InfoFactory();;
+  private static InfoFactory factory = new InfoFactory();
 
   /**
    * Constructor for method refactoring.
