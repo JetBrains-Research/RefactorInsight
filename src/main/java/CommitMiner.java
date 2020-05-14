@@ -6,6 +6,11 @@ import git4idea.repo.GitRepository;
 import gr.uom.java.xmi.diff.MoveAndRenameClassRefactoring;
 import gr.uom.java.xmi.diff.MoveClassRefactoring;
 import gr.uom.java.xmi.diff.RenameClassRefactoring;
+import org.refactoringminer.api.*;
+import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
+import org.refactoringminer.util.GitServiceImpl;
+import refactoringInfo.InfoFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,14 +18,6 @@ import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import org.refactoringminer.api.GitHistoryRefactoringMiner;
-import org.refactoringminer.api.GitService;
-import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringHandler;
-import org.refactoringminer.api.RefactoringType;
-import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
-import org.refactoringminer.util.GitServiceImpl;
-import refactoringInfo.RefactoringInfo;
 
 public class CommitMiner implements Consumer<GitCommit> {
 
@@ -35,6 +32,7 @@ public class CommitMiner implements Consumer<GitCommit> {
   public List<ClassRename> classRenames;
   private Map<String, List<String>> methodsMap;
   private MethodRefactoringProcessor processor;
+  private InfoFactory infoFactory;
 
 
   /**
@@ -53,12 +51,12 @@ public class CommitMiner implements Consumer<GitCommit> {
     this.methodsMap = methodsMap;
     this.repository = repository;
     this.processor = new MethodRefactoringProcessor(repository.getProject().getBasePath());
-    this.renameOperations = new ArrayList<MethodRefactoring>();
+    this.renameOperations = new ArrayList<>();
     this.classRenames = new ArrayList<>();
     this.commitsDone = commitsDone;
     this.progressIndicator = progressIndicator;
     this.limit = limit;
-
+    infoFactory = new InfoFactory();
   }
 
   @Override
@@ -107,7 +105,7 @@ public class CommitMiner implements Consumer<GitCommit> {
                               ((RenameClassRefactoring) x).getRenamedClassName(),
                               gitCommit.getCommitTime())));
 
-                  map.put(commitId, refactorings.stream().map(RefactoringInfo::convert).collect(
+                  map.put(commitId, refactorings.stream().map(ref -> infoFactory.create(ref).toString()).collect(
                       Collectors.toList()));
                   incrementProgress();
                 }

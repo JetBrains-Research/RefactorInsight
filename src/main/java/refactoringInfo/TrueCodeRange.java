@@ -6,6 +6,7 @@ public class TrueCodeRange extends CodeRange {
 
     private int trueStartLine;
     private int trueEndLine;
+
     private String trueCodeElement;
 
     public TrueCodeRange(CodeRange codeRange) {
@@ -13,7 +14,7 @@ public class TrueCodeRange extends CodeRange {
                 codeRange.getStartColumn(), codeRange.getEndColumn(), codeRange.getCodeElementType());
         trueStartLine = this.getStartLine();
         trueEndLine = this.getEndLine();
-        trueCodeElement = this.getCodeElement();
+        trueCodeElement = codeRange.getCodeElement();
     }
 
     public int getTrueStartLine() {
@@ -34,5 +35,13 @@ public class TrueCodeRange extends CodeRange {
 
     public void setTrueEndLine(int trueEndLine) {
         this.trueEndLine = trueEndLine;
+    }
+
+    public String getTrueCodeElement() {
+        return trueCodeElement;
+    }
+
+    public void setTrueCodeElement(String trueCodeElement) {
+        this.trueCodeElement = trueCodeElement;
     }
 }
