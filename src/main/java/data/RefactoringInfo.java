@@ -71,6 +71,7 @@ public class RefactoringInfo {
   }
 
   public RefactoringInfo(Refactoring refactoring) {
+    renames = new HashMap<>();
     processType(refactoring);
   }
 
