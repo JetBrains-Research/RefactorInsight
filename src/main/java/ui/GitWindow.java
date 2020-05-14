@@ -46,7 +46,6 @@ public class GitWindow extends ToggleAction {
   private JBViewport viewport;
   private boolean selected = false;
   private VcsLogGraphTable table;
-  private JBLabel test;
   private JBScrollPane scrollPane;
   private MiningService miningService;
 
@@ -62,18 +61,24 @@ public class GitWindow extends ToggleAction {
 
     table = logUI.getTable();
     table.getSelectionModel().addListSelectionListener(new CommitSelectionListener());
+
     event = e;
 
     myDiffContentFactory = DiffContentFactoryEx.getInstanceEx();
 
     viewport = (JBViewport) changesTree.getParent();
-    test = new JBLabel("TEST LABEL");
-    test.setVerticalAlignment(JBLabel.CENTER);
-    scrollPane = new JBScrollPane(test);
+
+    scrollPane = new JBScrollPane(new JBLabel("Select a commit to view refactorings"));
+
   }
 
   private void toRefactoringView(@NotNull AnActionEvent e) {
     System.out.println("Button ON");
+    e.getProject().getService(MiningService.class).loaded();
+    int index = table.getSelectionModel().getAnchorSelectionIndex();
+    if(index != -1) {
+      scrollPane.getViewport().setView(buildList(index));
+    }
     viewport.setView(scrollPane);
   }
 
@@ -102,7 +107,6 @@ public class GitWindow extends ToggleAction {
   @Override
   public void update(@NotNull AnActionEvent e) {
     e.getPresentation().setVisible(true);
-    e.getProject().getService(MiningService.class).loaded();
     super.update(e);
   }
 
