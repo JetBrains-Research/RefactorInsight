@@ -1,8 +1,11 @@
+package actions;
+
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
+import services.MiningService;
 
 public class ClearRefactoringCacheAction extends AnAction {
 

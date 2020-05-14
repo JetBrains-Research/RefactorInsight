@@ -1,3 +1,5 @@
+package diff;
+
 public class LineRange {
   public int start;
   public int end;

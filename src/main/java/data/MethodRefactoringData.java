@@ -1,3 +1,5 @@
+package data;
+
 import java.io.Serializable;
 import org.refactoringminer.api.RefactoringType;
 
@@ -6,7 +8,6 @@ public class MethodRefactoringData implements Serializable {
   private RefactoringType type;
   private String methodBefore;
   private String methodAfter;
-  private long timeOfCommit;
 
   /**
    * Constructor for the methods refactoring class.
@@ -16,11 +17,10 @@ public class MethodRefactoringData implements Serializable {
    * @param methodAfter  method after the refactoring.
    */
   public MethodRefactoringData(RefactoringType type,
-                               String methodBefore, String methodAfter, long timeOfCommit) {
+                               String methodBefore, String methodAfter) {
     this.type = type;
     this.methodBefore = methodBefore;
     this.methodAfter = methodAfter;
-    this.timeOfCommit = timeOfCommit;
   }
 
   public String getMethodAfter() {
@@ -33,10 +33,6 @@ public class MethodRefactoringData implements Serializable {
 
   public RefactoringType getType() {
     return type;
-  }
-
-  public long getTimeOfCommit() {
-    return timeOfCommit;
   }
 
 }
