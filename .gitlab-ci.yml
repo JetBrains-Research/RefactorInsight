@@ -3,7 +3,7 @@ image: gradle:6.0-jdk11
 stages:
   - build
   - validate
-#  - test
+  - test
 #  - coverage
 
 variables:
@@ -33,14 +33,14 @@ checkStyle:
     paths:
       - build/
       - .gradle/
-#
-#test:
-#  stage: test
-#  artifacts:
-#    untracked: true
-#  script:
-#    gradle check
-#
+
+test:
+  stage: test
+  artifacts:
+    untracked: true
+  script:
+    gradle check
+
 #coverage:
 #  stage: coverage
 #  dependencies:

@@ -54,6 +54,7 @@ intellij {
 checkstyle {
     toolVersion "8.31"
     configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+    checkstyleTest.enabled = false
 }
 
 
