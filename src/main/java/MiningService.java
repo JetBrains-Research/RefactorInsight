@@ -46,6 +46,10 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     return ServiceManager.getService(project, MiningService.class);
   }
 
+  public boolean isMining() {
+    return mining;
+  }
+
   @Override
   public MyState getState() {
     return innerState;

@@ -29,6 +29,10 @@
                 description="Clear refactoring cache">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
         </action>
+        <action id="RefactoringAction" class="RefactoringAction" text="Mine Repo"
+                description="Start refactoring miner">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+        </action>
         <action id="MethodHistory" class="MethodHistory" text="Check method&#39;s history"
                 description="Retrieve refactorings history for this method">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
