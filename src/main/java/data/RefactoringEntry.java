@@ -12,6 +12,7 @@ public class RefactoringEntry implements Serializable {
   private List<String> parents;
   private String commitId;
   private long time;
+  private static InfoFactory factory = new InfoFactory();;
 
   /**
    * Constructor for method refactoring.
@@ -59,7 +60,7 @@ public class RefactoringEntry implements Serializable {
                                List<String> parents, long time) {
     return new RefactoringEntry(
         refactorings.stream()
-            .map(refactoring -> new RefactoringInfo(refactoring, commitId))
+            .map(refactoring -> factory.create(refactoring, commitId))
             .collect(Collectors.toList()),
         commitId, parents, time).toString();
   }

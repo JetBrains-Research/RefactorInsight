@@ -25,9 +25,7 @@ import diff.FileDiffInfo;
 import diff.HalfDiffInfo;
 import diff.LineRange;
 import org.jetbrains.annotations.NotNull;
-import refactoringInfo.RefactoringInfo;
 
-import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.event.MouseAdapter;
@@ -38,9 +36,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.DefaultListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import org.jetbrains.annotations.NotNull;
 import services.MiningService;
 
 public class GitWindow extends ToggleAction {
