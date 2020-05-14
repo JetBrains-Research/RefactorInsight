@@ -22,9 +22,16 @@ public interface Handler {
     String signatureBefore = ref == null ? "" : ref.getMethodBefore();
     String signatureAfter = ref == null ? "" : ref.getMethodAfter();
 
-    return new RefactoringInfo(refactoring.getName(), refactoring.toString(),
-        refactoring.getRefactoringType(), left, right, commitId,
-        signatureBefore, signatureAfter);
+    return new RefactoringInfo()
+        .setName(refactoring.getName())
+        .setText(refactoring.toString())
+        .setType(refactoring.getRefactoringType())
+        .setLeftSide(left)
+        .setRightSide(right)
+        .setCommitId(commitId)
+        .setSignatureBefore(signatureBefore)
+        .setSignatureAfter(signatureAfter);
+
   }
 
 }

@@ -25,29 +25,50 @@ public class RefactoringInfo {
   private Map<String, String> renames;
   private int[] nameIndeces = {0, 0};
 
-  /**
-   * Constructor for refactoring info data structure.
-   *
-   * @param name of the refactoring
-   * @param text of the refactoring
-   * @param type of the refactoring
-   * @param leftSide before refactoring data
-   * @param rightSide after refactoring data
-   */
-  public RefactoringInfo(String name, String text, RefactoringType type, List<TrueCodeRange> leftSide,
-                         List<TrueCodeRange> rightSide, String commitId, String signatureBefore,
-                         String signatureAfter) {
+  public RefactoringInfo setName(String name) {
     this.name = name;
-    this.type = type;
-    this.text = text;
-    this.leftSide = leftSide;
-    this.rightSide = rightSide;
-    this.commitId = commitId;
-    renames = new HashMap<>();
-    this.signatureBefore = signatureBefore;
-    this.signatureAfter = signatureAfter;
+    return this;
   }
 
+  public RefactoringInfo setCommitId(String commitId) {
+    this.commitId = commitId;
+    return this;
+  }
+
+  public RefactoringInfo setSignatureBefore(String signatureBefore) {
+    this.signatureBefore = signatureBefore;
+    return this;
+  }
+
+  public RefactoringInfo setSignatureAfter(String signatureAfter) {
+    this.signatureAfter = signatureAfter;
+    return this;
+  }
+
+  public RefactoringInfo setType(RefactoringType type) {
+    this.type = type;
+    return this;
+  }
+
+  public RefactoringInfo setLeftSide(List<TrueCodeRange> leftSide) {
+    this.leftSide = leftSide;
+    return this;
+  }
+
+  public RefactoringInfo setRightSide(List<TrueCodeRange> rightSide) {
+    this.rightSide = rightSide;
+    return this;
+  }
+
+  public RefactoringInfo setRenames(Map<String, String> renames) {
+    this.renames = renames;
+    return this;
+  }
+
+  public RefactoringInfo setNameIndeces(int[] nameIndeces) {
+    this.nameIndeces = nameIndeces;
+    return this;
+  }
 
   public RefactoringInfo() {
   }
@@ -88,8 +109,9 @@ public class RefactoringInfo {
     return text;
   }
 
-  public void setText(String text) {
+  public RefactoringInfo setText(String text) {
     this.text = text;
+    return this;
   }
 
   public String getCommitId() {
