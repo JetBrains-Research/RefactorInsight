@@ -1,3 +1,5 @@
+package ui;
+
 import com.intellij.diff.DiffContentFactoryEx;
 import com.intellij.diff.DiffManager;
 import com.intellij.diff.contents.DiffContent;
@@ -17,6 +19,11 @@ import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
+import data.RefactoringEntry;
+import data.RefactoringInfo;
+import diff.FileDiffInfo;
+import diff.HalfDiffInfo;
+import diff.LineRange;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -28,9 +35,13 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.jetbrains.annotations.NotNull;
+import services.MiningService;
 
 public class GitWindow extends ToggleAction {
 
+  Project project;
+  AnActionEvent event;
+  DiffContentFactoryEx myDiffContentFactory;
   private ChangesTree changesTree;
   private JBViewport viewport;
   private boolean selected = false;
@@ -38,10 +49,6 @@ public class GitWindow extends ToggleAction {
   private JBLabel test;
   private JBScrollPane scrollPane;
   private MiningService miningService;
-  Project project;
-  AnActionEvent event;
-  DiffContentFactoryEx myDiffContentFactory;
-
 
   private void setUp(@NotNull AnActionEvent e) {
     VcsLogChangesBrowser changesBrowser =
@@ -92,24 +99,6 @@ public class GitWindow extends ToggleAction {
     selected = state;
   }
 
-  class CommitSelectionListener implements ListSelectionListener {
-    @Override
-    public void valueChanged(ListSelectionEvent listSelectionEvent) {
-      if (listSelectionEvent.getValueIsAdjusting()) {
-        return;
-      }
-      DefaultListSelectionModel selectionModel =
-          (DefaultListSelectionModel) listSelectionEvent.getSource();
-
-      int beginIndex = selectionModel.getMinSelectionIndex();
-      int endIndex = selectionModel.getMaxSelectionIndex();
-
-      if (beginIndex != -1 || endIndex != -1) {
-        scrollPane.getViewport().setView(buildList(beginIndex));
-      }
-    }
-  }
-
   @Override
   public void update(@NotNull AnActionEvent e) {
     e.getPresentation().setVisible(true);
@@ -120,11 +109,9 @@ public class GitWindow extends ToggleAction {
   private JBList buildList(int index) {
     String commitId = table.getModel().getCommitId(index).getHash().asString();
 
-    List<RefactoringInfo> refs = miningService.getRefactorings(commitId)
-        .stream()
-        .map(RefactoringInfo::fromString)
-        .collect(Collectors.toList());
-
+    List<RefactoringInfo> refs =
+        RefactoringEntry.fromString(miningService.getRefactorings(commitId))
+            .getRefactorings();
     String[] names = refs.stream()
         .map(r -> r != null ? r.getName() : "not mined, DON'T CLICK!!")
         .toArray(String[]::new);
@@ -202,6 +189,24 @@ public class GitWindow extends ToggleAction {
 
       DiffManager.getInstance().showDiff(project, request);
     });
+  }
+
+  class CommitSelectionListener implements ListSelectionListener {
+    @Override
+    public void valueChanged(ListSelectionEvent listSelectionEvent) {
+      if (listSelectionEvent.getValueIsAdjusting()) {
+        return;
+      }
+      DefaultListSelectionModel selectionModel =
+          (DefaultListSelectionModel) listSelectionEvent.getSource();
+
+      int beginIndex = selectionModel.getMinSelectionIndex();
+      int endIndex = selectionModel.getMaxSelectionIndex();
+
+      if (beginIndex != -1 || endIndex != -1) {
+        scrollPane.getViewport().setView(buildList(beginIndex));
+      }
+    }
   }
 
 
