@@ -1,13 +1,56 @@
 package data;
 
-//CHECKSTYLE:OFF
-import data.types.*;
-//CHECKSTYLE:ON
+import data.types.AddMethodAnnotationHandler;
+import data.types.ChangeAttributeTypeHandler;
+import data.types.ChangeMethodSignatureHandler;
+import data.types.ChangeParameterTypeHandler;
+import data.types.ChangeReturnTypeHandler;
+import data.types.ChangeVariableTypeHandler;
+import data.types.ExtractAndMoveOperationHandler;
+import data.types.ExtractAttributeHandler;
+import data.types.ExtractClassHandler;
+import data.types.ExtractInterfaceHandler;
+import data.types.ExtractOperationHandler;
+import data.types.ExtractSubClassHandler;
+import data.types.ExtractSuperClassHandler;
+import data.types.ExtractVariableHandler;
+import data.types.Handler;
+import data.types.InlineOperationHandler;
+import data.types.InlineVariableHandler;
+import data.types.MergeAttributeHandler;
+import data.types.MergeOperationHandler;
+import data.types.MergeParameterHandler;
+import data.types.MergeVariableHandler;
+import data.types.ModifyMethodAnnotationHandler;
+import data.types.MoveAndInlineOperationHandler;
+import data.types.MoveAndRenameOperationHandler;
+import data.types.MoveAttributeHandler;
+import data.types.MoveClassHandler;
+import data.types.MoveOperationHandler;
+import data.types.MoveRenameAttributeHandler;
+import data.types.MoveRenameClassHandler;
+import data.types.MoveSourceFolderHandler;
+import data.types.ParameterizeVariableHandler;
+import data.types.PullUpAttributeHandler;
+import data.types.PullUpOperationHandler;
+import data.types.PushDownAttributeHandler;
+import data.types.PushDownOperationHandler;
+import data.types.RemoveMethodAnnotationHandler;
+import data.types.RenameAttributeHandler;
+import data.types.RenameClassHandler;
+import data.types.RenameMethodHandler;
+import data.types.RenamePackageHandler;
+import data.types.RenameParameterHandler;
+import data.types.RenameVariableHandler;
+import data.types.ReplaceAttributeHandler;
+import data.types.ReplaceVariableWithAttributeHandler;
+import data.types.SplitAttributeHandler;
+import data.types.SplitParameterHandler;
+import data.types.SplitVariableHandler;
 import java.util.HashMap;
 import java.util.Map;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
-
 
 public class InfoFactory {
 
@@ -17,92 +60,99 @@ public class InfoFactory {
    * Constructor for the infoFactory.
    */
   public InfoFactory() {
+
     refactoringHandlers.put(RefactoringType.CHANGE_ATTRIBUTE_TYPE,
-            new ChangeAttributeTypeHandler());
+        new ChangeAttributeTypeHandler());
     refactoringHandlers.put(RefactoringType.CHANGE_PARAMETER_TYPE,
-            new ChangeParameterTypeHandler());
+        new ChangeParameterTypeHandler());
     refactoringHandlers.put(RefactoringType.CHANGE_RETURN_TYPE,
-            new ChangeReturnTypeHandler());
+        new ChangeReturnTypeHandler());
     refactoringHandlers.put(RefactoringType.CHANGE_VARIABLE_TYPE,
-            new ChangeVariableTypeHandler());
+        new ChangeVariableTypeHandler());
+    refactoringHandlers.put(RefactoringType.CHANGE_METHOD_SIGNATURE,
+        new ChangeMethodSignatureHandler());
     refactoringHandlers.put(RefactoringType.EXTRACT_AND_MOVE_OPERATION,
-            new ExtractAndMoveOperationHandler());
+        new ExtractAndMoveOperationHandler());
     refactoringHandlers.put(RefactoringType.EXTRACT_ATTRIBUTE,
-            new ExtractAttributeHandler());
+        new ExtractAttributeHandler());
     refactoringHandlers.put(RefactoringType.EXTRACT_CLASS,
-            new ExtractClassHandler());
+        new ExtractClassHandler());
     refactoringHandlers.put(RefactoringType.EXTRACT_INTERFACE,
-            new ExtractInterfaceHandler());
+        new ExtractInterfaceHandler());
     refactoringHandlers.put(RefactoringType.EXTRACT_OPERATION,
-            new ExtractOperationHandler());
+        new ExtractOperationHandler());
     refactoringHandlers.put(RefactoringType.EXTRACT_SUBCLASS,
-            new ExtractSubClassHandler());
+        new ExtractSubClassHandler());
     refactoringHandlers.put(RefactoringType.EXTRACT_SUPERCLASS,
-            new ExtractSuperClassHandler());
+        new ExtractSuperClassHandler());
     refactoringHandlers.put(RefactoringType.EXTRACT_VARIABLE,
-            new ExtractVariableHandler());
+        new ExtractVariableHandler());
     refactoringHandlers.put(RefactoringType.INLINE_OPERATION,
-            new InlineOperationHandler());
+        new InlineOperationHandler());
     refactoringHandlers.put(RefactoringType.INLINE_VARIABLE,
-            new InlineVariableHandler());
+        new InlineVariableHandler());
     refactoringHandlers.put(RefactoringType.MERGE_ATTRIBUTE,
-            new MergeAttributeHandler());
+        new MergeAttributeHandler());
     refactoringHandlers.put(RefactoringType.MERGE_PARAMETER,
-            new MergeParameterHandler());
+        new MergeParameterHandler());
     refactoringHandlers.put(RefactoringType.MERGE_VARIABLE,
-            new MergeVariableHandler());
+        new MergeVariableHandler());
+    refactoringHandlers.put(RefactoringType.MERGE_OPERATION,
+        new MergeOperationHandler());
     refactoringHandlers.put(RefactoringType.MODIFY_METHOD_ANNOTATION,
-            new ModifyMethodAnnotationHandler());
+        new ModifyMethodAnnotationHandler());
     refactoringHandlers.put(RefactoringType.MOVE_AND_INLINE_OPERATION,
-            new MoveAndInlineOperationHandler());
+        new MoveAndInlineOperationHandler());
     refactoringHandlers.put(RefactoringType.MOVE_AND_RENAME_OPERATION,
-            new MoveAndRenameOperationHandler());
+        new MoveAndRenameOperationHandler());
     refactoringHandlers.put(RefactoringType.MOVE_ATTRIBUTE,
-            new MoveAttributeHandler());
+        new MoveAttributeHandler());
     refactoringHandlers.put(RefactoringType.MOVE_CLASS,
-            new MoveClassHandler());
+        new MoveClassHandler());
     refactoringHandlers.put(RefactoringType.MOVE_OPERATION,
-            new MoveOperationHandler());
+        new MoveOperationHandler());
     refactoringHandlers.put(RefactoringType.MOVE_RENAME_ATTRIBUTE,
-            new MoveRenameAttributeHandler());
+        new MoveRenameAttributeHandler());
     refactoringHandlers.put(RefactoringType.MOVE_RENAME_CLASS,
-            new MoveRenameClassHandler());
+        new MoveRenameClassHandler());
     refactoringHandlers.put(RefactoringType.MOVE_SOURCE_FOLDER,
-            new MoveSourceFolderHandler());
+        new MoveSourceFolderHandler());
     refactoringHandlers.put(RefactoringType.PARAMETERIZE_VARIABLE,
-            new ParameterizeVariableHandler());
+        new ParameterizeVariableHandler());
     refactoringHandlers.put(RefactoringType.PULL_UP_ATTRIBUTE,
-            new PullUpAttributeHandler());
+        new PullUpAttributeHandler());
     refactoringHandlers.put(RefactoringType.PULL_UP_OPERATION,
-            new PullUpOperationHandler());
+        new PullUpOperationHandler());
     refactoringHandlers.put(RefactoringType.PUSH_DOWN_ATTRIBUTE,
-            new PushDownAttributeHandler());
+        new PushDownAttributeHandler());
     refactoringHandlers.put(RefactoringType.PUSH_DOWN_OPERATION,
-            new PushDownOperationHandler());
+        new PushDownOperationHandler());
     refactoringHandlers.put(RefactoringType.REMOVE_METHOD_ANNOTATION,
-            new RemoveMethodAnnotationHandler());
+        new RemoveMethodAnnotationHandler());
     refactoringHandlers.put(RefactoringType.RENAME_ATTRIBUTE,
-            new RenameAttributeHandler());
+        new RenameAttributeHandler());
     refactoringHandlers.put(RefactoringType.RENAME_CLASS,
-            new RenameClassHandler());
+        new RenameClassHandler());
     refactoringHandlers.put(RefactoringType.RENAME_METHOD,
-            new RenameMethodHandler());
+        new RenameMethodHandler());
     refactoringHandlers.put(RefactoringType.RENAME_PACKAGE,
-            new RenamePackageHandler());
+        new RenamePackageHandler());
     refactoringHandlers.put(RefactoringType.RENAME_PARAMETER,
-            new RenameParameterHandler());
+        new RenameParameterHandler());
     refactoringHandlers.put(RefactoringType.RENAME_VARIABLE,
-            new RenameVariableHandler());
+        new RenameVariableHandler());
     refactoringHandlers.put(RefactoringType.REPLACE_ATTRIBUTE,
-            new ReplaceAttributeHandler());
+        new ReplaceAttributeHandler());
     refactoringHandlers.put(RefactoringType.REPLACE_VARIABLE_WITH_ATTRIBUTE,
-            new ReplaceVariableWithAttributeHandler());
+        new ReplaceVariableWithAttributeHandler());
     refactoringHandlers.put(RefactoringType.SPLIT_ATTRIBUTE,
-            new SplitAttributeHandler());
+        new SplitAttributeHandler());
     refactoringHandlers.put(RefactoringType.SPLIT_PARAMETER,
-            new SplitParameterHandler());
+        new SplitParameterHandler());
     refactoringHandlers.put(RefactoringType.SPLIT_VARIABLE,
-            new SplitVariableHandler());
+        new SplitVariableHandler());
+    refactoringHandlers.put(RefactoringType.ADD_METHOD_ANNOTATION,
+        new AddMethodAnnotationHandler());
 
   }
 
@@ -110,11 +160,12 @@ public class InfoFactory {
    * Method that creates the relevant RefactoringInfo for a refactoring.
    *
    * @param refactoring to be analyzed
-   * @param commitId from which the is detected
+   * @param commitId    from which the is detected
    * @return resulting RefactoringInfo
    */
   public RefactoringInfo create(Refactoring refactoring, String commitId) {
-
-    return refactoringHandlers.get(refactoring.getRefactoringType()).handle(refactoring, commitId);
+    System.out.println(refactoring.getRefactoringType());
+    return refactoringHandlers.get(refactoring.getRefactoringType())
+        .handle(refactoring, commitId);
   }
 }
