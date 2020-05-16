@@ -49,8 +49,7 @@ public class MethodRefactoringPopup {
     } else {
       panel = new JBPanel();
       JBList<String> list = new JBList<>(refactorings.stream()
-          .map(s -> new String(s.getType().getDisplayName() + ":  "
-              + s.getNameBefore() + " -> " + s.getNameAfter()))
+          .map(s -> new String(s.getText()))
           .collect(Collectors.toList()));
 
       MouseAdapter mouseAdapter = new MouseAdapter() {

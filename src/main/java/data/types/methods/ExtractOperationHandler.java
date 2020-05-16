@@ -14,10 +14,9 @@ public class ExtractOperationHandler implements Handler {
   @Override
   public RefactoringInfo handle(Refactoring refactoring, String commitId) {
     ExtractOperationRefactoring ref = (ExtractOperationRefactoring) refactoring;
+
     TrueCodeRange left = new TrueCodeRange(ref.getSourceOperationBeforeExtraction().codeRange());
-
     TrueCodeRange right1 = new TrueCodeRange(ref.getSourceOperationAfterExtraction().codeRange());
-
     TrueCodeRange right2 = new TrueCodeRange(ref.getExtractedOperationCodeRange());
 
     if (!ref.getSourceOperationBeforeExtraction().getClassName().equals(ref
