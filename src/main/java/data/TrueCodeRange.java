@@ -16,7 +16,7 @@ public class TrueCodeRange extends CodeRange {
    */
   public TrueCodeRange(CodeRange codeRange) {
     super(codeRange.getFilePath(), codeRange.getStartLine(), codeRange.getEndLine(),
-            codeRange.getStartColumn(), codeRange.getEndColumn(), codeRange.getCodeElementType());
+        codeRange.getStartColumn(), codeRange.getEndColumn(), codeRange.getCodeElementType());
     trueStartLine = this.getStartLine();
     trueEndLine = this.getEndLine();
     trueCodeElement = codeRange.getCodeElement();
