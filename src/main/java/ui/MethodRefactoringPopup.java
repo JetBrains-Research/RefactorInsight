@@ -19,6 +19,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
+import services.RefactoringsBundle;
 
 
 public class MethodRefactoringPopup {
@@ -45,7 +46,7 @@ public class MethodRefactoringPopup {
     JBPanel panel;
     if (refactorings == null || refactorings.isEmpty()) {
       panel = new JBPanel(new GridLayout(0, 1));
-      panel.add(new JBLabel("No refactorings for this method."));
+      panel.add(new JBLabel(RefactoringsBundle.message("no.ref.method")));
     } else {
       panel = new JBPanel();
       JBList<String> list = new JBList<>(refactorings.stream()
@@ -80,8 +81,9 @@ public class MethodRefactoringPopup {
       panel.add(list);
 
       panel.setBorder(BorderFactory.createTitledBorder(
-          BorderFactory.createEtchedBorder(), "Refactoring history for "
-              + methodName.substring(methodName.lastIndexOf(".") + 1)));
+          BorderFactory.createEtchedBorder(),
+          String.format(RefactoringsBundle.message("method.refactoring.history"),
+              methodName.substring(methodName.lastIndexOf(".") + 1))));
     }
 
     JBPopup popup = JBPopupFactory.getInstance()

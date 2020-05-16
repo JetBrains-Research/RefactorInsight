@@ -36,6 +36,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.jetbrains.annotations.NotNull;
 import services.MiningService;
+import services.RefactoringsBundle;
 
 
 public class GitWindow extends ToggleAction {
@@ -69,7 +70,7 @@ public class GitWindow extends ToggleAction {
 
     viewport = (JBViewport) changesTree.getParent();
 
-    scrollPane = new JBScrollPane(new JBLabel("Select a commit to view refactorings"));
+    scrollPane = new JBScrollPane(new JBLabel(RefactoringsBundle.message("not.selected")));
 
   }
 
@@ -118,7 +119,7 @@ public class GitWindow extends ToggleAction {
         RefactoringEntry.fromString(miningService.getRefactorings(commitId))
             .getRefactorings();
     String[] names = refs.stream()
-        .map(r -> r != null ? r.getName() : "not mined, DON'T CLICK!!")
+        .map(r -> r != null ? r.getName() : RefactoringsBundle.message("not.mined"))
         .toArray(String[]::new);
 
     JBList<String> list = new JBList<>(names);
@@ -185,7 +186,7 @@ public class GitWindow extends ToggleAction {
           ? myDiffContentFactory.create(project, contentAfter, JavaClassFileType.INSTANCE)
           : myDiffContentFactory.createEmpty();
 
-      SimpleDiffRequest request = new SimpleDiffRequest("Refactorings",
+      SimpleDiffRequest request = new SimpleDiffRequest(RefactoringsBundle.message("title"),
           d1, d2, diffInfo.getLeftPath(), diffInfo.getRightPath());
 
       request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
