@@ -4,10 +4,8 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.util.Consumer;
 import com.intellij.vcs.log.Hash;
 import data.RefactoringEntry;
-import data.RefactoringInfo;
 import git4idea.GitCommit;
 import git4idea.repo.GitRepository;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -19,6 +17,7 @@ import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringHandler;
 import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
 import org.refactoringminer.util.GitServiceImpl;
+import services.RefactoringsBundle;
 
 public class CommitMiner implements Consumer<GitCommit> {
 
@@ -29,6 +28,7 @@ public class CommitMiner implements Consumer<GitCommit> {
   private final AtomicInteger commitsDone;
   private final ProgressIndicator progressIndicator;
   private final int limit;
+  private static final String progress = RefactoringsBundle.message("progress");
 
 
   /**
@@ -91,9 +91,11 @@ public class CommitMiner implements Consumer<GitCommit> {
 
   private void incrementProgress() {
     final int nCommits = commitsDone.incrementAndGet();
-    progressIndicator.setText("Mining refactoring: " + nCommits + "/" + limit);
+    progressIndicator.setText(String.format(progress,
+        nCommits, limit));
     progressIndicator.setFraction(
         (float) nCommits / limit);
+
 
   }
 }
