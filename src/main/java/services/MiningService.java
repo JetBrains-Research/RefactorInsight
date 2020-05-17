@@ -14,7 +14,6 @@ import data.RefactoringEntry;
 import data.RefactoringInfo;
 import git4idea.history.GitHistoryUtils;
 import git4idea.repo.GitRepository;
-import git4idea.repo.GitRepositoryManager;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -182,7 +181,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     List<RefactoringInfo> refs = new ArrayList<>();
     PriorityQueue<RefactoringEntry> queue = new PriorityQueue<>(
         Comparator.comparingLong(RefactoringEntry::getTimeStamp).reversed());
-    if(innerState.map.containsKey(commitId)) {
+    if (innerState.map.containsKey(commitId)) {
       queue.add(RefactoringEntry.fromString(innerState.map.get(commitId)));
     }
     Set<String> visited = new HashSet<>();
