@@ -155,7 +155,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
       return;
     }
     loaded = true;
-    mineRepo(GitRepositoryManager.getInstance(project).getRepositories().get(0));
+    //mineRepo(GitRepositoryManager.getInstance(project).getRepositories().get(0));
   }
 
   /**
@@ -182,7 +182,9 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     List<RefactoringInfo> refs = new ArrayList<>();
     PriorityQueue<RefactoringEntry> queue = new PriorityQueue<>(
         Comparator.comparingLong(RefactoringEntry::getTimeStamp).reversed());
-    queue.add(RefactoringEntry.fromString(innerState.map.get(commitId)));
+    if(innerState.map.containsKey(commitId)) {
+      queue.add(RefactoringEntry.fromString(innerState.map.get(commitId)));
+    }
     Set<String> visited = new HashSet<>();
     while (!queue.isEmpty()) {
       RefactoringEntry refactoringEntry = queue.remove();
@@ -203,9 +205,5 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     @NotNull
     @MapAnnotation
     public Map<String, String> map = new ConcurrentHashMap<>();
-  }
-
-  public boolean isMining() {
-    return mining;
   }
 }

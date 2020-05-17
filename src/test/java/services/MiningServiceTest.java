@@ -1,13 +1,13 @@
+package services;
+
 import com.intellij.openapi.vcs.Executor;
+import data.RefactoringEntry;
 import git4idea.test.GitExecutor;
 import git4idea.test.GitSingleRepoTest;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -50,11 +50,11 @@ public class MiningServiceTest extends GitSingleRepoTest {
     Executor.overwrite(file, fileContent1);
 
     String somethingElse = GitExecutor.addCommit(repo, "second commit");
+    repo.update();
 
     MiningService miner = myProject.getService(MiningService.class);
     miner.loaded();
-    ConcurrentHashMap<String, List<String>> methodsMap = new ConcurrentHashMap<>();
-    miner.mineRepo(repo, methodsMap);
+    miner.mineRepo(repo);
 
     //wait for miner to finish mining
     //this is busy waiting which floods your cpu
@@ -62,8 +62,8 @@ public class MiningServiceTest extends GitSingleRepoTest {
     while (miner.isMining()) {
     }
 
-    String refactoring = miner.getRefactorings(somethingElse).get(0);
-    String type = RefactoringInfo.fromString(refactoring).getName();
+    String refactoring = miner.getRefactorings(somethingElse);
+    String type = RefactoringEntry.fromString(refactoring).getRefactorings().get(0).getName();
     assertEquals("Rename Method", type);
   }
 
@@ -85,30 +85,18 @@ public class MiningServiceTest extends GitSingleRepoTest {
     File newGitDir = new File(projectPath + "/.git");
     FileUtils.deleteDirectory(newGitDir);
     oldGitDir.renameTo(newGitDir);
+    repo.update();
 
     MiningService miner = myProject.getService(MiningService.class);
     miner.loaded();
-    miner.mineRepo(repo, new ConcurrentHashMap<>());
+    miner.mineRepo(repo);
 
     while (miner.isMining()) {
     }
 
-    Iterator<List<String>> refactorings = miner.getState().map.values().iterator();
+    String name = RefactoringEntry.fromString(miner.getRefactorings(repo.getCurrentRevision()))
+        .getRefactorings().get(0).getName();
 
-    String refactoring = "";
-    while (refactorings.hasNext()) {
-      List<String> refs = refactorings.next();
-      if (refs.size() != 0) {
-        refactoring = refs.get(0);
-        break;
-      }
-    }
-
-    RefactoringInfo info = RefactoringInfo.fromString(refactoring);
-
-    assertEquals("Rename Method", info.getName());
-
+    assertEquals("Rename Method", name);
   }
-
-
 }
