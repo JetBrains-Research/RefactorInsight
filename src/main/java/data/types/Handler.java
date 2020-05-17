@@ -1,45 +1,37 @@
 package data.types;
 
-import data.MethodRefactoringData;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
+import gr.uom.java.xmi.UMLOperation;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
-import processors.MethodRefactoringProcessor;
 
 public interface Handler {
 
   /**
-   * Default handle method for unimplemented specific refactoring types.
+   * Builder for a method's signature.
    *
-   * @param refactoring to process
-   * @param commitId of the commit within the refactoring was detected
-   * @return the the built refactoringInfo
+   * @param operation retrieved from RefactoringMiner
+   * @return a String signature of the operation.
    */
-  default RefactoringInfo handle(Refactoring refactoring, String commitId) {
-    List<TrueCodeRange> left = refactoring.leftSide().stream()
-            .map(TrueCodeRange::new).collect(Collectors.toList());
-    List<TrueCodeRange> right = refactoring.rightSide().stream()
-            .map(TrueCodeRange::new).collect(Collectors.toList());
+  static String calculateSignature(UMLOperation operation) {
+    StringBuilder builder = new StringBuilder();
+    builder.append(operation.getClassName())
+        .append(".")
+        .append(operation.getName())
+        .append("(");
+    operation.getParameterTypeList().forEach(x -> builder.append(x).append(","));
 
-    MethodRefactoringProcessor processor = new MethodRefactoringProcessor("");
-    MethodRefactoringData ref = processor.process(refactoring);
+    if (operation.getParameterTypeList().size() > 0) {
+      builder.deleteCharAt(builder.length() - 1);
+    }
 
-
-    String signatureBefore = ref == null ? "" : ref.getMethodBefore();
-    String signatureAfter = ref == null ? "" : ref.getMethodAfter();
-
-    return new RefactoringInfo(refactoring)
-        .setName(refactoring.getName())
-        .setText(refactoring.toString())
-        .setType(refactoring.getRefactoringType())
-        .setLeftSide(left)
-        .setRightSide(right)
-        .setCommitId(commitId)
-        .setSignatureBefore(signatureBefore)
-        .setSignatureAfter(signatureAfter);
-
+    builder.append(")");
+    return builder.toString();
   }
+
+
+  RefactoringInfo handle(Refactoring refactoring, String commitId);
 
 }

@@ -201,4 +201,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     public Map<String, String> map = new ConcurrentHashMap<>();
   }
 
+  public boolean isMining() {
+    return mining;
+  }
 }

@@ -76,7 +76,10 @@ public class GitWindow extends ToggleAction {
 
   private void toRefactoringView(@NotNull AnActionEvent e) {
     System.out.println("Button ON");
-    e.getProject().getService(MiningService.class).loaded();
+    miningService.loaded();
+    while (miningService.isMining()) {
+
+    }
     int index = table.getSelectionModel().getAnchorSelectionIndex();
     if (index != -1) {
       scrollPane.getViewport().setView(buildList(index));
@@ -210,7 +213,9 @@ public class GitWindow extends ToggleAction {
       int endIndex = selectionModel.getMaxSelectionIndex();
 
       if (beginIndex != -1 || endIndex != -1) {
-        scrollPane.getViewport().setView(buildList(beginIndex));
+        if (!miningService.isMining()) {
+          scrollPane.getViewport().setView(buildList(beginIndex));
+        }
       }
     }
   }

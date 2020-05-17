@@ -30,15 +30,18 @@ public class FileDiffInfo {
     } catch (VcsException e) {
       e.printStackTrace();
     }
+
+    int leftSize = (int) leftContent.chars().filter(x -> x == '\n').count() + 1;
+    int rightSize = (int) rightContent.chars().filter(x -> x == '\n').count() + 1;
     this.diffFragments = Streams.zip(
         left.getRanges().stream(),
         right.getRanges().stream(),
-        (l, r) -> new LineFragmentImpl(
-            l.start, l.end < 0
-            ? (int) leftContent.chars().filter(x -> x == '\n').count() + 1 : l.end,
-            r.start, r.end < 0
-            ? (int) rightContent.chars().filter(x -> x == '\n').count() + 1 : l.end,
-            0, 0, 0, 0))
+        (l, r) ->
+            new LineFragmentImpl(
+                l.start, l.end < 0 ? leftSize : l.end,
+                r.start, r.end < 0 ? rightSize : r.end,
+                0, 0, 0, 0)
+    )
         .collect(Collectors.toList());
   }
 
