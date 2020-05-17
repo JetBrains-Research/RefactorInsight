@@ -14,7 +14,7 @@ repositories {
 
 
 test {
-    useJUnitPlatform()
+//    useJUnitPlatform()
 }
 
 jacocoTestReport {
@@ -26,10 +26,13 @@ jacocoTestReport {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+//    testCompile group: 'junit', name: 'junit', version: '4.12'
+//    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+//    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+    testImplementation('junit:junit:4.13')
     implementation files('lib/RefactoringMiner-1.0.jar')
+    implementation files('lib/intellij.vcs.git.jar')
+    implementation files('lib/intellij.platform.vcs.testFramework.jar')
     compile 'org.eclipse.jgit:org.eclipse.jgit:5.2.1.201812262042-r'
     compile 'org.slf4j:slf4j-log4j12:1.7.7'
     compile 'org.eclipse.jdt:org.eclipse.jdt.core:3.16.0'
@@ -51,6 +54,7 @@ intellij {
 checkstyle {
     toolVersion "8.31"
     configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+    checkstyleTest.enabled = false
 }
 
 

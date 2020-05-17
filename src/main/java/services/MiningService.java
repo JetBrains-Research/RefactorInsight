@@ -14,7 +14,6 @@ import data.RefactoringEntry;
 import data.RefactoringInfo;
 import git4idea.history.GitHistoryUtils;
 import git4idea.repo.GitRepository;
-import git4idea.repo.GitRepositoryManager;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +54,10 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
   public static MiningService getInstance(@NotNull Project project) {
     return ServiceManager.getService(project, MiningService.class);
+  }
+
+  public boolean isMining() {
+    return mining;
   }
 
   @Override
@@ -151,7 +154,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
       return;
     }
     loaded = true;
-    mineRepo(GitRepositoryManager.getInstance(project).getRepositories().get(0));
+    //mineRepo(GitRepositoryManager.getInstance(project).getRepositories().get(0));
   }
 
   /**
@@ -178,7 +181,9 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     List<RefactoringInfo> refs = new ArrayList<>();
     PriorityQueue<RefactoringEntry> queue = new PriorityQueue<>(
         Comparator.comparingLong(RefactoringEntry::getTimeStamp).reversed());
-    queue.add(RefactoringEntry.fromString(innerState.map.get(commitId)));
+    if (innerState.map.containsKey(commitId)) {
+      queue.add(RefactoringEntry.fromString(innerState.map.get(commitId)));
+    }
     Set<String> visited = new HashSet<>();
     while (!queue.isEmpty()) {
       RefactoringEntry refactoringEntry = queue.remove();
@@ -199,9 +204,5 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     @NotNull
     @MapAnnotation
     public Map<String, String> map = new ConcurrentHashMap<>();
-  }
-
-  public boolean isMining() {
-    return mining;
   }
 }
