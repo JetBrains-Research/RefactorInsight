@@ -16,31 +16,31 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <projectService serviceImplementation="MiningService"/>
-        <projectService serviceImplementation="MethodService"/>
+        <projectService serviceImplementation="services.MiningService"/>
     </extensions>
 
     <actions>
-        <action id="GitWindow" class="GitWindow" text="Refactorings" description="GitWindow">
+        <action id="ui.GitWindow" class="ui.GitWindow" text="Refactorings" description="ui.GitWindow">
             <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>
         </action>
         <!-- Add your actions here -->
-        <action id="ClearRefactoringCacheAction" class="ClearRefactoringCacheAction" text="Clear Refactorings"
+        <action id="actions.ClearRefactoringCacheAction" class="actions.ClearRefactoringCacheAction" text="Clear Refactorings"
                 description="Clear refactoring cache">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
         </action>
-        <action id="RefactoringAction" class="RefactoringAction" text="Mine Repo"
-                description="Start refactoring miner">
+
+        <action id="RefAction" class="actions.RefactoringAction" text="Refactorings"
+                description="Clear refactoring cache">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
         </action>
-        <action id="MethodHistory" class="MethodHistory" text="Check method&#39;s history"
+        <action id="actions.MethodAction" class="actions.MethodAction" text="Check method&#39;s history"
                 description="Retrieve refactorings history for this method">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
     </actions>
 
     <projectListeners>
-        <listener class="CommitListener" topic="git4idea.repo.GitRepositoryChangeListener"/>
+        <listener class="processors.CommitListener" topic="git4idea.repo.GitRepositoryChangeListener"/>
     </projectListeners>
 
 
