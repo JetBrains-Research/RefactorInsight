@@ -33,7 +33,7 @@
                 description="Clear refactoring cache">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
         </action>
-        <action id="actions.MethodAction" class="actions.MethodAction" text="Check method&#39;s history"
+        <action id="actions.MethodAction" class="actions.MethodAction" text="Check Refactoring History"
                 description="Retrieve refactorings history for this method">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
             <keyboard-shortcut first-keystroke="control alt R" keymap="$default"/>
