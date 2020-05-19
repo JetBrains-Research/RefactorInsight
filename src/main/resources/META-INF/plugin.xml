@@ -35,7 +35,7 @@
         </action>
         <action id="actions.MethodAction" class="actions.MethodAction" text="Check Refactoring History"
                 description="Retrieve refactorings history for this method">
-            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
             <keyboard-shortcut first-keystroke="control alt R" keymap="$default"/>
         </action>
     </actions>
