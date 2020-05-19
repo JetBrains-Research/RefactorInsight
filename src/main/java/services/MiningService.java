@@ -10,6 +10,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.annotations.MapAnnotation;
+import com.intellij.vcs.log.VcsCommitMetadata;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
 import git4idea.history.GitHistoryUtils;
@@ -140,6 +141,10 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             progressIndicator.setText("Finished");
           }
         });
+  }
+
+  public void mineAtCommit(VcsCommitMetadata commit, Project project) {
+    CommitMiner.mineAtCommit(commit, innerState.map, project);
   }
 
   public String getRefactorings(String commitHash) {

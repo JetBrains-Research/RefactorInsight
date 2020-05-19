@@ -117,10 +117,14 @@ public class GitWindow extends ToggleAction {
 
   private JBList buildList(int index) {
     String commitId = table.getModel().getCommitId(index).getHash().asString();
+    String refactorings = miningService.getRefactorings(commitId);
+
+    if (refactorings.equals("")) {
+      miningService.mineAtCommit(table.getModel().getCommitMetadata(index), project);
+    }
 
     List<RefactoringInfo> refs =
-        RefactoringEntry.fromString(miningService.getRefactorings(commitId))
-            .getRefactorings();
+        RefactoringEntry.fromString(miningService.getRefactorings(commitId)).getRefactorings();
     String[] names = refs.stream()
         .map(r -> r != null ? r.getName() : RefactoringsBundle.message("not.mined"))
         .toArray(String[]::new);

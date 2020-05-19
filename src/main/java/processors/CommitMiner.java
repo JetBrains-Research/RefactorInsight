@@ -1,8 +1,10 @@
 package processors;
 
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.project.Project;
 import com.intellij.util.Consumer;
 import com.intellij.vcs.log.Hash;
+import com.intellij.vcs.log.VcsCommitMetadata;
 import data.RefactoringEntry;
 import git4idea.GitCommit;
 import git4idea.repo.GitRepository;
@@ -22,13 +24,13 @@ import services.RefactoringsBundle;
 public class CommitMiner implements Consumer<GitCommit> {
 
 
+  private static final String progress = RefactoringsBundle.message("progress");
   private final Executor pool;
   private final Map<String, String> map;
   private final GitRepository repository;
   private final AtomicInteger commitsDone;
   private final ProgressIndicator progressIndicator;
   private final int limit;
-  private static final String progress = RefactoringsBundle.message("progress");
 
 
   /**
@@ -48,6 +50,42 @@ public class CommitMiner implements Consumer<GitCommit> {
     this.progressIndicator = progressIndicator;
     this.limit = limit;
 
+  }
+
+  /**
+   * Method that mines only one commit.
+   * @param commit commit metadata
+   * @param map the inner map that should be updated
+   * @param project the current project
+   */
+  public static void mineAtCommit(VcsCommitMetadata commit, Map<String, String> map,
+                                  Project project) {
+    GitService gitService = new GitServiceImpl();
+    GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
+    try {
+      miner.detectAtCommit(gitService.openRepository(project.getBasePath()),
+          commit.getId().asString(), new RefactoringHandler() {
+            @Override
+            public void handle(String commitId, List<Refactoring> refactorings) {
+              System.out.println(commitId);
+              long time = commit.getCommitTime();
+              List<String> parents = commit.getParents()
+                  .stream()
+                  .map(Hash::asString)
+                  .collect(Collectors.toList());
+              map.put(commitId,
+                  RefactoringEntry
+                      .convert(refactorings, commitId, parents, time));
+
+              if (parents.size() != 1 && parents.size() != 2) {
+                System.out.println(parents.toString());
+              }
+
+            }
+          });
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   @Override
