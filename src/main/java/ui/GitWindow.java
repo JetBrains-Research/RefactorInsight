@@ -11,8 +11,10 @@ import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
+import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
@@ -32,6 +34,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.JButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.jetbrains.annotations.NotNull;
@@ -82,9 +85,51 @@ public class GitWindow extends ToggleAction {
     }
     int index = table.getSelectionModel().getAnchorSelectionIndex();
     if (index != -1) {
-      scrollPane.getViewport().setView(buildList(index));
+      buildComponent(index);
     }
     viewport.setView(scrollPane);
+  }
+
+  private void buildComponent(int index) {
+    String commitId = table.getModel().getCommitId(index).getHash().asString();
+    String refactorings = miningService.getRefactorings(commitId);
+    if (!refactorings.equals("")) {
+      scrollPane.getViewport().setView(buildList(index, refactorings));
+    } else {
+      JBSplitter splitter = new JBSplitter(true, (float) 0.1);
+      JBLabel label = new JBLabel(RefactoringsBundle.message("not.mined"));
+      JBPanel panel = new JBPanel();
+      splitter.setFirstComponent(label);
+
+      JButton button = new JButton("Mine this commit");
+      GitWindow gitWindow = this;
+      button.addMouseListener(
+          new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+              miningService
+                  .mineAtCommit(table.getModel().getCommitMetadata(index), project, gitWindow);
+            }
+          });
+
+      panel.add(button);
+      splitter.setSecondComponent(panel);
+      scrollPane.getViewport().setView(splitter);
+    }
+  }
+
+  /**
+   * Method called after a single commit is mined.
+   * Updates the view with the refactorings found.
+   * @param commitId to refresh the view at.
+   */
+  public void refresh(String commitId) {
+    int index = table.getSelectionModel().getAnchorSelectionIndex();
+    System.out.println("refresh");
+    if (table.getModel().getCommitId(index).getHash().asString().equals(commitId)) {
+      System.out.println("aaa");
+      buildComponent(index);
+    }
   }
 
   private void toChangesView(@NotNull AnActionEvent e) {
@@ -115,20 +160,9 @@ public class GitWindow extends ToggleAction {
     super.update(e);
   }
 
-  private JBList buildList(int index) {
-    String commitId = table.getModel().getCommitId(index).getHash().asString();
-    String refactorings = miningService.getRefactorings(commitId);
-
-    if (refactorings.equals("")) {
-      miningService.mineAtCommit(table.getModel().getCommitMetadata(index), project);
-    }
-
-    List<RefactoringInfo> refs =
-        RefactoringEntry.fromString(miningService.getRefactorings(commitId)).getRefactorings();
-    String[] names = refs.stream()
-        .map(r -> r != null ? r.getName() : RefactoringsBundle.message("not.mined"))
-        .toArray(String[]::new);
-
+  private JBList buildList(int index, String refactorings) {
+    List<RefactoringInfo> refs = RefactoringEntry.fromString(refactorings).getRefactorings();
+    String[] names = refs.stream().map(r -> r.getName()).toArray(String[]::new);
     JBList<String> list = new JBList<>(names);
 
     MouseAdapter mouseListener = new MouseAdapter() {
@@ -218,7 +252,7 @@ public class GitWindow extends ToggleAction {
 
       if (beginIndex != -1 || endIndex != -1) {
         if (!miningService.isMining()) {
-          scrollPane.getViewport().setView(buildList(beginIndex));
+          buildComponent(beginIndex);
         }
       }
     }

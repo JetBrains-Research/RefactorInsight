@@ -1,5 +1,6 @@
 package services;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.ServiceManager;
@@ -35,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.jetbrains.annotations.NotNull;
 import processors.CommitMiner;
+import ui.GitWindow;
 
 @State(name = "ChangesState",
     storages = {@Storage("refactorings.xml")})
@@ -143,8 +145,27 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
         });
   }
 
-  public void mineAtCommit(VcsCommitMetadata commit, Project project) {
-    CommitMiner.mineAtCommit(commit, innerState.map, project);
+  /**
+   * Method for mining a single commit.
+   *
+   * @param commit    to be mined.
+   * @param project   current project.
+   * @param gitWindow to be updated.
+   */
+  public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow gitWindow) {
+    ProgressManager.getInstance()
+        .run(new Task.Backgroundable(project, "Mining at commit " + commit.getId().asString()) {
+
+          public void onFinished() {
+            super.onFinished();
+            ApplicationManager.getApplication()
+                .invokeLater(() -> gitWindow.refresh(commit.getId().asString()));
+          }
+
+          public void run(@NotNull ProgressIndicator progressIndicator) {
+            CommitMiner.mineAtCommit(commit, innerState.map, project);
+          }
+        });
   }
 
   public String getRefactorings(String commitHash) {

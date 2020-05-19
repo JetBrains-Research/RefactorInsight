@@ -32,7 +32,6 @@ public class CommitMiner implements Consumer<GitCommit> {
   private final ProgressIndicator progressIndicator;
   private final int limit;
 
-
   /**
    * misc.CommitMiner for mining a single commit.
    *
@@ -54,8 +53,9 @@ public class CommitMiner implements Consumer<GitCommit> {
 
   /**
    * Method that mines only one commit.
-   * @param commit commit metadata
-   * @param map the inner map that should be updated
+   *
+   * @param commit  commit metadata
+   * @param map     the inner map that should be updated
    * @param project the current project
    */
   public static void mineAtCommit(VcsCommitMetadata commit, Map<String, String> map,
@@ -64,7 +64,8 @@ public class CommitMiner implements Consumer<GitCommit> {
     GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
     try {
       miner.detectAtCommit(gitService.openRepository(project.getBasePath()),
-          commit.getId().asString(), new RefactoringHandler() {
+          commit.getId().asString(),
+          new RefactoringHandler() {
             @Override
             public void handle(String commitId, List<Refactoring> refactorings) {
               System.out.println(commitId);
@@ -76,13 +77,9 @@ public class CommitMiner implements Consumer<GitCommit> {
               map.put(commitId,
                   RefactoringEntry
                       .convert(refactorings, commitId, parents, time));
-
-              if (parents.size() != 1 && parents.size() != 2) {
-                System.out.println(parents.toString());
-              }
-
             }
-          });
+          }
+      );
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -110,10 +107,6 @@ public class CommitMiner implements Consumer<GitCommit> {
                   map.put(commitId,
                       RefactoringEntry
                           .convert(refactorings, commitId, parents, time));
-
-                  if (parents.size() != 1 && parents.size() != 2) {
-                    System.out.println(parents.toString());
-                  }
 
                   incrementProgress();
                 }
