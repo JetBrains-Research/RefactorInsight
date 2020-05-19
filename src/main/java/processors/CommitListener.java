@@ -7,10 +7,9 @@ import services.MiningService;
 
 public class CommitListener implements GitRepositoryChangeListener {
 
-
   @Override
   public void repositoryChanged(@NotNull GitRepository repository) {
-    System.out.println("COMMIT");
-    repository.getProject().getService(MiningService.class).mineRepo(repository);
+    System.out.println("Event: repository changed");
+    MiningService.getInstance(repository.getProject()).mineRepo(repository);
   }
 }

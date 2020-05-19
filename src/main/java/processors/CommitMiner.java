@@ -68,7 +68,6 @@ public class CommitMiner implements Consumer<GitCommit> {
           new RefactoringHandler() {
             @Override
             public void handle(String commitId, List<Refactoring> refactorings) {
-              System.out.println(commitId);
               long time = commit.getCommitTime();
               List<String> parents = commit.getParents()
                   .stream()
@@ -97,8 +96,6 @@ public class CommitMiner implements Consumer<GitCommit> {
               commitId, new RefactoringHandler() {
                 @Override
                 public void handle(String commitId, List<Refactoring> refactorings) {
-                  System.out.println(commitId);
-
                   long time = gitCommit.getCommitTime();
                   List<String> parents = gitCommit.getParents()
                       .stream()

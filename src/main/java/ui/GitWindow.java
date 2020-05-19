@@ -61,25 +61,18 @@ public class GitWindow extends ToggleAction {
     MainVcsLogUi logUI = e.getData(VcsLogInternalDataKeys.MAIN_UI);
 
     project = e.getProject();
-
     miningService = project.getService(MiningService.class);
 
     table = logUI.getTable();
     table.getSelectionModel().addListSelectionListener(new CommitSelectionListener());
 
     event = e;
-
     myDiffContentFactory = DiffContentFactoryEx.getInstanceEx();
-
     viewport = (JBViewport) changesTree.getParent();
-
     scrollPane = new JBScrollPane(new JBLabel(RefactoringsBundle.message("not.selected")));
-
   }
 
   private void toRefactoringView(@NotNull AnActionEvent e) {
-    System.out.println("Button ON");
-    miningService.loaded();
     while (miningService.isMining()) {
 
     }
@@ -125,9 +118,7 @@ public class GitWindow extends ToggleAction {
    */
   public void refresh(String commitId) {
     int index = table.getSelectionModel().getAnchorSelectionIndex();
-    System.out.println("refresh");
     if (table.getModel().getCommitId(index).getHash().asString().equals(commitId)) {
-      System.out.println("aaa");
       buildComponent(index);
     }
   }
@@ -257,6 +248,4 @@ public class GitWindow extends ToggleAction {
       }
     }
   }
-
-
 }
