@@ -15,11 +15,13 @@ import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import services.MiningService;
 import ui.MethodRefactoringPopup;
+import ui.MethodRefactoringToolbar;
 
 public class MethodAction extends AnAction {
 
   Map<String, List<RefactoringInfo>> map;
   MethodRefactoringPopup methodRefactoringPopup;
+  MethodRefactoringToolbar methodRefactoringToolbar;
 
   /**
    * Implement this method to provide your action handler.
@@ -80,7 +82,13 @@ public class MethodAction extends AnAction {
       methodRefactoringPopup = new MethodRefactoringPopup(project);
     }
     return methodRefactoringPopup;
+  }
 
+  public MethodRefactoringToolbar getToolbarWindow(Project project) {
+    if (methodRefactoringToolbar == null) {
+      methodRefactoringToolbar = new MethodRefactoringToolbar(project);
+    }
+    return methodRefactoringToolbar;
   }
 
 }
