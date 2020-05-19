@@ -71,10 +71,10 @@ public class MethodAction extends AnAction {
   }
 
   /**
-   * Create or get a method refactorings tool window.
+   * Create or get a method refactorings popup window.
    *
    * @param project the current project.
-   * @return a new method refactorings tool window.
+   * @return a new method refactorings popup window.
    */
   public MethodRefactoringPopup getPopupWindow(Project project) {
     if (methodRefactoringPopup == null) {
@@ -83,6 +83,12 @@ public class MethodAction extends AnAction {
     return methodRefactoringPopup;
   }
 
+  /**
+   * Create or get a method refactorings toolbar window.
+   *
+   * @param project the current project.
+   * @return a new method refactorings toolbar window.
+   */
   public MethodRefactoringToolbar getToolbarWindow(Project project) {
     if (methodRefactoringToolbar == null) {
       methodRefactoringToolbar = new MethodRefactoringToolbar(project);
