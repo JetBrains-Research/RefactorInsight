@@ -37,20 +37,20 @@ class MethodColumnInfoFactory {
         @Nullable
         @Override
         public String valueOf(RefactoringInfo methodItem) {
-            return methodItem.getName();
+            return methodItem.getNameAfter();
         }
 
         @Nullable
         @Override
         public Comparator<RefactoringInfo> getComparator() {
-            return Comparator.comparing(RefactoringInfo::getName);
+            return Comparator.comparing(RefactoringInfo::getNameAfter);
         }
     }
 
     static class TypeInfo extends ColumnInfo<RefactoringInfo, String> {
 
         public TypeInfo() {
-            super("CC");
+            super("Refactoring Type");
         }
 
         @Nullable

@@ -8,11 +8,15 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
+import com.intellij.ui.table.JBTable;
+import com.intellij.util.ui.ListTableModel;
 import com.intellij.vcs.log.VcsLogFilterCollection;
 import com.intellij.vcs.log.impl.VcsLogManager;
 import com.intellij.vcs.log.impl.VcsProjectLog;
@@ -21,6 +25,7 @@ import data.RefactoringInfo;
 import services.RefactoringsBundle;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -42,14 +47,36 @@ public class MethodRefactoringToolbar {
 
     public void showToolbar(List<RefactoringInfo> refactorings, String methodName, DataContext datacontext) {
         JBPanel panel;
+
         if (refactorings == null || refactorings.isEmpty()) {
             panel = new JBPanel(new GridLayout(0, 1));
             panel.add(new JBLabel(RefactoringsBundle.message("no.ref.method")));
         } else {
             panel = new JBPanel();
-            JBList<String> list = new JBList<>(refactorings.stream()
-                    .map(s -> new String(s.getText()))
-                    .collect(Collectors.toList()));
+            panel.setLayout(new BorderLayout());
+//            JBList<String> list = new JBList<>(refactorings.stream()
+//                    .map(s -> new String(s.getText()))
+//                    .collect(Collectors.toList()));
+
+
+            ListTableModel<RefactoringInfo> model = new ListTableModel<>(
+                    new MethodColumnInfoFactory().getColumnInfos(), refactorings);
+            JBTable table = new JBTable(model);
+            table.setDefaultRenderer(table.getColumnClass(0), new DefaultTableCellRenderer() {
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                               boolean hasFocus, int row, int column) {
+                    RefactoringInfo method = model.getItem(row);
+                    if (column == 0) {
+                        setBackground(JBColor.YELLOW);
+                    }
+                    else {
+                        setBackground(JBColor.WHITE);
+                    }
+
+                    return super.getTableCellRendererComponent(table, value, isSelected,
+                            hasFocus, row, column);
+                }
+            });
 
             MouseAdapter mouseAdapter = new MouseAdapter() {
                 @Override
@@ -59,27 +86,26 @@ public class MethodRefactoringToolbar {
                     VcsLogManager.LogWindowKind kind = VcsLogManager.LogWindowKind.TOOL_WINDOW;
                     VcsProjectLog.getInstance(project).openLogTab(filters, kind)
                             .getVcsLog()
-                            .jumpToReference(refactorings.get(list.locationToIndex(e.getPoint())).getCommitId());
+                            .jumpToReference(refactorings.get(
+                                    //list.locationToIndex(e.getPoint())).getCommitId());
+                            table.convertRowIndexToModel(table.getSelectedRow())).getCommitId());
                 }
             };
 
-            MouseAdapter mouseSelection = new MouseAdapter() {
-                @Override
-                public void mouseMoved(MouseEvent e) {
-                    super.mouseMoved(e);
-                    e.getComponent().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    list.setSelectedIndex(list.locationToIndex(e.getPoint()));
-                }
-            };
+//            list.addMouseMotionListener(mouseSelection);
+//            list.addMouseListener(mouseAdapter);
+//            panel.add(list);
 
-            list.addMouseMotionListener(mouseSelection);
-            list.addMouseListener(mouseAdapter);
-            panel.add(list);
 
-            panel.setBorder(BorderFactory.createTitledBorder(
-                    BorderFactory.createEtchedBorder(),
-                    String.format(RefactoringsBundle.message("method.refactoring.history"),
-                            methodName.substring(methodName.lastIndexOf(".") + 1))));
+
+
+            table.addMouseListener(mouseAdapter);
+            panel.add(new JBScrollPane(table), BorderLayout.CENTER);
+
+//            panel.setBorder(BorderFactory.createTitledBorder(
+//                    BorderFactory.createEtchedBorder(),
+//                    String.format(RefactoringsBundle.message("method.refactoring.history"),
+//                            methodName.substring(methodName.lastIndexOf(".") + 1))));
         }
 
         Content content;
