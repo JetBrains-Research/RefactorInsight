@@ -14,8 +14,7 @@ public class RefactoringAction extends AnAction {
     GitRepository repository =
         GitRepositoryManager.getInstance(e.getProject()).getRepositories().get(0);
 
-    e.getProject().getService(MiningService.class).mineRepo(repository);
-
+    MiningService.getInstance(e.getProject()).mineRepo(repository);
   }
 
 }

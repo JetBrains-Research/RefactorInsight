@@ -53,7 +53,6 @@ public class MiningServiceTest extends GitSingleRepoTest {
     repo.update();
 
     MiningService miner = myProject.getService(MiningService.class);
-    miner.loaded();
     miner.mineRepo(repo);
 
     //wait for miner to finish mining
@@ -88,7 +87,6 @@ public class MiningServiceTest extends GitSingleRepoTest {
     repo.update();
 
     MiningService miner = myProject.getService(MiningService.class);
-    miner.loaded();
     miner.mineRepo(repo);
 
     while (miner.isMining()) {

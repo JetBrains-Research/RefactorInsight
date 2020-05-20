@@ -40,27 +40,26 @@ public class MethodAction extends AnAction {
       if (target instanceof PsiElementUsageTarget) {
         if (((PsiElementUsageTarget) target).getElement() instanceof PsiMethod) {
           PsiMethod method = (PsiMethod) ((PsiElementUsageTarget) target).getElement();
-          String signature = method.getName();
-          signature = method.getContainingClass().getQualifiedName() + "." + signature + "(";
-
-          PsiParameterList parameterList = method.getParameterList();
-          for (int i = 0; i < parameterList.getParametersCount(); i++) {
-            if (i != parameterList.getParametersCount() - 1) {
-              signature += parameterList.getParameter(i).getType().getPresentableText() + ",";
-            } else {
-              signature += parameterList.getParameter(i).getType().getPresentableText();
-            }
-          }
-
-          signature += ")";
-          System.out.println(signature);
-          System.out.println(map.get(signature));
-
+          String signature = calculateSignature(method);
           getPopupWindow(project).show(map.get(signature), signature, dataContext);
         }
       }
     }
+  }
 
+  private String calculateSignature(PsiMethod method) {
+    String signature = method.getName();
+    signature = method.getContainingClass().getQualifiedName() + "." + signature + "(";
+    PsiParameterList parameterList = method.getParameterList();
+    for (int i = 0; i < parameterList.getParametersCount(); i++) {
+      if (i != parameterList.getParametersCount() - 1) {
+        signature += parameterList.getParameter(i).getType().getPresentableText() + ",";
+      } else {
+        signature += parameterList.getParameter(i).getType().getPresentableText();
+      }
+    }
+    signature += ")";
+    return signature;
   }
 
   @Override
@@ -80,7 +79,6 @@ public class MethodAction extends AnAction {
       methodRefactoringPopup = new MethodRefactoringPopup(project);
     }
     return methodRefactoringPopup;
-
   }
 
 }
