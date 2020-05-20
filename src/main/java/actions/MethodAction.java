@@ -30,7 +30,6 @@ public class MethodAction extends AnAction {
    */
   @Override
   public void actionPerformed(@NotNull AnActionEvent e) {
-    System.out.println(e.getPlace());
     Project project = e.getProject();
     if (project == null) {
       return;
