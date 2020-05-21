@@ -1,5 +1,6 @@
 package ui;
 
+import com.intellij.codeInsight.documentation.DocumentationComponent;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
@@ -9,6 +10,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
@@ -54,6 +56,8 @@ public class MethodRefactoringToolbar {
         } else {
             panel = new JBPanel();
             panel.setLayout(new BorderLayout());
+            JBSplitter splitterPane = new JBSplitter(false, .5f);
+            panel.add(splitterPane);
 //            JBList<String> list = new JBList<>(refactorings.stream()
 //                    .map(s -> new String(s.getText()))
 //                    .collect(Collectors.toList()));
@@ -82,14 +86,16 @@ public class MethodRefactoringToolbar {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     super.mouseClicked(e);
+                    RefactoringInfo info = refactorings
+                            .get(table.convertRowIndexToModel(table.getSelectedRow()));
+                    JLabel description = new JLabel(formatText(info.getText()));
+                    splitterPane.setSecondComponent(description);
                     if(e.getClickCount() == 2) {
                     VcsLogFilterCollection filters = VcsLogFilterObject.collection();
                     VcsLogManager.LogWindowKind kind = VcsLogManager.LogWindowKind.TOOL_WINDOW;
                         VcsProjectLog.getInstance(project).openLogTab(filters, kind)
                                 .getVcsLog()
-                                .jumpToReference(refactorings.get(
-                                        //list.locationToIndex(e.getPoint())).getCommitId());
-                                        table.convertRowIndexToModel(table.getSelectedRow())).getCommitId());
+                                .jumpToReference(info.getCommitId());
                     }
                 }
             };
@@ -102,7 +108,8 @@ public class MethodRefactoringToolbar {
 
 
             table.addMouseListener(mouseAdapter);
-            panel.add(new JBScrollPane(table), BorderLayout.CENTER);
+            splitterPane.setFirstComponent(new JBScrollPane(table));
+            splitterPane.setSecondComponent(new JBLabel("Select refactoring to see description"));
 
 //            panel.setBorder(BorderFactory.createTitledBorder(
 //                    BorderFactory.createEtchedBorder(),
@@ -122,5 +129,19 @@ public class MethodRefactoringToolbar {
         toolWindow.setIcon(AllIcons.Ide.Rating);
         toolWindow.show();
 
+    }
+
+    private static String formatText(String text) {
+        StringBuilder sb = new StringBuilder(text);
+
+        int i = 0;
+        while ((i = sb.indexOf(" ", i + 60)) != -1) {
+            sb.replace(i, i + 1, "<br/>");
+        }
+
+        sb.insert(0, "<html>");
+        sb.append("</html>");
+
+        return sb.toString();
     }
 }
