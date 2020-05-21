@@ -1,13 +1,10 @@
 package data.types;
 
 import data.RefactoringInfo;
-import data.TrueCodeRange;
 import gr.uom.java.xmi.UMLOperation;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
 
-public interface Handler {
+public abstract class Handler {
 
   /**
    * Builder for a method's signature.
@@ -15,7 +12,7 @@ public interface Handler {
    * @param operation retrieved from RefactoringMiner
    * @return a String signature of the operation.
    */
-  static String calculateSignature(UMLOperation operation) {
+  protected String calculateSignature(UMLOperation operation) {
     StringBuilder builder = new StringBuilder();
     builder.append(operation.getClassName())
         .append(".")
@@ -31,7 +28,21 @@ public interface Handler {
     return builder.toString();
   }
 
+  /**
+   * Start generating RefactoringInfo from Refactoring.
+   * @param refactoring Refactoring from RefactoringMiner
+   * @param commitId Commit Hash String
+   * @return RefactoringInfo
+   */
+  public RefactoringInfo handle(Refactoring refactoring, String commitId) {
+    return specify(refactoring, new RefactoringInfo()
+        .setType(refactoring.getRefactoringType())
+        .setName(refactoring.getName())
+        .setText(refactoring.toString())
+        .setCommitId(commitId));
+  }
 
-  RefactoringInfo handle(Refactoring refactoring, String commitId);
+  public abstract RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info);
+
 
 }

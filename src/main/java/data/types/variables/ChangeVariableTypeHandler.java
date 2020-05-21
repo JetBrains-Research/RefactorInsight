@@ -1,34 +1,20 @@
 package data.types.variables;
 
+import data.Group;
 import data.RefactoringInfo;
-import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ChangeVariableTypeRefactoring;
-import java.util.Arrays;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 
-public class ChangeVariableTypeHandler implements Handler {
+public class ChangeVariableTypeHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring, String commitId) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ChangeVariableTypeRefactoring ref = (ChangeVariableTypeRefactoring) refactoring;
-    if (ref.getOriginalVariable().isParameter() && ref.getChangedTypeVariable().isParameter()) {
-      return new RefactoringInfo(Type.VARIABLE)
-          .setType(RefactoringType.CHANGE_PARAMETER_TYPE)
-          .setName(ref.getName())
-          .setText(ref.toString())
-          .setCommitId(commitId)
-          .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalVariable().codeRange())))
-          .setRightSide(Arrays.asList(new TrueCodeRange(ref.getChangedTypeVariable().codeRange())));
-    }
-    return new RefactoringInfo(Type.VARIABLE)
-        .setType(RefactoringType.CHANGE_VARIABLE_TYPE)
-        .setName(ref.getName())
-        .setText(ref.toString())
-        .setCommitId(commitId)
-        .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalVariable().codeRange())))
-        .setRightSide(Arrays.asList(new TrueCodeRange(ref.getChangedTypeVariable().codeRange())));
+    //TODO ref.getRalatedRefactorings might help in combining refactorings such as
+    //TODO renaming variables and corresponding methods
+    return info.setGroup(Group.VARIABLE)
+        .addMarking(ref.getOriginalVariable().codeRange(),
+            ref.getChangedTypeVariable().codeRange());
   }
 }

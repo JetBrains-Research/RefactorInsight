@@ -1,6 +1,6 @@
 package data;
 
-public enum Type {
+public enum Group {
   METHOD,
   CLASS,
   ATTRIBUTE,

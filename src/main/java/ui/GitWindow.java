@@ -9,6 +9,7 @@ import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
 import com.intellij.ui.components.JBLabel;
@@ -21,16 +22,10 @@ import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
-import diff.FileDiffInfo;
-import diff.HalfDiffInfo;
-import diff.LineRange;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -138,66 +133,36 @@ public class GitWindow extends ToggleAction {
     return list;
   }
 
-  private void showDiff(int index, RefactoringInfo ri) {
-    Collection<Change> changes = table.getModel().getFullDetails(index).getChanges();
+  private void showDiff(int index, RefactoringInfo info) {
+    try {
+      Collection<Change> changes = table.getModel().getFullDetails(index).getChanges();
 
-    List<HalfDiffInfo> leftDiffs = changes
-        .stream()
-        .map(Change::getBeforeRevision)
-        .filter(Objects::nonNull)
-        .map(c -> {
-          List<LineRange> ranges = new ArrayList<>();
-          ri.getLeftSide().forEach(cr -> {
-            if ((project.getBasePath() + "/" + cr.getFilePath()).equals(c.getFile().getPath())) {
-              ranges.add(new LineRange(cr.getTrueStartLine() - 1, cr.getTrueEndLine()));
-            }
-          });
-          return new HalfDiffInfo(ranges, c);
-        }).filter(hdi -> !hdi.getRanges().isEmpty())
-        .collect(Collectors.toList());
+      String contentBefore = "";
+      String contentAfter = "";
+      for (Change change : changes) {
+        if (info.getBeforePath().equals(change.getBeforeRevision().getFile().getPath())) {
+          contentBefore = change.getBeforeRevision().getContent();
+        }
+        if (info.getAfterPath().equals(change.getAfterRevision().getFile().getPath())) {
+          contentAfter = change.getAfterRevision().getContent();
+        }
+      }
 
-    List<HalfDiffInfo> rightDiffs = changes
-        .stream()
-        .map(Change::getAfterRevision)
-        .filter(Objects::nonNull)
-        .map(c -> {
-          List<LineRange> ranges = new ArrayList<>();
-          ri.getRightSide().forEach(cr -> {
-            if ((project.getBasePath() + "/" + cr.getFilePath()).equals(c.getFile().getPath())) {
-              ranges.add(new LineRange(cr.getTrueStartLine() - 1, cr.getTrueEndLine()));
-            }
-          });
-          return new HalfDiffInfo(ranges, c);
-        }).filter(hdi -> !hdi.getRanges().isEmpty())
-        .collect(Collectors.toList());
+      DiffContent diffContentBefore = myDiffContentFactory.create(project, contentBefore,
+          JavaClassFileType.INSTANCE);
+      DiffContent diffContentAfter = myDiffContentFactory.create(project, contentAfter,
+          JavaClassFileType.INSTANCE);
 
-    List<FileDiffInfo> diffInfos = leftDiffs
-        .stream()
-        .flatMap(left -> rightDiffs.stream()
-            .map(right -> new FileDiffInfo(left, right)))
-        .collect(Collectors.toList());
-
-    diffInfos.forEach(diffInfo -> {
-      String contentBefore = diffInfo.getLeftContent();
-      String contentAfter = diffInfo.getRightContent();
-
-      DiffContent d1 = contentBefore != null
-          ? myDiffContentFactory.create(project, contentBefore, JavaClassFileType.INSTANCE)
-          : myDiffContentFactory.createEmpty();
-
-      DiffContent d2 = contentAfter != null
-          ? myDiffContentFactory.create(project, contentAfter, JavaClassFileType.INSTANCE)
-          : myDiffContentFactory.createEmpty();
-
-      SimpleDiffRequest request = new SimpleDiffRequest(RefactoringsBundle.message("title"),
-          d1, d2, diffInfo.getLeftPath(), diffInfo.getRightPath());
+      SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
+          diffContentBefore, diffContentAfter, info.getBeforePath(), info.getAfterPath());
 
       request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
-          (text1, text2, policy, innerChanges, indicator)
-              -> diffInfo.getDiffFragments());
+          (text1, text2, policy, innerChanges, indicator) -> info.getLineMarkings());
 
       DiffManager.getInstance().showDiff(project, request);
-    });
+    } catch (VcsException e) {
+      e.printStackTrace();
+    }
   }
 
   class CommitSelectionListener implements ListSelectionListener {
@@ -219,6 +184,4 @@ public class GitWindow extends ToggleAction {
       }
     }
   }
-
-
 }

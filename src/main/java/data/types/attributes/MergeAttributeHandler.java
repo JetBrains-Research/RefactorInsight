@@ -1,26 +1,20 @@
 package data.types.attributes;
 
+import data.Group;
 import data.RefactoringInfo;
-import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MergeAttributeRefactoring;
-import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 
-public class MergeAttributeHandler implements Handler {
+public class MergeAttributeHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring, String commitId) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     MergeAttributeRefactoring ref = (MergeAttributeRefactoring) refactoring;
-    return new RefactoringInfo(Type.ATTRIBUTE)
-        .setType(RefactoringType.MERGE_ATTRIBUTE)
-        .setName(ref.getName())
-        .setText(ref.toString())
-        .setCommitId(commitId)
-        .setLeftSide(ref.leftSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()))
-        .setRightSide(
-            ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));
+
+    ref.getMergedAttributes().forEach(attr ->
+        info.addMarking(attr.codeRange(), ref.getNewAttribute().codeRange()));
+
+    return info.setGroup(Group.ATTRIBUTE);
   }
 }

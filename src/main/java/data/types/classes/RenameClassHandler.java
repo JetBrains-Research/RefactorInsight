@@ -1,27 +1,24 @@
 package data.types.classes;
 
+import data.Group;
 import data.RefactoringInfo;
-import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.RenameClassRefactoring;
-import java.util.Arrays;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 
-public class RenameClassHandler implements Handler {
+public class RenameClassHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring, String commitId) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RenameClassRefactoring ref = (RenameClassRefactoring) refactoring;
 
-    return new RefactoringInfo(Type.CLASS)
-        .setType(RefactoringType.RENAME_CLASS)
-        .setName(ref.getName())
-        .setText(ref.toString())
-        .setCommitId(commitId)
-        .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalClass().codeRange())))
-        .setRightSide(Arrays.asList(new TrueCodeRange(ref.getRenamedClass().codeRange())))
+    return info.setGroup(Group.CLASS)
+        .addMarking(ref.getOriginalClass().codeRange().getStartLine(),
+            ref.getOriginalClass().codeRange().getStartLine() + 1,
+            ref.getRenamedClass().codeRange().getStartLine(),
+            ref.getRenamedClass().codeRange().getStartLine() + 1,
+            ref.getOriginalClass().codeRange().getFilePath(),
+            ref.getRenamedClass().codeRange().getFilePath())
         .setNameBefore(ref.getOriginalClassName())
         .setNameAfter(ref.getRenamedClassName());
   }

@@ -4,10 +4,11 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import org.refactoringminer.api.Refactoring;
 
-public class ChangeMethodSignatureHandler implements Handler {
+public class ChangeMethodSignatureHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring, String commitId) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+    //TODO why is this not implemented?
     return null;
   }
 }
