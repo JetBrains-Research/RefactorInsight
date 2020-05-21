@@ -20,26 +20,23 @@
     </extensions>
 
     <actions>
-        <action id="ui.GitWindow" class="ui.GitWindow" text="Refactorings" description="ui.GitWindow">
+        <action id="ui.GitWindow" class="ui.GitWindow" text="Mine refactorings" description="ui.GitWindow">
             <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>
         </action>
         <!-- Add your actions here -->
-        <action id="actions.ClearRefactoringCacheAction" class="actions.ClearRefactoringCacheAction" text="Clear Refactorings"
-                description="Clear refactoring cache">
-            <add-to-group group-id="ToolsMenu" anchor="first"/>
-        </action>
 
         <action id="RefAction" class="actions.RefactoringAction" text="Refactorings"
                 description="Clear refactoring cache">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
         </action>
+        <action id="actions.MethodAction" class="actions.MethodAction" text="Check Refactoring History"
+                description="Retrieve refactorings history for this method">
+            <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
+            <keyboard-shortcut first-keystroke="control alt R" keymap="$default"/>
+        </action>
         <action id="DiffTestAction" class="actions.DiffTestAction" text="DiffTest"
                 description="Testing dem diffs">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
-        </action>
-        <action id="actions.MethodAction" class="actions.MethodAction" text="Check method&#39;s history"
-                description="Retrieve refactorings history for this method">
-            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
     </actions>
 

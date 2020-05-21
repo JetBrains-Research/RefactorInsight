@@ -1,5 +1,6 @@
 package services;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.ServiceManager;
@@ -10,6 +11,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.annotations.MapAnnotation;
+import com.intellij.vcs.log.VcsCommitMetadata;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
 import git4idea.history.GitHistoryUtils;
@@ -34,16 +36,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.jetbrains.annotations.NotNull;
 import processors.CommitMiner;
+import ui.GitWindow;
 
-@State(name = "ChangesState",
+@State(name = "MiningRefactoringsState",
     storages = {@Storage("refactorings.xml")})
 @Service
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
   public static ConcurrentHashMap<String, List<RefactoringInfo>> methodHistory
       = new ConcurrentHashMap<>();
-  private boolean loaded = false;
-  private boolean first = true;
   private boolean mining = false;
   private Project project;
   private MyState innerState = new MyState();
@@ -76,10 +77,6 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    * @param repository GitRepository
    */
   public void mineRepo(GitRepository repository) {
-    if (!loaded) {
-      return;
-    }
-
     int limit = 100;
     try {
       limit = getCommitCount(repository);
@@ -88,7 +85,6 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     } finally {
       mineRepo(repository, limit);
     }
-
   }
 
   /**
@@ -98,9 +94,6 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    * @param limit      int
    */
   public void mineRepo(GitRepository repository, int limit) {
-    if (!loaded) {
-      return;
-    }
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(repository.getProject(), "Mining refactorings") {
           public void run(@NotNull ProgressIndicator progressIndicator) {
@@ -131,13 +124,36 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             } catch (InterruptedException e) {
               e.printStackTrace();
             }
-
-            System.out.println("done");
+            System.out.println("Mining done");
             getOrderedRefactorings(repository.getCurrentRevision())
                 .forEach(r -> r.addToHistory(methodHistory));
-
-            System.out.println("done");
+            System.out.println("Method history computed");
             progressIndicator.setText("Finished");
+          }
+        });
+  }
+
+  /**
+   * Method for mining a single commit.
+   *
+   * @param commit    to be mined.
+   * @param project   current project.
+   * @param gitWindow to be updated.
+   */
+  public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow gitWindow) {
+    System.out.println("Mining commit " + commit.getId().asString());
+    ProgressManager.getInstance()
+        .run(new Task.Backgroundable(project, "Mining at commit " + commit.getId().asString()) {
+
+          public void onFinished() {
+            super.onFinished();
+            System.out.println("Mining commit done");
+            ApplicationManager.getApplication()
+                .invokeLater(() -> gitWindow.refresh(commit.getId().asString()));
+          }
+
+          public void run(@NotNull ProgressIndicator progressIndicator) {
+            CommitMiner.mineAtCommit(commit, innerState.map, project);
           }
         });
   }
@@ -147,21 +163,10 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   }
 
   /**
-   * Sets loaded = true, which allows refactoring miner to run.
-   */
-  public void loaded() {
-    if (loaded) {
-      return;
-    }
-    loaded = true;
-    //mineRepo(GitRepositoryManager.getInstance(project).getRepositories().get(0));
-  }
-
-  /**
-   * Get the total ammount of commits in a repository.
+   * Get the total amount of commits in a repository.
    *
    * @param repository GitRepository
-   * @return int, ammount of commits
+   * @return int, amount of commits
    * @throws IOException bla
    */
   public int getCommitCount(GitRepository repository) throws IOException {
@@ -169,7 +174,6 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
         new File(repository.getRoot().getCanonicalPath()));
     BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
     String output = reader.readLine();
-    System.out.println(output);
     return Integer.parseInt(output);
   }
 
