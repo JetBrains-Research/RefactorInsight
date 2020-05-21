@@ -82,13 +82,15 @@ public class MethodRefactoringToolbar {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     super.mouseClicked(e);
+                    if(e.getClickCount() == 2) {
                     VcsLogFilterCollection filters = VcsLogFilterObject.collection();
                     VcsLogManager.LogWindowKind kind = VcsLogManager.LogWindowKind.TOOL_WINDOW;
-                    VcsProjectLog.getInstance(project).openLogTab(filters, kind)
-                            .getVcsLog()
-                            .jumpToReference(refactorings.get(
-                                    //list.locationToIndex(e.getPoint())).getCommitId());
-                            table.convertRowIndexToModel(table.getSelectedRow())).getCommitId());
+                        VcsProjectLog.getInstance(project).openLogTab(filters, kind)
+                                .getVcsLog()
+                                .jumpToReference(refactorings.get(
+                                        //list.locationToIndex(e.getPoint())).getCommitId());
+                                        table.convertRowIndexToModel(table.getSelectedRow())).getCommitId());
+                    }
                 }
             };
 
