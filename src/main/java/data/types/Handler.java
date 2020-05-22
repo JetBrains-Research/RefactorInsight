@@ -1,5 +1,6 @@
 package data.types;
 
+import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import gr.uom.java.xmi.UMLOperation;
@@ -32,6 +33,6 @@ public interface Handler {
   }
 
 
-  RefactoringInfo handle(Refactoring refactoring, String commitId);
+  RefactoringInfo handle(Refactoring refactoring);
 
 }

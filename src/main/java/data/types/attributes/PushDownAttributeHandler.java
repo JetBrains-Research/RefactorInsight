@@ -12,13 +12,12 @@ import org.refactoringminer.api.RefactoringType;
 public class PushDownAttributeHandler implements Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring, String commitId) {
+  public RefactoringInfo handle(Refactoring refactoring) {
     PushDownAttributeRefactoring ref = (PushDownAttributeRefactoring) refactoring;
     return new RefactoringInfo(Type.ATTRIBUTE)
         .setType(RefactoringType.PUSH_DOWN_ATTRIBUTE)
         .setName(ref.getName())
         .setText(ref.toString())
-        .setCommitId(commitId)
         .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalAttribute().codeRange())))
         .setRightSide(Arrays.asList(new TrueCodeRange(ref.getMovedAttribute().codeRange())));
   }

@@ -1,5 +1,6 @@
 package data.types.methods;
 
+import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -12,13 +13,12 @@ import org.refactoringminer.api.RefactoringType;
 public class PushDownOperationHandler implements Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring, String commitId) {
+  public RefactoringInfo handle(Refactoring refactoring) {
     PushDownOperationRefactoring ref = (PushDownOperationRefactoring) refactoring;
     return new RefactoringInfo(Type.METHOD)
         .setType(RefactoringType.PUSH_DOWN_OPERATION)
         .setText(ref.toString())
         .setName(ref.getName())
-        .setCommitId(commitId)
         .setLeftSide(
             Arrays.asList(new TrueCodeRange(ref.getSourceOperationCodeRangeBeforeMove())))
         .setRightSide(

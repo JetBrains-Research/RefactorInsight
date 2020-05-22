@@ -14,13 +14,11 @@ import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import services.MiningService;
-import ui.MethodRefactoringPopup;
 import ui.MethodRefactoringToolbar;
 
 public class MethodAction extends AnAction {
 
   Map<String, List<RefactoringInfo>> map;
-  MethodRefactoringPopup methodRefactoringPopup;
   MethodRefactoringToolbar methodRefactoringToolbar;
 
   /**
@@ -68,19 +66,6 @@ public class MethodAction extends AnAction {
   public void update(@NotNull AnActionEvent e) {
     e.getPresentation().setVisible(true);
     super.update(e);
-  }
-
-  /**
-   * Create or get a method refactorings popup window.
-   *
-   * @param project the current project.
-   * @return a new method refactorings popup window.
-   */
-  public MethodRefactoringPopup getPopupWindow(Project project) {
-    if (methodRefactoringPopup == null) {
-      methodRefactoringPopup = new MethodRefactoringPopup(project);
-    }
-    return methodRefactoringPopup;
   }
 
   /**

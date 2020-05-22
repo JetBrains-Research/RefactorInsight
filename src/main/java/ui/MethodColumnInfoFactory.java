@@ -2,6 +2,8 @@ package ui;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.VcsException;
+import com.intellij.util.text.DateFormatUtil;
+import com.intellij.util.text.JBDateFormat;
 import com.intellij.util.ui.ColumnInfo;
 import data.RefactoringInfo;
 import java.text.Format;
@@ -23,15 +25,16 @@ class MethodColumnInfoFactory {
    * @return ColumnInfo's
    */
   public ColumnInfo[] getColumnInfos() {
-    return new ColumnInfo[]{
+    return new ColumnInfo[] {
         new TimeOfCommit(),
         new NameInfo(),
+        new ClassInfo(),
         new TypeInfo()
     };
   }
 
   public Class[] getColumnClasses() {
-    return new Class[]{TimeOfCommit.class, NameInfo.class, TypeInfo.class};
+    return new Class[] {TimeOfCommit.class, NameInfo.class, ClassInfo.class, TypeInfo.class};
   }
 
   static class TimeOfCommit extends ColumnInfo<RefactoringInfo, String> {
@@ -43,36 +46,16 @@ class MethodColumnInfoFactory {
     @Nullable
     @Override
     public String valueOf(RefactoringInfo methodItem) {
-      long timestamp = 0;
-      try {
-        timestamp = methodItem.getTimestamp(project);
-      } catch (VcsException e) {
-        e.printStackTrace();
-      }
-      return convertTime(timestamp);
+      return JBDateFormat.getFormatter()
+          .formatPrettyDateTime(methodItem.getTimestamp());
     }
 
     @Nullable
     @Override
     public Comparator<RefactoringInfo> getComparator() {
-      return new Comparator<RefactoringInfo>() {
-        @Override
-        public int compare(RefactoringInfo r1, RefactoringInfo r2) {
-          try {
-            return Long.compare(r2.getTimestamp(project), r1.getTimestamp(project));
-          } catch (VcsException e) {
-            e.printStackTrace();
-          }
-            return 0;
-          }
-      };
+      return Comparator.comparing(RefactoringInfo::getTimestamp);
     }
 
-    public static String convertTime(long time) {
-      Date date = new Date(time);
-      Format format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-      return format.format(date);
-    }
   }
 
   static class NameInfo extends ColumnInfo<RefactoringInfo, String> {
@@ -84,7 +67,29 @@ class MethodColumnInfoFactory {
     @Nullable
     @Override
     public String valueOf(RefactoringInfo methodItem) {
-      return methodItem.getNameAfter();
+      String name = methodItem.getNameAfter();
+      return name.substring(name.lastIndexOf('.') + 1);
+    }
+
+    @Nullable
+    @Override
+    public Comparator<RefactoringInfo> getComparator() {
+      return Comparator.comparing(RefactoringInfo::getNameAfter);
+    }
+  }
+
+  static class ClassInfo extends ColumnInfo<RefactoringInfo, String> {
+
+    public ClassInfo() {
+      super("Class at That Time");
+    }
+
+    @Nullable
+    @Override
+    public String valueOf(RefactoringInfo methodItem) {
+      String name = methodItem.getNameAfter();
+      name = name.substring(0, name.lastIndexOf('.'));
+      return name.substring(name.lastIndexOf('.') + 1);
     }
 
     @Nullable
@@ -104,7 +109,7 @@ class MethodColumnInfoFactory {
     @Nullable
     @Override
     public String valueOf(RefactoringInfo methodItem) {
-      return methodItem.getType().toString();
+      return methodItem.getType().toString().toLowerCase().replace('_', ' ');
     }
 
     @Nullable

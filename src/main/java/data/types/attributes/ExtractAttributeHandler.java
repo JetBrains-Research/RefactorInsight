@@ -1,5 +1,6 @@
 package data.types.attributes;
 
+import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -12,13 +13,12 @@ import org.refactoringminer.api.RefactoringType;
 public class ExtractAttributeHandler implements Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring, String commitId) {
+  public RefactoringInfo handle(Refactoring refactoring) {
     ExtractAttributeRefactoring ref = (ExtractAttributeRefactoring) refactoring;
     return new RefactoringInfo(Type.ATTRIBUTE)
         .setType(RefactoringType.EXTRACT_ATTRIBUTE)
         .setName(ref.getName())
         .setText(ref.toString())
-        .setCommitId(commitId)
         .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getVariableDeclaration().codeRange())))
         .setRightSide(
             Arrays.asList(new TrueCodeRange(ref.getExtractedVariableDeclarationCodeRange())));

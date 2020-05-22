@@ -13,9 +13,9 @@ import org.refactoringminer.api.RefactoringType;
 
 public class RefactoringInfo {
 
+  private transient RefactoringEntry entry;
   private String text;
   private String name;
-  private String commitId;
   private String nameBefore;
   private String nameAfter;
   private RefactoringType type;
@@ -75,12 +75,12 @@ public class RefactoringInfo {
     return this;
   }
 
-  public String getCommitId() {
-    return commitId;
+  public RefactoringEntry getEntry() {
+    return entry;
   }
 
-  public RefactoringInfo setCommitId(String commitId) {
-    this.commitId = commitId;
+  public RefactoringInfo setEntry(RefactoringEntry entry) {
+    this.entry = entry;
     return this;
   }
 
@@ -134,15 +134,11 @@ public class RefactoringInfo {
     return this;
   }
 
-  /**
-   * Computes and gets the timestamp of the refactoring.
-   *
-   * @param project current project
-   * @return timestamp
-   * @throws VcsException if vcs processing fails
-   */
-  public long getTimestamp(Project project) throws VcsException {
-    return GitHistoryUtils.getAuthorTime(project, project.getBaseDir(), getCommitId());
+  public long getTimestamp() {
+    return entry.getTimeStamp();
   }
 
+  public String getCommitId() {
+    return entry.getCommitId();
+  }
 }

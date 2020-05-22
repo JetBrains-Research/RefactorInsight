@@ -28,6 +28,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import services.RefactoringsBundle;
 
@@ -39,10 +40,10 @@ public class MethodRefactoringToolbar {
   private Project project;
 
   /**
-  * Constructor for the toolbar.
-  *
-  * @param project current project
-  */
+   * Constructor for the toolbar.
+   *
+   * @param project current project
+   */
   public MethodRefactoringToolbar(Project project) {
     this.project = project;
     toolWindowManager = ToolWindowManager.getInstance(project);
@@ -51,11 +52,11 @@ public class MethodRefactoringToolbar {
   }
 
   /**
-  * Displayer for the toolbar.
-  *
-  * @param refactorings detected refactorings
-  * @param methodName name of the method
-  */
+   * Displayer for the toolbar.
+   *
+   * @param refactorings detected refactorings
+   * @param methodName   name of the method
+   */
   public void showToolbar(List<RefactoringInfo> refactorings,
                           String methodName) {
     JBPanel panel;
@@ -74,21 +75,6 @@ public class MethodRefactoringToolbar {
       ListTableModel<RefactoringInfo> model = new ListTableModel<>(
           new MethodColumnInfoFactory().getColumnInfos(), refactorings);
       JBTable table = new JBTable(model);
-      table.setDefaultRenderer(table.getColumnClass(0), new DefaultTableCellRenderer() {
-        public Component getTableCellRendererComponent(JTable table,
-                                                       Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
-              RefactoringInfo method = model.getItem(row);
-              if (column == 0) {
-                setBackground(JBColor.YELLOW);
-              } else {
-                setBackground(JBColor.WHITE);
-              }
-
-              return super.getTableCellRendererComponent(table, value, isSelected,
-                  hasFocus, row, column);
-        }
-      });
 
       MouseAdapter mouseAdapter = new MouseAdapter() {
         @Override
@@ -102,8 +88,8 @@ public class MethodRefactoringToolbar {
             VcsLogFilterCollection filters = VcsLogFilterObject.collection();
             VcsLogManager.LogWindowKind kind = VcsLogManager.LogWindowKind.TOOL_WINDOW;
             VcsProjectLog.getInstance(project).openLogTab(filters, kind)
-              .getVcsLog()
-              .jumpToReference(info.getCommitId());
+                .getVcsLog()
+                .jumpToReference(info.getCommitId());
           }
         }
       };
@@ -111,8 +97,9 @@ public class MethodRefactoringToolbar {
 
       table.addMouseListener(mouseAdapter);
       splitterPane.setFirstComponent(new JBScrollPane(table));
-      splitterPane.setSecondComponent(new JBLabel("Select refactoring to see description"));
-
+      splitterPane.setSecondComponent(
+          new JBLabel(RefactoringsBundle.message("method.refactoring.history"),
+              SwingConstants.CENTER));
     }
 
     Content content;
