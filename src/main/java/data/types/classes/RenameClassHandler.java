@@ -1,5 +1,6 @@
 package data.types.classes;
 
+import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -12,14 +13,13 @@ import org.refactoringminer.api.RefactoringType;
 public class RenameClassHandler implements Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring, String commitId) {
+  public RefactoringInfo handle(Refactoring refactoring) {
     RenameClassRefactoring ref = (RenameClassRefactoring) refactoring;
 
     return new RefactoringInfo(Type.CLASS)
         .setType(RefactoringType.RENAME_CLASS)
         .setName(ref.getName())
         .setText(ref.toString())
-        .setCommitId(commitId)
         .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalClass().codeRange())))
         .setRightSide(Arrays.asList(new TrueCodeRange(ref.getRenamedClass().codeRange())))
         .setNameBefore(ref.getOriginalClassName())

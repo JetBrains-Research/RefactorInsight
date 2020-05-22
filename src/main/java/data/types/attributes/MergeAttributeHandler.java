@@ -1,5 +1,6 @@
 package data.types.attributes;
 
+import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -12,13 +13,12 @@ import org.refactoringminer.api.RefactoringType;
 public class MergeAttributeHandler implements Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring, String commitId) {
+  public RefactoringInfo handle(Refactoring refactoring) {
     MergeAttributeRefactoring ref = (MergeAttributeRefactoring) refactoring;
     return new RefactoringInfo(Type.ATTRIBUTE)
         .setType(RefactoringType.MERGE_ATTRIBUTE)
         .setName(ref.getName())
         .setText(ref.toString())
-        .setCommitId(commitId)
         .setLeftSide(ref.leftSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()))
         .setRightSide(
             ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));

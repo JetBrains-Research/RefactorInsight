@@ -1,5 +1,6 @@
 package data.types.packages;
 
+import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -12,13 +13,12 @@ import org.refactoringminer.api.RefactoringType;
 public class RenamePackageHandler implements Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring, String commitId) {
+  public RefactoringInfo handle(Refactoring refactoring) {
     RenamePackageRefactoring ref = (RenamePackageRefactoring) refactoring;
     return new RefactoringInfo(Type.PACKAGE)
         .setType(RefactoringType.RENAME_PACKAGE)
         .setName(ref.getName())
         .setText(ref.toString())
-        .setCommitId(commitId)
         .setLeftSide(ref.leftSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()))
         .setRightSide(
             ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));

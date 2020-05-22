@@ -149,11 +149,10 @@ public class InfoFactory {
    * Method that creates the relevant RefactoringInfo for a refactoring.
    *
    * @param refactoring to be analyzed
-   * @param commitId    from which the is detected
    * @return resulting RefactoringInfo
    */
-  public RefactoringInfo create(Refactoring refactoring, String commitId) {
+  public RefactoringInfo create(Refactoring refactoring) {
     return refactoringHandlers.get(refactoring.getRefactoringType())
-        .handle(refactoring, commitId);
+        .handle(refactoring);
   }
 }

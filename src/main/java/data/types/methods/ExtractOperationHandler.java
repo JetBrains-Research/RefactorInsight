@@ -1,5 +1,6 @@
 package data.types.methods;
 
+import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -12,7 +13,7 @@ import org.refactoringminer.api.RefactoringType;
 public class ExtractOperationHandler implements Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring, String commitId) {
+  public RefactoringInfo handle(Refactoring refactoring) {
     ExtractOperationRefactoring ref = (ExtractOperationRefactoring) refactoring;
 
     TrueCodeRange left = new TrueCodeRange(ref.getSourceOperationBeforeExtraction().codeRange());
@@ -25,7 +26,6 @@ public class ExtractOperationHandler implements Handler {
           .setType(RefactoringType.EXTRACT_AND_MOVE_OPERATION)
           .setName(ref.getName())
           .setText(ref.toString())
-          .setCommitId(commitId)
           .setLeftSide(Arrays.asList(left))
           .setRightSide(Arrays.asList(right1, right2))
           .setNameBefore(Handler.calculateSignature(ref.getSourceOperationBeforeExtraction()))
@@ -35,7 +35,6 @@ public class ExtractOperationHandler implements Handler {
         .setType(RefactoringType.EXTRACT_OPERATION)
         .setName(ref.getName())
         .setText(ref.toString())
-        .setCommitId(commitId)
         .setLeftSide(Arrays.asList(left))
         .setRightSide(Arrays.asList(right1, right2))
         .setNameBefore(Handler.calculateSignature(ref.getSourceOperationBeforeExtraction()))

@@ -1,6 +1,9 @@
 package data;
 
 import com.google.gson.Gson;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.VcsException;
+import git4idea.history.GitHistoryUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -10,9 +13,9 @@ import org.refactoringminer.api.RefactoringType;
 
 public class RefactoringInfo {
 
+  private transient RefactoringEntry entry;
   private String text;
   private String name;
-  private String commitId;
   private String nameBefore;
   private String nameAfter;
   private RefactoringType type;
@@ -72,12 +75,12 @@ public class RefactoringInfo {
     return this;
   }
 
-  public String getCommitId() {
-    return commitId;
+  public RefactoringEntry getEntry() {
+    return entry;
   }
 
-  public RefactoringInfo setCommitId(String commitId) {
-    this.commitId = commitId;
+  public RefactoringInfo setEntry(RefactoringEntry entry) {
+    this.entry = entry;
     return this;
   }
 
@@ -131,4 +134,11 @@ public class RefactoringInfo {
     return this;
   }
 
+  public long getTimestamp() {
+    return entry.getTimeStamp();
+  }
+
+  public String getCommitId() {
+    return entry.getCommitId();
+  }
 }

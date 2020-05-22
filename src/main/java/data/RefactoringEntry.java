@@ -27,6 +27,7 @@ public class RefactoringEntry implements Serializable {
     this.parents = parents;
     this.time = time;
     this.commitId = commitId;
+    data.forEach(r -> r.setEntry(this));
   }
 
   /**
@@ -40,7 +41,9 @@ public class RefactoringEntry implements Serializable {
       return null;
     }
     try {
-      return new Gson().fromJson(value, RefactoringEntry.class);
+      RefactoringEntry entry = new Gson().fromJson(value, RefactoringEntry.class);
+      entry.getRefactorings().forEach(r -> r.setEntry(entry));
+      return entry;
     } catch (Exception e) {
       e.printStackTrace();
       return null;
@@ -60,7 +63,7 @@ public class RefactoringEntry implements Serializable {
                                List<String> parents, long time) {
     return new RefactoringEntry(
         refactorings.stream()
-            .map(refactoring -> factory.create(refactoring, commitId))
+            .map(refactoring -> factory.create(refactoring))
             .collect(Collectors.toList()),
         commitId, parents, time).toString();
   }

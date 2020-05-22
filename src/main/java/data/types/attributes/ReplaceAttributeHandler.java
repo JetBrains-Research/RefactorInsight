@@ -1,5 +1,6 @@
 package data.types.attributes;
 
+import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -13,13 +14,12 @@ import org.refactoringminer.api.RefactoringType;
 public class ReplaceAttributeHandler implements Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring, String commitId) {
+  public RefactoringInfo handle(Refactoring refactoring) {
     ReplaceAttributeRefactoring ref = (ReplaceAttributeRefactoring) refactoring;
     return new RefactoringInfo(Type.ATTRIBUTE)
         .setType(RefactoringType.REPLACE_ATTRIBUTE)
         .setName(ref.getName())
         .setText(ref.toString())
-        .setCommitId(commitId)
         .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalAttribute().codeRange())))
         .setRightSide(
             ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));
