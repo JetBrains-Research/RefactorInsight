@@ -21,14 +21,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -125,9 +120,10 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
               e.printStackTrace();
             }
             System.out.println("Mining done");
-            getOrderedRefactorings(repository.getCurrentRevision())
-                .forEach(r -> r.addToHistory(methodHistory));
+
+            computeMethodHistory(repository.getCurrentRevision());
             System.out.println("Method history computed");
+
             progressIndicator.setText("Finished");
           }
         });
@@ -202,27 +198,16 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     return methodHistory;
   }
 
-  private Collection<RefactoringInfo> getOrderedRefactorings(String commitId) {
+  private void computeMethodHistory(String commitId) {
     List<RefactoringInfo> refs = new ArrayList<>();
-    PriorityQueue<RefactoringEntry> queue = new PriorityQueue<>(
-        Comparator.comparingLong(RefactoringEntry::getTimeStamp).reversed());
-    if (innerState.map.containsKey(commitId)) {
-      queue.add(RefactoringEntry.fromString(innerState.map.get(commitId)));
-    }
-    Set<String> visited = new HashSet<>();
-    while (!queue.isEmpty()) {
-      RefactoringEntry refactoringEntry = queue.remove();
+    while (innerState.map.containsKey(commitId)) {
+      RefactoringEntry refactoringEntry = RefactoringEntry
+          .fromString(innerState.map.get(commitId));
       refs.addAll(refactoringEntry.getRefactorings());
-      visited.add(refactoringEntry.getCommitId());
-      refactoringEntry.getParents().forEach(e -> {
-        if (innerState.map.containsKey(e) && !visited.contains(e)) {
-          queue.add(RefactoringEntry.fromString(innerState.map.get(e)));
-          visited.add(e);
-        }
-      });
+      commitId = refactoringEntry.getParents().get(0);
     }
     Collections.reverse(refs);
-    return refs;
+    refs.forEach(r -> r.addToHistory(methodHistory));
   }
 
   public RefactoringEntry getEntry(String hash) {
@@ -234,4 +219,5 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     @MapAnnotation
     public Map<String, String> map = new ConcurrentHashMap<>();
   }
+
 }

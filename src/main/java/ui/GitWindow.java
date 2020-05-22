@@ -41,7 +41,6 @@ import org.jetbrains.annotations.NotNull;
 import services.MiningService;
 import services.RefactoringsBundle;
 
-
 public class GitWindow extends ToggleAction {
 
   Project project;
@@ -169,7 +168,6 @@ public class GitWindow extends ToggleAction {
 
   private void showDiff(int index, RefactoringInfo ri) {
     Collection<Change> changes = table.getModel().getFullDetails(index).getChanges();
-
     List<HalfDiffInfo> leftDiffs = changes
         .stream()
         .map(Change::getBeforeRevision)
