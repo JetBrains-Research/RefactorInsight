@@ -1,9 +1,6 @@
 package data;
 
 import com.google.gson.Gson;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.VcsException;
-import git4idea.history.GitHistoryUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -55,7 +52,6 @@ public class RefactoringInfo {
       map.put(nameAfter, refs);
     }
   }
-
 
   public String getName() {
     return name;
