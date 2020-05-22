@@ -72,7 +72,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   }
 
   /**
-   * Mine compelete git repo for refactorings.
+   * Mine complete git repo for refactorings.
    *
    * @param repository GitRepository
    */
@@ -131,6 +131,27 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             progressIndicator.setText("Finished");
           }
         });
+    synchronized (this) {
+      notifyAll();
+    }
+  }
+
+  /**
+   * Mine complete git repo for refactorings, and wait to be done.
+   *
+   * @param repository GitRepository
+   */
+  public void mineAndWait(GitRepository repository) {
+    synchronized (this) {
+      mineRepo(repository);
+      while (mining) {
+        try {
+          wait();
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    }
   }
 
   /**
@@ -202,6 +223,10 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     }
     Collections.reverse(refs);
     return refs;
+  }
+
+  public RefactoringEntry getEntry(String hash) {
+    return RefactoringEntry.fromString(innerState.map.get(hash));
   }
 
   public static class MyState {
