@@ -43,8 +43,7 @@ public class MethodAction extends AnAction {
         if (((PsiElementUsageTarget) target).getElement() instanceof PsiMethod) {
           PsiMethod method = (PsiMethod) ((PsiElementUsageTarget) target).getElement();
           String signature = calculateSignature(method);
-          //getPopupWindow(project).show(map.get(signature), signature, dataContext);
-          getToolbarWindow(project).showToolbar(map.get(signature), signature, dataContext);
+          getToolbarWindow(project).showToolbar(map.get(signature), signature);
         }
       }
     }

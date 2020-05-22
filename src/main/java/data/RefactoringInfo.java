@@ -1,17 +1,14 @@
 package data;
 
 import com.google.gson.Gson;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.VcsException;
+import git4idea.history.GitHistoryUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.VcsException;
-import com.intellij.vcs.log.impl.HashImpl;
-import com.intellij.vcs.log.impl.VcsProjectLog;
-import git4idea.history.GitHistoryUtils;
 import org.refactoringminer.api.RefactoringType;
 
 public class RefactoringInfo {
@@ -137,11 +134,15 @@ public class RefactoringInfo {
     return this;
   }
 
+  /**
+   * Computes and gets the timestamp of the refactoring.
+   *
+   * @param project current project
+   * @return timestamp
+   * @throws VcsException if vcs processing fails
+   */
   public long getTimestamp(Project project) throws VcsException {
     return GitHistoryUtils.getAuthorTime(project, project.getBaseDir(), getCommitId());
-//    VcsProjectLog.getInstance(project).getDataManager().getCommitDetailsGetter().
-//            getCommitDataIfAvailable(HashImpl.build(getCommitId()).hashCode())
-//            .getTimestamp();
   }
 
 }
