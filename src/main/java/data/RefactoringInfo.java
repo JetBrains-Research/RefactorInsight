@@ -6,6 +6,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.VcsException;
+import com.intellij.vcs.log.impl.HashImpl;
+import com.intellij.vcs.log.impl.VcsProjectLog;
+import git4idea.history.GitHistoryUtils;
 import org.refactoringminer.api.RefactoringType;
 
 public class RefactoringInfo {
@@ -129,6 +135,13 @@ public class RefactoringInfo {
   public RefactoringInfo setNameAfter(String nameAfter) {
     this.nameAfter = nameAfter;
     return this;
+  }
+
+  public long getTimestamp(Project project) throws VcsException {
+    return GitHistoryUtils.getAuthorTime(project, project.getBaseDir(), getCommitId());
+//    VcsProjectLog.getInstance(project).getDataManager().getCommitDetailsGetter().
+//            getCommitDataIfAvailable(HashImpl.build(getCommitId()).hashCode())
+//            .getTimestamp();
   }
 
 }

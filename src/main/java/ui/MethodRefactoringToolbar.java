@@ -63,6 +63,7 @@ public class MethodRefactoringToolbar {
 //                    .collect(Collectors.toList()));
 
 
+            MethodColumnInfoFactory.project = project;
             ListTableModel<RefactoringInfo> model = new ListTableModel<>(
                     new MethodColumnInfoFactory().getColumnInfos(), refactorings);
             JBTable table = new JBTable(model);
