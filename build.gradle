@@ -15,12 +15,18 @@ repositories {
 
 test {
 //    useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
+
+//jacoco {
+//    toolVersion = "0.8.5"
+//    reportsDir = file("$buildDir/JaCoCo")
+//}
 
 jacocoTestReport {
     reports {
         xml.enabled true
-        csv.enabled false
+        csv.enabled true
         html.destination file("${buildDir}/jacocoHtml")
     }
 }
@@ -49,7 +55,6 @@ intellij {
     plugins 'java', 'git4idea'
     downloadSources true
 }
-
 
 checkstyle {
     toolVersion "8.31"
