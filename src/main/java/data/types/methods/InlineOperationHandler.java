@@ -1,9 +1,8 @@
 package data.types.methods;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
+import data.Scope;
 import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.CodeRange;
 import gr.uom.java.xmi.diff.InlineOperationRefactoring;
@@ -25,20 +24,24 @@ public class InlineOperationHandler implements Handler {
 
     if (!ref.getTargetOperationBeforeInline().getClassName().equals(ref
         .getTargetOperationAfterInline().getClassName())) {
-      return new RefactoringInfo(Type.METHOD)
+      return new RefactoringInfo(Scope.METHOD)
           .setType(RefactoringType.MOVE_AND_INLINE_OPERATION)
           .setName(ref.getName())
           .setText(ref.toString())
           .setLeftSide(Arrays.asList(left))
           .setRightSide(right)
+          .setElementBefore(ref.getInlinedOperation().getName())
+          .setElementAfter(" in method " + ref.getTargetOperationAfterInline().getName())
           .setNameBefore(Handler.calculateSignature(ref.getTargetOperationBeforeInline()))
           .setNameAfter(Handler.calculateSignature(ref.getTargetOperationAfterInline()));
     }
 
-    return new RefactoringInfo(Type.METHOD)
+    return new RefactoringInfo(Scope.METHOD)
         .setType(RefactoringType.INLINE_OPERATION)
         .setName(ref.getName())
         .setText(ref.toString())
+        .setElementBefore(ref.getInlinedOperation().getName())
+        .setElementAfter(" in method " + ref.getTargetOperationAfterInline().getName())
         .setLeftSide(Arrays.asList(left))
         .setRightSide(right)
         .setNameBefore(Handler.calculateSignature(ref.getTargetOperationBeforeInline()))

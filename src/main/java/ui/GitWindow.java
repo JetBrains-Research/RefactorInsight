@@ -144,11 +144,14 @@ public class GitWindow extends ToggleAction {
             if (path == null) {
               return;
             }
-            Object obj = path.getParentPath().getLastPathComponent();
-            Object ri = ((DefaultMutableTreeNode) obj).getUserObject();
+            TreePath parent = path.getParentPath();
+            Object obj = parent != null ? parent.getLastPathComponent() : null;
+            Object ri = obj != null ? ((DefaultMutableTreeNode) obj).getUserObject() : null;
+
             if (ri instanceof RefactoringInfo) {
               showDiff(index, (RefactoringInfo) ri);
             }
+
           }
         }
       });

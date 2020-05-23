@@ -1,9 +1,8 @@
 package data.types.variables;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
+import data.Scope;
 import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ExtractVariableRefactoring;
 import java.util.Arrays;
@@ -15,7 +14,7 @@ public class ExtractVariableHandler implements Handler {
   @Override
   public RefactoringInfo handle(Refactoring refactoring) {
     ExtractVariableRefactoring ref = (ExtractVariableRefactoring) refactoring;
-    return new RefactoringInfo(Type.VARIABLE)
+    return new RefactoringInfo(Scope.VARIABLE)
         .setType(RefactoringType.EXTRACT_VARIABLE)
         .setName(ref.getName())
         .setText(ref.toString())

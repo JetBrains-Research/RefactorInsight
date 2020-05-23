@@ -1,8 +1,8 @@
 package data.types.variables;
 
 import data.RefactoringInfo;
+import data.Scope;
 import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.InlineVariableRefactoring;
 import java.util.Arrays;
@@ -15,7 +15,7 @@ public class InlineVariableHandler implements Handler {
   @Override
   public RefactoringInfo handle(Refactoring refactoring) {
     InlineVariableRefactoring ref = (InlineVariableRefactoring) refactoring;
-    return new RefactoringInfo(Type.VARIABLE)
+    return new RefactoringInfo(Scope.VARIABLE)
         .setType(RefactoringType.INLINE_VARIABLE)
         .setName(ref.getName())
         .setText(ref.toString())

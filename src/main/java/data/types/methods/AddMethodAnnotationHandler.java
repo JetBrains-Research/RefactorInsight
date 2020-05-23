@@ -1,9 +1,8 @@
 package data.types.methods;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
+import data.Scope;
 import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.AddMethodAnnotationRefactoring;
 import java.util.Arrays;
@@ -18,10 +17,12 @@ public class AddMethodAnnotationHandler implements Handler {
     TrueCodeRange left = new TrueCodeRange(ref.getOperationBefore().codeRange());
     TrueCodeRange right = new TrueCodeRange(ref.getAnnotation().codeRange());
 
-    return new RefactoringInfo(Type.METHOD)
+    return new RefactoringInfo(Scope.METHOD)
         .setType(RefactoringType.ADD_METHOD_ANNOTATION)
         .setName(ref.getName())
         .setText(ref.toString())
+        .setElementBefore(null)
+        .setElementAfter(ref.getAnnotation().toString())
         .setLeftSide(Arrays.asList(left))
         .setRightSide(Arrays.asList(right))
         .setNameBefore(Handler.calculateSignature(ref.getOperationBefore()))

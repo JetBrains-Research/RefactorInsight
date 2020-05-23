@@ -1,8 +1,8 @@
 package data.types.attributes;
 
 import data.RefactoringInfo;
+import data.Scope;
 import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ExtractAttributeRefactoring;
 import java.util.Arrays;
@@ -14,7 +14,7 @@ public class ExtractAttributeHandler implements Handler {
   @Override
   public RefactoringInfo handle(Refactoring refactoring) {
     ExtractAttributeRefactoring ref = (ExtractAttributeRefactoring) refactoring;
-    return new RefactoringInfo(Type.ATTRIBUTE)
+    return new RefactoringInfo(Scope.ATTRIBUTE)
         .setType(RefactoringType.EXTRACT_ATTRIBUTE)
         .setName(ref.getName())
         .setText(ref.toString())

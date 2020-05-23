@@ -1,9 +1,8 @@
 package data.types.variables;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
+import data.Scope;
 import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ChangeReturnTypeRefactoring;
 import java.util.Arrays;
@@ -15,7 +14,7 @@ public class ChangeReturnTypeHandler implements Handler {
   @Override
   public RefactoringInfo handle(Refactoring refactoring) {
     ChangeReturnTypeRefactoring ref = (ChangeReturnTypeRefactoring) refactoring;
-    return new RefactoringInfo(Type.VARIABLE)
+    return new RefactoringInfo(Scope.VARIABLE)
         .setType(RefactoringType.CHANGE_RETURN_TYPE)
         .setName(ref.getName())
         .setText(ref.toString())

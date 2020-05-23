@@ -51,6 +51,8 @@ class MyCellRenderer extends JBDefaultTreeCellRenderer {
       }
     } else if (leaf) {
       setIcon(AllIcons.Actions.Diff);
+    } else if (node.getChildAt(0).isLeaf()) {
+      setIcon(AllIcons.Nodes.Package);
     } else {
       setIcon(null);
     }

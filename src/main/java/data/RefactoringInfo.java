@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javax.swing.tree.DefaultMutableTreeNode;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.refactoringminer.api.RefactoringType;
 
 public class RefactoringInfo {
@@ -18,9 +21,15 @@ public class RefactoringInfo {
   private RefactoringType type;
   private List<TrueCodeRange> leftSide;
   private List<TrueCodeRange> rightSide;
-  private Type object;
 
-  public RefactoringInfo(Type object) {
+  @Nullable
+  String elementBefore;
+  @Nullable
+  String elementAfter;
+
+  private Scope object;
+
+  public RefactoringInfo(Scope object) {
     this.object = object;
   }
 
@@ -32,7 +41,7 @@ public class RefactoringInfo {
    */
   public void addToHistory(Map<String, List<RefactoringInfo>> map) {
     //System.out.println(signatureAfter);
-    if (object == Type.CLASS && nameBefore != null && nameAfter != null) {
+    if (object == Scope.CLASS && nameBefore != null && nameAfter != null) {
       Map<String, String> renames = new HashMap<>();
       renames.put(nameBefore, nameAfter);
       renames.forEach((before, after) -> map.keySet().stream()
@@ -45,12 +54,61 @@ public class RefactoringInfo {
       return;
     }
 
-    if (object == Type.METHOD) {
+    if (object == Scope.METHOD) {
       List<RefactoringInfo> refs = map.getOrDefault(nameBefore, new LinkedList<>());
       map.remove(nameBefore);
       refs.add(0, this);
       map.put(nameAfter, refs);
     }
+  }
+
+  @NotNull
+  protected DefaultMutableTreeNode getSimpleNode() {
+    DefaultMutableTreeNode change;
+    if (nameAfter == null && nameBefore == null) {
+      change = new DefaultMutableTreeNode("view changes");
+    } else {
+      char a = '→';
+      change = new DefaultMutableTreeNode(nameBefore + " " + a + " " + nameAfter);
+    }
+    return change;
+  }
+
+  protected void getNodeClass(DefaultMutableTreeNode refName) {
+    String packageBefore = nameBefore.substring(0, nameBefore.lastIndexOf("."));
+    String packageAfter = nameAfter.substring(0, nameAfter.lastIndexOf("."));
+    DefaultMutableTreeNode package1 = new DefaultMutableTreeNode(packageBefore);
+    DefaultMutableTreeNode package2 = new DefaultMutableTreeNode(packageAfter);
+    String before = nameBefore.substring(nameBefore.lastIndexOf(".") + 1);
+    String after = nameAfter.substring(nameAfter.lastIndexOf(".") + 1);
+    DefaultMutableTreeNode name1 = new DefaultMutableTreeNode(before);
+    DefaultMutableTreeNode name2 = new DefaultMutableTreeNode(after);
+    package1.add(name1);
+    package2.add(name2);
+    DefaultMutableTreeNode bf = new DefaultMutableTreeNode("Before refactoring");
+    DefaultMutableTreeNode af = new DefaultMutableTreeNode("After refactoring");
+    bf.add(package1);
+    af.add(package2);
+    refName.add(bf);
+    refName.add(af);
+  }
+
+  @NotNull
+  protected DefaultMutableTreeNode getNodeMethod() {
+    DefaultMutableTreeNode change;
+    final String elementBefore = this.elementBefore;
+    final String elementAfter = this.elementAfter;
+    if (elementAfter != null && elementBefore != null) {
+      char a = '→';
+      change = new DefaultMutableTreeNode(elementBefore + " " + a + " " + elementAfter);
+    } else if (elementAfter != null) {
+      change = new DefaultMutableTreeNode(elementAfter);
+    } else if (elementBefore != null) {
+      change = new DefaultMutableTreeNode(elementBefore);
+    } else {
+      change = new DefaultMutableTreeNode("view changes");
+    }
+    return change;
   }
 
   public String getName() {
@@ -136,5 +194,19 @@ public class RefactoringInfo {
 
   public String getCommitId() {
     return entry.getCommitId();
+  }
+
+  public Scope getObject() {
+    return object;
+  }
+
+  public RefactoringInfo setElementBefore(@Nullable String elementBefore) {
+    this.elementBefore = elementBefore;
+    return this;
+  }
+
+  public RefactoringInfo setElementAfter(@Nullable String elementAfter) {
+    this.elementAfter = elementAfter;
+    return this;
   }
 }

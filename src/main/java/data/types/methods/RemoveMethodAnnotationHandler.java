@@ -1,9 +1,8 @@
 package data.types.methods;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
+import data.Scope;
 import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.RemoveMethodAnnotationRefactoring;
 import java.util.Arrays;
@@ -15,10 +14,12 @@ public class RemoveMethodAnnotationHandler implements Handler {
   @Override
   public RefactoringInfo handle(Refactoring refactoring) {
     RemoveMethodAnnotationRefactoring ref = (RemoveMethodAnnotationRefactoring) refactoring;
-    return new RefactoringInfo(Type.METHOD)
+    return new RefactoringInfo(Scope.METHOD)
         .setType(RefactoringType.REMOVE_METHOD_ANNOTATION)
         .setText(ref.toString())
         .setName(ref.getName())
+        .setElementBefore(ref.getAnnotation().toString())
+        .setElementAfter(null)
         .setLeftSide(
             Arrays.asList(new TrueCodeRange(ref.getAnnotation().codeRange())))
         .setRightSide(

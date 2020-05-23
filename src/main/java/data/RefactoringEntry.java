@@ -1,23 +1,13 @@
 package data;
 
 import com.google.gson.Gson;
-import com.intellij.ui.components.JBTreeTable;
-import com.intellij.ui.tree.ui.DefaultTreeUI;
 import com.intellij.ui.treeStructure.Tree;
-import com.intellij.ui.treeStructure.treetable.ListTreeTableModel;
-import com.intellij.ui.treeStructure.treetable.TreeTableModel;
-import com.intellij.util.ui.ColumnInfo;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.swing.JComponent;
-import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
-import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
-import org.jetbrains.annotations.Nullable;
 import org.refactoringminer.api.Refactoring;
+import org.refactoringminer.api.RefactoringType;
 
 public class RefactoringEntry implements Serializable {
 
@@ -81,6 +71,55 @@ public class RefactoringEntry implements Serializable {
         commitId, parents, time).toString();
   }
 
+  /**
+   * Builds a UI tree.
+   *
+   * @return Swing Tree visualisation of refactorings in this entry.
+   */
+  public Tree buildTree() {
+    List<RefactoringInfo> refs = data;
+
+    DefaultMutableTreeNode root = new DefaultMutableTreeNode("Refactorings at commit " + commitId);
+
+    for (RefactoringInfo refactoringInfo : refs) {
+      DefaultMutableTreeNode refName =
+          new DefaultMutableTreeNode(refactoringInfo);
+      root.add(refName);
+
+      DefaultMutableTreeNode change = null;
+      if (refactoringInfo.getObject() == Scope.METHOD) {
+        change = refactoringInfo.getNodeMethod();
+      } else if (refactoringInfo.getObject() == Scope.CLASS && refactoringInfo.getType()
+          != RefactoringType.RENAME_CLASS) {
+        refactoringInfo.getNodeClass(refName);
+      } else {
+        change = refactoringInfo.getSimpleNode();
+      }
+      if (change != null) {
+        refName.add(change);
+      }
+    }
+
+    Tree tree = new Tree(root);
+    tree.setRootVisible(false);
+    expandAllNodes(tree, 0, tree.getRowCount());
+    MyCellRenderer renderer = new MyCellRenderer();
+    tree.setCellRenderer(renderer);
+
+    return tree;
+  }
+
+
+  private void expandAllNodes(Tree tree, int startingIndex, int rowCount) {
+    for (int i = startingIndex; i < rowCount; ++i) {
+      tree.expandRow(i);
+    }
+
+    if (tree.getRowCount() != rowCount) {
+      expandAllNodes(tree, rowCount, tree.getRowCount());
+    }
+  }
+
   public List<RefactoringInfo> getRefactorings() {
     return data;
   }
@@ -100,35 +139,5 @@ public class RefactoringEntry implements Serializable {
 
   public String getCommitId() {
     return commitId;
-  }
-
-  /**
-   * Builds a UI tree.
-   *
-   * @return Swing Tree visualisation of refactorings in this entry.
-   */
-  public Tree buildTree() {
-    List<RefactoringInfo> refs = data;
-
-    DefaultMutableTreeNode root = new DefaultMutableTreeNode("Refactorings at commit " + commitId);
-
-    for (RefactoringInfo refactoringInfo : refs) {
-      DefaultMutableTreeNode refName =
-          new DefaultMutableTreeNode(refactoringInfo);
-      root.add(refName);
-      char a = '→';
-      DefaultMutableTreeNode change = new
-          DefaultMutableTreeNode(
-          refactoringInfo.getNameBefore() + " " + a + " " + refactoringInfo.getNameAfter());
-      refName.add(change);
-    }
-    Tree tree = new Tree(root);
-
-    tree.setRootVisible(true);
-
-    MyCellRenderer renderer = new MyCellRenderer();
-    tree.setCellRenderer(renderer);
-
-    return tree;
   }
 }

@@ -1,9 +1,8 @@
 package data.types.classes;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
+import data.Scope;
 import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MoveAndRenameClassRefactoring;
 import java.util.Arrays;
@@ -16,7 +15,7 @@ public class MoveRenameClassHandler implements Handler {
   public RefactoringInfo handle(Refactoring refactoring) {
     MoveAndRenameClassRefactoring ref = (MoveAndRenameClassRefactoring) refactoring;
 
-    return new RefactoringInfo(Type.CLASS)
+    return new RefactoringInfo(Scope.CLASS)
         .setType(RefactoringType.MOVE_RENAME_CLASS)
         .setName(ref.getName())
         .setText(ref.toString())

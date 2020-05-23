@@ -1,9 +1,8 @@
 package data.types.methods;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
+import data.Scope;
 import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ExtractOperationRefactoring;
 import java.util.Arrays;
@@ -22,19 +21,25 @@ public class ExtractOperationHandler implements Handler {
 
     if (!ref.getSourceOperationBeforeExtraction().getClassName().equals(ref
         .getExtractedOperation().getClassName())) {
-      return new RefactoringInfo(Type.METHOD)
+      return new RefactoringInfo(Scope.METHOD)
           .setType(RefactoringType.EXTRACT_AND_MOVE_OPERATION)
           .setName(ref.getName())
           .setText(ref.toString())
+          .setElementBefore(ref.getSourceOperationBeforeExtraction().getName() + " in class "
+              + ref.getSourceOperationBeforeExtraction().getClassName())
+          .setElementAfter("extracted " + ref.getExtractedOperation().getName() + " moved in "
+              + ref.getExtractedOperation().getClassName())
           .setLeftSide(Arrays.asList(left))
           .setRightSide(Arrays.asList(right1, right2))
           .setNameBefore(Handler.calculateSignature(ref.getSourceOperationBeforeExtraction()))
           .setNameAfter(Handler.calculateSignature(ref.getSourceOperationAfterExtraction()));
     }
-    return new RefactoringInfo(Type.METHOD)
+    return new RefactoringInfo(Scope.METHOD)
         .setType(RefactoringType.EXTRACT_OPERATION)
         .setName(ref.getName())
         .setText(ref.toString())
+        .setElementBefore("from " + ref.getSourceOperationBeforeExtraction().getName())
+        .setElementAfter("extracted " + ref.getExtractedOperation().getName())
         .setLeftSide(Arrays.asList(left))
         .setRightSide(Arrays.asList(right1, right2))
         .setNameBefore(Handler.calculateSignature(ref.getSourceOperationBeforeExtraction()))

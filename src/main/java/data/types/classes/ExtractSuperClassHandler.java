@@ -1,9 +1,8 @@
 package data.types.classes;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
+import data.Scope;
 import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ExtractSuperclassRefactoring;
 import java.util.stream.Collectors;
@@ -14,7 +13,7 @@ public class ExtractSuperClassHandler implements Handler {
   @Override
   public RefactoringInfo handle(Refactoring refactoring) {
     ExtractSuperclassRefactoring ref = (ExtractSuperclassRefactoring) refactoring;
-    return new RefactoringInfo(Type.CLASS)
+    return new RefactoringInfo(Scope.CLASS)
         .setType(ref.getRefactoringType())
         .setName(ref.getName())
         .setText(ref.toString())

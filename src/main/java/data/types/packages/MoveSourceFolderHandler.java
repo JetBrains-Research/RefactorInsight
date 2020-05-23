@@ -1,8 +1,8 @@
 package data.types.packages;
 
 import data.RefactoringInfo;
+import data.Scope;
 import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MoveSourceFolderRefactoring;
 import java.util.stream.Collectors;
@@ -14,7 +14,7 @@ public class MoveSourceFolderHandler implements Handler {
   @Override
   public RefactoringInfo handle(Refactoring refactoring) {
     MoveSourceFolderRefactoring ref = (MoveSourceFolderRefactoring) refactoring;
-    return new RefactoringInfo(Type.PACKAGE)
+    return new RefactoringInfo(Scope.PACKAGE)
         .setType(RefactoringType.MOVE_SOURCE_FOLDER)
         .setName(ref.getName())
         .setText(ref.toString())

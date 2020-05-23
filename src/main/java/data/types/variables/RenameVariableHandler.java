@@ -1,9 +1,8 @@
 package data.types.variables;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
+import data.Scope;
 import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.RenameVariableRefactoring;
 import java.util.stream.Collectors;
@@ -14,7 +13,7 @@ public class RenameVariableHandler implements Handler {
   @Override
   public RefactoringInfo handle(Refactoring refactoring) {
     RenameVariableRefactoring ref = (RenameVariableRefactoring) refactoring;
-    return new RefactoringInfo(Type.VARIABLE)
+    return new RefactoringInfo(Scope.VARIABLE)
         .setType(ref.getRefactoringType())
         .setName(ref.getName())
         .setText(ref.toString())

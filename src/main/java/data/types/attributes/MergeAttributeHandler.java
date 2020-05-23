@@ -1,8 +1,8 @@
 package data.types.attributes;
 
 import data.RefactoringInfo;
+import data.Scope;
 import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MergeAttributeRefactoring;
 import java.util.stream.Collectors;
@@ -14,7 +14,7 @@ public class MergeAttributeHandler implements Handler {
   @Override
   public RefactoringInfo handle(Refactoring refactoring) {
     MergeAttributeRefactoring ref = (MergeAttributeRefactoring) refactoring;
-    return new RefactoringInfo(Type.ATTRIBUTE)
+    return new RefactoringInfo(Scope.ATTRIBUTE)
         .setType(RefactoringType.MERGE_ATTRIBUTE)
         .setName(ref.getName())
         .setText(ref.toString())
