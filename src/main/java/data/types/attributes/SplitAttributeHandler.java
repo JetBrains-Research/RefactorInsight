@@ -1,6 +1,5 @@
 package data.types.attributes;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -18,6 +17,9 @@ public class SplitAttributeHandler implements Handler {
         .setType(ref.getRefactoringType())
         .setName(ref.getName())
         .setText(ref.toString())
+        .setNameBefore(ref.getOldAttribute().getVariableName())
+        .setNameAfter(ref.getSplitAttributes().stream().map(x -> x.getVariableName()).collect(
+            Collectors.joining()))
         .setLeftSide(ref.leftSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()))
         .setRightSide(
             ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));

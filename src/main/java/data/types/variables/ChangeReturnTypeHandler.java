@@ -19,6 +19,8 @@ public class ChangeReturnTypeHandler implements Handler {
         .setType(RefactoringType.CHANGE_RETURN_TYPE)
         .setName(ref.getName())
         .setText(ref.toString())
+        .setNameBefore(ref.getOriginalType().toString())
+        .setNameAfter(ref.getChangedType().toString())
         .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOperationBefore().codeRange())))
         .setRightSide(Arrays.asList(new TrueCodeRange(ref.getOperationAfter().codeRange())));
   }

@@ -5,18 +5,23 @@ import com.intellij.diff.DiffManager;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.util.DiffUserDataKeysEx;
+import com.intellij.icons.AllIcons;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
+import com.intellij.ui.JBDefaultTreeCellRenderer;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.components.JBTreeTable;
 import com.intellij.ui.components.JBViewport;
+import com.intellij.ui.treeStructure.treetable.ListTreeTableModel;
+import com.intellij.util.ui.ColumnInfo;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
@@ -26,6 +31,7 @@ import data.RefactoringInfo;
 import diff.FileDiffInfo;
 import diff.HalfDiffInfo;
 import diff.LineRange;
+import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -34,10 +40,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JTree;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import services.MiningService;
 import services.RefactoringsBundle;
 
@@ -86,7 +97,8 @@ public class GitWindow extends ToggleAction {
     String commitId = table.getModel().getCommitId(index).getHash().asString();
     String refactorings = miningService.getRefactorings(commitId);
     if (!refactorings.equals("")) {
-      scrollPane.getViewport().setView(buildList(index, refactorings));
+      buildList(index, refactorings);
+      //scrollPane.getViewport().setView(buildList(index, refactorings));
     } else {
       JBSplitter splitter = new JBSplitter(true, (float) 0.1);
       JBLabel label = new JBLabel(RefactoringsBundle.message("not.mined"));
@@ -113,6 +125,7 @@ public class GitWindow extends ToggleAction {
   /**
    * Method called after a single commit is mined.
    * Updates the view with the refactorings found.
+   *
    * @param commitId to refresh the view at.
    */
   public void refresh(String commitId) {
@@ -152,17 +165,53 @@ public class GitWindow extends ToggleAction {
 
   private JBList buildList(int index, String refactorings) {
     List<RefactoringInfo> refs = RefactoringEntry.fromString(refactorings).getRefactorings();
-    String[] names = refs.stream().map(r -> r.getName()).toArray(String[]::new);
-    JBList<String> list = new JBList<>(names);
+
+    DefaultMutableTreeNode root = new DefaultMutableTreeNode("Refactorings at commit");
+
+    for (RefactoringInfo refactoringInfo : refs) {
+      DefaultMutableTreeNode refName =
+          new DefaultMutableTreeNode(refactoringInfo);
+      root.add(refName);
+      char a = '\u2192';
+      DefaultMutableTreeNode change = new
+          DefaultMutableTreeNode(
+          refactoringInfo.getNameBefore() + " " + a + " " + refactoringInfo.getNameAfter());
+      refName.add(change);
+    }
+
+    ListTreeTableModel model = new ListTreeTableModel(root,
+        new ColumnInfo[] {new ColumnInfo<DefaultMutableTreeNode, String>("Changes") {
+
+          @Nullable
+          @Override
+          public String valueOf(DefaultMutableTreeNode o) {
+            return o.toString();
+          }
+        }
+        });
+
+    JBTreeTable treeTable = new JBTreeTable(model);
+    treeTable.getTree().setRootVisible(true);
+    MyCellRenderer renderer = new MyCellRenderer();
+
+    treeTable.getTree().setCellRenderer(renderer);
+    treeTable.setAutoscrolls(true);
+
+    scrollPane.getViewport().setView(treeTable);
 
     MouseAdapter mouseListener = new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
         if (e.getClickCount() == 2) {
-          showDiff(index, refs.get(list.locationToIndex(e.getPoint())));
+          TreePath path = treeTable.getTree().getPathForLocation(e.getPoint().x, e.getPoint().y);
+          System.out.println(path.getPath());
+          //showDiff(index,
+          // refs.get());
         }
       }
     };
-    list.addMouseListener(mouseListener);
+    treeTable.addMouseListener(mouseListener);
+    String[] names = refs.stream().map(r -> r.getName()).toArray(String[]::new);
+    JBList<String> list = new JBList<>(names);
     return list;
   }
 
@@ -245,5 +294,54 @@ public class GitWindow extends ToggleAction {
         }
       }
     }
+  }
+
+
+}
+
+class MyCellRenderer extends JBDefaultTreeCellRenderer {
+
+  public MyCellRenderer() {
+    super();
+  }
+
+  @Override
+  public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
+                                                boolean expanded, boolean leaf, int row,
+                                                boolean hasFocus) {
+    super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+
+    DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+
+    if (node.getParent() != null && node.getParent().equals(node.getRoot())) {
+      if (node.toString().contains("Class")) {
+        Icon icon = AllIcons.Nodes.Class;
+        setIcon(icon);
+      } else if (node.toString().contains("Operation") || node.toString().contains("Method")) {
+        Icon icon = AllIcons.Nodes.Method;
+        setIcon(icon);
+      } else if (node.toString().contains("Attribute")) {
+        Icon icon = AllIcons.Nodes.ObjectTypeAttribute;
+        setIcon(icon);
+      } else if (node.toString().contains("Variable")) {
+        Icon icon = AllIcons.Nodes.Variable;
+        setIcon(icon);
+      } else if (node.toString().contains("Parameter")) {
+        Icon icon = AllIcons.Nodes.Parameter;
+        setIcon(icon);
+      } else if (node.toString().contains("Package")) {
+        Icon icon = AllIcons.Nodes.Package;
+        setIcon(icon);
+      } else if (node.toString().contains("Return")) {
+        Icon icon = AllIcons.Debugger.WatchLastReturnValue;
+        setIcon(icon);
+      } else if (node.toString().contains("Interface")) {
+        Icon icon = AllIcons.Nodes.Interface;
+        setIcon(icon);
+      }
+    } else {
+      setIcon(null);
+    }
+    return this;
   }
 }

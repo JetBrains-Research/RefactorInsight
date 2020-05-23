@@ -1,6 +1,5 @@
 package data.types.variables;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -18,6 +17,9 @@ public class MergeVariableHandler implements Handler {
         .setType(ref.getRefactoringType())
         .setName(ref.getName())
         .setText(ref.toString())
+        .setNameBefore(ref.getMergedVariables().stream().map(x -> x.getVariableName()).collect(
+            Collectors.joining()))
+        .setNameAfter(ref.getNewVariable().getVariableName())
         .setLeftSide(ref.leftSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()))
         .setRightSide(
             ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));

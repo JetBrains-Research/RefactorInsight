@@ -1,6 +1,5 @@
 package data.types.attributes;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -20,6 +19,8 @@ public class ReplaceAttributeHandler implements Handler {
         .setType(RefactoringType.REPLACE_ATTRIBUTE)
         .setName(ref.getName())
         .setText(ref.toString())
+        .setNameBefore(ref.getOriginalAttribute().getName())
+        .setNameAfter(ref.getMovedAttribute().getName())
         .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalAttribute().codeRange())))
         .setRightSide(
             ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));

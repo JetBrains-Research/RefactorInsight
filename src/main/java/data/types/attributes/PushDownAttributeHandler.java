@@ -18,6 +18,8 @@ public class PushDownAttributeHandler implements Handler {
         .setType(RefactoringType.PUSH_DOWN_ATTRIBUTE)
         .setName(ref.getName())
         .setText(ref.toString())
+        .setNameBefore(ref.getSourceClassName())
+        .setNameAfter(ref.getTargetClassName())
         .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalAttribute().codeRange())))
         .setRightSide(Arrays.asList(new TrueCodeRange(ref.getMovedAttribute().codeRange())));
   }

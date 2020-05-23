@@ -1,6 +1,5 @@
 package data.types.attributes;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -19,6 +18,8 @@ public class RenameAttributeHandler implements Handler {
         .setType(RefactoringType.RENAME_ATTRIBUTE)
         .setName(ref.getName())
         .setText(ref.toString())
+        .setNameBefore(ref.getOriginalAttribute().getVariableName())
+        .setNameAfter(ref.getRenamedAttribute().getVariableName())
         .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalAttribute().codeRange())))
         .setRightSide(Arrays.asList(new TrueCodeRange(ref.getRenamedAttribute().codeRange())));
   }

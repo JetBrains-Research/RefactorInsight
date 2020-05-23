@@ -20,6 +20,8 @@ public class ChangeVariableTypeHandler implements Handler {
           .setType(RefactoringType.CHANGE_PARAMETER_TYPE)
           .setName(ref.getName())
           .setText(ref.toString())
+          .setNameBefore(ref.getOriginalVariable().getType().toString())
+          .setNameAfter(ref.getChangedTypeVariable().getType().toString())
           .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalVariable().codeRange())))
           .setRightSide(Arrays.asList(new TrueCodeRange(ref.getChangedTypeVariable().codeRange())));
     }
@@ -27,6 +29,8 @@ public class ChangeVariableTypeHandler implements Handler {
         .setType(RefactoringType.CHANGE_VARIABLE_TYPE)
         .setName(ref.getName())
         .setText(ref.toString())
+        .setNameBefore(ref.getOriginalVariable().getType().toString())
+        .setNameAfter(ref.getChangedTypeVariable().getType().toString())
         .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalVariable().codeRange())))
         .setRightSide(Arrays.asList(new TrueCodeRange(ref.getChangedTypeVariable().codeRange())));
   }

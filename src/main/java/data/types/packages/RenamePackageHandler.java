@@ -1,6 +1,5 @@
 package data.types.packages;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;

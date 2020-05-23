@@ -18,6 +18,8 @@ public class RenameVariableHandler implements Handler {
         .setType(ref.getRefactoringType())
         .setName(ref.getName())
         .setText(ref.toString())
+        .setNameBefore(ref.getOriginalVariable().getVariableName())
+        .setNameAfter(ref.getRenamedVariable().getVariableName())
         .setLeftSide(ref.leftSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()))
         .setRightSide(
             ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));

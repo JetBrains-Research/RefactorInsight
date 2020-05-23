@@ -1,6 +1,5 @@
 package data.types.attributes;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -19,6 +18,9 @@ public class MergeAttributeHandler implements Handler {
         .setType(RefactoringType.MERGE_ATTRIBUTE)
         .setName(ref.getName())
         .setText(ref.toString())
+        .setNameBefore(ref.getMergedAttributes().stream().map(x -> x.getVariableName()).collect(
+            Collectors.joining()))
+        .setNameAfter(ref.getNewAttribute().getVariableName())
         .setLeftSide(ref.leftSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()))
         .setRightSide(
             ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));

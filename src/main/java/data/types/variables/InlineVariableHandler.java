@@ -1,6 +1,5 @@
 package data.types.variables;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -20,6 +19,8 @@ public class InlineVariableHandler implements Handler {
         .setType(RefactoringType.INLINE_VARIABLE)
         .setName(ref.getName())
         .setText(ref.toString())
+        .setNameBefore(ref.getVariableDeclaration().getVariableName())
+        .setNameAfter(" in method " + ref.getOperationAfter().getName())
         .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getVariableDeclaration().codeRange())))
         .setRightSide(
             ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));

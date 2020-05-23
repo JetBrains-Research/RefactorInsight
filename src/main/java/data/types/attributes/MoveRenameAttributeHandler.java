@@ -1,6 +1,5 @@
 package data.types.attributes;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -19,6 +18,9 @@ public class MoveRenameAttributeHandler implements Handler {
         .setType(RefactoringType.MOVE_RENAME_ATTRIBUTE)
         .setName(ref.getName())
         .setText(ref.toString())
+        .setNameBefore(
+            ref.getOriginalAttribute().getName() + " in class " + ref.getSourceClassName())
+        .setNameAfter(ref.getMovedAttribute().getName() + " in class " + ref.getTargetClassName())
         .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalAttribute().codeRange())))
         .setRightSide(Arrays.asList(new TrueCodeRange(ref.getMovedAttribute().codeRange())));
   }

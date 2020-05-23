@@ -19,6 +19,8 @@ public class MoveAttributeHandler implements Handler {
         .setType(RefactoringType.MOVE_ATTRIBUTE)
         .setName(ref.getName())
         .setText(ref.toString())
+        .setNameBefore(ref.getSourceClassName())
+        .setNameAfter(ref.getTargetClassName())
         .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalAttribute().codeRange())))
         .setRightSide(Arrays.asList(new TrueCodeRange(ref.getMovedAttribute().codeRange())));
   }

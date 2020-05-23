@@ -1,6 +1,5 @@
 package data.types.attributes;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -19,6 +18,8 @@ public class ExtractAttributeHandler implements Handler {
         .setType(RefactoringType.EXTRACT_ATTRIBUTE)
         .setName(ref.getName())
         .setText(ref.toString())
+        .setNameBefore(ref.getOriginalClass().getName())
+        .setNameAfter(ref.getNextClass().getName())
         .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getVariableDeclaration().codeRange())))
         .setRightSide(
             Arrays.asList(new TrueCodeRange(ref.getExtractedVariableDeclarationCodeRange())));

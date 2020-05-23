@@ -1,6 +1,5 @@
 package data.types.attributes;
 
-import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.TrueCodeRange;
 import data.Type;
@@ -19,6 +18,8 @@ public class ChangeAttributeTypeHandler implements Handler {
         .setType(RefactoringType.CHANGE_ATTRIBUTE_TYPE)
         .setName(ref.getName())
         .setText(ref.toString())
+        .setNameBefore(ref.getOriginalAttribute().getType().toString())
+        .setNameAfter(ref.getChangedTypeAttribute().getType().toString())
         .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalAttribute().codeRange())))
         .setRightSide(Arrays.asList(new TrueCodeRange(ref.getChangedTypeAttribute().codeRange())));
   }
