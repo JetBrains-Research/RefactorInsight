@@ -13,7 +13,9 @@ public class ExtractSuperClassHandler extends Handler {
     //TODO three file viewer
     ExtractSuperclassRefactoring ref = (ExtractSuperclassRefactoring) refactoring;
     return info.setGroup(Group.CLASS)
-        .setElementBefore(null)
-        .setElementAfter("extracted " + ref.getExtractedClass().getName());
+        .setElementBefore("extracted " + ref.getExtractedClass().getName())
+        .setElementAfter(null)
+        .setNameBefore(ref.getExtractedClass().getName())
+        .setNameAfter(ref.getExtractedClass().getName());
   }
 }

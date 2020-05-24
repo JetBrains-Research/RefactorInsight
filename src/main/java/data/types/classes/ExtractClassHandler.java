@@ -15,7 +15,9 @@ public class ExtractClassHandler extends Handler {
     //TODO implement three file viewer
 
     return info.setGroup(Group.CLASS)
-        .setElementBefore(ref.getOriginalClass().getName())
-        .setElementAfter("extracted " + ref.getExtractedClass().getName());
+        .setElementBefore("from " + ref.getOriginalClass().getName())
+        .setElementAfter("extracted " + ref.getExtractedClass().getName())
+        .setNameBefore(ref.getExtractedClass().getName())
+        .setElementAfter(ref.getExtractedClass().getName());
   }
 }

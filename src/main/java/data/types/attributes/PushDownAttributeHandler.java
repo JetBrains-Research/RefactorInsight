@@ -12,8 +12,10 @@ public class PushDownAttributeHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     PushDownAttributeRefactoring ref = (PushDownAttributeRefactoring) refactoring;
     return info.setGroup(Group.ATTRIBUTE)
-        .setNameBefore(ref.getSourceClassName())
-        .setNameAfter(ref.getTargetClassName())
+        .setElementBefore(ref.getSourceClassName())
+        .setElementAfter(ref.getTargetClassName())
+        .setNameBefore(ref.getOriginalAttribute().getName())
+        .setNameAfter(ref.getMovedAttribute().getName())
         .addMarking(ref.getSourceAttributeCodeRangeBeforeMove(),
             ref.getTargetAttributeCodeRangeAfterMove());
   }

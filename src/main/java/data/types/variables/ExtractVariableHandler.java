@@ -12,8 +12,10 @@ public class ExtractVariableHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ExtractVariableRefactoring ref = (ExtractVariableRefactoring) refactoring;
     return info.setGroup(Group.VARIABLE)
-        .setNameBefore(ref.getOperationBefore().getClassName())
-        .setNameAfter(ref.getOperationAfter().getClassName())
+        .setElementBefore(ref.getOperationBefore().getClassName())
+        .setElementAfter(ref.getOperationAfter().getClassName())
+        .setNameBefore(ref.getVariableDeclaration().getVariableName())
+        .setNameAfter(ref.getVariableDeclaration().getVariableName())
         .addMarking(ref.getVariableDeclaration().codeRange(),
             ref.getExtractedVariableDeclarationCodeRange());
   }

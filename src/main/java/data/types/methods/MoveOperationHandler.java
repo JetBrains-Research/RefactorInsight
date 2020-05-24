@@ -13,10 +13,8 @@ public class MoveOperationHandler extends Handler {
     final MoveOperationRefactoring ref = (MoveOperationRefactoring) refactoring;
 
     return info.setGroup(Group.METHOD)
-        .setElementBefore("from class " + ref.getOriginalOperation().getClassName() + ": "
-            + ref.getOriginalOperation().getName())
-        .setElementAfter(" to class " + ref.getMovedOperation().getClassName() + ": "
-            + ref.getMovedOperation().getName())
+        .setElementBefore("from class " + ref.getOriginalOperation().getClassName())
+        .setElementAfter(" to class " + ref.getMovedOperation().getClassName())
         .addMarking(ref.getSourceOperationCodeRangeBeforeMove(),
             ref.getTargetOperationCodeRangeAfterMove())
         .setNameBefore(calculateSignature(ref.getOriginalOperation()))

@@ -18,7 +18,7 @@ public class ExtractOperationHandler extends Handler {
       return info
           .setElementBefore(ref.getSourceOperationBeforeExtraction().getName() + " in class "
               + ref.getSourceOperationBeforeExtraction().getClassName())
-          .setElementAfter("extracted " + ref.getExtractedOperation().getName() + " moved in "
+          .setElementAfter("extracted " + ref.getExtractedOperation().getName() + " & moved in "
               + ref.getExtractedOperation().getClassName())
           .setNameBefore(calculateSignature(ref.getSourceOperationBeforeExtraction()))
           .setNameAfter(calculateSignature(ref.getSourceOperationAfterExtraction()));

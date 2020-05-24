@@ -12,8 +12,10 @@ public class ChangeAttributeTypeHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ChangeAttributeTypeRefactoring ref = (ChangeAttributeTypeRefactoring) refactoring;
     return info.setGroup(Group.ATTRIBUTE)
-        .setNameBefore(ref.getOriginalAttribute().getType().toString())
-        .setNameAfter(ref.getChangedTypeAttribute().getType().toString())
+        .setElementBefore(null)
+        .setElementAfter(null)
+        .setNameBefore(ref.getOriginalAttribute().toQualifiedString())
+        .setNameAfter(ref.getChangedTypeAttribute().toQualifiedString())
         .addMarking(ref.getOriginalAttribute().codeRange(),
             ref.getChangedTypeAttribute().codeRange());
 

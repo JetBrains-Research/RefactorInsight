@@ -17,8 +17,10 @@ public class SplitAttributeHandler extends Handler {
         info.addMarking(ref.getOldAttribute().codeRange(), attr.codeRange()));
 
     return info.setGroup(Group.ATTRIBUTE)
+        .setElementBefore(ref.getOldAttribute().getVariableName())
+        .setElementAfter(ref.getSplitAttributes().stream().map(x -> x.getVariableName()).collect(
+            Collectors.joining()))
         .setNameBefore(ref.getOldAttribute().getVariableName())
-        .setNameAfter(ref.getSplitAttributes().stream().map(x -> x.getVariableName()).collect(
-            Collectors.joining()));
+        .setElementAfter(ref.getOldAttribute().getVariableName());
   }
 }

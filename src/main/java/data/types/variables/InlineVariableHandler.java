@@ -12,8 +12,10 @@ public class InlineVariableHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     InlineVariableRefactoring ref = (InlineVariableRefactoring) refactoring;
     return info.setGroup(Group.VARIABLE)
+        .setElementBefore(" in method " + ref.getOperationAfter().getName())
+        .setElementAfter(null)
         .setNameBefore(ref.getVariableDeclaration().getVariableName())
-        .setNameAfter(" in method " + ref.getOperationAfter().getName())
+        .setNameAfter(ref.getVariableDeclaration().getVariableName())
         .addMarking(ref.getVariableDeclaration().codeRange(),
             ref.getInlinedVariableDeclarationCodeRange());
 

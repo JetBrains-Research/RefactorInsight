@@ -12,7 +12,9 @@ public class RenameAttributeHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RenameAttributeRefactoring ref = (RenameAttributeRefactoring) refactoring;
     return info.setGroup(Group.ATTRIBUTE)
-        .setNameBefore(ref.getOriginalAttribute().getVariableName())
+        .setElementBefore(null)
+        .setElementAfter(null)
+        .setNameBefore(ref.getRenamedAttribute().getVariableName())
         .setNameAfter(ref.getRenamedAttribute().getVariableName())
         .addMarking(ref.getOriginalAttribute().codeRange(), ref.getRenamedAttribute().codeRange());
 

@@ -17,8 +17,10 @@ public class MergeAttributeHandler extends Handler {
         info.addMarking(attr.codeRange(), ref.getNewAttribute().codeRange()));
 
     return info.setGroup(Group.ATTRIBUTE)
-        .setNameBefore(ref.getMergedAttributes().stream().map(x -> x.getVariableName()).collect(
+        .setElementBefore(ref.getMergedAttributes().stream().map(x -> x.getVariableName()).collect(
             Collectors.joining()))
+        .setElementAfter(ref.getNewAttribute().getVariableName())
+        .setNameBefore(ref.getNewAttribute().getVariableName())
         .setNameAfter(ref.getNewAttribute().getVariableName());
 
   }

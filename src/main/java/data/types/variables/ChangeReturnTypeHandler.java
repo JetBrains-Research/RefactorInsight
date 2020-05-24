@@ -12,8 +12,10 @@ public class ChangeReturnTypeHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ChangeReturnTypeRefactoring ref = (ChangeReturnTypeRefactoring) refactoring;
     return info.setGroup(Group.VARIABLE)
-        .setNameBefore(ref.getOriginalType().toString())
-        .setNameAfter(ref.getChangedType().toString())
+        .setElementBefore(ref.getOriginalType().toString())
+        .setElementAfter(ref.getChangedType().toString())
+        .setNameBefore(calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(calculateSignature(ref.getOperationBefore()))
         .addMarking(ref.getOriginalType().codeRange(),
             ref.getChangedType().codeRange());
   }

@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.swing.tree.DefaultMutableTreeNode;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.refactoringminer.api.RefactoringType;
 
@@ -29,11 +28,6 @@ public class RefactoringInfo {
   private RefactoringType type;
   private List<LineFragmentImpl> lineMarkings = new ArrayList<LineFragmentImpl>();
   private Group group;
-
-  public RefactoringInfo setGroup(Group group) {
-    this.group = group;
-    return this;
-  }
 
   /**
    * Adds this refactoring to the method history map.
@@ -63,7 +57,6 @@ public class RefactoringInfo {
       map.put(nameAfter, refs);
     }
   }
-
 
   public String getName() {
     return name;
@@ -149,6 +142,11 @@ public class RefactoringInfo {
     return group;
   }
 
+  public RefactoringInfo setGroup(Group group) {
+    this.group = group;
+    return this;
+  }
+
   public String getBeforePath() {
     return beforePath;
   }
@@ -198,6 +196,9 @@ public class RefactoringInfo {
   }
 
   private void addLeaves(DefaultMutableTreeNode node) {
+    if (elementBefore == null) {
+      return;
+    }
     String info = elementBefore;
     if (elementAfter != null) {
       info += " → " + elementAfter;
