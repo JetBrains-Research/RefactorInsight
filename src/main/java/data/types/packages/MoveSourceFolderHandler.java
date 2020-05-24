@@ -1,26 +1,17 @@
 package data.types.packages;
 
-import data.RefactoringEntry;
+import data.Group;
 import data.RefactoringInfo;
-import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MoveSourceFolderRefactoring;
-import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 
-public class MoveSourceFolderHandler implements Handler {
+public class MoveSourceFolderHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     MoveSourceFolderRefactoring ref = (MoveSourceFolderRefactoring) refactoring;
-    return new RefactoringInfo(Type.PACKAGE)
-        .setType(RefactoringType.MOVE_SOURCE_FOLDER)
-        .setName(ref.getName())
-        .setText(ref.toString())
-        .setLeftSide(ref.leftSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()))
-        .setRightSide(
-            ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));
+    //TODO i dont really think a diff window is the best way to display a change of folder
+    return info.setGroup(Group.PACKAGE);
   }
 }

@@ -1,43 +1,44 @@
 package data.types.methods;
 
-import data.RefactoringEntry;
+import data.Group;
 import data.RefactoringInfo;
-import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ExtractOperationRefactoring;
-import java.util.Arrays;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
 
-public class ExtractOperationHandler implements Handler {
+public class ExtractOperationHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ExtractOperationRefactoring ref = (ExtractOperationRefactoring) refactoring;
 
-    TrueCodeRange left = new TrueCodeRange(ref.getSourceOperationBeforeExtraction().codeRange());
-    TrueCodeRange right1 = new TrueCodeRange(ref.getSourceOperationAfterExtraction().codeRange());
-    TrueCodeRange right2 = new TrueCodeRange(ref.getExtractedOperationCodeRange());
+    //TODO three side view
+    if (ref.getRefactoringType() == RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
+      return info
+          .setElementBefore(ref.getSourceOperationBeforeExtraction().getName() + " in class "
+              + ref.getSourceOperationBeforeExtraction().getClassName())
+          .setElementAfter("extracted " + ref.getExtractedOperation().getName() + " & moved in "
+              + ref.getExtractedOperation().getClassName())
+          .setNameBefore(calculateSignature(ref.getSourceOperationBeforeExtraction()))
+          .setNameAfter(calculateSignature(ref.getSourceOperationAfterExtraction()));
+    } else {
+      info.setGroup(Group.METHOD)
+          .setElementBefore("from " + ref.getSourceOperationBeforeExtraction().getName())
+          .setElementAfter("extracted " + ref.getExtractedOperation().getName())
+          .setNameBefore(calculateSignature(ref.getSourceOperationBeforeExtraction()))
+          .setNameAfter(calculateSignature(ref.getSourceOperationAfterExtraction()))
+          .addMarking(ref.getExtractedCodeRangeFromSourceOperation(),
+              ref.getExtractedCodeRangeToExtractedOperation());
 
-    if (!ref.getSourceOperationBeforeExtraction().getClassName().equals(ref
-        .getExtractedOperation().getClassName())) {
-      return new RefactoringInfo(Type.METHOD)
-          .setType(RefactoringType.EXTRACT_AND_MOVE_OPERATION)
-          .setName(ref.getName())
-          .setText(ref.toString())
-          .setLeftSide(Arrays.asList(left))
-          .setRightSide(Arrays.asList(right1, right2))
-          .setNameBefore(Handler.calculateSignature(ref.getSourceOperationBeforeExtraction()))
-          .setNameAfter(Handler.calculateSignature(ref.getSourceOperationAfterExtraction()));
+      ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
+          info.addMarking(ref.getExtractedCodeRangeFromSourceOperation().getStartLine(),
+              ref.getExtractedCodeRangeFromSourceOperation().getStartLine() - 1,
+              invocation.getStartLine(), invocation.getEndLine(),
+              ref.getExtractedCodeRangeFromSourceOperation().getFilePath(),
+              invocation.getFilePath())
+      );
+      return info;
     }
-    return new RefactoringInfo(Type.METHOD)
-        .setType(RefactoringType.EXTRACT_OPERATION)
-        .setName(ref.getName())
-        .setText(ref.toString())
-        .setLeftSide(Arrays.asList(left))
-        .setRightSide(Arrays.asList(right1, right2))
-        .setNameBefore(Handler.calculateSignature(ref.getSourceOperationBeforeExtraction()))
-        .setNameAfter(Handler.calculateSignature(ref.getSourceOperationAfterExtraction()));
   }
 }

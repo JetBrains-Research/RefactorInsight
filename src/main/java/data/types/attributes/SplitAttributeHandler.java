@@ -1,25 +1,26 @@
 package data.types.attributes;
 
-import data.RefactoringEntry;
+import data.Group;
 import data.RefactoringInfo;
-import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.SplitAttributeRefactoring;
 import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
 
-public class SplitAttributeHandler implements Handler {
+public class SplitAttributeHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     SplitAttributeRefactoring ref = (SplitAttributeRefactoring) refactoring;
-    return new RefactoringInfo(Type.ATTRIBUTE)
-        .setType(ref.getRefactoringType())
-        .setName(ref.getName())
-        .setText(ref.toString())
-        .setLeftSide(ref.leftSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()))
-        .setRightSide(
-            ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));
+
+    ref.getSplitAttributes().forEach(attr ->
+        info.addMarking(ref.getOldAttribute().codeRange(), attr.codeRange()));
+
+    return info.setGroup(Group.ATTRIBUTE)
+        .setElementBefore(ref.getOldAttribute().getVariableName())
+        .setElementAfter(ref.getSplitAttributes().stream().map(x -> x.getVariableName()).collect(
+            Collectors.joining()))
+        .setNameBefore(ref.getOldAttribute().getVariableName())
+        .setElementAfter(ref.getOldAttribute().getVariableName());
   }
 }

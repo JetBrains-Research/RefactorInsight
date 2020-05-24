@@ -1,26 +1,23 @@
 package data.types.variables;
 
-import data.RefactoringEntry;
+import data.Group;
 import data.RefactoringInfo;
-import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ChangeReturnTypeRefactoring;
-import java.util.Arrays;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 
-public class ChangeReturnTypeHandler implements Handler {
+public class ChangeReturnTypeHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ChangeReturnTypeRefactoring ref = (ChangeReturnTypeRefactoring) refactoring;
-    return new RefactoringInfo(Type.VARIABLE)
-        .setType(RefactoringType.CHANGE_RETURN_TYPE)
-        .setName(ref.getName())
-        .setText(ref.toString())
-        .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOperationBefore().codeRange())))
-        .setRightSide(Arrays.asList(new TrueCodeRange(ref.getOperationAfter().codeRange())));
+    return info.setGroup(Group.VARIABLE)
+        .setElementBefore(ref.getOriginalType().toString())
+        .setElementAfter(ref.getChangedType().toString())
+        .setNameBefore(calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(calculateSignature(ref.getOperationBefore()))
+        .addMarking(ref.getOriginalType().codeRange(),
+            ref.getChangedType().codeRange());
   }
 
 }
