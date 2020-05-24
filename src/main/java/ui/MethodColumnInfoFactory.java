@@ -103,7 +103,7 @@ class MethodColumnInfoFactory {
   static class TypeInfo extends ColumnInfo<RefactoringInfo, String> {
 
     public TypeInfo() {
-      super("Refactoring Type");
+      super("Refactoring Scope");
     }
 
     @Nullable

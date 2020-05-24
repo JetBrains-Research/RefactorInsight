@@ -1,12 +1,10 @@
 package ui;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -21,15 +19,12 @@ import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.visible.filters.VcsLogFilterObject;
 import data.RefactoringInfo;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.swing.JLabel;
-import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
 import services.RefactoringsBundle;
 
 
@@ -51,6 +46,20 @@ public class MethodRefactoringToolbar {
         .registerToolWindow("Refactoring History", true, ToolWindowAnchor.BOTTOM);
   }
 
+  private static String formatText(String text) {
+    StringBuilder sb = new StringBuilder(text);
+
+    int i = 0;
+    while ((i = sb.indexOf(" ", i + 60)) != -1) {
+      sb.replace(i, i + 1, "<br/>");
+    }
+
+    sb.insert(0, "<html>");
+    sb.append("</html>");
+
+    return sb.toString();
+  }
+
   /**
    * Displayer for the toolbar.
    *
@@ -67,7 +76,7 @@ public class MethodRefactoringToolbar {
     } else {
       panel = new JBPanel();
       panel.setLayout(new BorderLayout());
-      JBSplitter splitterPane = new JBSplitter(false, .5f);
+      JBSplitter splitterPane = new JBSplitter(false, .75f);
       panel.add(splitterPane);
 
 
@@ -107,26 +116,13 @@ public class MethodRefactoringToolbar {
       content.setComponent(panel);
     } else {
       ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-      content = contentFactory.createContent(panel, methodName, false);
+      content = contentFactory
+          .createContent(panel, methodName.substring(methodName.lastIndexOf(".") + 1), false);
       toolWindow.getContentManager().addContent(content);
     }
     toolWindow.getContentManager().setSelectedContent(content);
     toolWindow.setIcon(AllIcons.Ide.Rating);
     toolWindow.show();
 
-  }
-
-  private static String formatText(String text) {
-    StringBuilder sb = new StringBuilder(text);
-
-    int i = 0;
-    while ((i = sb.indexOf(" ", i + 60)) != -1) {
-      sb.replace(i, i + 1, "<br/>");
-    }
-
-    sb.insert(0, "<html>");
-    sb.append("</html>");
-
-    return sb.toString();
   }
 }

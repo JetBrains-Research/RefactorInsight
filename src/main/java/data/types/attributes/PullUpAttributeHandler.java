@@ -1,25 +1,22 @@
 package data.types.attributes;
 
-import data.RefactoringEntry;
+import data.Group;
 import data.RefactoringInfo;
-import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.PullUpAttributeRefactoring;
-import java.util.Arrays;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 
-public class PullUpAttributeHandler implements Handler {
+public class PullUpAttributeHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     PullUpAttributeRefactoring ref = (PullUpAttributeRefactoring) refactoring;
-    return new RefactoringInfo(Type.ATTRIBUTE)
-        .setType(RefactoringType.PULL_UP_ATTRIBUTE)
-        .setName(ref.getName())
-        .setText(ref.toString())
-        .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalAttribute().codeRange())))
-        .setRightSide(Arrays.asList(new TrueCodeRange(ref.getMovedAttribute().codeRange())));
+    return info.setGroup(Group.ATTRIBUTE)
+        .setElementBefore(ref.getSourceClassName())
+        .setElementAfter(ref.getTargetClassName())
+        .setNameBefore(ref.getOriginalAttribute().getName())
+        .setNameAfter(ref.getMovedAttribute().getName())
+        .addMarking(ref.getSourceAttributeCodeRangeBeforeMove(),
+            ref.getTargetAttributeCodeRangeAfterMove());
   }
 }

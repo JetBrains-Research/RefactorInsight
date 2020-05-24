@@ -1,25 +1,23 @@
 package data.types.variables;
 
-import data.RefactoringEntry;
+import data.Group;
 import data.RefactoringInfo;
-import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.RenameVariableRefactoring;
-import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
 
-public class RenameVariableHandler implements Handler {
+public class RenameVariableHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RenameVariableRefactoring ref = (RenameVariableRefactoring) refactoring;
-    return new RefactoringInfo(Type.VARIABLE)
-        .setType(ref.getRefactoringType())
-        .setName(ref.getName())
-        .setText(ref.toString())
-        .setLeftSide(ref.leftSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()))
-        .setRightSide(
-            ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));
+    return info.setGroup(Group.VARIABLE)
+        .setNameBefore(ref.getOriginalVariable().getVariableName() + " in method "
+            + ref.getOperationBefore().getName())
+        .setNameAfter(ref.getOriginalVariable().getVariableName() + " in method "
+            + ref.getOperationBefore().getName())
+        .setElementBefore(ref.getOriginalVariable().getVariableDeclaration().toQualifiedString())
+        .setElementAfter(ref.getRenamedVariable().getVariableDeclaration().toQualifiedString())
+        .addMarking(ref.getOriginalVariable().codeRange(), ref.getRenamedVariable().codeRange());
   }
 }

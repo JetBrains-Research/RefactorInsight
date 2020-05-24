@@ -1,28 +1,36 @@
 package data;
 
 import com.google.gson.Gson;
+import com.intellij.diff.fragments.LineFragment;
+import com.intellij.diff.fragments.LineFragmentImpl;
+import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import javax.swing.tree.DefaultMutableTreeNode;
+import org.jetbrains.annotations.Nullable;
 import org.refactoringminer.api.RefactoringType;
 
 public class RefactoringInfo {
 
+  @Nullable
+  String elementBefore;
+  @Nullable
+  String elementAfter;
   private transient RefactoringEntry entry;
   private String text;
   private String name;
   private String nameBefore;
   private String nameAfter;
+  private String beforePath;
+  private String afterPath;
   private RefactoringType type;
-  private List<TrueCodeRange> leftSide;
-  private List<TrueCodeRange> rightSide;
-  private Type object;
-
-  public RefactoringInfo(Type object) {
-    this.object = object;
-  }
+  private List<RefactoringLine> lineMarkings = new ArrayList<>();
+  private Group group;
 
   /**
    * Adds this refactoring to the method history map.
@@ -31,8 +39,7 @@ public class RefactoringInfo {
    * @param map for method history
    */
   public void addToHistory(Map<String, List<RefactoringInfo>> map) {
-    //System.out.println(signatureAfter);
-    if (object == Type.CLASS && nameBefore != null && nameAfter != null) {
+    if (group == Group.CLASS && nameBefore != null && nameAfter != null) {
       Map<String, String> renames = new HashMap<>();
       renames.put(nameBefore, nameAfter);
       renames.forEach((before, after) -> map.keySet().stream()
@@ -45,7 +52,7 @@ public class RefactoringInfo {
       return;
     }
 
-    if (object == Type.METHOD) {
+    if (group == Group.METHOD) {
       List<RefactoringInfo> refs = map.getOrDefault(nameBefore, new LinkedList<>());
       map.remove(nameBefore);
       refs.add(0, this);
@@ -89,22 +96,70 @@ public class RefactoringInfo {
     return this;
   }
 
-  public List<TrueCodeRange> getLeftSide() {
-    return leftSide;
+  public RefactoringInfo addMarking(CodeRange left, CodeRange right) {
+    return addMarking(left.getStartLine(), left.getEndLine(), right.getStartLine(),
+        right.getEndLine(), left.getFilePath(), right.getFilePath());
   }
 
-  public RefactoringInfo setLeftSide(List<TrueCodeRange> leftSide) {
-    this.leftSide = leftSide;
+  /**
+   * Add line marking for diffwindow used to display refactorings.
+   *
+   * @param startBefore int
+   * @param endBefore   int
+   * @param startAfter  int
+   * @param endAfter    int
+   * @param beforePath  int
+   * @param afterPath   int
+   * @return this
+   */
+  public RefactoringInfo addMarking(int startBefore, int endBefore, int startAfter, int endAfter,
+                                    String beforePath, String afterPath) {
+    lineMarkings
+        .add(
+            new RefactoringLine(startBefore - 1, endBefore, startAfter - 1, endAfter));
+    this.beforePath = beforePath;
+    this.afterPath = afterPath;
     return this;
   }
 
-  public List<TrueCodeRange> getRightSide() {
-    return rightSide;
+  public RefactoringInfo addMarking(CodeRange left, CodeRange right,
+                                    Consumer<RefactoringLine> offsetFunction) {
+    return addMarking(left.getStartLine(), left.getEndLine(), right.getStartLine(),
+        right.getEndLine(), left.getFilePath(), right.getFilePath(), offsetFunction);
   }
 
-  public RefactoringInfo setRightSide(List<TrueCodeRange> rightSide) {
-    this.rightSide = rightSide;
+  /**
+   * Add line marking for diffwindow used to display refactorings.
+   * Includes possibility for sub-highlighting
+   *
+   * @param startBefore    int
+   * @param endBefore      int
+   * @param startAfter     int
+   * @param endAfter       int
+   * @param beforePath     int
+   * @param afterPath      int
+   * @param offsetFunction Consumer for adding subhighlightings
+   * @return
+   */
+  public RefactoringInfo addMarking(int startBefore, int endBefore, int startAfter, int endAfter,
+                                    String beforePath, String afterPath,
+                                    Consumer<RefactoringLine> offsetFunction) {
+    RefactoringLine line =
+        new RefactoringLine(startBefore - 1, endBefore, startAfter - 1, endAfter);
+    offsetFunction.accept(line);
+    lineMarkings.add(line);
+    this.beforePath = beforePath;
+    this.afterPath = afterPath;
     return this;
+  }
+
+  public List<LineFragment> getLineMarkings() {
+    return lineMarkings.stream().map(RefactoringLine::toLineFragment).collect(Collectors.toList());
+  }
+
+  public List<LineFragment> getLineMarkings(int maxLineBefore, int maxLineAfter) {
+    return lineMarkings.stream().map(l ->
+        l.toLineFragment(maxLineBefore, maxLineAfter)).collect(Collectors.toList());
   }
 
   @Override
@@ -119,6 +174,23 @@ public class RefactoringInfo {
   public RefactoringInfo setNameBefore(String nameBefore) {
     this.nameBefore = nameBefore;
     return this;
+  }
+
+  public Group getGroup() {
+    return group;
+  }
+
+  public RefactoringInfo setGroup(Group group) {
+    this.group = group;
+    return this;
+  }
+
+  public String getBeforePath() {
+    return beforePath;
+  }
+
+  public String getAfterPath() {
+    return afterPath;
   }
 
   public String getNameAfter() {
@@ -136,5 +208,55 @@ public class RefactoringInfo {
 
   public String getCommitId() {
     return entry.getCommitId();
+  }
+
+  public RefactoringInfo setElementBefore(@Nullable String elementBefore) {
+    this.elementBefore = elementBefore;
+    return this;
+  }
+
+  public RefactoringInfo setElementAfter(@Nullable String elementAfter) {
+    this.elementAfter = elementAfter;
+    return this;
+  }
+
+  /**
+   * Creates a DefaultMutableTreeNode for the git window UI.
+   *
+   * @return the node.
+   */
+  public DefaultMutableTreeNode makeNode() {
+    DefaultMutableTreeNode node = new DefaultMutableTreeNode(this);
+    DefaultMutableTreeNode child = new DefaultMutableTreeNode(getDisplayableElement());
+    node.add(child);
+    addLeaves(child);
+    return node;
+  }
+
+  private void addLeaves(DefaultMutableTreeNode node) {
+    if (elementBefore == null) {
+      return;
+    }
+    String info = elementBefore;
+    if (elementAfter != null) {
+      info += " → " + elementAfter;
+    }
+    node.add(new DefaultMutableTreeNode(info));
+  }
+
+  private String getDisplayableElement() {
+    String before = nameBefore;
+    if (before.contains(".")) {
+      before = nameBefore.substring(nameBefore.lastIndexOf(".") + 1);
+    }
+    String after = nameAfter;
+    if (after.contains(".")) {
+      after = nameAfter.substring(nameAfter.lastIndexOf(".") + 1);
+    }
+    if (before.equals(after)) {
+      return before;
+    } else {
+      return before + " → " + after;
+    }
   }
 }

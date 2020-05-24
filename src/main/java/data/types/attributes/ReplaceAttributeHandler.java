@@ -1,27 +1,22 @@
 package data.types.attributes;
 
-import data.RefactoringEntry;
+import data.Group;
 import data.RefactoringInfo;
-import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ReplaceAttributeRefactoring;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 
-public class ReplaceAttributeHandler implements Handler {
+public class ReplaceAttributeHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ReplaceAttributeRefactoring ref = (ReplaceAttributeRefactoring) refactoring;
-    return new RefactoringInfo(Type.ATTRIBUTE)
-        .setType(RefactoringType.REPLACE_ATTRIBUTE)
-        .setName(ref.getName())
-        .setText(ref.toString())
-        .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalAttribute().codeRange())))
-        .setRightSide(
-            ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));
+    return info.setGroup(Group.ATTRIBUTE)
+        .setElementBefore(ref.getSourceClassName())
+        .setElementAfter(ref.getTargetClassName())
+        .setNameBefore(ref.getOriginalAttribute().getName())
+        .setNameAfter(ref.getMovedAttribute().getName())
+        .addMarking(ref.getSourceAttributeCodeRangeBeforeMove(),
+            ref.getTargetAttributeCodeRangeAfterMove());
   }
 }

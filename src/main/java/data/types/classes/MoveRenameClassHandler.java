@@ -1,28 +1,22 @@
 package data.types.classes;
 
-import data.RefactoringEntry;
+import data.Group;
 import data.RefactoringInfo;
-import data.TrueCodeRange;
-import data.Type;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MoveAndRenameClassRefactoring;
-import java.util.Arrays;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 
-public class MoveRenameClassHandler implements Handler {
+public class MoveRenameClassHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     MoveAndRenameClassRefactoring ref = (MoveAndRenameClassRefactoring) refactoring;
 
-    return new RefactoringInfo(Type.CLASS)
-        .setType(RefactoringType.MOVE_RENAME_CLASS)
-        .setName(ref.getName())
-        .setText(ref.toString())
-        .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalClass().codeRange())))
-        .setRightSide(Arrays.asList(new TrueCodeRange(ref.getRenamedClass().codeRange())))
+    return info.setGroup(Group.CLASS)
+        .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange())
         .setNameBefore(ref.getOriginalClassName())
-        .setNameAfter(ref.getRenamedClassName());
+        .setNameAfter(ref.getRenamedClassName())
+        .setElementBefore(ref.getOriginalClass().getPackageName())
+        .setElementAfter(ref.getRenamedClass().getPackageName());
   }
 }
