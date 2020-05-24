@@ -64,55 +64,6 @@ public class RefactoringInfo {
     }
   }
 
-  @NotNull
-  protected DefaultMutableTreeNode getSimpleNode() {
-    DefaultMutableTreeNode change;
-    if (nameAfter == null && nameBefore == null) {
-      change = new DefaultMutableTreeNode("view changes");
-    } else {
-      char a = '→';
-      change = new DefaultMutableTreeNode(nameBefore + " " + a + " " + nameAfter);
-    }
-    return change;
-  }
-
-  protected void getNodeClass(DefaultMutableTreeNode refName) {
-    String before = nameBefore.substring(nameBefore.lastIndexOf(".") + 1);
-    String after = nameAfter.substring(nameAfter.lastIndexOf(".") + 1);
-    DefaultMutableTreeNode className;
-    if (before.equals(after)) {
-      className = new DefaultMutableTreeNode(after);
-    } else {
-      char a = '→';
-      className = new DefaultMutableTreeNode(before + " " + a + " " + after);
-    }
-
-    String packageBefore = nameBefore.substring(0, nameBefore.lastIndexOf("."));
-    String packageAfter = nameAfter.substring(0, nameAfter.lastIndexOf("."));
-    DefaultMutableTreeNode package1 = new DefaultMutableTreeNode("before: " + packageBefore);
-    DefaultMutableTreeNode package2 = new DefaultMutableTreeNode("after: " + packageAfter);
-    className.add(package1);
-    className.add(package2);
-    refName.add(className);
-  }
-
-  @NotNull
-  protected DefaultMutableTreeNode getNodeMethod() {
-    DefaultMutableTreeNode change;
-    final String elementBefore = this.elementBefore;
-    final String elementAfter = this.elementAfter;
-    if (elementAfter != null && elementBefore != null) {
-      char a = '→';
-      change = new DefaultMutableTreeNode(elementBefore + " " + a + " " + elementAfter);
-    } else if (elementAfter != null) {
-      change = new DefaultMutableTreeNode(elementAfter);
-    } else if (elementBefore != null) {
-      change = new DefaultMutableTreeNode(elementBefore);
-    } else {
-      change = new DefaultMutableTreeNode("view changes");
-    }
-    return change;
-  }
 
   public String getName() {
     return name;
@@ -157,12 +108,13 @@ public class RefactoringInfo {
 
   /**
    * Add line marking for diffwindow used to display refactorings.
+   *
    * @param startBefore int
-   * @param endBefore int
-   * @param startAfter int
-   * @param endAfter int
-   * @param beforePath int
-   * @param afterPath int
+   * @param endBefore   int
+   * @param startAfter  int
+   * @param endAfter    int
+   * @param beforePath  int
+   * @param afterPath   int
    * @return this
    */
   public RefactoringInfo addMarking(int startBefore, int endBefore, int startAfter, int endAfter,
@@ -230,5 +182,42 @@ public class RefactoringInfo {
   public RefactoringInfo setElementAfter(@Nullable String elementAfter) {
     this.elementAfter = elementAfter;
     return this;
+  }
+
+  /**
+   * Creates a DefaultMutableTreeNode for the git window UI.
+   *
+   * @return the node.
+   */
+  public DefaultMutableTreeNode makeNode() {
+    DefaultMutableTreeNode node = new DefaultMutableTreeNode(this);
+    DefaultMutableTreeNode child = new DefaultMutableTreeNode(getDisplayableElement());
+    node.add(child);
+    addLeaves(child);
+    return node;
+  }
+
+  private void addLeaves(DefaultMutableTreeNode node) {
+    String info = elementBefore;
+    if (elementAfter != null) {
+      info += " → " + elementAfter;
+    }
+    node.add(new DefaultMutableTreeNode(info));
+  }
+
+  private String getDisplayableElement() {
+    String before = nameBefore;
+    if (before.contains(".")) {
+      before = nameBefore.substring(nameBefore.lastIndexOf(".") + 1);
+    }
+    String after = nameAfter;
+    if (after.contains(".")) {
+      after = nameAfter.substring(nameAfter.lastIndexOf(".") + 1);
+    }
+    if (before.equals(after)) {
+      return before;
+    } else {
+      return before + " → " + after;
+    }
   }
 }

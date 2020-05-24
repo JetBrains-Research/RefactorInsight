@@ -20,44 +20,35 @@ class MyCellRenderer extends JBDefaultTreeCellRenderer {
     super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
     DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+    RefactoringInfo info = (RefactoringInfo) node.getUserObjectPath()[1];
 
+    String name = info.getType().getDisplayName();
     if (node.getUserObject() instanceof RefactoringInfo) {
-      RefactoringInfo ri = (RefactoringInfo) node.getUserObject();
-      setText(ri.getType().getDisplayName());
-      if (node.toString().contains("Class")) {
-        Icon icon = AllIcons.Nodes.Class;
-        setIcon(icon);
-      } else if (node.toString().contains("Operation") || node.toString().contains("Method")) {
-        Icon icon = AllIcons.Nodes.Method;
-        setIcon(icon);
-      } else if (node.toString().contains("Attribute")) {
-        Icon icon = AllIcons.Nodes.ObjectTypeAttribute;
-        setIcon(icon);
-      } else if (node.toString().contains("Variable")) {
-        Icon icon = AllIcons.Nodes.Variable;
-        setIcon(icon);
-      } else if (node.toString().contains("Parameter")) {
-        Icon icon = AllIcons.Nodes.Parameter;
-        setIcon(icon);
-      } else if (node.toString().contains("Package")) {
-        Icon icon = AllIcons.Nodes.Package;
-        setIcon(icon);
-      } else if (node.toString().contains("Return")) {
-        Icon icon = AllIcons.Debugger.WatchLastReturnValue;
-        setIcon(icon);
-      } else if (node.toString().contains("Interface")) {
-        Icon icon = AllIcons.Nodes.Interface;
-        setIcon(icon);
-      }
-    } else if (leaf && node.getSiblingCount() == 1) {
-      setIcon(AllIcons.Actions.Diff);
-    } else if (leaf && node.getSiblingCount() > 1) {
-      setIcon(AllIcons.Nodes.Package);
-    } else if (node.getChildAt(0).isLeaf()) {
-      setIcon(AllIcons.Nodes.Class);
-    } else {
-      setIcon(null);
+      setText(name);
     }
+
+    Icon icon = null;
+    if (leaf) {
+      icon = AllIcons.Actions.Diff;
+    } else if (name.contains("Class")) {
+      icon = AllIcons.Nodes.Class;
+    } else if (name.contains("Method")) {
+      icon = AllIcons.Nodes.Method;
+    } else if (name.contains("Attribute")) {
+      icon = AllIcons.Nodes.ObjectTypeAttribute;
+    } else if (name.contains("Variable")) {
+      icon = AllIcons.Nodes.Variable;
+    } else if (name.contains("Parameter")) {
+      icon = AllIcons.Nodes.Parameter;
+    } else if (name.contains("Package")) {
+      icon = AllIcons.Nodes.Package;
+    } else if (name.contains("Return")) {
+      icon = AllIcons.Debugger.WatchLastReturnValue;
+    } else if (name.contains("Interface")) {
+      icon = AllIcons.Nodes.Interface;
+    }
+    setIcon(icon);
+
     return this;
   }
 }

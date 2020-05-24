@@ -11,7 +11,8 @@ public class RenameMethodHandler extends Handler {
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RenameOperationRefactoring ref = (RenameOperationRefactoring) refactoring;
-    return info.setGroup(Group.METHOD).setElementBefore(ref.getOriginalOperation().getName())
+    return info.setGroup(Group.METHOD)
+        .setElementBefore(ref.getOriginalOperation().getName())
         .setElementAfter(ref.getRenamedOperation().getName())
         .addMarking(ref.getSourceOperationCodeRangeBeforeRename(),
             ref.getTargetOperationCodeRangeAfterRename())

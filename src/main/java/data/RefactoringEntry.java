@@ -7,12 +7,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 
 public class RefactoringEntry implements Serializable {
 
   private static InfoFactory factory = new InfoFactory();
-  private List<RefactoringInfo> data;
+  private List<RefactoringInfo> refactorings;
   private List<String> parents;
   private String commitId;
   private long time;
@@ -20,17 +19,17 @@ public class RefactoringEntry implements Serializable {
   /**
    * Constructor for method refactoring.
    *
-   * @param data    the refactoring data.
-   * @param parents the commit ids of the parents.
-   * @param time    timestamp of the commit.
+   * @param refactorings the refactoring data.
+   * @param parents      the commit ids of the parents.
+   * @param time         timestamp of the commit.
    */
-  public RefactoringEntry(List<RefactoringInfo> data, String commitId, List<String> parents,
+  public RefactoringEntry(List<RefactoringInfo> refactorings, String commitId, List<String> parents,
                           long time) {
-    this.data = data;
+    this.refactorings = refactorings;
     this.parents = parents;
     this.time = time;
     this.commitId = commitId;
-    data.forEach(r -> r.setEntry(this));
+    refactorings.forEach(r -> r.setEntry(this));
   }
 
   /**
@@ -77,28 +76,8 @@ public class RefactoringEntry implements Serializable {
    * @return Swing Tree visualisation of refactorings in this entry.
    */
   public Tree buildTree() {
-    List<RefactoringInfo> refs = data;
-
-    DefaultMutableTreeNode root = new DefaultMutableTreeNode("Refactorings at commit " + commitId);
-
-    for (RefactoringInfo refactoringInfo : refs) {
-      DefaultMutableTreeNode refName =
-          new DefaultMutableTreeNode(refactoringInfo);
-      root.add(refName);
-
-      DefaultMutableTreeNode change = null;
-      if (refactoringInfo.getGroup() == Group.METHOD) {
-        change = refactoringInfo.getNodeMethod();
-      } else if (refactoringInfo.getGroup() == Group.CLASS && refactoringInfo.getType()
-          != RefactoringType.RENAME_CLASS) {
-        refactoringInfo.getNodeClass(refName);
-      } else {
-        change = refactoringInfo.getSimpleNode();
-      }
-      if (change != null) {
-        refName.add(change);
-      }
-    }
+    DefaultMutableTreeNode root = new DefaultMutableTreeNode(commitId);
+    refactorings.forEach(r -> root.add(r.makeNode()));
 
     Tree tree = new Tree(root);
     tree.setRootVisible(false);
@@ -107,7 +86,6 @@ public class RefactoringEntry implements Serializable {
     tree.setCellRenderer(renderer);
     return tree;
   }
-
 
   private void expandAllNodes(Tree tree, int startingIndex, int rowCount) {
     for (int i = startingIndex; i < rowCount; ++i) {
@@ -119,7 +97,7 @@ public class RefactoringEntry implements Serializable {
   }
 
   public List<RefactoringInfo> getRefactorings() {
-    return data;
+    return refactorings;
   }
 
   public List<String> getParents() {
