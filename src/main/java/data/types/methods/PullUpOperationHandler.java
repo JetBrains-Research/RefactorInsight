@@ -14,6 +14,8 @@ public class PullUpOperationHandler extends Handler {
     PullUpOperationRefactoring ref = (PullUpOperationRefactoring) refactoring;
     //TODO check ammount of files
     return info.setGroup(Group.METHOD)
+        .setElementBefore("from class " + ref.getOriginalOperation().getClassName())
+        .setElementAfter(" to class " + ref.getMovedOperation().getClassName())
         .addMarking(ref.getSourceOperationCodeRangeBeforeMove(),
             ref.getTargetOperationCodeRangeAfterMove())
         .setNameBefore(calculateSignature(ref.getOriginalOperation()))

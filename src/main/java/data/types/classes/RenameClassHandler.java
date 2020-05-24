@@ -20,6 +20,8 @@ public class RenameClassHandler extends Handler {
             ref.getOriginalClass().codeRange().getFilePath(),
             ref.getRenamedClass().codeRange().getFilePath())
         .setNameBefore(ref.getOriginalClassName())
-        .setNameAfter(ref.getRenamedClassName());
+        .setNameAfter(ref.getRenamedClassName())
+        .setElementBefore(null)
+        .setElementAfter(null);
   }
 }

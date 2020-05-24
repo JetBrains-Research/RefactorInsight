@@ -4,6 +4,7 @@ import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MergeVariableRefactoring;
+import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
 
 public class MergeVariableHandler extends Handler {
@@ -15,6 +16,11 @@ public class MergeVariableHandler extends Handler {
     ref.getMergedVariables().forEach(var ->
         info.addMarking(var.codeRange(), ref.getNewVariable().codeRange()));
 
-    return info.setGroup(Group.VARIABLE);
+    return info.setGroup(Group.VARIABLE)
+        .setElementBefore(ref.getMergedVariables().stream().map(x -> x.getVariableName()).collect(
+            Collectors.joining()))
+        .setElementAfter(ref.getNewVariable().getVariableName())
+        .setNameBefore(ref.getNewVariable().getVariableName())
+        .setNameAfter(ref.getNewVariable().getVariableName());
   }
 }

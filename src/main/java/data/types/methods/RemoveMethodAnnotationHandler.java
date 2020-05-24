@@ -12,6 +12,8 @@ public class RemoveMethodAnnotationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RemoveMethodAnnotationRefactoring ref = (RemoveMethodAnnotationRefactoring) refactoring;
     return info.setGroup(Group.METHOD)
+        .setElementBefore(ref.getAnnotation().toString())
+        .setElementAfter(null)
         .addMarking(ref.getAnnotation().codeRange(),
             ref.getOperationAfter().codeRange())
         .setNameBefore(calculateSignature(ref.getOperationBefore()))

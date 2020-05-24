@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import services.MiningService;
-import ui.MethodRefactoringPopup;
+import ui.MethodRefactoringToolbar;
 
 public class MethodAction extends AnAction {
 
   Map<String, List<RefactoringInfo>> map;
-  MethodRefactoringPopup methodRefactoringPopup;
+  MethodRefactoringToolbar methodRefactoringToolbar;
 
   /**
    * Implement this method to provide your action handler.
@@ -41,7 +41,7 @@ public class MethodAction extends AnAction {
         if (((PsiElementUsageTarget) target).getElement() instanceof PsiMethod) {
           PsiMethod method = (PsiMethod) ((PsiElementUsageTarget) target).getElement();
           String signature = calculateSignature(method);
-          getPopupWindow(project).show(map.get(signature), signature, dataContext);
+          getToolbarWindow(project).showToolbar(map.get(signature), signature);
         }
       }
     }
@@ -69,16 +69,16 @@ public class MethodAction extends AnAction {
   }
 
   /**
-   * Create or get a method refactorings tool window.
+   * Create or get a method refactorings toolbar window.
    *
    * @param project the current project.
-   * @return a new method refactorings tool window.
+   * @return a new method refactorings toolbar window.
    */
-  public MethodRefactoringPopup getPopupWindow(Project project) {
-    if (methodRefactoringPopup == null) {
-      methodRefactoringPopup = new MethodRefactoringPopup(project);
+  public MethodRefactoringToolbar getToolbarWindow(Project project) {
+    if (methodRefactoringToolbar == null) {
+      methodRefactoringToolbar = new MethodRefactoringToolbar(project);
     }
-    return methodRefactoringPopup;
+    return methodRefactoringToolbar;
   }
 
 }

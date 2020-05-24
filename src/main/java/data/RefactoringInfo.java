@@ -2,6 +2,7 @@ package data;
 
 import com.google.gson.Gson;
 import com.intellij.diff.fragments.LineFragment;
+import com.intellij.diff.fragments.LineFragmentImpl;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,13 +11,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import javax.swing.tree.DefaultMutableTreeNode;
+import org.jetbrains.annotations.Nullable;
 import org.refactoringminer.api.RefactoringType;
 
 public class RefactoringInfo {
 
+  @Nullable
+  String elementBefore;
+  @Nullable
+  String elementAfter;
+  private transient RefactoringEntry entry;
   private String text;
   private String name;
-  private String commitId;
   private String nameBefore;
   private String nameAfter;
   private String beforePath;
@@ -25,11 +32,6 @@ public class RefactoringInfo {
   private List<RefactoringLine> lineMarkings = new ArrayList<>();
   private Group group;
 
-  public RefactoringInfo setGroup(Group group) {
-    this.group = group;
-    return this;
-  }
-
   /**
    * Adds this refactoring to the method history map.
    * Note that it should be called in chronological order.
@@ -37,7 +39,6 @@ public class RefactoringInfo {
    * @param map for method history
    */
   public void addToHistory(Map<String, List<RefactoringInfo>> map) {
-    //System.out.println(signatureAfter);
     if (group == Group.CLASS && nameBefore != null && nameAfter != null) {
       Map<String, String> renames = new HashMap<>();
       renames.put(nameBefore, nameAfter);
@@ -59,7 +60,6 @@ public class RefactoringInfo {
     }
   }
 
-
   public String getName() {
     return name;
   }
@@ -78,12 +78,12 @@ public class RefactoringInfo {
     return this;
   }
 
-  public String getCommitId() {
-    return commitId;
+  public RefactoringEntry getEntry() {
+    return entry;
   }
 
-  public RefactoringInfo setCommitId(String commitId) {
-    this.commitId = commitId;
+  public RefactoringInfo setEntry(RefactoringEntry entry) {
+    this.entry = entry;
     return this;
   }
 
@@ -157,6 +157,11 @@ public class RefactoringInfo {
     return lineMarkings.stream().map(RefactoringLine::toLineFragment).collect(Collectors.toList());
   }
 
+  public List<LineFragment> getLineMarkings(int maxLineBefore, int maxLineAfter) {
+    return lineMarkings.stream().map(l ->
+        l.toLineFragment(maxLineBefore, maxLineAfter)).collect(Collectors.toList());
+  }
+
   @Override
   public String toString() {
     return new Gson().toJson(this);
@@ -168,6 +173,15 @@ public class RefactoringInfo {
 
   public RefactoringInfo setNameBefore(String nameBefore) {
     this.nameBefore = nameBefore;
+    return this;
+  }
+
+  public Group getGroup() {
+    return group;
+  }
+
+  public RefactoringInfo setGroup(Group group) {
+    this.group = group;
     return this;
   }
 
@@ -188,4 +202,61 @@ public class RefactoringInfo {
     return this;
   }
 
+  public long getTimestamp() {
+    return entry.getTimeStamp();
+  }
+
+  public String getCommitId() {
+    return entry.getCommitId();
+  }
+
+  public RefactoringInfo setElementBefore(@Nullable String elementBefore) {
+    this.elementBefore = elementBefore;
+    return this;
+  }
+
+  public RefactoringInfo setElementAfter(@Nullable String elementAfter) {
+    this.elementAfter = elementAfter;
+    return this;
+  }
+
+  /**
+   * Creates a DefaultMutableTreeNode for the git window UI.
+   *
+   * @return the node.
+   */
+  public DefaultMutableTreeNode makeNode() {
+    DefaultMutableTreeNode node = new DefaultMutableTreeNode(this);
+    DefaultMutableTreeNode child = new DefaultMutableTreeNode(getDisplayableElement());
+    node.add(child);
+    addLeaves(child);
+    return node;
+  }
+
+  private void addLeaves(DefaultMutableTreeNode node) {
+    if (elementBefore == null) {
+      return;
+    }
+    String info = elementBefore;
+    if (elementAfter != null) {
+      info += " → " + elementAfter;
+    }
+    node.add(new DefaultMutableTreeNode(info));
+  }
+
+  private String getDisplayableElement() {
+    String before = nameBefore;
+    if (before.contains(".")) {
+      before = nameBefore.substring(nameBefore.lastIndexOf(".") + 1);
+    }
+    String after = nameAfter;
+    if (after.contains(".")) {
+      after = nameAfter.substring(nameAfter.lastIndexOf(".") + 1);
+    }
+    if (before.equals(after)) {
+      return before;
+    } else {
+      return before + " → " + after;
+    }
+  }
 }

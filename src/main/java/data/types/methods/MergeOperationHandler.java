@@ -8,7 +8,7 @@ public class MergeOperationHandler extends Handler {
 
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
-    //TODO implement this refactoring
+    //Is not supported by RefactoringMiner yet
     return null;
   }
 }

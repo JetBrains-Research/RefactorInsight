@@ -12,10 +12,12 @@ public class InlineOperationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     InlineOperationRefactoring ref = (InlineOperationRefactoring) refactoring;
 
-    //TODO what is this MOVE AND INLINE?
-
     return info.setGroup(Group.METHOD)
+        .setElementBefore(ref.getInlinedOperation().getName())
+        .setElementAfter(" in method " + ref.getTargetOperationAfterInline().getName())
         .setNameBefore(calculateSignature(ref.getTargetOperationBeforeInline()))
-        .setNameAfter(calculateSignature(ref.getTargetOperationAfterInline()));
+        .setNameAfter(calculateSignature(ref.getTargetOperationAfterInline()))
+        .addMarking(ref.getTargetOperationCodeRangeBeforeInline(),
+            ref.getInlinedCodeRangeFromInlinedOperation());
   }
 }

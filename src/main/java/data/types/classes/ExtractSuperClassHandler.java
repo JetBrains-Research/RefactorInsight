@@ -10,12 +10,12 @@ public class ExtractSuperClassHandler extends Handler {
 
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
-
     //TODO three file viewer
-
     ExtractSuperclassRefactoring ref = (ExtractSuperclassRefactoring) refactoring;
-    return info.setGroup(Group.CLASS);
-
-
+    return info.setGroup(Group.CLASS)
+        .setElementBefore("extracted " + ref.getExtractedClass().getName())
+        .setElementAfter(null)
+        .setNameBefore(ref.getExtractedClass().getName())
+        .setNameAfter(ref.getExtractedClass().getName());
   }
 }

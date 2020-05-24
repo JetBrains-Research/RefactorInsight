@@ -12,6 +12,8 @@ public class ModifyMethodAnnotationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ModifyMethodAnnotationRefactoring ref = (ModifyMethodAnnotationRefactoring) refactoring;
     return info.setGroup(Group.METHOD)
+        .setElementBefore(ref.getAnnotationBefore().toString())
+        .setElementAfter(ref.getAnnotationAfter().toString())
         .addMarking(ref.getAnnotationBefore().codeRange(), ref.getAnnotationAfter().codeRange())
         .setNameBefore(calculateSignature(ref.getOperationBefore()))
         .setNameAfter(calculateSignature(ref.getOperationAfter()));

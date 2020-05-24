@@ -12,6 +12,10 @@ public class ReplaceAttributeHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ReplaceAttributeRefactoring ref = (ReplaceAttributeRefactoring) refactoring;
     return info.setGroup(Group.ATTRIBUTE)
+        .setElementBefore(ref.getSourceClassName())
+        .setElementAfter(ref.getTargetClassName())
+        .setNameBefore(ref.getOriginalAttribute().getName())
+        .setNameAfter(ref.getMovedAttribute().getName())
         .addMarking(ref.getSourceAttributeCodeRangeBeforeMove(),
             ref.getTargetAttributeCodeRangeAfterMove());
   }

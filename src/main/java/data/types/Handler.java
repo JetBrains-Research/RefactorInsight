@@ -30,16 +30,15 @@ public abstract class Handler {
 
   /**
    * Start generating RefactoringInfo from Refactoring.
+   *
    * @param refactoring Refactoring from RefactoringMiner
-   * @param commitId Commit Hash String
    * @return RefactoringInfo
    */
-  public RefactoringInfo handle(Refactoring refactoring, String commitId) {
+  public RefactoringInfo handle(Refactoring refactoring) {
     return specify(refactoring, new RefactoringInfo()
         .setType(refactoring.getRefactoringType())
         .setName(refactoring.getName())
-        .setText(refactoring.toString())
-        .setCommitId(commitId));
+        .setText(refactoring.toString()));
   }
 
   public abstract RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info);

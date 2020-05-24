@@ -13,6 +13,8 @@ public class PushDownOperationHandler extends Handler {
     PushDownOperationRefactoring ref = (PushDownOperationRefactoring) refactoring;
     //TODO same as pullup
     return info.setGroup(Group.METHOD)
+        .setElementBefore("from class " + ref.getOriginalOperation().getClassName())
+        .setElementAfter(" to class " + ref.getMovedOperation().getClassName())
         .addMarking(ref.getSourceOperationCodeRangeBeforeMove(),
             ref.getTargetOperationCodeRangeAfterMove())
         .setNameBefore(calculateSignature(ref.getOriginalOperation()))

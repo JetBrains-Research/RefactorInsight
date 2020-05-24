@@ -14,14 +14,18 @@ public class ExtractOperationHandler extends Handler {
     ExtractOperationRefactoring ref = (ExtractOperationRefactoring) refactoring;
 
     //TODO three side view
-
     if (ref.getRefactoringType() == RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
       return info
+          .setElementBefore(ref.getSourceOperationBeforeExtraction().getName() + " in class "
+              + ref.getSourceOperationBeforeExtraction().getClassName())
+          .setElementAfter("extracted " + ref.getExtractedOperation().getName() + " & moved in "
+              + ref.getExtractedOperation().getClassName())
           .setNameBefore(calculateSignature(ref.getSourceOperationBeforeExtraction()))
           .setNameAfter(calculateSignature(ref.getSourceOperationAfterExtraction()));
     } else {
-
       info.setGroup(Group.METHOD)
+          .setElementBefore("from " + ref.getSourceOperationBeforeExtraction().getName())
+          .setElementAfter("extracted " + ref.getExtractedOperation().getName())
           .setNameBefore(calculateSignature(ref.getSourceOperationBeforeExtraction()))
           .setNameAfter(calculateSignature(ref.getSourceOperationAfterExtraction()))
           .addMarking(ref.getExtractedCodeRangeFromSourceOperation(),

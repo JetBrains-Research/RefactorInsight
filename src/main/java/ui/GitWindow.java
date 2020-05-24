@@ -1,36 +1,24 @@
 package ui;
 
 import com.intellij.diff.DiffContentFactoryEx;
-import com.intellij.diff.DiffContext;
 import com.intellij.diff.DiffManager;
-import com.intellij.diff.FrameDiffTool;
-import com.intellij.diff.chains.DiffRequestChain;
 import com.intellij.diff.contents.DiffContent;
-import com.intellij.diff.impl.DiffWindow;
 import com.intellij.diff.requests.SimpleDiffRequest;
-import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
-import com.intellij.diff.tools.simple.ThreesideDiffChangeBase;
-import com.intellij.diff.tools.simple.ThreesideTextDiffViewerEx;
-import com.intellij.diff.tools.util.side.ThreesideDiffViewer;
-import com.intellij.diff.tools.util.side.ThreesideTextDiffViewer;
-import com.intellij.diff.util.DiffDividerDrawUtil;
 import com.intellij.diff.util.DiffUserDataKeysEx;
-import com.intellij.diff.util.Side;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
-import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.WindowWrapper;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBViewport;
+import com.intellij.ui.treeStructure.Tree;
+import com.intellij.vcs.log.VcsCommitMetadata;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
@@ -40,16 +28,15 @@ import data.RefactoringInfo;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
-import java.util.List;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import services.MiningService;
 import services.RefactoringsBundle;
-
 
 public class GitWindow extends ToggleAction {
 
@@ -92,46 +79,6 @@ public class GitWindow extends ToggleAction {
     viewport.setView(scrollPane);
   }
 
-  private void buildComponent(int index) {
-    String commitId = table.getModel().getCommitId(index).getHash().asString();
-    String refactorings = miningService.getRefactorings(commitId);
-    if (!refactorings.equals("")) {
-      scrollPane.getViewport().setView(buildList(index, refactorings));
-    } else {
-      JBSplitter splitter = new JBSplitter(true, (float) 0.1);
-      JBLabel label = new JBLabel(RefactoringsBundle.message("not.mined"));
-      JBPanel panel = new JBPanel();
-      splitter.setFirstComponent(label);
-
-      JButton button = new JButton("Mine this commit");
-      GitWindow gitWindow = this;
-      button.addMouseListener(
-          new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-              miningService
-                  .mineAtCommit(table.getModel().getCommitMetadata(index), project, gitWindow);
-            }
-          });
-
-      panel.add(button);
-      splitter.setSecondComponent(panel);
-      scrollPane.getViewport().setView(splitter);
-    }
-  }
-
-  /**
-   * Method called after a single commit is mined.
-   * Updates the view with the refactorings found.
-   * @param commitId to refresh the view at.
-   */
-  public void refresh(String commitId) {
-    int index = table.getSelectionModel().getAnchorSelectionIndex();
-    if (table.getModel().getCommitId(index).getHash().asString().equals(commitId)) {
-      buildComponent(index);
-    }
-  }
-
   private void toChangesView(@NotNull AnActionEvent e) {
     viewport.setView(changesTree);
   }
@@ -160,25 +107,72 @@ public class GitWindow extends ToggleAction {
     super.update(e);
   }
 
-  private JBList buildList(int index, String refactorings) {
-    List<RefactoringInfo> refs = RefactoringEntry.fromString(refactorings).getRefactorings();
-    String[] names = refs.stream().map(r -> r.getName()).toArray(String[]::new);
-    JBList<String> list = new JBList<>(names);
+  /**
+   * Method called after a single commit is mined.
+   * Updates the view with the refactorings found.
+   *
+   * @param commitId to refresh the view at.
+   */
+  public void refresh(String commitId) {
+    int index = table.getSelectionModel().getAnchorSelectionIndex();
+    if (table.getModel().getCommitId(index).getHash().asString().equals(commitId)) {
+      buildComponent(index);
+    }
+  }
 
-    MouseAdapter mouseListener = new MouseAdapter() {
-      public void mouseClicked(MouseEvent e) {
-        if (e.getClickCount() == 2) {
-          showDiff(index, refs.get(list.locationToIndex(e.getPoint())));
+  private void buildComponent(int index) {
+    String commitId = table.getModel().getCommitId(index).getHash().asString();
+    VcsCommitMetadata metadata = table.getModel().getCommitMetadata(index);
+
+    String refactorings = miningService.getRefactorings(commitId);
+    RefactoringEntry entry = RefactoringEntry.fromString(refactorings);
+
+    if (entry != null) {
+      Tree tree = entry.buildTree();
+      tree.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+          if (e.getClickCount() == 2) {
+            TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+            if (path == null) {
+              return;
+            }
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+                path.getLastPathComponent();
+            if (node.isLeaf()) {
+              RefactoringInfo info = (RefactoringInfo)
+                  node.getUserObjectPath()[1];
+              showDiff(index, info);
+            }
+          }
         }
-      }
-    };
-    list.addMouseListener(mouseListener);
-    return list;
+      });
+      scrollPane.getViewport().setView(tree);
+    } else {
+      JBLabel label = new JBLabel(RefactoringsBundle.message("not.mined"));
+
+      JBPanel panel = new JBPanel();
+      JButton button = new JButton("Mine this commit");
+      GitWindow gitWindow = this;
+      button.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+          miningService
+              .mineAtCommit(metadata, project, gitWindow);
+        }
+      });
+      panel.add(button);
+
+      JBSplitter splitter = new JBSplitter(true, (float) 0.1);
+      splitter.setFirstComponent(label);
+      splitter.setSecondComponent(panel);
+      scrollPane.getViewport().setView(splitter);
+    }
   }
 
   private void showDiff(int index, RefactoringInfo info) {
     try {
-      Collection<Change> changes = table.getModel().getFullDetails(index).getChanges();
+      Collection<Change> changes = table.getModel().getFullDetails(index).getChanges(0);
 
       String contentBefore = "";
       String contentAfter = "";
@@ -203,13 +197,11 @@ public class GitWindow extends ToggleAction {
       SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
           diffContentBefore, diffContentAfter, info.getBeforePath(), info.getAfterPath());
 
+      int lineCountBefore = (int) contentBefore.chars().filter(c -> c == '\n').count() + 1;
+      int lineCountAfter = (int) contentAfter.chars().filter(c -> c == '\n').count() + 1;
       request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
-          (text1, text2, policy, innerChanges, indicator) -> info.getLineMarkings());
-
-
-
-
-
+          (text1, text2, policy, innerChanges, indicator) ->
+              info.getLineMarkings(lineCountBefore, lineCountAfter));
 
       DiffManager.getInstance().showDiff(project, request);
     } catch (VcsException e) {
