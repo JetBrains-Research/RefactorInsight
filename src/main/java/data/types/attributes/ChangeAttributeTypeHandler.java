@@ -20,7 +20,7 @@ public class ChangeAttributeTypeHandler extends Handler {
             ref.getChangedTypeAttribute().codeRange()).addMarking(ref.getOriginalAttribute().codeRange(),
             ref.getChangedTypeAttribute().codeRange(), line ->
                 line.addOffset(ref.getOriginalAttribute().getType().getLocationInfo(),
-                    ref.getChangedTypeAttribute().getType().getLocationInfo()));;
+                    ref.getChangedTypeAttribute().getType().getLocationInfo()));
 
   }
 }
