@@ -21,7 +21,9 @@ public class ChangeAttributeTypeHandler extends Handler {
         .setElementBefore(ref.getOriginalAttribute().toQualifiedString())
         .setElementAfter(ref.getChangedTypeAttribute().toQualifiedString())
         .addMarking(ref.getOriginalAttribute().codeRange(),
-            ref.getChangedTypeAttribute().codeRange());
+            ref.getChangedTypeAttribute().codeRange(), line ->
+                line.addOffset(ref.getOriginalAttribute().getType().getLocationInfo(),
+                    ref.getChangedTypeAttribute().getType().getLocationInfo()));
 
   }
 }

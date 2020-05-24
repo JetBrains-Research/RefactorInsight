@@ -22,8 +22,6 @@ public class RenameAttributeHandler extends Handler {
             ref.getOriginalAttribute().getVariableName() + " in class "
                 + ref.getClassNameBefore().substring(ref.getClassNameBefore().lastIndexOf(".") + 1))
         .setElementBefore(ref.getOriginalAttribute().getVariableName())
-        .setElementAfter(ref.getRenamedAttribute().getVariableName())
-        .addMarking(ref.getOriginalAttribute().codeRange(), ref.getRenamedAttribute().codeRange());
-
+        .setElementAfter(ref.getRenamedAttribute().getVariableName());
   }
 }
