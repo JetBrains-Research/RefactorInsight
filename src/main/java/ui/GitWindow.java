@@ -3,6 +3,8 @@ package ui;
 import com.intellij.diff.DiffContentFactoryEx;
 import com.intellij.diff.DiffManager;
 import com.intellij.diff.contents.DiffContent;
+import com.intellij.diff.fragments.LineFragment;
+import com.intellij.diff.fragments.LineFragmentImpl;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.util.DiffUserDataKeysEx;
 import com.intellij.ide.highlighter.JavaClassFileType;
@@ -28,6 +30,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.event.ListSelectionEvent;
@@ -169,10 +172,14 @@ public class GitWindow extends ToggleAction {
       String contentBefore = "";
       String contentAfter = "";
       for (Change change : changes) {
-        if (info.getBeforePath().equals(change.getBeforeRevision().getFile().getPath())) {
+        if (change.getBeforeRevision() != null
+            && (project.getBasePath() + "/" + info.getBeforePath())
+            .equals(change.getBeforeRevision().getFile().getPath())) {
           contentBefore = change.getBeforeRevision().getContent();
         }
-        if (info.getAfterPath().equals(change.getAfterRevision().getFile().getPath())) {
+        if (change.getAfterRevision() != null
+            && (project.getBasePath() + "/" + info.getAfterPath())
+            .equals(change.getAfterRevision().getFile().getPath())) {
           contentAfter = change.getAfterRevision().getContent();
         }
       }
@@ -185,13 +192,26 @@ public class GitWindow extends ToggleAction {
       SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
           diffContentBefore, diffContentAfter, info.getBeforePath(), info.getAfterPath());
 
+      List<LineFragment> fragments = filterWrongCodeRanges(info, contentBefore, contentAfter);
       request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
-          (text1, text2, policy, innerChanges, indicator) -> info.getLineMarkings());
+          (text1, text2, policy, innerChanges, indicator) -> fragments);
 
       DiffManager.getInstance().showDiff(project, request);
     } catch (VcsException e) {
       e.printStackTrace();
     }
+  }
+  //TODO: deal with -1 code range somewhere else
+  private List<LineFragment> filterWrongCodeRanges(RefactoringInfo info, String contentBefore, String contentAfter){
+    int beforeLinecount = (int) contentBefore.chars().filter(c -> c == '\n').count() + 1;
+    int afterLinecount = (int) contentAfter.chars().filter(c -> c == '\n').count() + 1;
+    return info.getLineMarkings().stream().map(o ->
+        new LineFragmentImpl(o.getStartLine1(),
+            o.getEndLine1() > 0 ? o.getEndLine1() : beforeLinecount,
+            o.getStartLine2(),
+            o.getEndLine2() > 0 ? o.getEndLine2() : afterLinecount,
+            0, 0, 0, 0)
+    ).collect(Collectors.toList());
   }
 
   class CommitSelectionListener implements ListSelectionListener {

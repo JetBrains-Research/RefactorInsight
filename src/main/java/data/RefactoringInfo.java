@@ -1,7 +1,6 @@
 package data;
 
 import com.google.gson.Gson;
-import com.intellij.diff.fragments.LineFragment;
 import com.intellij.diff.fragments.LineFragmentImpl;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ public class RefactoringInfo {
   private String beforePath;
   private String afterPath;
   private RefactoringType type;
-  private List<LineFragment> lineMarkings = new ArrayList<>();
+  private List<LineFragmentImpl> lineMarkings = new ArrayList<LineFragmentImpl>();
   private Group group;
 
   public RefactoringInfo setGroup(Group group) {
@@ -120,7 +119,7 @@ public class RefactoringInfo {
     return this;
   }
 
-  public List<LineFragment> getLineMarkings() {
+  public List<LineFragmentImpl> getLineMarkings() {
     return lineMarkings;
   }
 
