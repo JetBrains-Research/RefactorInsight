@@ -14,7 +14,7 @@ public class RenameAttributeHandler extends Handler {
     return info.setGroup(Group.ATTRIBUTE)
         .setElementBefore(null)
         .setElementAfter(null)
-        .setNameBefore(ref.getRenamedAttribute().getVariableName())
+        .setNameBefore(ref.getOriginalAttribute().getVariableName())
         .setNameAfter(ref.getRenamedAttribute().getVariableName())
         .addMarking(ref.getOriginalAttribute().codeRange(), ref.getRenamedAttribute().codeRange());
 
