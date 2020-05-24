@@ -105,7 +105,6 @@ public class RefactoringEntry implements Serializable {
     expandAllNodes(tree, 0, tree.getRowCount());
     MyCellRenderer renderer = new MyCellRenderer();
     tree.setCellRenderer(renderer);
-
     return tree;
   }
 
@@ -114,7 +113,6 @@ public class RefactoringEntry implements Serializable {
     for (int i = startingIndex; i < rowCount; ++i) {
       tree.expandRow(i);
     }
-
     if (tree.getRowCount() != rowCount) {
       expandAllNodes(tree, rowCount, tree.getRowCount());
     }

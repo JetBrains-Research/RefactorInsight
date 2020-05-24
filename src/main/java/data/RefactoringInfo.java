@@ -13,6 +13,10 @@ import org.refactoringminer.api.RefactoringType;
 
 public class RefactoringInfo {
 
+  @Nullable
+  String elementBefore;
+  @Nullable
+  String elementAfter;
   private transient RefactoringEntry entry;
   private String text;
   private String name;
@@ -21,12 +25,6 @@ public class RefactoringInfo {
   private RefactoringType type;
   private List<TrueCodeRange> leftSide;
   private List<TrueCodeRange> rightSide;
-
-  @Nullable
-  String elementBefore;
-  @Nullable
-  String elementAfter;
-
   private Scope object;
 
   public RefactoringInfo(Scope object) {
@@ -75,22 +73,23 @@ public class RefactoringInfo {
   }
 
   protected void getNodeClass(DefaultMutableTreeNode refName) {
-    String packageBefore = nameBefore.substring(0, nameBefore.lastIndexOf("."));
-    String packageAfter = nameAfter.substring(0, nameAfter.lastIndexOf("."));
-    DefaultMutableTreeNode package1 = new DefaultMutableTreeNode(packageBefore);
-    DefaultMutableTreeNode package2 = new DefaultMutableTreeNode(packageAfter);
     String before = nameBefore.substring(nameBefore.lastIndexOf(".") + 1);
     String after = nameAfter.substring(nameAfter.lastIndexOf(".") + 1);
-    DefaultMutableTreeNode name1 = new DefaultMutableTreeNode(before);
-    DefaultMutableTreeNode name2 = new DefaultMutableTreeNode(after);
-    package1.add(name1);
-    package2.add(name2);
-    DefaultMutableTreeNode bf = new DefaultMutableTreeNode("Before refactoring");
-    DefaultMutableTreeNode af = new DefaultMutableTreeNode("After refactoring");
-    bf.add(package1);
-    af.add(package2);
-    refName.add(bf);
-    refName.add(af);
+    DefaultMutableTreeNode className;
+    if (before.equals(after)) {
+      className = new DefaultMutableTreeNode(after);
+    } else {
+      char a = '→';
+      className = new DefaultMutableTreeNode(before + " " + a + " " + after);
+    }
+
+    String packageBefore = nameBefore.substring(0, nameBefore.lastIndexOf("."));
+    String packageAfter = nameAfter.substring(0, nameAfter.lastIndexOf("."));
+    DefaultMutableTreeNode package1 = new DefaultMutableTreeNode("before: " + packageBefore);
+    DefaultMutableTreeNode package2 = new DefaultMutableTreeNode("after: " + packageAfter);
+    className.add(package1);
+    className.add(package2);
+    refName.add(className);
   }
 
   @NotNull

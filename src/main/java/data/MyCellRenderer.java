@@ -49,10 +49,12 @@ class MyCellRenderer extends JBDefaultTreeCellRenderer {
         Icon icon = AllIcons.Nodes.Interface;
         setIcon(icon);
       }
-    } else if (leaf) {
+    } else if (leaf && node.getSiblingCount() == 1) {
       setIcon(AllIcons.Actions.Diff);
-    } else if (node.getChildAt(0).isLeaf()) {
+    } else if (leaf && node.getSiblingCount() > 1) {
       setIcon(AllIcons.Nodes.Package);
+    } else if (node.getChildAt(0).isLeaf()) {
+      setIcon(AllIcons.Nodes.Class);
     } else {
       setIcon(null);
     }
