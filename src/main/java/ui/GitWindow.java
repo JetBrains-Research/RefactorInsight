@@ -181,7 +181,7 @@ public class GitWindow extends ToggleAction {
 
   private void showDiff(int index, RefactoringInfo ri) {
     VcsFullCommitDetails details = table.getModel().getFullDetails(index);
-    Collection<Change> changes = details.getChanges();
+    Collection<Change> changes = details.getChanges(0);
     List<HalfDiffInfo> leftDiffs = changes
         .stream()
         .map(Change::getBeforeRevision)
