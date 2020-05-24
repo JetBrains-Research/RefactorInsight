@@ -212,8 +212,10 @@ public class GitWindow extends ToggleAction {
       e.printStackTrace();
     }
   }
+
   //TODO: deal with -1 code range somewhere else
-  private List<LineFragment> filterWrongCodeRanges(RefactoringInfo info, String contentBefore, String contentAfter){
+  private List<LineFragment> filterWrongCodeRanges(RefactoringInfo info, String contentBefore,
+                                                   String contentAfter) {
     int beforeLinecount = (int) contentBefore.chars().filter(c -> c == '\n').count() + 1;
     int afterLinecount = (int) contentAfter.chars().filter(c -> c == '\n').count() + 1;
     return info.getLineMarkings().stream().map(o ->
