@@ -20,6 +20,9 @@ class MyCellRenderer extends JBDefaultTreeCellRenderer {
     super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
     DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+    if (node.equals(node.getRoot())) {
+      return this;
+    }
     RefactoringInfo info = (RefactoringInfo) node.getUserObjectPath()[1];
 
     String name = info.getType().getDisplayName();
