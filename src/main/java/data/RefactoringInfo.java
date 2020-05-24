@@ -1,6 +1,7 @@
 package data;
 
 import com.google.gson.Gson;
+import com.intellij.diff.fragments.LineFragment;
 import com.intellij.diff.fragments.LineFragmentImpl;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
@@ -8,6 +9,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.jetbrains.annotations.Nullable;
 import org.refactoringminer.api.RefactoringType;
@@ -26,8 +29,13 @@ public class RefactoringInfo {
   private String beforePath;
   private String afterPath;
   private RefactoringType type;
-  private List<LineFragmentImpl> lineMarkings = new ArrayList<LineFragmentImpl>();
+  private List<RefactoringLine> lineMarkings = new ArrayList<>();
   private Group group;
+
+  public RefactoringInfo setGroup(Group group) {
+    this.group = group;
+    return this;
+  }
 
   /**
    * Adds this refactoring to the method history map.
@@ -37,7 +45,6 @@ public class RefactoringInfo {
    */
   public void addToHistory(Map<String, List<RefactoringInfo>> map) {
     if (group == Group.CLASS && nameBefore != null && nameAfter != null) {
-
       Map<String, String> renames = new HashMap<>();
       renames.put(nameBefore, nameAfter);
       renames.forEach((before, after) -> map.keySet().stream()
@@ -114,14 +121,45 @@ public class RefactoringInfo {
                                     String beforePath, String afterPath) {
     lineMarkings
         .add(
-            new LineFragmentImpl(startBefore - 1, endBefore, startAfter - 1, endAfter, 0, 0, 0, 0));
+            new RefactoringLine(startBefore - 1, endBefore, startAfter - 1, endAfter));
     this.beforePath = beforePath;
     this.afterPath = afterPath;
     return this;
   }
 
-  public List<LineFragmentImpl> getLineMarkings() {
-    return lineMarkings;
+  public RefactoringInfo addMarking(CodeRange left, CodeRange right,
+                                    Consumer<RefactoringLine> offsetFunction) {
+    return addMarking(left.getStartLine(), left.getEndLine(), right.getStartLine(),
+        right.getEndLine(), left.getFilePath(), right.getFilePath(), offsetFunction);
+  }
+
+  /**
+   * Add line marking for diffwindow used to display refactorings.
+   * Includes possibility for sub-highlighting
+   *
+   * @param startBefore    int
+   * @param endBefore      int
+   * @param startAfter     int
+   * @param endAfter       int
+   * @param beforePath     int
+   * @param afterPath      int
+   * @param offsetFunction Consumer for adding subhighlightings
+   * @return
+   */
+  public RefactoringInfo addMarking(int startBefore, int endBefore, int startAfter, int endAfter,
+                                    String beforePath, String afterPath,
+                                    Consumer<RefactoringLine> offsetFunction) {
+    RefactoringLine line =
+        new RefactoringLine(startBefore - 1, endBefore, startAfter - 1, endAfter);
+    offsetFunction.accept(line);
+    lineMarkings.add(line);
+    this.beforePath = beforePath;
+    this.afterPath = afterPath;
+    return this;
+  }
+
+  public List<LineFragment> getLineMarkings() {
+    return lineMarkings.stream().map(RefactoringLine::toLineFragment).collect(Collectors.toList());
   }
 
   @Override

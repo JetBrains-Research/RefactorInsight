@@ -1,21 +1,33 @@
 package ui;
 
 import com.intellij.diff.DiffContentFactoryEx;
+import com.intellij.diff.DiffContext;
 import com.intellij.diff.DiffManager;
+import com.intellij.diff.FrameDiffTool;
+import com.intellij.diff.chains.DiffRequestChain;
 import com.intellij.diff.contents.DiffContent;
-import com.intellij.diff.fragments.LineFragment;
-import com.intellij.diff.fragments.LineFragmentImpl;
+import com.intellij.diff.impl.DiffWindow;
 import com.intellij.diff.requests.SimpleDiffRequest;
+import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
+import com.intellij.diff.tools.simple.ThreesideDiffChangeBase;
+import com.intellij.diff.tools.simple.ThreesideTextDiffViewerEx;
+import com.intellij.diff.tools.util.side.ThreesideDiffViewer;
+import com.intellij.diff.tools.util.side.ThreesideTextDiffViewer;
+import com.intellij.diff.util.DiffDividerDrawUtil;
 import com.intellij.diff.util.DiffUserDataKeysEx;
+import com.intellij.diff.util.Side;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.WindowWrapper;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBViewport;
@@ -40,6 +52,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import services.MiningService;
 import services.RefactoringsBundle;
 
@@ -202,28 +215,13 @@ public class GitWindow extends ToggleAction {
       SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
           diffContentBefore, diffContentAfter, info.getBeforePath(), info.getAfterPath());
 
-      List<LineFragment> fragments = filterWrongCodeRanges(info, contentBefore, contentAfter);
       request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
-          (text1, text2, policy, innerChanges, indicator) -> fragments);
+          (text1, text2, policy, innerChanges, indicator) -> info.getLineMarkings());
 
       DiffManager.getInstance().showDiff(project, request);
     } catch (VcsException e) {
       e.printStackTrace();
     }
-  }
-
-  //TODO: deal with -1 code range somewhere else
-  private List<LineFragment> filterWrongCodeRanges(RefactoringInfo info, String contentBefore,
-                                                   String contentAfter) {
-    int beforeLinecount = (int) contentBefore.chars().filter(c -> c == '\n').count() + 1;
-    int afterLinecount = (int) contentAfter.chars().filter(c -> c == '\n').count() + 1;
-    return info.getLineMarkings().stream().map(o ->
-        new LineFragmentImpl(o.getStartLine1(),
-            o.getEndLine1() > 0 ? o.getEndLine1() : beforeLinecount,
-            o.getStartLine2(),
-            o.getEndLine2() > 0 ? o.getEndLine2() : afterLinecount,
-            0, 0, 0, 0)
-    ).collect(Collectors.toList());
   }
 
   class CommitSelectionListener implements ListSelectionListener {
@@ -245,7 +243,4 @@ public class GitWindow extends ToggleAction {
       }
     }
   }
-
-
 }
-

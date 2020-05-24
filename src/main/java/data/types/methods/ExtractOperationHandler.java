@@ -33,7 +33,7 @@ public class ExtractOperationHandler extends Handler {
 
       ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
           info.addMarking(ref.getExtractedCodeRangeFromSourceOperation().getStartLine(),
-              ref.getExtractedCodeRangeFromSourceOperation().getEndLine(),
+              ref.getExtractedCodeRangeFromSourceOperation().getStartLine() - 1,
               invocation.getStartLine(), invocation.getEndLine(),
               ref.getExtractedCodeRangeFromSourceOperation().getFilePath(),
               invocation.getFilePath())
