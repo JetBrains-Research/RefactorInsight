@@ -1,28 +1,21 @@
 package data.types.variables;
 
+import data.Group;
 import data.RefactoringInfo;
-import data.Scope;
-import data.TrueCodeRange;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.InlineVariableRefactoring;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 
-public class InlineVariableHandler implements Handler {
+public class InlineVariableHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     InlineVariableRefactoring ref = (InlineVariableRefactoring) refactoring;
-    return new RefactoringInfo(Scope.VARIABLE)
-        .setType(RefactoringType.INLINE_VARIABLE)
-        .setName(ref.getName())
-        .setText(ref.toString())
+    return info.setGroup(Group.VARIABLE)
         .setNameBefore(ref.getVariableDeclaration().getVariableName())
         .setNameAfter(" in method " + ref.getOperationAfter().getName())
-        .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getVariableDeclaration().codeRange())))
-        .setRightSide(
-            ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));
+        .addMarking(ref.getVariableDeclaration().codeRange(),
+            ref.getInlinedVariableDeclarationCodeRange());
+
   }
 }

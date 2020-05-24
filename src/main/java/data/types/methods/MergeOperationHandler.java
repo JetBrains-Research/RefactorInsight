@@ -4,10 +4,11 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import org.refactoringminer.api.Refactoring;
 
-public class MergeOperationHandler implements Handler {
+public class MergeOperationHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+    //Is not supported by RefactoringMiner yet
     return null;
   }
 }

@@ -87,9 +87,9 @@ public class RefactoringEntry implements Serializable {
       root.add(refName);
 
       DefaultMutableTreeNode change = null;
-      if (refactoringInfo.getObject() == Scope.METHOD) {
+      if (refactoringInfo.getGroup() == Group.METHOD) {
         change = refactoringInfo.getNodeMethod();
-      } else if (refactoringInfo.getObject() == Scope.CLASS && refactoringInfo.getType()
+      } else if (refactoringInfo.getGroup() == Group.CLASS && refactoringInfo.getType()
           != RefactoringType.RENAME_CLASS) {
         refactoringInfo.getNodeClass(refName);
       } else {

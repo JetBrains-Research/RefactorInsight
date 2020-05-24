@@ -1,26 +1,20 @@
 package data.types.attributes;
 
+import data.Group;
 import data.RefactoringInfo;
-import data.Scope;
-import data.TrueCodeRange;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.PushDownAttributeRefactoring;
-import java.util.Arrays;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 
-public class PushDownAttributeHandler implements Handler {
+public class PushDownAttributeHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     PushDownAttributeRefactoring ref = (PushDownAttributeRefactoring) refactoring;
-    return new RefactoringInfo(Scope.ATTRIBUTE)
-        .setType(RefactoringType.PUSH_DOWN_ATTRIBUTE)
-        .setName(ref.getName())
-        .setText(ref.toString())
+    return info.setGroup(Group.ATTRIBUTE)
         .setNameBefore(ref.getSourceClassName())
         .setNameAfter(ref.getTargetClassName())
-        .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalAttribute().codeRange())))
-        .setRightSide(Arrays.asList(new TrueCodeRange(ref.getMovedAttribute().codeRange())));
+        .addMarking(ref.getSourceAttributeCodeRangeBeforeMove(),
+            ref.getTargetAttributeCodeRangeAfterMove());
   }
 }

@@ -1,6 +1,6 @@
 package data;
 
-public enum Scope {
+public enum Group {
   METHOD,
   CLASS,
   ATTRIBUTE,

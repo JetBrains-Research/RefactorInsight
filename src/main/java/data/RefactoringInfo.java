@@ -1,6 +1,8 @@
 package data;
 
 import com.google.gson.Gson;
+import com.intellij.diff.fragments.LineFragmentImpl;
+import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -22,13 +24,15 @@ public class RefactoringInfo {
   private String name;
   private String nameBefore;
   private String nameAfter;
+  private String beforePath;
+  private String afterPath;
   private RefactoringType type;
-  private List<TrueCodeRange> leftSide;
-  private List<TrueCodeRange> rightSide;
-  private Scope object;
+  private List<LineFragmentImpl> lineMarkings = new ArrayList<LineFragmentImpl>();
+  private Group group;
 
-  public RefactoringInfo(Scope object) {
-    this.object = object;
+  public RefactoringInfo setGroup(Group group) {
+    this.group = group;
+    return this;
   }
 
   /**
@@ -38,8 +42,8 @@ public class RefactoringInfo {
    * @param map for method history
    */
   public void addToHistory(Map<String, List<RefactoringInfo>> map) {
-    //System.out.println(signatureAfter);
-    if (object == Scope.CLASS && nameBefore != null && nameAfter != null) {
+    if (group == Group.CLASS && nameBefore != null && nameAfter != null) {
+
       Map<String, String> renames = new HashMap<>();
       renames.put(nameBefore, nameAfter);
       renames.forEach((before, after) -> map.keySet().stream()
@@ -52,7 +56,7 @@ public class RefactoringInfo {
       return;
     }
 
-    if (object == Scope.METHOD) {
+    if (group == Group.METHOD) {
       List<RefactoringInfo> refs = map.getOrDefault(nameBefore, new LinkedList<>());
       map.remove(nameBefore);
       refs.add(0, this);
@@ -146,22 +150,33 @@ public class RefactoringInfo {
     return this;
   }
 
-  public List<TrueCodeRange> getLeftSide() {
-    return leftSide;
+  public RefactoringInfo addMarking(CodeRange left, CodeRange right) {
+    return addMarking(left.getStartLine(), left.getEndLine(), right.getStartLine(),
+        right.getEndLine(), left.getFilePath(), right.getFilePath());
   }
 
-  public RefactoringInfo setLeftSide(List<TrueCodeRange> leftSide) {
-    this.leftSide = leftSide;
+  /**
+   * Add line marking for diffwindow used to display refactorings.
+   * @param startBefore int
+   * @param endBefore int
+   * @param startAfter int
+   * @param endAfter int
+   * @param beforePath int
+   * @param afterPath int
+   * @return this
+   */
+  public RefactoringInfo addMarking(int startBefore, int endBefore, int startAfter, int endAfter,
+                                    String beforePath, String afterPath) {
+    lineMarkings
+        .add(
+            new LineFragmentImpl(startBefore - 1, endBefore, startAfter - 1, endAfter, 0, 0, 0, 0));
+    this.beforePath = beforePath;
+    this.afterPath = afterPath;
     return this;
   }
 
-  public List<TrueCodeRange> getRightSide() {
-    return rightSide;
-  }
-
-  public RefactoringInfo setRightSide(List<TrueCodeRange> rightSide) {
-    this.rightSide = rightSide;
-    return this;
+  public List<LineFragmentImpl> getLineMarkings() {
+    return lineMarkings;
   }
 
   @Override
@@ -176,6 +191,18 @@ public class RefactoringInfo {
   public RefactoringInfo setNameBefore(String nameBefore) {
     this.nameBefore = nameBefore;
     return this;
+  }
+
+  public Group getGroup() {
+    return group;
+  }
+
+  public String getBeforePath() {
+    return beforePath;
+  }
+
+  public String getAfterPath() {
+    return afterPath;
   }
 
   public String getNameAfter() {
@@ -193,10 +220,6 @@ public class RefactoringInfo {
 
   public String getCommitId() {
     return entry.getCommitId();
-  }
-
-  public Scope getObject() {
-    return object;
   }
 
   public RefactoringInfo setElementBefore(@Nullable String elementBefore) {

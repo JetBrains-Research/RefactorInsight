@@ -1,27 +1,24 @@
 package data.types.variables;
 
+import data.Group;
 import data.RefactoringInfo;
-import data.Scope;
-import data.TrueCodeRange;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MergeVariableRefactoring;
 import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
 
-public class MergeVariableHandler implements Handler {
+public class MergeVariableHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     MergeVariableRefactoring ref = (MergeVariableRefactoring) refactoring;
-    return new RefactoringInfo(Scope.VARIABLE)
-        .setType(ref.getRefactoringType())
-        .setName(ref.getName())
-        .setText(ref.toString())
+
+    ref.getMergedVariables().forEach(var ->
+        info.addMarking(var.codeRange(), ref.getNewVariable().codeRange()));
+
+    return info.setGroup(Group.VARIABLE)
         .setNameBefore(ref.getMergedVariables().stream().map(x -> x.getVariableName()).collect(
             Collectors.joining()))
-        .setNameAfter(ref.getNewVariable().getVariableName())
-        .setLeftSide(ref.leftSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()))
-        .setRightSide(
-            ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));
+        .setNameAfter(ref.getNewVariable().getVariableName());
   }
 }

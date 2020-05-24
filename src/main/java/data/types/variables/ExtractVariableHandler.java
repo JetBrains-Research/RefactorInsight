@@ -1,27 +1,20 @@
 package data.types.variables;
 
+import data.Group;
 import data.RefactoringInfo;
-import data.Scope;
-import data.TrueCodeRange;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ExtractVariableRefactoring;
-import java.util.Arrays;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 
-public class ExtractVariableHandler implements Handler {
+public class ExtractVariableHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ExtractVariableRefactoring ref = (ExtractVariableRefactoring) refactoring;
-    return new RefactoringInfo(Scope.VARIABLE)
-        .setType(RefactoringType.EXTRACT_VARIABLE)
-        .setName(ref.getName())
-        .setText(ref.toString())
+    return info.setGroup(Group.VARIABLE)
         .setNameBefore(ref.getOperationBefore().getClassName())
         .setNameAfter(ref.getOperationAfter().getClassName())
-        .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getVariableDeclaration().codeRange())))
-        .setRightSide(
-            Arrays.asList(new TrueCodeRange(ref.getExtractedVariableDeclarationCodeRange())));
+        .addMarking(ref.getVariableDeclaration().codeRange(),
+            ref.getExtractedVariableDeclarationCodeRange());
   }
 }

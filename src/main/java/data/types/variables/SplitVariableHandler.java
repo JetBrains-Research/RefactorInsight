@@ -1,27 +1,23 @@
 package data.types.variables;
 
+import data.Group;
 import data.RefactoringInfo;
-import data.Scope;
-import data.TrueCodeRange;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.SplitVariableRefactoring;
 import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
 
-public class SplitVariableHandler implements Handler {
+public class SplitVariableHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     SplitVariableRefactoring ref = (SplitVariableRefactoring) refactoring;
-    return new RefactoringInfo(Scope.VARIABLE)
-        .setType(ref.getRefactoringType())
-        .setName(ref.getName())
-        .setText(ref.toString())
-        .setNameBefore(ref.getOldVariable().getVariableName())
+
+    ref.getSplitVariables().forEach(var ->
+        info.addMarking(ref.getOldVariable().codeRange(), var.codeRange()));
+
+    return info.setGroup(Group.VARIABLE).setNameBefore(ref.getOldVariable().getVariableName())
         .setNameAfter(ref.getSplitVariables().stream().map(x -> x.getVariableName()).collect(
-            Collectors.joining()))
-        .setLeftSide(ref.leftSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()))
-        .setRightSide(
-            ref.rightSide().stream().map(TrueCodeRange::new).collect(Collectors.toList()));
+            Collectors.joining()));
   }
 }

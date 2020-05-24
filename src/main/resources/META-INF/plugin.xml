@@ -34,6 +34,10 @@
             <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
             <keyboard-shortcut first-keystroke="control alt R" keymap="$default"/>
         </action>
+        <action id="DiffTestAction" class="actions.DiffTestAction" text="DiffTest"
+                description="Testing dem diffs">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+        </action>
     </actions>
 
     <projectListeners>

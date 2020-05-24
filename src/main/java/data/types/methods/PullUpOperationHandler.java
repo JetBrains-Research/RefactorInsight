@@ -1,33 +1,26 @@
 package data.types.methods;
 
+import data.Group;
 import data.RefactoringInfo;
-import data.Scope;
-import data.TrueCodeRange;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.PullUpOperationRefactoring;
-import java.util.Arrays;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 
-public class PullUpOperationHandler implements Handler {
+public class PullUpOperationHandler extends Handler {
 
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     PullUpOperationRefactoring ref = (PullUpOperationRefactoring) refactoring;
-    return new RefactoringInfo(Scope.METHOD)
-        .setType(RefactoringType.PULL_UP_OPERATION)
-        .setText(ref.toString())
-        .setName(ref.getName())
+    //TODO check ammount of files
+    return info.setGroup(Group.METHOD)
         .setElementBefore("from class " + ref.getOriginalOperation().getClassName() + ": "
             + ref.getMovedOperation().getName())
         .setElementAfter(" to class "
             + ref.getMovedOperation().getClassName())
-        .setLeftSide(
-            Arrays.asList(new TrueCodeRange(ref.getSourceOperationCodeRangeBeforeMove())))
-        .setRightSide(
-            Arrays.asList(new TrueCodeRange(ref.getTargetOperationCodeRangeAfterMove())))
-        .setNameBefore(Handler.calculateSignature(ref.getOriginalOperation()))
-        .setNameAfter(Handler.calculateSignature(ref.getMovedOperation()));
+        .addMarking(ref.getSourceOperationCodeRangeBeforeMove(),
+            ref.getTargetOperationCodeRangeAfterMove())
+        .setNameBefore(calculateSignature(ref.getOriginalOperation()))
+        .setNameAfter(calculateSignature(ref.getMovedOperation()));
   }
 }

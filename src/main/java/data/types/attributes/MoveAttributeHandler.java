@@ -1,26 +1,20 @@
 package data.types.attributes;
 
+import data.Group;
 import data.RefactoringInfo;
-import data.Scope;
-import data.TrueCodeRange;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MoveAttributeRefactoring;
-import java.util.Arrays;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 
-public class MoveAttributeHandler implements Handler {
+public class MoveAttributeHandler extends Handler {
 
   @Override
-  public RefactoringInfo handle(Refactoring refactoring) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     MoveAttributeRefactoring ref = (MoveAttributeRefactoring) refactoring;
-    return new RefactoringInfo(Scope.ATTRIBUTE)
-        .setType(RefactoringType.MOVE_ATTRIBUTE)
-        .setName(ref.getName())
-        .setText(ref.toString())
-        .setNameBefore(ref.getSourceClassName())
+    return info.setGroup(Group.ATTRIBUTE).setNameBefore(ref.getSourceClassName())
         .setNameAfter(ref.getTargetClassName())
-        .setLeftSide(Arrays.asList(new TrueCodeRange(ref.getOriginalAttribute().codeRange())))
-        .setRightSide(Arrays.asList(new TrueCodeRange(ref.getMovedAttribute().codeRange())));
+        .addMarking(ref.getSourceAttributeCodeRangeBeforeMove(),
+            ref.getTargetAttributeCodeRangeAfterMove());
+
   }
 }
