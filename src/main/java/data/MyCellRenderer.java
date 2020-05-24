@@ -50,6 +50,9 @@ class MyCellRenderer extends JBDefaultTreeCellRenderer {
     } else if (name.contains("Interface")) {
       icon = AllIcons.Nodes.Interface;
     }
+    if (node.getRoot().equals(node.getParent())) {
+      icon = AllIcons.Actions.SuggestedRefactoringBulb;
+    }
     setIcon(icon);
 
     return this;

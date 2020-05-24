@@ -14,10 +14,14 @@ public class ChangeVariableTypeHandler extends Handler {
     //TODO ref.getRalatedRefactorings might help in combining refactorings such as
     //TODO renaming variables and corresponding methods
     return info.setGroup(Group.VARIABLE)
-        .setElementBefore(null)
-        .setElementAfter(null)
-        .setNameBefore(ref.getOriginalVariable().toQualifiedString())
-        .setNameAfter(ref.getChangedTypeVariable().toQualifiedString())
+        .setNameBefore(
+            ref.getOriginalVariable().getVariableName() + " in method "
+                + ref.getOperationAfter().getName())
+        .setNameAfter(
+            ref.getOriginalVariable().getVariableName() + " in method "
+                + ref.getOperationAfter().getName())
+        .setElementBefore(ref.getOriginalVariable().toQualifiedString())
+        .setElementAfter(ref.getChangedTypeVariable().toQualifiedString())
         .addMarking(ref.getOriginalVariable().codeRange(),
             ref.getChangedTypeVariable().codeRange());
   }

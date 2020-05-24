@@ -12,10 +12,12 @@ public class RenameVariableHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RenameVariableRefactoring ref = (RenameVariableRefactoring) refactoring;
     return info.setGroup(Group.VARIABLE)
-        .setElementBefore(null)
-        .setElementAfter(null)
-        .setNameBefore(ref.getOriginalVariable().getVariableName())
-        .setNameAfter(ref.getRenamedVariable().getVariableName())
+        .setNameBefore(ref.getOriginalVariable().getVariableName() + " in method "
+            + ref.getOperationBefore().getName())
+        .setNameAfter(ref.getOriginalVariable().getVariableName() + " in method "
+            + ref.getOperationBefore().getName())
+        .setElementBefore(ref.getOriginalVariable().getVariableDeclaration().toQualifiedString())
+        .setElementAfter(ref.getRenamedVariable().getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOriginalVariable().codeRange(), ref.getRenamedVariable().codeRange());
   }
 }

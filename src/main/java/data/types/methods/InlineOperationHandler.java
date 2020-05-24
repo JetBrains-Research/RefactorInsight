@@ -17,7 +17,7 @@ public class InlineOperationHandler extends Handler {
         .setElementAfter(" in method " + ref.getTargetOperationAfterInline().getName())
         .setNameBefore(calculateSignature(ref.getTargetOperationBeforeInline()))
         .setNameAfter(calculateSignature(ref.getTargetOperationAfterInline()))
-        .addMarking(ref.getTargetOperationCodeRangeBeforeInline(),
-            ref.getInlinedCodeRangeFromInlinedOperation());
+        .addMarking(ref.getInlinedCodeRangeFromInlinedOperation(),
+            ref.getInlinedCodeRangeInTargetOperation());
   }
 }
