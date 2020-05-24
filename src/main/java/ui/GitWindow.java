@@ -1,39 +1,24 @@
 package ui;
 
 import com.intellij.diff.DiffContentFactoryEx;
-import com.intellij.diff.DiffContext;
 import com.intellij.diff.DiffManager;
-import com.intellij.diff.FrameDiffTool;
-import com.intellij.diff.chains.DiffRequestChain;
 import com.intellij.diff.contents.DiffContent;
-import com.intellij.diff.impl.DiffWindow;
 import com.intellij.diff.requests.SimpleDiffRequest;
-import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
-import com.intellij.diff.tools.simple.ThreesideDiffChangeBase;
-import com.intellij.diff.tools.simple.ThreesideTextDiffViewerEx;
-import com.intellij.diff.tools.util.side.ThreesideDiffViewer;
-import com.intellij.diff.tools.util.side.ThreesideTextDiffViewer;
-import com.intellij.diff.util.DiffDividerDrawUtil;
 import com.intellij.diff.util.DiffUserDataKeysEx;
-import com.intellij.diff.util.Side;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
-import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.WindowWrapper;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.VcsCommitMetadata;
-import com.intellij.vcs.log.VcsFullCommitDetails;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
@@ -43,8 +28,6 @@ import data.RefactoringInfo;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.event.ListSelectionEvent;
@@ -52,7 +35,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import services.MiningService;
 import services.RefactoringsBundle;
 
@@ -215,8 +197,8 @@ public class GitWindow extends ToggleAction {
       SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
           diffContentBefore, diffContentAfter, info.getBeforePath(), info.getAfterPath());
 
-      int lineCountBefore = (int) contentBefore.chars().filter(c -> c =='\n').count() + 1;
-      int lineCountAfter = (int) contentAfter.chars().filter(c -> c =='\n').count() + 1;
+      int lineCountBefore = (int) contentBefore.chars().filter(c -> c == '\n').count() + 1;
+      int lineCountAfter = (int) contentAfter.chars().filter(c -> c == '\n').count() + 1;
       request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
           (text1, text2, policy, innerChanges, indicator) ->
               info.getLineMarkings(lineCountBefore, lineCountAfter));

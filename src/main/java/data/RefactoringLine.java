@@ -17,10 +17,11 @@ public class RefactoringLine {
 
   /**
    * Data holder for refactoring code ranges.
+   *
    * @param beforeStart int
-   * @param beforeEnd int
-   * @param afterStart int
-   * @param afterEnd int
+   * @param beforeEnd   int
+   * @param afterStart  int
+   * @param afterEnd    int
    */
   public RefactoringLine(int beforeStart, int beforeEnd, int afterStart, int afterEnd) {
     this.beforeStart = beforeStart;
@@ -35,6 +36,7 @@ public class RefactoringLine {
   /**
    * Returns coderange in a LineFragment object.
    * This object allows highlighting in the IDEA diff window.
+   *
    * @return LineFragment
    */
   public LineFragment toLineFragment() {
@@ -51,13 +53,14 @@ public class RefactoringLine {
   /**
    * Returns coderange in a LineFragment object.
    * This object allows highlighting in the IDEA diff window.
+   *
    * @return LineFragment
    */
   public LineFragment toLineFragment(int maxLineBefore, int maxLineAfter) {
-    if(beforeEnd < 0) {
+    if (beforeEnd < 0) {
       beforeEnd = maxLineBefore;
     }
-    if(afterEnd < 0) {
+    if (afterEnd < 0) {
       afterEnd = maxLineAfter;
     }
     return toLineFragment();
