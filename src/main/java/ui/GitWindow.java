@@ -1,14 +1,27 @@
 package ui;
 
 import com.intellij.diff.DiffContentFactoryEx;
+import com.intellij.diff.DiffContext;
 import com.intellij.diff.DiffManager;
+import com.intellij.diff.FrameDiffTool;
+import com.intellij.diff.chains.DiffRequestChain;
 import com.intellij.diff.contents.DiffContent;
+import com.intellij.diff.impl.DiffWindow;
 import com.intellij.diff.requests.SimpleDiffRequest;
+import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
+import com.intellij.diff.tools.simple.ThreesideDiffChangeBase;
+import com.intellij.diff.tools.simple.ThreesideTextDiffViewerEx;
+import com.intellij.diff.tools.util.side.ThreesideDiffViewer;
+import com.intellij.diff.tools.util.side.ThreesideTextDiffViewer;
+import com.intellij.diff.util.DiffDividerDrawUtil;
 import com.intellij.diff.util.DiffUserDataKeysEx;
+import com.intellij.diff.util.Side;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.WindowWrapper;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
@@ -33,6 +46,7 @@ import javax.swing.JButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import services.MiningService;
 import services.RefactoringsBundle;
 
@@ -169,10 +183,14 @@ public class GitWindow extends ToggleAction {
       String contentBefore = "";
       String contentAfter = "";
       for (Change change : changes) {
-        if (info.getBeforePath().equals(change.getBeforeRevision().getFile().getPath())) {
+        if (change.getBeforeRevision() != null
+            && (project.getBasePath() + "/" + info.getBeforePath())
+            .equals(change.getBeforeRevision().getFile().getPath())) {
           contentBefore = change.getBeforeRevision().getContent();
         }
-        if (info.getAfterPath().equals(change.getAfterRevision().getFile().getPath())) {
+        if (change.getAfterRevision() != null
+            && (project.getBasePath() + "/" + info.getAfterPath())
+            .equals(change.getAfterRevision().getFile().getPath())) {
           contentAfter = change.getAfterRevision().getContent();
         }
       }
@@ -187,6 +205,11 @@ public class GitWindow extends ToggleAction {
 
       request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
           (text1, text2, policy, innerChanges, indicator) -> info.getLineMarkings());
+
+
+
+
+
 
       DiffManager.getInstance().showDiff(project, request);
     } catch (VcsException e) {
