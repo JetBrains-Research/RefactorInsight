@@ -32,11 +32,6 @@ public class RefactoringInfo {
   private List<RefactoringLine> lineMarkings = new ArrayList<>();
   private Group group;
 
-  public RefactoringInfo setGroup(Group group) {
-    this.group = group;
-    return this;
-  }
-
   /**
    * Adds this refactoring to the method history map.
    * Note that it should be called in chronological order.
@@ -160,6 +155,11 @@ public class RefactoringInfo {
 
   public List<LineFragment> getLineMarkings() {
     return lineMarkings.stream().map(RefactoringLine::toLineFragment).collect(Collectors.toList());
+  }
+
+  public List<LineFragment> getLineMarkings(int maxLineBefore, int maxLineAfter) {
+    return lineMarkings.stream().map(l ->
+        l.toLineFragment(maxLineBefore, maxLineAfter)).collect(Collectors.toList());
   }
 
   @Override

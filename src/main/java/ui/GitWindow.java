@@ -215,8 +215,11 @@ public class GitWindow extends ToggleAction {
       SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
           diffContentBefore, diffContentAfter, info.getBeforePath(), info.getAfterPath());
 
+      int lineCountBefore = (int) contentBefore.chars().filter(c -> c =='\n').count() + 1;
+      int lineCountAfter = (int) contentAfter.chars().filter(c -> c =='\n').count() + 1;
       request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
-          (text1, text2, policy, innerChanges, indicator) -> info.getLineMarkings());
+          (text1, text2, policy, innerChanges, indicator) ->
+              info.getLineMarkings(lineCountBefore, lineCountAfter));
 
       DiffManager.getInstance().showDiff(project, request);
     } catch (VcsException e) {

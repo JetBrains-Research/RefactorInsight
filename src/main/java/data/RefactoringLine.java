@@ -48,6 +48,21 @@ public class RefactoringLine {
     }
   }
 
+  /**
+   * Returns coderange in a LineFragment object.
+   * This object allows highlighting in the IDEA diff window.
+   * @return LineFragment
+   */
+  public LineFragment toLineFragment(int maxLineBefore, int maxLineAfter) {
+    if(beforeEnd < 0) {
+      beforeEnd = maxLineBefore;
+    }
+    if(afterEnd < 0) {
+      afterEnd = maxLineAfter;
+    }
+    return toLineFragment();
+  }
+
   public RefactoringLine addOffset(int beforeStart, int beforeEnd, int afterStart, int afterEnd) {
     offsets.add(new RefactoringOffset(beforeStart, beforeEnd, afterStart, afterEnd));
     return this;
