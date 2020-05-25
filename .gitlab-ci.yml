@@ -47,10 +47,10 @@ coverage:
   dependencies:
     - test
   script:
-    - coverage=$(awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/",
+    - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/",
       instructions, "instructions covered"; print 100*covered/instructions, "%
-      covered" }' build/reports/jacoco/test/jacocoTestReport.csv)
+      covered" }' build/reports/jacoco/test/jacocoTestReport.csv
     # - aggregate=$(awk -F"," '{ branches += $6 + $7; covered += $7 } END { print "\nAGGREGATE COVERAGE REPORT"; print covered, "/", branches, "branches covered"; print int(100*covered/branches), "%% covered\n---------------------------\n" }' target/site/jacoco-aggregate/jacoco.csv)
-    - printf "$coverage"
+#    - printf "$coverage"
   coverage: '/Total.*?([0-9]{1,3})%/'
 
