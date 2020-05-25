@@ -198,11 +198,11 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     return methodHistory;
   }
 
-  private void computeMethodHistory(String commitId) {
+  private void computeMethodHistory(@NotNull String commitId) {
     List<RefactoringInfo> refs = new ArrayList<>();
     while (innerState.map.containsKey(commitId)) {
-      RefactoringEntry refactoringEntry = RefactoringEntry
-          .fromString(innerState.map.get(commitId));
+      RefactoringEntry refactoringEntry = RefactoringEntry.fromString(innerState.map.get(commitId));
+      assert refactoringEntry != null;
       refs.addAll(refactoringEntry.getRefactorings());
       commitId = refactoringEntry.getParents().get(0);
     }
