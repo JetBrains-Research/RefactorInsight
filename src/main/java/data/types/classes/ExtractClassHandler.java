@@ -18,6 +18,6 @@ public class ExtractClassHandler extends Handler {
         .setElementBefore("from " + ref.getOriginalClass().getName())
         .setElementAfter("extracted " + ref.getExtractedClass().getName())
         .setNameBefore(ref.getExtractedClass().getName())
-        .setElementAfter(ref.getExtractedClass().getName());
+        .setNameAfter(ref.getExtractedClass().getName());
   }
 }
