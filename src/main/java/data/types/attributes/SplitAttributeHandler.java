@@ -21,6 +21,6 @@ public class SplitAttributeHandler extends Handler {
         .setElementAfter(ref.getSplitAttributes().stream().map(x -> x.getVariableName()).collect(
             Collectors.joining()))
         .setNameBefore(ref.getOldAttribute().getVariableName())
-        .setElementAfter(ref.getOldAttribute().getVariableName());
+        .setNameAfter(ref.getOldAttribute().getVariableName());
   }
 }

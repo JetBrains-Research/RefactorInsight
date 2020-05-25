@@ -12,6 +12,8 @@ public class MoveSourceFolderHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     MoveSourceFolderRefactoring ref = (MoveSourceFolderRefactoring) refactoring;
     //TODO i dont really think a diff window is the best way to display a change of folder
-    return info.setGroup(Group.PACKAGE);
+    return info.setGroup(Group.PACKAGE)
+        .setNameBefore(ref.getPattern().getBefore())
+        .setNameAfter(ref.getPattern().getAfter());
   }
 }
