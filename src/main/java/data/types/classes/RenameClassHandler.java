@@ -13,7 +13,8 @@ public class RenameClassHandler extends Handler {
     RenameClassRefactoring ref = (RenameClassRefactoring) refactoring;
 
     return info.setGroup(Group.CLASS)
-        .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange())
+        .addMarking(ref.getOriginalClass().codeRange(),
+                ref.getRenamedClass().codeRange())
         .setNameBefore(ref.getOriginalClassName())
         .setNameAfter(ref.getRenamedClassName())
         .setElementBefore(null)
