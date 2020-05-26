@@ -22,15 +22,10 @@ build:
     paths:
       - build/
       - .gradle/
-  artifacts:
-    paths:
-      - build/
 
 checkStyle:
   stage: validate
-  script: gradle checkstyleMain
-  dependencies:
-    - build
+  script: gradle --build-cache checkstyleMain
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
@@ -46,14 +41,12 @@ test:
     paths:
       - build/
       - .gradle/
-  dependencies:
-    - build
   artifacts:
     paths:
      - build/reports/jacoco/test
      - build/jacocoHtml
   script:
-    - gradle test
+    - gradle --build-cache test
 
 coverage:
   stage: coverage
