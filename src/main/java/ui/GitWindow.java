@@ -12,9 +12,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
-import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.ui.treeStructure.Tree;
@@ -29,7 +27,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 import javax.swing.DefaultListSelectionModel;
-import javax.swing.JButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -149,24 +146,7 @@ public class GitWindow extends ToggleAction {
       });
       scrollPane.getViewport().setView(tree);
     } else {
-      JBLabel label = new JBLabel(RefactoringsBundle.message("not.mined"));
-
-      JBPanel panel = new JBPanel();
-      JButton button = new JButton("Mine this commit");
-      GitWindow gitWindow = this;
-      button.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-          miningService
-              .mineAtCommit(metadata, project, gitWindow);
-        }
-      });
-      panel.add(button);
-
-      JBSplitter splitter = new JBSplitter(true, (float) 0.1);
-      splitter.setFirstComponent(label);
-      splitter.setSecondComponent(panel);
-      scrollPane.getViewport().setView(splitter);
+      miningService.mineAtCommit(metadata, project, this);
     }
   }
 
