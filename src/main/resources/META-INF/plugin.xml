@@ -41,4 +41,5 @@
     </projectListeners>
 
 
+    <idea-version since-build="2020.1"/>
 </idea-plugin>
