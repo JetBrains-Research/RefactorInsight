@@ -34,7 +34,7 @@ public class RefactoringLine {
   }
 
   /**
-   * Returns coderange in a LineFragment object.
+   * Returns code range in a LineFragment object.
    * This object allows highlighting in the IDEA diff window.
    *
    * @return LineFragment

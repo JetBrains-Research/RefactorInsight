@@ -159,7 +159,7 @@ public class RefactoringInfo {
 
   public List<LineFragment> getLineMarkings(int maxLineBefore, int maxLineAfter) {
     return lineMarkings.stream().map(l ->
-        l.toLineFragment(maxLineBefore, maxLineAfter)).collect(Collectors.toList());
+            l.toLineFragment(maxLineBefore, maxLineAfter)).collect(Collectors.toList());
   }
 
   @Override
