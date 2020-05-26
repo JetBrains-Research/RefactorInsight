@@ -28,7 +28,7 @@ checkStyle:
   script: gradle --build-cache checkstyleMain
   cache:
     key: "$CI_COMMIT_REF_NAME"
-    policy: pull
+    policy: pull-push
     paths:
       - build/
       - .gradle/
@@ -37,7 +37,7 @@ test:
   stage: validate
   cache:
     key: "$CI_COMMIT_REF_NAME"
-    policy: pull
+    policy: pull-push
     paths:
       - build/
       - .gradle/
