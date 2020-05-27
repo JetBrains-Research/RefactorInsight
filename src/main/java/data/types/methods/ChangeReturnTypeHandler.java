@@ -1,4 +1,4 @@
-package data.types.variables;
+package data.types.methods;
 
 import data.Group;
 import data.RefactoringInfo;
@@ -11,7 +11,7 @@ public class ChangeReturnTypeHandler extends Handler {
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ChangeReturnTypeRefactoring ref = (ChangeReturnTypeRefactoring) refactoring;
-    return info.setGroup(Group.VARIABLE)
+    return info.setGroup(Group.METHOD)
         .setElementBefore(ref.getOriginalType().toString())
         .setElementAfter(ref.getChangedType().toString())
         .setNameBefore(calculateSignature(ref.getOperationBefore()))

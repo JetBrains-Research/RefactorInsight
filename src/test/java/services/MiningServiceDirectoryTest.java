@@ -1,10 +1,22 @@
 package services;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import com.intellij.vcs.log.Hash;
+import com.intellij.vcs.log.VcsUser;
+import com.intellij.vcs.log.impl.VcsCommitMetadataImpl;
 import data.RefactoringEntry;
 import git4idea.test.GitSingleRepoTest;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
+import org.mockito.Mockito;
+import ui.GitWindow;
 
 /**
  * Extend GitSingleRepoTest
@@ -23,7 +35,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
     miner = MiningService.getInstance(myProject);
     String thisDir = System.getProperty("user.dir");
     //Make files for source and destination directory
-    File srcDir = new File(thisDir + "/src/test/testData/exampleTestProject");
+    File srcDir = new File(thisDir + "/src/test/testData/example-refactorings copy");
     File destDir = new File(projectPath);
     //Copy directory + contents
     try {
@@ -47,8 +59,62 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
   //Example of using an existing repo
   //note that the project directory has to contain the .git folder but renamed
   public void testDirectory() {
-    String name = RefactoringEntry.fromString(miner.getRefactorings(repo.getCurrentRevision()))
-        .getRefactorings().get(0).getName();
-    assertEquals("Rename Method", name);
+    String head = repo.getCurrentRevision();
+
+    RefactoringEntry entry = miner.getEntry(head);
+    assertNotNull(entry.buildTree());
+
+    assertNull(RefactoringEntry.fromString(""));
+    assertNull(RefactoringEntry.fromString(null));
+
+    assertEquals(1, entry.getRefactorings().size());
+    assertTrue(miner.getRefactorings(head).length() > 0);
+
+    Hash hash = new Hash() {
+      @NotNull
+      @Override
+      public String asString() {
+        return head;
+      }
+
+      @NotNull
+      @Override
+      public String toShortString() {
+        return head;
+      }
+    };
+
+    Hash parent = mock(Hash.class);
+    when(parent.asString()).thenReturn(head.substring(1));
+    List<Hash> parents = Arrays.asList(parent);
+    VcsUser user = new VcsUser() {
+      @NotNull
+      @Override
+      public String getName() {
+        return "test";
+      }
+
+      @NotNull
+      @Override
+      public String getEmail() {
+        return "test";
+      }
+    };
+    VcsCommitMetadataImpl vcsCommitMetadata =
+        new VcsCommitMetadataImpl(hash, parents, 0, projectRoot,
+            "subject", user, "ms", user, 0);
+    assertNotNull(hash);
+
+    GitWindow gitWindow = mock(GitWindow.class);
+    Mockito.doThrow(new NullPointerException()).when(gitWindow).refresh(any());
+    miner.mineAtCommit(vcsCommitMetadata, myProject, gitWindow);
+
+    assertThrows(IllegalArgumentException.class, () -> MiningService.getInstance(null));
+    assertEquals(miner, MiningService.getInstance(myProject));
+    assert miner.getState() != null;
+    assertFalse(miner.getState().map.size() == 0);
+    assertTrue(!miner.isMining());
+    assertFalse(miner.getMethodHistory().isEmpty());
+    assertThrows(NullPointerException.class, () -> miner.mineAndWait(null));
   }
 }

@@ -13,8 +13,8 @@ public class ExtractAttributeHandler extends Handler {
     ExtractAttributeRefactoring ref = (ExtractAttributeRefactoring) refactoring;
 
     return info.setGroup(Group.ATTRIBUTE)
-        .setElementBefore(ref.getOriginalClass().getName())
-        .setElementAfter(ref.getNextClass().getName())
+        .setElementBefore("in class " + ref.getOriginalClass().getName())
+        .setElementAfter(null)
         .setNameBefore(ref.getVariableDeclaration().getName())
         .setNameAfter(ref.getVariableDeclaration().getName())
         .addMarking(ref.getVariableDeclaration().codeRange(),

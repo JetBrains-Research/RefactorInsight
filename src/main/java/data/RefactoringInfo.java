@@ -42,7 +42,7 @@ public class RefactoringInfo {
    * @param map for method history
    */
   public void addToHistory(Map<String, List<RefactoringInfo>> map) {
-    if (group == Group.CLASS && nameBefore != null && nameAfter != null) {
+    if (group == Group.CLASS) {
       Map<String, String> renames = new HashMap<>();
       renames.put(nameBefore, nameAfter);
       renames.forEach((before, after) -> map.keySet().stream()

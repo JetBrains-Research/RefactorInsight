@@ -183,8 +183,8 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    * Get the total amount of commits in a repository.
    *
    * @param repository GitRepository
-   * @return int, amount of commits
-   * @throws IOException bla
+   * @return the amount of commits
+   * @throws IOException in case of a problem
    */
   public int getCommitCount(GitRepository repository) throws IOException {
     Process process = Runtime.getRuntime().exec("git rev-list --all --count", null,

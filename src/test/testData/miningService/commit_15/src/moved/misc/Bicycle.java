@@ -1,5 +1,5 @@
 package misc;
-public class Bicycle {
+public class Bicycle implements Vehicle{
 
     public int gear2;
     public int speed;
