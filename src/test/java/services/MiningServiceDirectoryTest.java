@@ -2,6 +2,7 @@ package services;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.intellij.vcs.log.Hash;
@@ -16,6 +17,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
+import org.mockito.internal.verification.Times;
 import ui.GitWindow;
 
 /**
@@ -70,6 +72,17 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
     assertEquals(1, entry.getRefactorings().size());
     assertTrue(miner.getRefactorings(head).length() > 0);
 
+    assertThrows(IllegalArgumentException.class, () -> MiningService.getInstance(null));
+    assertEquals(miner, MiningService.getInstance(myProject));
+    assertNotNull(miner.getState());
+    assertFalse(miner.getState().map.size() == 0);
+    assertTrue(!miner.isMining());
+    assertFalse(miner.getMethodHistory().isEmpty());
+    assertThrows(NullPointerException.class, () -> miner.mineAndWait(null));
+  }
+
+  public void testMineAtCommit() {
+    String head = repo.getCurrentRevision();
     Hash hash = new Hash() {
       @NotNull
       @Override
@@ -100,21 +113,14 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
         return "test";
       }
     };
+
     VcsCommitMetadataImpl vcsCommitMetadata =
         new VcsCommitMetadataImpl(hash, parents, 0, projectRoot,
             "subject", user, "ms", user, 0);
-    assertNotNull(hash);
 
     GitWindow gitWindow = mock(GitWindow.class);
     Mockito.doThrow(new NullPointerException()).when(gitWindow).refresh(any());
     miner.mineAtCommit(vcsCommitMetadata, myProject, gitWindow);
-
-    assertThrows(IllegalArgumentException.class, () -> MiningService.getInstance(null));
-    assertEquals(miner, MiningService.getInstance(myProject));
-    assert miner.getState() != null;
-    assertFalse(miner.getState().map.size() == 0);
-    assertTrue(!miner.isMining());
-    assertFalse(miner.getMethodHistory().isEmpty());
-    assertThrows(NullPointerException.class, () -> miner.mineAndWait(null));
+    verify(parent, new Times(1)).asString();
   }
 }
