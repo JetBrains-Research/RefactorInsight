@@ -3,7 +3,6 @@ image: gradle:6.0-jdk11
 stages:
   - build
   - validate
-  - test
   - coverage
 
 variables:
@@ -19,29 +18,35 @@ build:
     gradle --build-cache assemble
   cache:
     key: "$CI_COMMIT_REF_NAME"
-    policy: push
+    policy: pull-push
     paths:
       - build/
       - .gradle/
 
 checkStyle:
   stage: validate
-  script: gradle checkstyleMain
+  script: gradle --build-cache checkstyleMain
   cache:
     key: "$CI_COMMIT_REF_NAME"
-    policy: pull
+    policy: pull-push
     paths:
       - build/
       - .gradle/
 
 test:
-  stage: test
+  stage: validate
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull-push
+    paths:
+      - build/
+      - .gradle/
   artifacts:
     paths:
      - build/reports/jacoco/test
      - build/jacocoHtml
   script:
-    - gradle test
+    - gradle --build-cache test
 
 coverage:
   stage: coverage
