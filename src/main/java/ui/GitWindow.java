@@ -16,9 +16,13 @@ public class GitWindow extends ToggleAction {
   @Override
   public void setSelected(@NotNull AnActionEvent e, boolean state) {
     VcsLogGraphTable table = e.getData(VcsLogInternalDataKeys.MAIN_UI).getTable();
-    gitInfo.putIfAbsent(table, new GitWindowInfo(e));
-    gitInfo.values().forEach(v -> v.applyState(state));
-    this.state = state;
+    if (!gitInfo.containsKey(table)) {
+      this.state ^= state;
+      gitInfo.put(table, new GitWindowInfo(e));
+    } else {
+      this.state = state;
+    }
+    gitInfo.values().forEach(v -> v.applyState(this.state));
   }
 
   @Override

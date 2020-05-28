@@ -81,7 +81,6 @@ public class GitWindowInfo {
 
   private void buildComponent() {
     int index = table.getSelectionModel().getAnchorSelectionIndex();
-    System.out.println("build " + index);
     if (index < 0) {
       viewport.setView(new JBLabel(RefactoringsBundle.message("not.selected")));
       return;
