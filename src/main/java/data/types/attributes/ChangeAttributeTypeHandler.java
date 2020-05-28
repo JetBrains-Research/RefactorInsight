@@ -16,8 +16,8 @@ public class ChangeAttributeTypeHandler extends Handler {
             ref.getOriginalAttribute().getVariableName() + " in class "
                 + ref.getClassNameBefore().substring(ref.getClassNameBefore().lastIndexOf(".") + 1))
         .setNameAfter(
-            ref.getOriginalAttribute().getVariableName() + " in class "
-                + ref.getClassNameBefore().substring(ref.getClassNameBefore().lastIndexOf(".") + 1))
+            ref.getChangedTypeAttribute().getVariableName() + " in class "
+                + ref.getClassNameAfter().substring(ref.getClassNameBefore().lastIndexOf(".") + 1))
         .setElementBefore(ref.getOriginalAttribute().toQualifiedString())
         .setElementAfter(ref.getChangedTypeAttribute().toQualifiedString())
         .addMarking(ref.getOriginalAttribute().codeRange(),
