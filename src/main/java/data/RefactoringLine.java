@@ -140,7 +140,7 @@ public class RefactoringLine {
     return this;
   }
 
-    public enum ThreeSidedType {
+  public enum ThreeSidedType {
     LEFT,
     RIGHT,
     BOTH
