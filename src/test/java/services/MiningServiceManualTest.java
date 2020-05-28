@@ -47,6 +47,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import javax.swing.tree.TreeCellRenderer;
 import org.hamcrest.CustomMatcher;
 import org.hamcrest.Matcher;
 import org.junit.rules.ErrorCollector;
@@ -184,21 +185,16 @@ public class MiningServiceManualTest extends GitSingleRepoTest {
           }
           List<RefactoringInfo> refactorings = ((RefactoringEntry) o).getRefactorings();
           Tree tree = ((RefactoringEntry) o).buildTree();
+          final TreeCellRenderer cellRenderer = tree.getCellRenderer();
           Object root = tree.getModel().getRoot();
-          assertNotNull(tree.getCellRenderer()
-              .getTreeCellRendererComponent(tree, root, false,
-                  false, false, 0, false));
+
+          //for each refactoring check that the renderer works properly
           int children = tree.getModel().getChildCount(root);
-          int i = 0;
-          while (i < children) {
-            Object oo = tree.getModel().getChild(root, i);
-            assertNotNull(tree.getCellRenderer()
-                .getTreeCellRendererComponent(tree, oo, false,
-                    false, false, 0, false));
-            assertNotNull(tree.getCellRenderer()
-                .getTreeCellRendererComponent(tree, tree.getModel().getChild(oo, 0), false,
-                    false, true, 0, false));
-            i++;
+          for (int i = 0; i < children; i++) {
+            Object refactoringNode = tree.getModel().getChild(root, i);
+            assertNotNull(cellRenderer
+                .getTreeCellRendererComponent(tree, refactoringNode, false,
+                    false, false, 1, false));
           }
 
           boolean res = true;
