@@ -17,7 +17,10 @@ public class InlineVariableHandler extends Handler {
         .setNameBefore(ref.getVariableDeclaration().getVariableName())
         .setNameAfter(ref.getVariableDeclaration().getVariableName())
         .addMarking(ref.getVariableDeclaration().codeRange(),
-            ref.getInlinedVariableDeclarationCodeRange());
+            ref.getInlinedVariableDeclarationCodeRange(), line ->
+                line.addOffset(ref.getVariableDeclaration().getLocationInfo().getStartOffset(),
+                        ref.getVariableDeclaration().getLocationInfo().getEndOffset(),
+                        0, 0));
 
   }
 }
