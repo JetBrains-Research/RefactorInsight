@@ -22,7 +22,7 @@ public class AddMethodAnnotationHandler extends Handler {
                 annotation.getLocationInfo().getEndLine(),
                 ref.getOperationBefore().codeRange().getFilePath(),
                 annotation.getLocationInfo().getFilePath(),
-                line -> line.addOffset(0, 0,
+            line -> line.addOffset(0, 0,
                         annotation.getLocationInfo().getStartOffset(),
                         annotation.getLocationInfo().getEndOffset()))
         .setNameBefore(calculateSignature(ref.getOperationBefore()))

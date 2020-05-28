@@ -22,7 +22,7 @@ public class RemoveMethodAnnotationHandler extends Handler {
                 ref.getOperationBefore().codeRange().getStartLine() - 1,
                 ref.getOperationBefore().codeRange().getFilePath(),
                 annotation.getLocationInfo().getFilePath(),
-                line -> line.addOffset(annotation.getLocationInfo().getStartOffset(),
+            line -> line.addOffset(annotation.getLocationInfo().getStartOffset(),
                         annotation.getLocationInfo().getEndOffset(),
                         0, 0))
         .setNameBefore(calculateSignature(ref.getOperationBefore()))

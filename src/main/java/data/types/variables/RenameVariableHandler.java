@@ -19,7 +19,7 @@ public class RenameVariableHandler extends Handler {
         .setElementBefore(ref.getOriginalVariable().getVariableDeclaration().toQualifiedString())
         .setElementAfter(ref.getRenamedVariable().getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOriginalVariable().codeRange(), ref.getRenamedVariable().codeRange(),
-                line -> line.addOffset(ref.getOriginalVariable().getLocationInfo(),
+            line -> line.addOffset(ref.getOriginalVariable().getLocationInfo(),
                         ref.getRenamedVariable().getLocationInfo()));
   }
 }

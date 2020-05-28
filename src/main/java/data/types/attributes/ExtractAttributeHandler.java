@@ -27,7 +27,8 @@ public class ExtractAttributeHandler extends Handler {
             info.addMarking(extraction.getStartLine(), extraction.getEndLine(),
                     ref.getExtractedVariableDeclarationCodeRange().getStartLine(),
                     ref.getExtractedVariableDeclarationCodeRange().getEndLine(),
-                    extraction.getFilePath(), ref.getExtractedVariableDeclarationCodeRange().getFilePath()));
+                    extraction.getFilePath(),
+                    ref.getExtractedVariableDeclarationCodeRange().getFilePath()));
     return info;
   }
 }

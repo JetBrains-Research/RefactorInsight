@@ -24,7 +24,7 @@ public class ChangeVariableTypeHandler extends Handler {
         .setElementAfter(ref.getChangedTypeVariable().toQualifiedString())
         .addMarking(ref.getOriginalVariable().codeRange(),
             ref.getChangedTypeVariable().codeRange(),
-                line -> line.addOffset(ref.getOriginalVariable().getType().getLocationInfo(),
+            line -> line.addOffset(ref.getOriginalVariable().getType().getLocationInfo(),
                         ref.getChangedTypeVariable().getType().getLocationInfo()));
   }
 }

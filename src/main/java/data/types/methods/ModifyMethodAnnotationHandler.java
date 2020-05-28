@@ -16,7 +16,7 @@ public class ModifyMethodAnnotationHandler extends Handler {
         .setElementBefore(ref.getAnnotationBefore().toString())
         .setElementAfter(ref.getAnnotationAfter().toString())
         .addMarking(ref.getAnnotationBefore().codeRange(), ref.getAnnotationAfter().codeRange(),
-                line -> line.addOffset(ref.getAnnotationBefore().getLocationInfo(),
+            line -> line.addOffset(ref.getAnnotationBefore().getLocationInfo(),
                         ref.getAnnotationAfter().getLocationInfo()))
         .setNameBefore(calculateSignature(ref.getOperationBefore()))
         .setNameAfter(calculateSignature(ref.getOperationAfter()));
