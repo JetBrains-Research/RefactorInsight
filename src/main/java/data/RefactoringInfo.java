@@ -220,12 +220,6 @@ public class RefactoringInfo {
         l.getTwoSidedRange(maxLineBefore, maxLineAfter)).collect(Collectors.toList());
   }
 
-
-  public List<LineFragment> getLineMarkings(int maxLineBefore, int maxLineAfter) {
-    return lineMarkings.stream().map(l ->
-            l.toLineFragment(maxLineBefore, maxLineAfter)).collect(Collectors.toList());
-  }
-
   /**
    *  Get line markings for two sided window.
    *  Should only be called if isThreeSided() evaluates to true.
