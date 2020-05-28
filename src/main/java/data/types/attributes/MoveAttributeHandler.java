@@ -17,7 +17,9 @@ public class MoveAttributeHandler extends Handler {
         .setNameBefore(ref.getOriginalAttribute().getName())
         .setNameAfter(ref.getOriginalAttribute().getName())
         .addMarking(ref.getSourceAttributeCodeRangeBeforeMove(),
-            ref.getTargetAttributeCodeRangeAfterMove());
+            ref.getTargetAttributeCodeRangeAfterMove(), line ->
+                line.addOffset(ref.getOriginalAttribute().getLocationInfo(),
+                        ref.getMovedAttribute().getVariableDeclaration().getLocationInfo()));
 
   }
 }
