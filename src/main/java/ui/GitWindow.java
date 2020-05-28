@@ -1,11 +1,6 @@
 package ui;
 
 import com.intellij.diff.DiffContentFactoryEx;
-import com.intellij.diff.DiffManager;
-import com.intellij.diff.contents.DiffContent;
-import com.intellij.diff.requests.SimpleDiffRequest;
-import com.intellij.diff.util.DiffUserDataKeysEx;
-import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.project.Project;
@@ -154,36 +149,34 @@ public class GitWindow extends ToggleAction {
     try {
       Collection<Change> changes = table.getModel().getFullDetails(index).getChanges(0);
 
-      String contentBefore = "";
-      String contentAfter = "";
+      String left = "";
+      String right = "";
       for (Change change : changes) {
         if (change.getBeforeRevision() != null
-            && (project.getBasePath() + "/" + info.getBeforePath())
+            && (project.getBasePath() + "/" + info.getLeftPath())
             .equals(change.getBeforeRevision().getFile().getPath())) {
-          contentBefore = change.getBeforeRevision().getContent();
+          left = change.getBeforeRevision().getContent();
         }
         if (change.getAfterRevision() != null
-            && (project.getBasePath() + "/" + info.getAfterPath())
+            && (project.getBasePath() + "/" + info.getRightPath())
             .equals(change.getAfterRevision().getFile().getPath())) {
-          contentAfter = change.getAfterRevision().getContent();
+          right = change.getAfterRevision().getContent();
         }
       }
+      String mid = "";
+      if (info.isThreeSided()) {
+        for (Change change : changes) {
+          if (change.getAfterRevision() != null
+              && (project.getBasePath() + "/" + info.getMidPath())
+              .equals(change.getAfterRevision().getFile().getPath())) {
+            mid = change.getAfterRevision().getContent();
+          }
+        }
+        DiffWindow.showDiff(left, mid, right, info, project);
+      } else {
+        DiffWindow.showDiff(left, right, info, project);
+      }
 
-      DiffContent diffContentBefore = myDiffContentFactory.create(project, contentBefore,
-          JavaClassFileType.INSTANCE);
-      DiffContent diffContentAfter = myDiffContentFactory.create(project, contentAfter,
-          JavaClassFileType.INSTANCE);
-
-      SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
-          diffContentBefore, diffContentAfter, info.getBeforePath(), info.getAfterPath());
-
-      int lineCountBefore = (int) contentBefore.chars().filter(c -> c == '\n').count() + 1;
-      int lineCountAfter = (int) contentAfter.chars().filter(c -> c == '\n').count() + 1;
-      request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
-          (text1, text2, policy, innerChanges, indicator) ->
-              info.getLineMarkings(lineCountBefore, lineCountAfter));
-
-      DiffManager.getInstance().showDiff(project, request);
     } catch (VcsException e) {
       e.printStackTrace();
     }

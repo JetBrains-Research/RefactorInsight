@@ -16,6 +16,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
+        <diff.DiffExtension implementation="ui.DiffWindow"/>
         <projectService serviceImplementation="services.MiningService"/>
     </extensions>
 
