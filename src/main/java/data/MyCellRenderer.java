@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ui.JBDefaultTreeCellRenderer;
 import java.awt.Component;
 import javax.swing.Icon;
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -38,7 +39,7 @@ class MyCellRenderer extends JBDefaultTreeCellRenderer {
     } else if (name.contains("Method")) {
       icon = AllIcons.Nodes.Method;
     } else if (name.contains("Attribute")) {
-      icon = AllIcons.Nodes.ObjectTypeAttribute;
+      icon = AllIcons.Nodes.Field;
     } else if (name.contains("Variable")) {
       icon = AllIcons.Nodes.Variable;
     } else if (name.contains("Parameter")) {
@@ -54,7 +55,6 @@ class MyCellRenderer extends JBDefaultTreeCellRenderer {
       icon = AllIcons.Actions.SuggestedRefactoringBulb;
     }
     setIcon(icon);
-
     return this;
   }
 }

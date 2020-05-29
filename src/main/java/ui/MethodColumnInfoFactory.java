@@ -1,15 +1,9 @@
 package ui;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.VcsException;
-import com.intellij.util.text.DateFormatUtil;
 import com.intellij.util.text.JBDateFormat;
 import com.intellij.util.ui.ColumnInfo;
 import data.RefactoringInfo;
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.util.Comparator;
-import java.util.Date;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -50,52 +44,34 @@ class MethodColumnInfoFactory {
           .formatPrettyDateTime(methodItem.getTimestamp());
     }
 
-    @Nullable
-    @Override
-    public Comparator<RefactoringInfo> getComparator() {
-      return Comparator.comparing(RefactoringInfo::getTimestamp);
-    }
-
   }
 
   static class NameInfo extends ColumnInfo<RefactoringInfo, String> {
 
     public NameInfo() {
-      super("Name at That Time");
+      super("Name");
     }
 
     @Nullable
     @Override
     public String valueOf(RefactoringInfo methodItem) {
-      String name = methodItem.getNameAfter();
-      return name.substring(name.lastIndexOf('.') + 1);
-    }
-
-    @Nullable
-    @Override
-    public Comparator<RefactoringInfo> getComparator() {
-      return Comparator.comparing(RefactoringInfo::getNameAfter);
+      return methodItem.getDisplayableName();
     }
   }
 
   static class ClassInfo extends ColumnInfo<RefactoringInfo, String> {
 
     public ClassInfo() {
-      super("Class at That Time");
+      super("Change");
     }
 
     @Nullable
     @Override
     public String valueOf(RefactoringInfo methodItem) {
-      String name = methodItem.getNameAfter();
-      name = name.substring(0, name.lastIndexOf('.'));
-      return name.substring(name.lastIndexOf('.') + 1);
-    }
-
-    @Nullable
-    @Override
-    public Comparator<RefactoringInfo> getComparator() {
-      return Comparator.comparing(RefactoringInfo::getNameAfter);
+      if (methodItem.getDisplayableElement() == null) {
+        return methodItem.getDisplayableName();
+      }
+      return methodItem.getDisplayableElement();
     }
   }
 
@@ -109,13 +85,7 @@ class MethodColumnInfoFactory {
     @Nullable
     @Override
     public String valueOf(RefactoringInfo methodItem) {
-      return methodItem.getType().toString().toLowerCase().replace('_', ' ');
-    }
-
-    @Nullable
-    @Override
-    public Comparator<RefactoringInfo> getComparator() {
-      return Comparator.comparing(o -> o.getType().toString());
+      return methodItem.getType().getDisplayName();
     }
   }
 }

@@ -19,12 +19,18 @@ import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.visible.filters.VcsLogFilterObject;
 import data.RefactoringInfo;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.EventObject;
 import java.util.List;
+import javax.swing.CellEditor;
 import javax.swing.JLabel;
+import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.event.CellEditorListener;
+import javax.swing.table.TableCellEditor;
 import services.RefactoringsBundle;
 
 
@@ -85,6 +91,7 @@ public class MethodRefactoringToolbar {
           new MethodColumnInfoFactory().getColumnInfos(), refactorings);
       JBTable table = new JBTable(model);
 
+
       MouseAdapter mouseAdapter = new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -121,7 +128,7 @@ public class MethodRefactoringToolbar {
       toolWindow.getContentManager().addContent(content);
     }
     toolWindow.getContentManager().setSelectedContent(content);
-    toolWindow.setIcon(AllIcons.Ide.Rating);
+    toolWindow.setIcon(AllIcons.Actions.RefactoringBulb);
     toolWindow.show();
 
   }

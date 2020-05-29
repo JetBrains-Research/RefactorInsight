@@ -212,8 +212,8 @@ public class RefactoringInfo {
   }
 
   /**
-   *  Get line markings for two sided window.
-   *  Should only be called if isThreeSided() evaluates to false.
+   * Get line markings for two sided window.
+   * Should only be called if isThreeSided() evaluates to false.
    */
   public List<LineFragment> getTwoSidedLineMarkings(int maxLineBefore, int maxLineAfter) {
     return lineMarkings.stream().map(l ->
@@ -221,14 +221,14 @@ public class RefactoringInfo {
   }
 
   /**
-   *  Get line markings for two sided window.
-   *  Should only be called if isThreeSided() evaluates to true.
+   * Get line markings for two sided window.
+   * Should only be called if isThreeSided() evaluates to true.
    */
   @SuppressWarnings("checkstyle")
   public List<SimpleThreesideDiffChange> getThreeSidedLineMarkings(int maxLineLeft,
                                                                    int maxLineMid,
                                                                    int maxLineRight,
-                                                          SimpleThreesideDiffViewer viewer) {
+                                                                   SimpleThreesideDiffViewer viewer) {
     return lineMarkings.stream()
         .map(line -> line.getThreeSidedRange(maxLineLeft, maxLineMid, maxLineRight, viewer))
         .collect(Collectors.toList());
@@ -312,24 +312,33 @@ public class RefactoringInfo {
    */
   public DefaultMutableTreeNode makeNode() {
     DefaultMutableTreeNode node = new DefaultMutableTreeNode(this);
-    DefaultMutableTreeNode child = new DefaultMutableTreeNode(getDisplayableElement());
+    DefaultMutableTreeNode child = new DefaultMutableTreeNode(getDisplayableName());
     node.add(child);
     addLeaves(child);
     return node;
   }
 
   private void addLeaves(DefaultMutableTreeNode node) {
-    if (elementBefore == null) {
+    String displayableElement = getDisplayableElement();
+    if (displayableElement == null) {
       return;
+    }
+    node.add(new DefaultMutableTreeNode(displayableElement));
+  }
+
+  public String getDisplayableElement() {
+    if (elementBefore == null) {
+      return null;
     }
     String info = elementBefore;
     if (elementAfter != null) {
       info += " -> " + elementAfter;
     }
-    node.add(new DefaultMutableTreeNode(info));
+    return info;
   }
 
-  private String getDisplayableElement() {
+
+  public String getDisplayableName() {
     String before = nameBefore;
     if (before.contains(".")) {
       before = nameBefore.substring(nameBefore.lastIndexOf(".") + 1);
