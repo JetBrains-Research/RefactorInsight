@@ -28,7 +28,7 @@ public class Utils {
    */
   public static int indexOfDifference(String nameBefore, String nameAfter) {
     int minLen = Math.min(nameBefore.length(), nameAfter.length());
-    int index = -1;
+    int index = 0;
     for (int i = 0; i != minLen; i++) {
       char chA = nameBefore.charAt(i);
       char chB = nameAfter.charAt(i);

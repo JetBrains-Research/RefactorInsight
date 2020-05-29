@@ -38,7 +38,7 @@ public class MyCellRenderer extends JBDefaultTreeCellRenderer {
       if (isMethodHistory) {
 
         StringBuffer html = new StringBuffer(
-            "<html> " + name + " <font color=\"#696969\"> at "
+            "<html> " + name + " <font color=\"#696969\"> "
                 + JBDateFormat.getFormatter()
                 .formatPrettyDateTime(info.getTimestamp()) + "</font></html>");
         setText(html.toString());
