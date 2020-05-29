@@ -9,7 +9,6 @@ import utils.Utils;
 
 public class PullUpOperationHandler extends Handler {
 
-
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     PullUpOperationRefactoring ref = (PullUpOperationRefactoring) refactoring;

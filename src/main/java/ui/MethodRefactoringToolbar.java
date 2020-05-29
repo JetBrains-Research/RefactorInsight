@@ -8,6 +8,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.ui.Gray;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -93,14 +94,16 @@ public class MethodRefactoringToolbar {
       });
 
       splitter.setFirstComponent(tree);
-      splitter.setSecondComponent(
-          new JBLabel("Double click to jump at commit.", SwingConstants.CENTER));
+      final JBLabel component =
+          new JBLabel("Double click to jump at commit.", SwingConstants.CENTER);
+      component.setForeground(Gray._105);
+      splitter.setSecondComponent(component);
       JBScrollPane pane = new JBScrollPane(splitter);
       int size = refactorings.size();
       JBLabel label =
           new JBLabel(
               size + (size > 1 ? " refactorings" : " refactoring") + " detected for this method");
-      label.setForeground(new Color(105, 105, 105));
+      label.setForeground(Gray._105);
       pane.setColumnHeaderView(label);
       showContent(methodName, pane);
     }
