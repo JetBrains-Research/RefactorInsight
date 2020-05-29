@@ -66,24 +66,6 @@ public class MethodRefactoringToolbar {
       tree.setCellRenderer(new MyCellRenderer(true));
 
 
-      /*tree.addMouseMotionListener(new MouseMotionAdapter() {
-        @Override
-        public void mouseDragged(MouseEvent e) {
-          super.mouseDragged(e);
-          TreePath path = tree.getPathForLocation(e.getX(), e.getY());
-          if (path == null) {
-            return;
-          }
-          DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-              path.getLastPathComponent();
-          if (node.isLeaf()) {
-            JBLabel l = new JBLabel("Double click to go at this commit");
-            JBPopup popup = JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(l, null).createPopup();
-            popup.show(new RelativePoint(e.getPoint()));
-          }
-        }
-      });*/
       tree.addMouseListener(new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent e) {

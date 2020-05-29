@@ -3,11 +3,9 @@ package data;
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.JBDefaultTreeCellRenderer;
 import com.intellij.util.text.JBDateFormat;
-import java.awt.Color;
 import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.JTree;
-import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 public class MyCellRenderer extends JBDefaultTreeCellRenderer {
@@ -38,8 +36,13 @@ public class MyCellRenderer extends JBDefaultTreeCellRenderer {
     String name = info.getType().getDisplayName();
     if (node.getUserObject() instanceof RefactoringInfo) {
       if (isMethodHistory) {
-        setText(name + " at " + JBDateFormat.getFormatter()
-            .formatPrettyDateTime(info.getTimestamp()));
+
+        StringBuffer html = new StringBuffer(
+            "<html> " + name + " <font color=\"#696969\"> at "
+                + JBDateFormat.getFormatter()
+                .formatPrettyDateTime(info.getTimestamp()) + "</font></html>");
+        setText(html.toString());
+
       } else {
         setText(name);
       }
