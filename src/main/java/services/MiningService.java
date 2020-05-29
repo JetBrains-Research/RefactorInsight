@@ -1,5 +1,6 @@
 package services;
 
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;
@@ -32,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jetbrains.annotations.NotNull;
 import processors.CommitMiner;
 import ui.GitWindow;
+import ui.GitWindowInfo;
 
 @State(name = "MiningRefactoringsState",
     storages = {@Storage("refactorings.xml")})
@@ -41,11 +43,9 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   public static ConcurrentHashMap<String, List<RefactoringInfo>> methodHistory
       = new ConcurrentHashMap<>();
   private boolean mining = false;
-  private Project project;
   private MyState innerState = new MyState();
 
-  public MiningService(Project project) {
-    this.project = project;
+  public MiningService() {
   }
 
   public static MiningService getInstance(@NotNull Project project) {
@@ -152,12 +152,11 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
   /**
    * Method for mining a single commit.
-   *
-   * @param commit    to be mined.
+   *  @param commit    to be mined.
    * @param project   current project.
-   * @param gitWindow to be updated.
+   * @param info to be updated.
    */
-  public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow gitWindow) {
+  public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindowInfo info) {
     System.out.println("Mining commit " + commit.getId().asString());
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(project, "Mining at commit " + commit.getId().asString()) {
@@ -166,7 +165,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             super.onFinished();
             System.out.println("Mining commit done");
             ApplicationManager.getApplication()
-                .invokeLater(() -> gitWindow.refresh(commit.getId().asString()));
+                .invokeLater(() -> info.refresh(commit.getId().asString()));
           }
 
           public void run(@NotNull ProgressIndicator progressIndicator) {
