@@ -14,6 +14,10 @@ public class AddParameterHandler extends Handler {
         .setNameBefore(calculateSignature(ref.getOperationBefore()))
         .setNameAfter(calculateSignature(ref.getOperationAfter()))
         .setElementBefore(ref.getParameter().getVariableDeclaration().toQualifiedString())
-        .setElementAfter(null);
+        .setElementAfter(null)
+        .addMarking(ref.getOperationBefore().codeRange(), ref.getOperationAfter().codeRange(),
+            line -> line.addOffset(0, 0,
+                ref.getParameter().getVariableDeclaration().getLocationInfo().getStartOffset(),
+                ref.getParameter().getVariableDeclaration().getLocationInfo().getEndOffset()));
   }
 }
