@@ -8,8 +8,10 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.treeStructure.Tree;
@@ -19,10 +21,13 @@ import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.visible.filters.VcsLogFilterObject;
 import data.MyCellRenderer;
 import data.RefactoringInfo;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import javax.swing.JComponent;
+import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.jetbrains.annotations.NotNull;
@@ -60,6 +65,9 @@ public class MethodRefactoringToolbar {
     if (refactorings == null || refactorings.isEmpty()) {
       showPopup(datacontext);
     } else {
+
+      JBSplitter splitter = new JBSplitter(false, (float) 0.5);
+
       Tree tree = createTree(refactorings);
       tree.setRootVisible(false);
       Utils.expandAllNodes(tree, 0, tree.getRowCount());
@@ -77,14 +85,24 @@ public class MethodRefactoringToolbar {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)
                 path.getLastPathComponent();
             if (node.isLeaf()) {
-              RefactoringInfo info = (RefactoringInfo)
-                  node.getUserObjectPath()[1];
+              RefactoringInfo info = (RefactoringInfo) node.getUserObjectPath()[1];
               showLogTab(info);
             }
           }
         }
       });
-      showContent(methodName, tree);
+
+      splitter.setFirstComponent(tree);
+      splitter.setSecondComponent(
+          new JBLabel("Double click to jump at commit.", SwingConstants.CENTER));
+      JBScrollPane pane = new JBScrollPane(splitter);
+      int size = refactorings.size();
+      JBLabel label =
+          new JBLabel(
+              size + (size > 1 ? " refactorings" : " refactoring") + " detected for this method");
+      label.setForeground(new Color(105, 105, 105));
+      pane.setColumnHeaderView(label);
+      showContent(methodName, pane);
     }
 
   }
@@ -114,7 +132,7 @@ public class MethodRefactoringToolbar {
     return new Tree(root);
   }
 
-  private void showContent(String methodName, Tree tree) {
+  private void showContent(String methodName, JComponent tree) {
     Content content;
     if ((content = toolWindow.getContentManager().findContent(methodName)) != null) {
       content.setComponent(tree);
