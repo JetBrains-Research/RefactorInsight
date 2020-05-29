@@ -23,7 +23,6 @@ public class RefactoringInfo {
   @Nullable
   String elementAfter;
   private transient RefactoringEntry entry;
-  private String text;
   private String name;
   private String nameBefore;
   private String nameAfter;
@@ -72,14 +71,6 @@ public class RefactoringInfo {
     return this;
   }
 
-  public String getText() {
-    return text;
-  }
-
-  public RefactoringInfo setText(String text) {
-    this.text = text;
-    return this;
-  }
 
   public RefactoringEntry getEntry() {
     return entry;
@@ -224,11 +215,11 @@ public class RefactoringInfo {
    * Get line markings for two sided window.
    * Should only be called if isThreeSided() evaluates to true.
    */
-  @SuppressWarnings("checkstyle")
   public List<SimpleThreesideDiffChange> getThreeSidedLineMarkings(int maxLineLeft,
                                                                    int maxLineMid,
                                                                    int maxLineRight,
-                                                                   SimpleThreesideDiffViewer viewer) {
+                                                                   SimpleThreesideDiffViewer
+                                                                       viewer) {
     return lineMarkings.stream()
         .map(line -> line.getThreeSidedRange(maxLineLeft, maxLineMid, maxLineRight, viewer))
         .collect(Collectors.toList());
@@ -306,7 +297,7 @@ public class RefactoringInfo {
   }
 
   /**
-   * Creates a DefaultMutableTreeNode for the git window UI.
+   * Creates a DefaultMutableTreeNode for the UI.
    *
    * @return the node.
    */
@@ -318,7 +309,13 @@ public class RefactoringInfo {
     return node;
   }
 
-  private void addLeaves(DefaultMutableTreeNode node) {
+  /**
+   * Adds leaves for refactorings where the element
+   * is not null.
+   *
+   * @param node to add leaves to.
+   */
+  public void addLeaves(DefaultMutableTreeNode node) {
     String displayableElement = getDisplayableElement();
     if (displayableElement == null) {
       return;
@@ -326,6 +323,12 @@ public class RefactoringInfo {
     node.add(new DefaultMutableTreeNode(displayableElement));
   }
 
+  /**
+   * Method for create a presentable String out of the
+   * element changes for a refactoring.
+   *
+   * @return presentable String that shows the changes.
+   */
   public String getDisplayableElement() {
     if (elementBefore == null) {
       return null;
@@ -338,6 +341,12 @@ public class RefactoringInfo {
   }
 
 
+  /**
+   * Method for create a presentable String out of the
+   * name refactoring.
+   *
+   * @return presentable String that shows the changes if existent, else shows a presentable name.
+   */
   public String getDisplayableName() {
     String before = nameBefore;
     if (before.contains(".")) {

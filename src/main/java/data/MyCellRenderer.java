@@ -2,16 +2,25 @@ package data;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.JBDefaultTreeCellRenderer;
+import com.intellij.util.text.JBDateFormat;
+import java.awt.Color;
 import java.awt.Component;
 import javax.swing.Icon;
-import javax.swing.JPopupMenu;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-class MyCellRenderer extends JBDefaultTreeCellRenderer {
+public class MyCellRenderer extends JBDefaultTreeCellRenderer {
+
+  private boolean isMethodHistory = false;
 
   public MyCellRenderer() {
     super();
+  }
+
+  public MyCellRenderer(boolean isMethodHistory) {
+    super();
+    this.isMethodHistory = isMethodHistory;
   }
 
   @Override
@@ -28,11 +37,16 @@ class MyCellRenderer extends JBDefaultTreeCellRenderer {
 
     String name = info.getType().getDisplayName();
     if (node.getUserObject() instanceof RefactoringInfo) {
-      setText(name);
+      if (isMethodHistory) {
+        setText(name + " at " + JBDateFormat.getFormatter()
+            .formatPrettyDateTime(info.getTimestamp()));
+      } else {
+        setText(name);
+      }
     }
 
     Icon icon = null;
-    if (leaf) {
+    if (leaf && !isMethodHistory) {
       icon = AllIcons.Actions.Diff;
     } else if (name.contains("Class")) {
       icon = AllIcons.Nodes.Class;
@@ -53,6 +67,9 @@ class MyCellRenderer extends JBDefaultTreeCellRenderer {
     }
     if (node.getRoot().equals(node.getParent())) {
       icon = AllIcons.Actions.SuggestedRefactoringBulb;
+    }
+    if (leaf && isMethodHistory) {
+      icon = null;
     }
     setIcon(icon);
     return this;

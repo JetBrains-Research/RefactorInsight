@@ -1,37 +1,33 @@
 package ui;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.popup.JBPopup;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import com.intellij.ui.table.JBTable;
-import com.intellij.util.ui.ListTableModel;
+import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.VcsLogFilterCollection;
 import com.intellij.vcs.log.impl.VcsLogManager;
 import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.visible.filters.VcsLogFilterObject;
+import data.MyCellRenderer;
 import data.RefactoringInfo;
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.EventObject;
 import java.util.List;
-import javax.swing.CellEditor;
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.event.CellEditorListener;
-import javax.swing.table.TableCellEditor;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+import org.jetbrains.annotations.NotNull;
 import services.RefactoringsBundle;
+import utils.Utils;
 
 
 public class MethodRefactoringToolbar {
@@ -52,84 +48,110 @@ public class MethodRefactoringToolbar {
         .registerToolWindow("Refactoring History", true, ToolWindowAnchor.BOTTOM);
   }
 
-  private static String formatText(String text) {
-    StringBuilder sb = new StringBuilder(text);
-
-    int i = 0;
-    while ((i = sb.indexOf(" ", i + 60)) != -1) {
-      sb.replace(i, i + 1, "<br/>");
-    }
-
-    sb.insert(0, "<html>");
-    sb.append("</html>");
-
-    return sb.toString();
-  }
-
   /**
-   * Displayer for the toolbar.
+   * Display the toolbar.
    *
    * @param refactorings detected refactorings
    * @param methodName   name of the method
    */
   public void showToolbar(List<RefactoringInfo> refactorings,
-                          String methodName) {
-    JBPanel panel;
+                          String methodName, DataContext datacontext) {
 
     if (refactorings == null || refactorings.isEmpty()) {
-      panel = new JBPanel(new GridLayout(0, 1));
-      panel.add(new JBLabel(RefactoringsBundle.message("no.ref.method")));
+      showPopup(datacontext);
     } else {
-      panel = new JBPanel();
-      panel.setLayout(new BorderLayout());
-      JBSplitter splitterPane = new JBSplitter(false, .75f);
-      panel.add(splitterPane);
+      Tree tree = createTree(refactorings);
+      tree.setRootVisible(false);
+      Utils.expandAllNodes(tree, 0, tree.getRowCount());
+      tree.setCellRenderer(new MyCellRenderer(true));
 
 
-      MethodColumnInfoFactory.project = project;
-      ListTableModel<RefactoringInfo> model = new ListTableModel<>(
-          new MethodColumnInfoFactory().getColumnInfos(), refactorings);
-      JBTable table = new JBTable(model);
-
-
-      MouseAdapter mouseAdapter = new MouseAdapter() {
+      /*tree.addMouseMotionListener(new MouseMotionAdapter() {
         @Override
-        public void mouseClicked(MouseEvent e) {
-          super.mouseClicked(e);
-          RefactoringInfo info = refactorings
-              .get(table.convertRowIndexToModel(table.getSelectedRow()));
-          JLabel description = new JLabel(formatText(info.getText()));
-          splitterPane.setSecondComponent(description);
-          if (e.getClickCount() == 2) {
-            VcsLogFilterCollection filters = VcsLogFilterObject.collection();
-            VcsLogManager.LogWindowKind kind = VcsLogManager.LogWindowKind.TOOL_WINDOW;
-            VcsProjectLog.getInstance(project).openLogTab(filters, kind)
-                .getVcsLog()
-                .jumpToReference(info.getCommitId());
+        public void mouseDragged(MouseEvent e) {
+          super.mouseDragged(e);
+          TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+          if (path == null) {
+            return;
+          }
+          DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+              path.getLastPathComponent();
+          if (node.isLeaf()) {
+            JBLabel l = new JBLabel("Double click to go at this commit");
+            JBPopup popup = JBPopupFactory.getInstance()
+                .createComponentPopupBuilder(l, null).createPopup();
+            popup.show(new RelativePoint(e.getPoint()));
           }
         }
-      };
-
-
-      table.addMouseListener(mouseAdapter);
-      splitterPane.setFirstComponent(new JBScrollPane(table));
-      splitterPane.setSecondComponent(
-          new JBLabel(RefactoringsBundle.message("method.refactoring.history"),
-              SwingConstants.CENTER));
+      });*/
+      tree.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+          if (e.getClickCount() == 2) {
+            TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+            if (path == null) {
+              return;
+            }
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+                path.getLastPathComponent();
+            if (node.isLeaf()) {
+              RefactoringInfo info = (RefactoringInfo)
+                  node.getUserObjectPath()[1];
+              showLogTab(info);
+            }
+          }
+        }
+      });
+      showContent(methodName, tree);
     }
 
+  }
+
+  private void showLogTab(RefactoringInfo info) {
+    VcsLogFilterCollection filters = VcsLogFilterObject.collection();
+    VcsLogManager.LogWindowKind kind = VcsLogManager.LogWindowKind.TOOL_WINDOW;
+    VcsProjectLog.getInstance(project).openLogTab(filters, kind)
+        .getVcsLog()
+        .jumpToReference(info.getCommitId());
+  }
+
+  @NotNull
+  private Tree createTree(List<RefactoringInfo> refactorings) {
+    DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+
+    for (RefactoringInfo refactoringInfo : refactorings) {
+      if (refactoringInfo.getDisplayableName().contains("->")) {
+        DefaultMutableTreeNode node = refactoringInfo.makeNode();
+        root.add(node);
+      } else {
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(refactoringInfo);
+        refactoringInfo.addLeaves(node);
+        root.add(node);
+      }
+    }
+    return new Tree(root);
+  }
+
+  private void showContent(String methodName, Tree tree) {
     Content content;
     if ((content = toolWindow.getContentManager().findContent(methodName)) != null) {
-      content.setComponent(panel);
+      content.setComponent(tree);
     } else {
       ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
       content = contentFactory
-          .createContent(panel, methodName.substring(methodName.lastIndexOf(".") + 1), false);
+          .createContent(tree, methodName.substring(methodName.lastIndexOf(".") + 1), false);
       toolWindow.getContentManager().addContent(content);
     }
     toolWindow.getContentManager().setSelectedContent(content);
     toolWindow.setIcon(AllIcons.Actions.RefactoringBulb);
     toolWindow.show();
+  }
 
+  private void showPopup(DataContext datacontext) {
+    JBPanel panel = new JBPanel(new GridLayout(0, 1));
+    panel.add(new JBLabel(RefactoringsBundle.message("no.ref.method")));
+    JBPopup popup = JBPopupFactory.getInstance()
+        .createComponentPopupBuilder(panel, null).createPopup();
+    popup.showInBestPositionFor(datacontext);
   }
 }
