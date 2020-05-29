@@ -30,6 +30,7 @@ public class GitWindowInfo {
   private JBViewport viewport;
   private VcsLogGraphTable table;
   private MiningService miner;
+  private boolean state = false;
 
   /**
    * Constructor for a GitWindowInfo.
@@ -46,7 +47,7 @@ public class GitWindowInfo {
     MainVcsLogUi logUI = e.getData(VcsLogInternalDataKeys.MAIN_UI);
     table = logUI.getTable();
     table.getSelectionModel().addListSelectionListener(listSelectionEvent -> {
-      if (listSelectionEvent.getValueIsAdjusting()) {
+      if (!state || listSelectionEvent.getValueIsAdjusting()) {
         return;
       }
       buildComponent();
@@ -58,12 +59,17 @@ public class GitWindowInfo {
    *
    * @param state true for selected, false for unselected
    */
-  public void applyState(boolean state) {
+  public void setSelected(boolean state) {
     if (state) {
       buildComponent();
     } else {
       viewport.setView(changesTree);
     }
+    this.state = state;
+  }
+
+  public boolean isSelected() {
+    return state;
   }
 
   /**

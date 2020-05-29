@@ -18,6 +18,7 @@
         <!-- Add your extensions here -->
         <diff.DiffExtension implementation="ui.DiffWindow"/>
         <projectService serviceImplementation="services.MiningService"/>
+        <projectService serviceImplementation="services.WindowService"/>
     </extensions>
 
     <actions>

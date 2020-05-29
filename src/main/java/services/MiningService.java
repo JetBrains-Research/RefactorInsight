@@ -43,11 +43,9 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   public static ConcurrentHashMap<String, List<RefactoringInfo>> methodHistory
       = new ConcurrentHashMap<>();
   private boolean mining = false;
-  private Project project;
   private MyState innerState = new MyState();
 
-  public MiningService(Project project) {
-    this.project = project;
+  public MiningService() {
   }
 
   public static MiningService getInstance(@NotNull Project project) {
