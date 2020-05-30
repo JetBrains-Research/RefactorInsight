@@ -1,0 +1,98 @@
+0000000000000000000000000000000000000000 61b849a00cb43cecee3a76aad5fdff551a810b21 ioana <a.i.savu-1@student.tudelft.nl> 1590406900 +0200	clone: from https://github.com/ioanasv/example-refactorings.git
+61b849a00cb43cecee3a76aad5fdff551a810b21 61b849a00cb43cecee3a76aad5fdff551a810b21 ioana <a.i.savu-1@student.tudelft.nl> 1590407967 +0200	checkout: moving from master to setup-repository
+61b849a00cb43cecee3a76aad5fdff551a810b21 be5d3710f8774880c98895c0f621ba800b0e18d0 ioana <a.i.savu-1@student.tudelft.nl> 1590407983 +0200	commit: Added first classes.
+be5d3710f8774880c98895c0f621ba800b0e18d0 d7171ddb08f86a4821a59ef8ecfdd9133aed9392 ioana <a.i.savu-1@student.tudelft.nl> 1590408355 +0200	commit: Push down attribute: int noOfSeats from class Car.
+d7171ddb08f86a4821a59ef8ecfdd9133aed9392 8752907fbbbe86ff08089829270b8e956011349e ioana <a.i.savu-1@student.tudelft.nl> 1590408598 +0200	commit: Pull up attribute: engine.
+8752907fbbbe86ff08089829270b8e956011349e d64fa4a7326d5b82191214c2a912ecef9261552e ioana <a.i.savu-1@student.tudelft.nl> 1590408686 +0200	commit: Rename method.
+d64fa4a7326d5b82191214c2a912ecef9261552e b2d4317d111fdeffc3b40b3a22d7b9407181165f ioana <a.i.savu-1@student.tudelft.nl> 1590408860 +0200	commit: Inline method applyBreak.
+b2d4317d111fdeffc3b40b3a22d7b9407181165f 45a425ddf51998f40d3b504839c4978da80d0a4a ioana <a.i.savu-1@student.tudelft.nl> 1590409093 +0200	commit: Modify method annotation.
+45a425ddf51998f40d3b504839c4978da80d0a4a acff115c3a66b76c9faeee1e25ef9e548b73d189 ioana <a.i.savu-1@student.tudelft.nl> 1590409387 +0200	commit: Move and rename attribute.
+acff115c3a66b76c9faeee1e25ef9e548b73d189 ff84610965a3d44f69d81e51a579c5b419e54278 ioana <a.i.savu-1@student.tudelft.nl> 1590409475 +0200	commit: Move source folder.
+ff84610965a3d44f69d81e51a579c5b419e54278 47028dd628101fb1aadc60a1574348ced21ad97b ioana <a.i.savu-1@student.tudelft.nl> 1590409583 +0200	commit: Move method.
+47028dd628101fb1aadc60a1574348ced21ad97b ed80c78343e5b914af8fc6f585b6ab53d692f3ae ioana <a.i.savu-1@student.tudelft.nl> 1590409661 +0200	commit: Rename package.
+ed80c78343e5b914af8fc6f585b6ab53d692f3ae cc8439959534f9cab74be7cc50d2c3e1509c7ff2 ioana <a.i.savu-1@student.tudelft.nl> 1590409698 +0200	commit: Inline variable
+cc8439959534f9cab74be7cc50d2c3e1509c7ff2 ec29a78860a4b7def7e5da5d27e03ee54044ec92 ioana <a.i.savu-1@student.tudelft.nl> 1590410296 +0200	commit: Extract method initializeSpeeds
+ec29a78860a4b7def7e5da5d27e03ee54044ec92 08b10f54d29361ac71656dcce61978ba3c7eefbd ioana <a.i.savu-1@student.tudelft.nl> 1590410399 +0200	commit: Move and Rename method.
+08b10f54d29361ac71656dcce61978ba3c7eefbd 5b75da73079cd2bc924d8c4bc00f7aa322265f7c ioana <a.i.savu-1@student.tudelft.nl> 1590410453 +0200	commit: Extract and move method.
+5b75da73079cd2bc924d8c4bc00f7aa322265f7c bddad1d44f76deb39be5b952cdfed92f0b6db79d ioana <a.i.savu-1@student.tudelft.nl> 1590410568 +0200	commit: Rename class.
+bddad1d44f76deb39be5b952cdfed92f0b6db79d 0f46dbfcac4ec41a187c05aed5cd7c3bdc41a282 ioana <a.i.savu-1@student.tudelft.nl> 1590410630 +0200	commit: Extract Superclass.
+0f46dbfcac4ec41a187c05aed5cd7c3bdc41a282 d80051c1ba2385b69029a7a2859d1597b449ea2e ioana <a.i.savu-1@student.tudelft.nl> 1590410842 +0200	commit: Extract attribute.
+d80051c1ba2385b69029a7a2859d1597b449ea2e 368ea76ee88c89eb25389bc23bf62c56a3941eca ioana <a.i.savu-1@student.tudelft.nl> 1590411181 +0200	commit: Encapsulated attribute (not a name for refactoring)
+368ea76ee88c89eb25389bc23bf62c56a3941eca eb1d6a78cb8e3f9f89dcce3046d803838009ecc4 ioana <a.i.savu-1@student.tudelft.nl> 1590412918 +0200	commit: Update README.md
+eb1d6a78cb8e3f9f89dcce3046d803838009ecc4 e0315579240f3f2f1544829db6d91f9e510bf2f9 ioana <a.i.savu-1@student.tudelft.nl> 1590412997 +0200	commit: Extract variable
+e0315579240f3f2f1544829db6d91f9e510bf2f9 57904f2647b2ec3cb1cc84d191f7f0df674ec020 ioana <a.i.savu-1@student.tudelft.nl> 1590413231 +0200	commit: Merge variable
+57904f2647b2ec3cb1cc84d191f7f0df674ec020 59cebad3a8fe9b06a807a5e9514306583fbd4af3 ioana <a.i.savu-1@student.tudelft.nl> 1590413286 +0200	commit: Split variable
+59cebad3a8fe9b06a807a5e9514306583fbd4af3 f55cd4e8799f4e04ee61ca7ce3228eff8517fa2d ioana <a.i.savu-1@student.tudelft.nl> 1590413398 +0200	commit: Inline variable.
+f55cd4e8799f4e04ee61ca7ce3228eff8517fa2d 2cb091dbd3f41e2372bc8c68f03175d4e093eef7 ioana <a.i.savu-1@student.tudelft.nl> 1590413437 +0200	commit: Split variable.
+2cb091dbd3f41e2372bc8c68f03175d4e093eef7 20744cb3679a2134a45deb5bbb55b8e04ca13f50 ioana <a.i.savu-1@student.tudelft.nl> 1590414925 +0200	commit: Update README.md with refactorings that are not working.
+20744cb3679a2134a45deb5bbb55b8e04ca13f50 3f85498cc9853fc9cbd0374491ee995cdfa2f4aa ioana <a.i.savu-1@student.tudelft.nl> 1590495570 +0200	commit: Try to split variable result in class Utils.java
+3f85498cc9853fc9cbd0374491ee995cdfa2f4aa 764d8ae710446eddfa540b8c51e6d0f4e163d280 ioana <a.i.savu-1@student.tudelft.nl> 1590495640 +0200	commit: Try to split variable result in class Utils.java
+764d8ae710446eddfa540b8c51e6d0f4e163d280 c51ed196ab2c4e491ba1dac6029297574b401e69 ioana <a.i.savu-1@student.tudelft.nl> 1590495777 +0200	commit: Extract attribute.
+c51ed196ab2c4e491ba1dac6029297574b401e69 3c5dd1412ea3a8fe12cc3a14069d9e1337851bab ioana <a.i.savu-1@student.tudelft.nl> 1590495809 +0200	commit (amend): Move method.
+3c5dd1412ea3a8fe12cc3a14069d9e1337851bab f601c9b279fd5c80d3a52451b0fbbdd417fd19e7 ioana <a.i.savu-1@student.tudelft.nl> 1590495895 +0200	commit: Extract attribute.
+f601c9b279fd5c80d3a52451b0fbbdd417fd19e7 f08087fbe5b232546fa54897d564af9094230efd ioana <a.i.savu-1@student.tudelft.nl> 1590496049 +0200	commit: Rename and move attribute.
+f08087fbe5b232546fa54897d564af9094230efd 5aff5b278971494c6324b5ad5cff5ed248a45bca ioana <a.i.savu-1@student.tudelft.nl> 1590496070 +0200	commit (amend): Rename and move attribute - NOT RECOGNIZED.
+5aff5b278971494c6324b5ad5cff5ed248a45bca 3c5dd1412ea3a8fe12cc3a14069d9e1337851bab ioana <a.i.savu-1@student.tudelft.nl> 1590496087 +0200	rebase -i (start): checkout 3c5dd1412ea3a8fe12cc3a14069d9e1337851bab
+3c5dd1412ea3a8fe12cc3a14069d9e1337851bab f601c9b279fd5c80d3a52451b0fbbdd417fd19e7 ioana <a.i.savu-1@student.tudelft.nl> 1590496087 +0200	rebase -i: fast-forward
+f601c9b279fd5c80d3a52451b0fbbdd417fd19e7 18ea5453f0faab66829f0f9cc68ae085062e1e1f ioana <a.i.savu-1@student.tudelft.nl> 1590496087 +0200	rebase -i (reword): Move attribute.
+18ea5453f0faab66829f0f9cc68ae085062e1e1f f1623b171d95ca937b7b49c83dab2287ae79714d ioana <a.i.savu-1@student.tudelft.nl> 1590496088 +0200	rebase -i (pick): Rename and move attribute - NOT RECOGNIZED.
+f1623b171d95ca937b7b49c83dab2287ae79714d f1623b171d95ca937b7b49c83dab2287ae79714d ioana <a.i.savu-1@student.tudelft.nl> 1590496088 +0200	rebase -i (finish): returning to refs/heads/setup-repository
+f1623b171d95ca937b7b49c83dab2287ae79714d 61b849a00cb43cecee3a76aad5fdff551a810b21 ioana <a.i.savu-1@student.tudelft.nl> 1590582485 +0200	checkout: moving from setup-repository to master
+61b849a00cb43cecee3a76aad5fdff551a810b21 f1623b171d95ca937b7b49c83dab2287ae79714d ioana <a.i.savu-1@student.tudelft.nl> 1590582510 +0200	checkout: moving from master to setup-repository
+f1623b171d95ca937b7b49c83dab2287ae79714d 61b849a00cb43cecee3a76aad5fdff551a810b21 ioana <a.i.savu-1@student.tudelft.nl> 1590582530 +0200	checkout: moving from setup-repository to master
+61b849a00cb43cecee3a76aad5fdff551a810b21 f1623b171d95ca937b7b49c83dab2287ae79714d ioana <a.i.savu-1@student.tudelft.nl> 1590582534 +0200	checkout: moving from master to setup-repository
+f1623b171d95ca937b7b49c83dab2287ae79714d fb59bfb1cddc9a7759526667c1659e0455319741 ioana <a.i.savu-1@student.tudelft.nl> 1590583085 +0200	commit: Push down method doubleSpeed()
+fb59bfb1cddc9a7759526667c1659e0455319741 9cae39c176b4ae70584e63d212c9d617f66bea4a ioana <a.i.savu-1@student.tudelft.nl> 1590583363 +0200	commit: Set up class for replacing conditional with polymorphism.
+9cae39c176b4ae70584e63d212c9d617f66bea4a 399a3a1b903cdbc49d79f5873af056d02c653b03 ioana <a.i.savu-1@student.tudelft.nl> 1590583542 +0200	commit: Replaced conditional with polymorphism
+399a3a1b903cdbc49d79f5873af056d02c653b03 4f6f2bc83e03c2c3ab8392ffa356d95fedc74c6e ioana <a.i.savu-1@student.tudelft.nl> 1590583777 +0200	commit: Rename and move attribute.
+4f6f2bc83e03c2c3ab8392ffa356d95fedc74c6e a1e490dc4fbd2ca077290132f6bae4ff72156647 ioana <a.i.savu-1@student.tudelft.nl> 1590583893 +0200	commit: Replace variable with attribute.
+a1e490dc4fbd2ca077290132f6bae4ff72156647 ccd62bfaee4745086dec9b8e0ce7c8c102364255 ioana <a.i.savu-1@student.tudelft.nl> 1590583968 +0200	commit: Parametrize variable.
+ccd62bfaee4745086dec9b8e0ce7c8c102364255 659debf613cec1d1fafb9e1449878d5a963bbe84 ioana <a.i.savu-1@student.tudelft.nl> 1590585403 +0200	commit: Extract variable.
+659debf613cec1d1fafb9e1449878d5a963bbe84 a1e490dc4fbd2ca077290132f6bae4ff72156647 ioana <a.i.savu-1@student.tudelft.nl> 1590585822 +0200	rebase -i (start): checkout a1e490dc4fbd2ca077290132f6bae4ff72156647
+a1e490dc4fbd2ca077290132f6bae4ff72156647 ccd62bfaee4745086dec9b8e0ce7c8c102364255 ioana <a.i.savu-1@student.tudelft.nl> 1590585822 +0200	rebase -i: fast-forward
+ccd62bfaee4745086dec9b8e0ce7c8c102364255 bf682fa1a5af7776eaac60364ad1acf85075031a ioana <a.i.savu-1@student.tudelft.nl> 1590585822 +0200	rebase -i (reword): Parametrize variable - NOT RECOGNIZED.
+bf682fa1a5af7776eaac60364ad1acf85075031a b2d75f71abf2c327bcc12cb10e83c31174335a57 ioana <a.i.savu-1@student.tudelft.nl> 1590585823 +0200	rebase -i (pick): Extract variable.
+b2d75f71abf2c327bcc12cb10e83c31174335a57 b2d75f71abf2c327bcc12cb10e83c31174335a57 ioana <a.i.savu-1@student.tudelft.nl> 1590585823 +0200	rebase -i (finish): returning to refs/heads/setup-repository
+b2d75f71abf2c327bcc12cb10e83c31174335a57 4f6f2bc83e03c2c3ab8392ffa356d95fedc74c6e ioana <a.i.savu-1@student.tudelft.nl> 1590585836 +0200	rebase -i (start): checkout 4f6f2bc83e03c2c3ab8392ffa356d95fedc74c6e
+4f6f2bc83e03c2c3ab8392ffa356d95fedc74c6e a1e490dc4fbd2ca077290132f6bae4ff72156647 ioana <a.i.savu-1@student.tudelft.nl> 1590585836 +0200	rebase -i: fast-forward
+a1e490dc4fbd2ca077290132f6bae4ff72156647 c43f8b521e2134202b945d3ff259feae61b44612 ioana <a.i.savu-1@student.tudelft.nl> 1590585836 +0200	rebase -i (reword): Replace variable with attribute - NOT RECOGNIZED.
+c43f8b521e2134202b945d3ff259feae61b44612 880d51fa7cfd8429ac58c4938e04f3d47f35c851 ioana <a.i.savu-1@student.tudelft.nl> 1590585837 +0200	rebase -i (pick): Parametrize variable - NOT RECOGNIZED.
+880d51fa7cfd8429ac58c4938e04f3d47f35c851 dfe3a33ffbd2591e1714062598110dd53ea85c88 ioana <a.i.savu-1@student.tudelft.nl> 1590585837 +0200	rebase -i (pick): Extract variable.
+dfe3a33ffbd2591e1714062598110dd53ea85c88 dfe3a33ffbd2591e1714062598110dd53ea85c88 ioana <a.i.savu-1@student.tudelft.nl> 1590585837 +0200	rebase -i (finish): returning to refs/heads/setup-repository
+dfe3a33ffbd2591e1714062598110dd53ea85c88 399a3a1b903cdbc49d79f5873af056d02c653b03 ioana <a.i.savu-1@student.tudelft.nl> 1590585856 +0200	rebase -i (start): checkout 399a3a1b903cdbc49d79f5873af056d02c653b03
+399a3a1b903cdbc49d79f5873af056d02c653b03 4f6f2bc83e03c2c3ab8392ffa356d95fedc74c6e ioana <a.i.savu-1@student.tudelft.nl> 1590585856 +0200	rebase -i: fast-forward
+4f6f2bc83e03c2c3ab8392ffa356d95fedc74c6e 80c17f156010ce5ef82f5ea9ccd3fe4155dd31a4 ioana <a.i.savu-1@student.tudelft.nl> 1590585856 +0200	rebase -i (reword): Rename and move attribute - NOT RECOGNIZED.
+80c17f156010ce5ef82f5ea9ccd3fe4155dd31a4 1503f64002fac4a5f6bd01a3e3289e00da429417 ioana <a.i.savu-1@student.tudelft.nl> 1590585856 +0200	rebase -i (pick): Replace variable with attribute - NOT RECOGNIZED.
+1503f64002fac4a5f6bd01a3e3289e00da429417 305e5f517682af36618119ee366853d7e47e68d0 ioana <a.i.savu-1@student.tudelft.nl> 1590585856 +0200	rebase -i (pick): Parametrize variable - NOT RECOGNIZED.
+305e5f517682af36618119ee366853d7e47e68d0 7db1ffaa6ac729fc77d7152e3deaa241bb6967a8 ioana <a.i.savu-1@student.tudelft.nl> 1590585856 +0200	rebase -i (pick): Extract variable.
+7db1ffaa6ac729fc77d7152e3deaa241bb6967a8 7db1ffaa6ac729fc77d7152e3deaa241bb6967a8 ioana <a.i.savu-1@student.tudelft.nl> 1590585856 +0200	rebase -i (finish): returning to refs/heads/setup-repository
+7db1ffaa6ac729fc77d7152e3deaa241bb6967a8 9cae39c176b4ae70584e63d212c9d617f66bea4a ioana <a.i.savu-1@student.tudelft.nl> 1590585862 +0200	rebase -i (start): checkout 9cae39c176b4ae70584e63d212c9d617f66bea4a
+9cae39c176b4ae70584e63d212c9d617f66bea4a 399a3a1b903cdbc49d79f5873af056d02c653b03 ioana <a.i.savu-1@student.tudelft.nl> 1590585862 +0200	rebase -i: fast-forward
+399a3a1b903cdbc49d79f5873af056d02c653b03 6863c8021125f2f5c7de55e59b206fd4a4367294 ioana <a.i.savu-1@student.tudelft.nl> 1590585862 +0200	rebase -i (reword): Replaced conditional with polymorphism - NOT RECOGNIZED.
+6863c8021125f2f5c7de55e59b206fd4a4367294 3d5ca33307dc6206ad28f769cd779e0b18b423e3 ioana <a.i.savu-1@student.tudelft.nl> 1590585862 +0200	rebase -i (pick): Rename and move attribute - NOT RECOGNIZED.
+3d5ca33307dc6206ad28f769cd779e0b18b423e3 7a2d371e0d0006b6916352a1c9b575908b1d9aa7 ioana <a.i.savu-1@student.tudelft.nl> 1590585862 +0200	rebase -i (pick): Replace variable with attribute - NOT RECOGNIZED.
+7a2d371e0d0006b6916352a1c9b575908b1d9aa7 04341a7bff7bd634dbc1b6c9465d03f2b9fd7bef ioana <a.i.savu-1@student.tudelft.nl> 1590585862 +0200	rebase -i (pick): Parametrize variable - NOT RECOGNIZED.
+04341a7bff7bd634dbc1b6c9465d03f2b9fd7bef 167696695a07cdc33b99f5d2ba526afce214b7a9 ioana <a.i.savu-1@student.tudelft.nl> 1590585862 +0200	rebase -i (pick): Extract variable.
+167696695a07cdc33b99f5d2ba526afce214b7a9 167696695a07cdc33b99f5d2ba526afce214b7a9 ioana <a.i.savu-1@student.tudelft.nl> 1590585862 +0200	rebase -i (finish): returning to refs/heads/setup-repository
+167696695a07cdc33b99f5d2ba526afce214b7a9 a2a03e2eebdd118e49d616e0334a98d2c2f8450d ioana <a.i.savu-1@student.tudelft.nl> 1590586187 +0200	commit: Extract parameter
+a2a03e2eebdd118e49d616e0334a98d2c2f8450d 97da1d93a7d084d92b996ec88c11c72687028272 ioana <a.i.savu-1@student.tudelft.nl> 1590586198 +0200	commit (amend): Extract attribute.
+97da1d93a7d084d92b996ec88c11c72687028272 97da1d93a7d084d92b996ec88c11c72687028272 ioana <a.i.savu-1@student.tudelft.nl> 1590758830 +0200	checkout: moving from setup-repository to test
+97da1d93a7d084d92b996ec88c11c72687028272 451247ff27fd9dc0dd155ddacd92fc465e5606e0 ioana <a.i.savu-1@student.tudelft.nl> 1590758850 +0200	commit: rename method
+451247ff27fd9dc0dd155ddacd92fc465e5606e0 4033cda87451f2b7305f51b4245a0f41a4a18be1 ioana <a.i.savu-1@student.tudelft.nl> 1590758867 +0200	commit: rename method
+4033cda87451f2b7305f51b4245a0f41a4a18be1 97da1d93a7d084d92b996ec88c11c72687028272 ioana <a.i.savu-1@student.tudelft.nl> 1590785691 +0200	checkout: moving from test to setup-repository
+97da1d93a7d084d92b996ec88c11c72687028272 f5dada09bc95f0a0b21469a64be77c368abca420 ioana <a.i.savu-1@student.tudelft.nl> 1590785713 +0200	commit: Add class annotation. Add attribute annotation.
+f5dada09bc95f0a0b21469a64be77c368abca420 9c8b2e1e099b03513e63036f5df76a047b600dcc ioana <a.i.savu-1@student.tudelft.nl> 1590786352 +0200	commit: Modify attribute annotation.
+9c8b2e1e099b03513e63036f5df76a047b600dcc 9feb2da5ea8ceff142e9c43416cfbdb659d86ff5 ioana <a.i.savu-1@student.tudelft.nl> 1590786396 +0200	commit: Remove attribute & class annotation.
+9feb2da5ea8ceff142e9c43416cfbdb659d86ff5 1147da02b6a6f7df662273a9e0ababe67f27080a ioana <a.i.savu-1@student.tudelft.nl> 1590786519 +0200	commit: Remove parameter
+1147da02b6a6f7df662273a9e0ababe67f27080a 182f5bd7f166be14de6ca03e93c56bae370a91a0 ioana <a.i.savu-1@student.tudelft.nl> 1590786556 +0200	commit: Modify class annotation.
+182f5bd7f166be14de6ca03e93c56bae370a91a0 7a2d371e0d0006b6916352a1c9b575908b1d9aa7 ioana <a.i.savu-1@student.tudelft.nl> 1590832142 +0200	rebase -i (start): checkout 7a2d371e0d0006b6916352a1c9b575908b1d9aa7
+7a2d371e0d0006b6916352a1c9b575908b1d9aa7 04341a7bff7bd634dbc1b6c9465d03f2b9fd7bef ioana <a.i.savu-1@student.tudelft.nl> 1590832142 +0200	rebase -i: fast-forward
+04341a7bff7bd634dbc1b6c9465d03f2b9fd7bef 8a06ebd9dabe4e2326e8d0add019065593dc4469 ioana <a.i.savu-1@student.tudelft.nl> 1590832142 +0200	rebase -i (reword): Parametrize variable.
+8a06ebd9dabe4e2326e8d0add019065593dc4469 b8c6942c2dbfbbdf0624052b63d71e41b79f3ceb ioana <a.i.savu-1@student.tudelft.nl> 1590832143 +0200	rebase -i (pick): Extract variable.
+b8c6942c2dbfbbdf0624052b63d71e41b79f3ceb d56596dbeaba7b3cd4012887518366f4c2f2e46d ioana <a.i.savu-1@student.tudelft.nl> 1590832143 +0200	rebase -i (pick): Extract attribute.
+d56596dbeaba7b3cd4012887518366f4c2f2e46d 12556e2434bcbd2bf03661fedace2df7589d974d ioana <a.i.savu-1@student.tudelft.nl> 1590832143 +0200	rebase -i (pick): Add class annotation. Add attribute annotation.
+12556e2434bcbd2bf03661fedace2df7589d974d a5c324259abf5377c828229b1ef754a5e17dc0b9 ioana <a.i.savu-1@student.tudelft.nl> 1590832143 +0200	rebase -i (pick): Modify attribute annotation.
+a5c324259abf5377c828229b1ef754a5e17dc0b9 a8007435707d4f2ed01eb1e50c62ae571169f4aa ioana <a.i.savu-1@student.tudelft.nl> 1590832143 +0200	rebase -i (pick): Remove attribute & class annotation.
+a8007435707d4f2ed01eb1e50c62ae571169f4aa 066d5739078f17903dd14472f4454cd28a53e992 ioana <a.i.savu-1@student.tudelft.nl> 1590832143 +0200	rebase -i (pick): Remove parameter
+066d5739078f17903dd14472f4454cd28a53e992 4a0e32c80a0373979a13644ca7e3a13ed167b38a ioana <a.i.savu-1@student.tudelft.nl> 1590832143 +0200	rebase -i (pick): Modify class annotation.
+4a0e32c80a0373979a13644ca7e3a13ed167b38a 4a0e32c80a0373979a13644ca7e3a13ed167b38a ioana <a.i.savu-1@student.tudelft.nl> 1590832143 +0200	rebase -i (finish): returning to refs/heads/setup-repository

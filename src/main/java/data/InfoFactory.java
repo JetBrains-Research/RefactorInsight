@@ -1,23 +1,29 @@
 package data;
 
 import data.types.Handler;
+import data.types.attributes.AddAttributeAnnotationHandler;
 import data.types.attributes.ChangeAttributeTypeHandler;
 import data.types.attributes.ExtractAttributeHandler;
 import data.types.attributes.MergeAttributeHandler;
+import data.types.attributes.ModifyAttributeAnnotationHandler;
 import data.types.attributes.MoveAttributeHandler;
 import data.types.attributes.MoveRenameAttributeHandler;
 import data.types.attributes.PullUpAttributeHandler;
 import data.types.attributes.PushDownAttributeHandler;
+import data.types.attributes.RemoveAttributeAnnotationHandler;
 import data.types.attributes.RenameAttributeHandler;
 import data.types.attributes.ReplaceAttributeHandler;
 import data.types.attributes.SplitAttributeHandler;
+import data.types.classes.AddClassAnnotationHandler;
 import data.types.classes.ExtractClassHandler;
 import data.types.classes.ExtractSuperClassHandler;
+import data.types.classes.ModifyClassAnnotationHandler;
 import data.types.classes.MoveClassHandler;
 import data.types.classes.MoveRenameClassHandler;
+import data.types.classes.RemoveClassAnnotationHandler;
 import data.types.classes.RenameClassHandler;
 import data.types.methods.AddMethodAnnotationHandler;
-import data.types.methods.ChangeMethodSignatureHandler;
+import data.types.methods.AddParameterHandler;
 import data.types.methods.ChangeReturnTypeHandler;
 import data.types.methods.ExtractOperationHandler;
 import data.types.methods.InlineOperationHandler;
@@ -27,6 +33,7 @@ import data.types.methods.MoveOperationHandler;
 import data.types.methods.PullUpOperationHandler;
 import data.types.methods.PushDownOperationHandler;
 import data.types.methods.RemoveMethodAnnotationHandler;
+import data.types.methods.RemoveParameterHandler;
 import data.types.methods.RenameMethodHandler;
 import data.types.packages.MoveSourceFolderHandler;
 import data.types.packages.RenamePackageHandler;
@@ -58,8 +65,6 @@ public class InfoFactory {
         new ChangeReturnTypeHandler());
     refactoringHandlers.put(RefactoringType.CHANGE_VARIABLE_TYPE,
         new ChangeVariableTypeHandler());
-    refactoringHandlers.put(RefactoringType.CHANGE_METHOD_SIGNATURE,
-        new ChangeMethodSignatureHandler());
     refactoringHandlers.put(RefactoringType.EXTRACT_AND_MOVE_OPERATION,
         new ExtractOperationHandler());
     refactoringHandlers.put(RefactoringType.EXTRACT_ATTRIBUTE,
@@ -142,7 +147,22 @@ public class InfoFactory {
         new SplitVariableHandler());
     refactoringHandlers.put(RefactoringType.ADD_METHOD_ANNOTATION,
         new AddMethodAnnotationHandler());
-
+    refactoringHandlers.put(RefactoringType.ADD_PARAMETER,
+        new AddParameterHandler());
+    refactoringHandlers.put(RefactoringType.REMOVE_PARAMETER,
+        new RemoveParameterHandler());
+    refactoringHandlers.put(RefactoringType.ADD_ATTRIBUTE_ANNOTATION,
+        new AddAttributeAnnotationHandler());
+    refactoringHandlers.put(RefactoringType.REMOVE_ATTRIBUTE_ANNOTATION,
+        new RemoveAttributeAnnotationHandler());
+    refactoringHandlers.put(RefactoringType.MODIFY_ATTRIBUTE_ANNOTATION,
+        new ModifyAttributeAnnotationHandler());
+    refactoringHandlers.put(RefactoringType.ADD_CLASS_ANNOTATION,
+        new AddClassAnnotationHandler());
+    refactoringHandlers.put(RefactoringType.REMOVE_CLASS_ANNOTATION,
+        new RemoveClassAnnotationHandler());
+    refactoringHandlers.put(RefactoringType.MODIFY_CLASS_ANNOTATION,
+        new ModifyClassAnnotationHandler());
   }
 
   /**

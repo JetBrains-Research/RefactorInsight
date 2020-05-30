@@ -37,8 +37,7 @@ public abstract class Handler {
   public RefactoringInfo handle(Refactoring refactoring) {
     return specify(refactoring, new RefactoringInfo()
         .setType(refactoring.getRefactoringType())
-        .setName(refactoring.getName())
-        .setText(refactoring.toString()));
+        .setName(refactoring.getName()));
   }
 
   public abstract RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info);

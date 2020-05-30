@@ -41,7 +41,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
     miner = MiningService.getInstance(myProject);
     String thisDir = System.getProperty("user.dir");
     //Make files for source and destination directory
-    File srcDir = new File(thisDir + "/src/test/testData/example-refactorings copy");
+    File srcDir = new File(thisDir + "/src/test/testData/example-refactorings");
     File destDir = new File(projectPath);
     //Copy directory + contents
     try {
