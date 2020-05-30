@@ -7,7 +7,7 @@ import static org.refactoringminer.api.RefactoringType.CHANGE_PARAMETER_TYPE;
 import static org.refactoringminer.api.RefactoringType.CHANGE_RETURN_TYPE;
 import static org.refactoringminer.api.RefactoringType.CHANGE_VARIABLE_TYPE;
 import static org.refactoringminer.api.RefactoringType.EXTRACT_AND_MOVE_OPERATION;
-import static org.refactoringminer.api.RefactoringType.EXTRACT_ATTRIBUTE;
+import static org.refactoringminer.api.RefactoringType.EXTRACT_INTERFACE;
 import static org.refactoringminer.api.RefactoringType.EXTRACT_OPERATION;
 import static org.refactoringminer.api.RefactoringType.EXTRACT_VARIABLE;
 import static org.refactoringminer.api.RefactoringType.INLINE_OPERATION;
@@ -16,7 +16,6 @@ import static org.refactoringminer.api.RefactoringType.MOVE_AND_RENAME_OPERATION
 import static org.refactoringminer.api.RefactoringType.MOVE_ATTRIBUTE;
 import static org.refactoringminer.api.RefactoringType.MOVE_CLASS;
 import static org.refactoringminer.api.RefactoringType.MOVE_OPERATION;
-import static org.refactoringminer.api.RefactoringType.MOVE_RENAME_ATTRIBUTE;
 import static org.refactoringminer.api.RefactoringType.MOVE_RENAME_CLASS;
 import static org.refactoringminer.api.RefactoringType.MOVE_SOURCE_FOLDER;
 import static org.refactoringminer.api.RefactoringType.PULL_UP_ATTRIBUTE;
@@ -33,6 +32,7 @@ import static org.refactoringminer.api.RefactoringType.RENAME_VARIABLE;
 
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vcs.Executor;
+import com.intellij.ui.treeStructure.Tree;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
 import git4idea.test.GitExecutor;
@@ -47,6 +47,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import javax.swing.tree.TreeCellRenderer;
 import org.hamcrest.CustomMatcher;
 import org.hamcrest.Matcher;
 import org.junit.rules.ErrorCollector;
@@ -135,7 +136,8 @@ public class MiningServiceManualTest extends GitSingleRepoTest {
           ofType(MOVE_AND_RENAME_OPERATION)
       ),
       matcher(
-          ofType(INLINE_OPERATION)
+          ofType(INLINE_OPERATION),
+          ofType(EXTRACT_INTERFACE)
       )
   };
   private MyErrorCollector collector;
@@ -182,6 +184,19 @@ public class MiningServiceManualTest extends GitSingleRepoTest {
             return true;
           }
           List<RefactoringInfo> refactorings = ((RefactoringEntry) o).getRefactorings();
+          Tree tree = ((RefactoringEntry) o).buildTree();
+          final TreeCellRenderer cellRenderer = tree.getCellRenderer();
+          Object root = tree.getModel().getRoot();
+
+          //for each refactoring check that the renderer works properly
+          int children = tree.getModel().getChildCount(root);
+          for (int i = 0; i < children; i++) {
+            Object refactoringNode = tree.getModel().getChild(root, i);
+            assertNotNull(cellRenderer
+                .getTreeCellRendererComponent(tree, refactoringNode, false,
+                    false, false, 1, false));
+          }
+
           boolean res = true;
           for (Predicate<RefactoringInfo> p : predicates) {
             res &= refactorings.stream().anyMatch(p);

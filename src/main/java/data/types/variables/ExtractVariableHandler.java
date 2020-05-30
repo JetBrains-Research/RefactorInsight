@@ -16,7 +16,7 @@ public class ExtractVariableHandler extends Handler {
         .setElementAfter(null)
         .setNameBefore(ref.getVariableDeclaration().getVariableName())
         .setNameAfter(ref.getVariableDeclaration().getVariableName())
-        .addMarking(ref.getVariableDeclaration().codeRange(),
+        .addMarking(ref.getOperationBefore().codeRange(),
             ref.getExtractedVariableDeclarationCodeRange());
   }
 }
