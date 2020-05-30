@@ -10,6 +10,8 @@ public class ProjectListener implements ProjectManagerListener {
 
   @Override
   public void projectClosing(@NotNull Project project) {
-    Disposer.dispose(MethodRefactoringToolbar.openLogTab);
+    if (MethodRefactoringToolbar.openLogTab != null) {
+      Disposer.dispose(MethodRefactoringToolbar.openLogTab);
+    }
   }
 }
