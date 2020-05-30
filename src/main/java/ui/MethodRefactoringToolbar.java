@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -16,13 +17,13 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.treeStructure.Tree;
-import com.intellij.vcs.log.VcsLogFilterCollection;
+import com.intellij.vcs.log.data.VcsLogData;
 import com.intellij.vcs.log.impl.VcsLogManager;
 import com.intellij.vcs.log.impl.VcsProjectLog;
+import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.visible.filters.VcsLogFilterObject;
 import data.MyCellRenderer;
 import data.RefactoringInfo;
-import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -38,9 +39,11 @@ import utils.Utils;
 
 public class MethodRefactoringToolbar {
 
+  private final VcsLogManager.VcsLogUiFactory<? extends MainVcsLogUi> factory;
   private ToolWindowManager toolWindowManager;
   private ToolWindow toolWindow;
   private Project project;
+  public static MainVcsLogUi openLogTab;
 
   /**
    * Constructor for the toolbar.
@@ -50,6 +53,9 @@ public class MethodRefactoringToolbar {
   public MethodRefactoringToolbar(Project project) {
     this.project = project;
     toolWindowManager = ToolWindowManager.getInstance(project);
+
+    factory = VcsProjectLog.getInstance(project).getLogManager()
+        .getMainLogUiFactory("method history", VcsLogFilterObject.collection());
     toolWindow = toolWindowManager
         .registerToolWindow("Refactoring History", true, ToolWindowAnchor.BOTTOM);
   }
@@ -67,7 +73,7 @@ public class MethodRefactoringToolbar {
       showPopup(datacontext);
     } else {
 
-      JBSplitter splitter = new JBSplitter(false, (float) 0.5);
+      JBSplitter splitter = new JBSplitter(false, (float) 0.3);
 
       Tree tree = createTree(refactorings);
       tree.setRootVisible(false);
@@ -87,36 +93,47 @@ public class MethodRefactoringToolbar {
                 path.getLastPathComponent();
             if (node.isLeaf()) {
               RefactoringInfo info = (RefactoringInfo) node.getUserObjectPath()[1];
-              showLogTab(info);
+              showLogTab(info, splitter);
             }
           }
         }
       });
 
-      splitter.setFirstComponent(tree);
-      final JBLabel component =
-          new JBLabel("Double click to jump at commit.", SwingConstants.CENTER);
-      component.setForeground(Gray._105);
-      splitter.setSecondComponent(component);
-      JBScrollPane pane = new JBScrollPane(splitter);
+
+      JBScrollPane pane = new JBScrollPane(tree);
       int size = refactorings.size();
       JBLabel label =
           new JBLabel(
               size + (size > 1 ? " refactorings" : " refactoring") + " detected for this method");
       label.setForeground(Gray._105);
       pane.setColumnHeaderView(label);
-      showContent(methodName, pane);
+      splitter.setFirstComponent(pane);
+
+      final JBLabel component =
+          new JBLabel("Double click to jump at commit.", SwingConstants.CENTER);
+      component.setForeground(Gray._105);
+      splitter.setSecondComponent(component);
+
+      showContent(methodName, splitter);
     }
 
   }
 
-  private void showLogTab(RefactoringInfo info) {
-    VcsLogFilterCollection filters = VcsLogFilterObject.collection();
-    VcsLogManager.LogWindowKind kind = VcsLogManager.LogWindowKind.TOOL_WINDOW;
-    VcsProjectLog.getInstance(project).openLogTab(filters, kind)
-        .getVcsLog()
-        .jumpToReference(info.getCommitId());
+  private void showLogTab(RefactoringInfo info, JBSplitter splitter) {
+    VcsLogData data = VcsProjectLog.getInstance(project).getLogManager().getDataManager();
+    if (openLogTab != null) {
+      Disposer.dispose(openLogTab);
+    }
+    openLogTab = factory.createLogUi(project, data);
+    JComponent mainComponent = openLogTab.getMainComponent();
+    if (mainComponent != null) {
+      mainComponent.setAutoscrolls(true);
+      mainComponent.setSize(splitter.getSecondComponent().getSize());
+      splitter.setSecondComponent(mainComponent);
+      openLogTab.jumpToHash(info.getCommitId());
+    }
   }
+
 
   @NotNull
   private Tree createTree(List<RefactoringInfo> refactorings) {
