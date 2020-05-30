@@ -2,15 +2,23 @@ package data;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.JBDefaultTreeCellRenderer;
+import com.intellij.util.text.JBDateFormat;
 import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-class MyCellRenderer extends JBDefaultTreeCellRenderer {
+public class MyCellRenderer extends JBDefaultTreeCellRenderer {
+
+  private boolean isMethodHistory = false;
 
   public MyCellRenderer() {
     super();
+  }
+
+  public MyCellRenderer(boolean isMethodHistory) {
+    super();
+    this.isMethodHistory = isMethodHistory;
   }
 
   @Override
@@ -27,18 +35,28 @@ class MyCellRenderer extends JBDefaultTreeCellRenderer {
 
     String name = info.getType().getDisplayName();
     if (node.getUserObject() instanceof RefactoringInfo) {
-      setText(name);
+      if (isMethodHistory) {
+
+        StringBuffer html = new StringBuffer(
+            "<html> " + name + " <font color=\"#696969\"> "
+                + JBDateFormat.getFormatter()
+                .formatPrettyDateTime(info.getTimestamp()) + "</font></html>");
+        setText(html.toString());
+
+      } else {
+        setText(name);
+      }
     }
 
     Icon icon = null;
-    if (leaf) {
+    if (leaf && !isMethodHistory) {
       icon = AllIcons.Actions.Diff;
     } else if (name.contains("Class")) {
       icon = AllIcons.Nodes.Class;
     } else if (name.contains("Method")) {
       icon = AllIcons.Nodes.Method;
     } else if (name.contains("Attribute")) {
-      icon = AllIcons.Nodes.ObjectTypeAttribute;
+      icon = AllIcons.Nodes.Field;
     } else if (name.contains("Variable")) {
       icon = AllIcons.Nodes.Variable;
     } else if (name.contains("Parameter")) {
@@ -53,8 +71,10 @@ class MyCellRenderer extends JBDefaultTreeCellRenderer {
     if (node.getRoot().equals(node.getParent())) {
       icon = AllIcons.Actions.SuggestedRefactoringBulb;
     }
+    if (leaf && isMethodHistory) {
+      icon = null;
+    }
     setIcon(icon);
-
     return this;
   }
 }

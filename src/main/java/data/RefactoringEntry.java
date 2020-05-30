@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class RefactoringEntry implements Serializable {
 
@@ -81,19 +82,10 @@ public class RefactoringEntry implements Serializable {
 
     Tree tree = new Tree(root);
     tree.setRootVisible(false);
-    expandAllNodes(tree, 0, tree.getRowCount());
+    Utils.expandAllNodes(tree, 0, tree.getRowCount());
     MyCellRenderer renderer = new MyCellRenderer();
     tree.setCellRenderer(renderer);
     return tree;
-  }
-
-  private void expandAllNodes(Tree tree, int startingIndex, int rowCount) {
-    for (int i = startingIndex; i < rowCount; ++i) {
-      tree.expandRow(i);
-    }
-    if (tree.getRowCount() != rowCount) {
-      expandAllNodes(tree, rowCount, tree.getRowCount());
-    }
   }
 
   public List<RefactoringInfo> getRefactorings() {
