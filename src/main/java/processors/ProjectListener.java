@@ -2,16 +2,13 @@ package processors;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManagerListener;
-import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.NotNull;
-import ui.MethodRefactoringToolbar;
+import utils.Utils;
 
 public class ProjectListener implements ProjectManagerListener {
 
   @Override
   public void projectClosing(@NotNull Project project) {
-    if (MethodRefactoringToolbar.openLogTab != null) {
-      Disposer.dispose(MethodRefactoringToolbar.openLogTab);
-    }
+    Utils.dispose();
   }
 }

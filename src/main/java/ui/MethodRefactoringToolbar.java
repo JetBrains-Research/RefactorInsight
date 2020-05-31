@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -40,10 +39,10 @@ import utils.Utils;
 public class MethodRefactoringToolbar {
 
   private final VcsLogManager.VcsLogUiFactory<? extends MainVcsLogUi> factory;
+  private MainVcsLogUi openLogTab;
   private ToolWindowManager toolWindowManager;
   private ToolWindow toolWindow;
   private Project project;
-  public static MainVcsLogUi openLogTab;
 
   /**
    * Constructor for the toolbar.
@@ -56,8 +55,8 @@ public class MethodRefactoringToolbar {
 
     factory = VcsProjectLog.getInstance(project).getLogManager()
         .getMainLogUiFactory("method history", VcsLogFilterObject.collection());
-    toolWindow = toolWindowManager
-        .registerToolWindow("Refactoring History", true, ToolWindowAnchor.BOTTOM);
+    toolWindow =
+        toolWindowManager.registerToolWindow("Refactoring History", true, ToolWindowAnchor.BOTTOM);
   }
 
   /**
@@ -72,59 +71,59 @@ public class MethodRefactoringToolbar {
     if (refactorings == null || refactorings.isEmpty()) {
       showPopup(datacontext);
     } else {
-
       JBSplitter splitter = new JBSplitter(false, (float) 0.3);
-
       Tree tree = createTree(refactorings);
       tree.setRootVisible(false);
       Utils.expandAllNodes(tree, 0, tree.getRowCount());
       tree.setCellRenderer(new MyCellRenderer(true));
-
-
-      tree.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-          if (e.getClickCount() == 2) {
-            TreePath path = tree.getPathForLocation(e.getX(), e.getY());
-            if (path == null) {
-              return;
-            }
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-                path.getLastPathComponent();
-            if (node.isLeaf()) {
-              RefactoringInfo info = (RefactoringInfo) node.getUserObjectPath()[1];
-              showLogTab(info, splitter);
-            }
-          }
-        }
-      });
-
-
-      JBScrollPane pane = new JBScrollPane(tree);
-      int size = refactorings.size();
-      JBLabel label =
-          new JBLabel(
-              size + (size > 1 ? " refactorings" : " refactoring") + " detected for this method");
-      label.setForeground(Gray._105);
-      pane.setColumnHeaderView(label);
-      splitter.setFirstComponent(pane);
-
-      final JBLabel component =
-          new JBLabel("Double click to jump at commit.", SwingConstants.CENTER);
-      component.setForeground(Gray._105);
-      splitter.setSecondComponent(component);
-
+      addMouseListener(splitter, tree);
+      setFirstComponent(refactorings.size(), splitter, tree);
+      setSecondComponent(splitter);
       showContent(methodName, splitter);
     }
+  }
 
+  private void setSecondComponent(JBSplitter splitter) {
+    final JBLabel component =
+        new JBLabel("Double click to jump at commit.", SwingConstants.CENTER);
+    component.setForeground(Gray._105);
+    splitter.setSecondComponent(component);
+  }
+
+  private void setFirstComponent(int size, JBSplitter splitter, Tree tree) {
+    JBScrollPane pane = new JBScrollPane(tree);
+    JBLabel label =
+        new JBLabel(
+            size + (size > 1 ? " refactorings" : " refactoring") + " detected for this method");
+    label.setForeground(Gray._105);
+    pane.setColumnHeaderView(label);
+    splitter.setFirstComponent(pane);
+  }
+
+  private void addMouseListener(JBSplitter splitter, Tree tree) {
+    tree.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        if (e.getClickCount() == 2) {
+          TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+          if (path == null) {
+            return;
+          }
+          DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+              path.getLastPathComponent();
+          if (node.isLeaf()) {
+            RefactoringInfo info = (RefactoringInfo) node.getUserObjectPath()[1];
+            showLogTab(info, splitter);
+          }
+        }
+      }
+    });
   }
 
   private void showLogTab(RefactoringInfo info, JBSplitter splitter) {
     VcsLogData data = VcsProjectLog.getInstance(project).getLogManager().getDataManager();
-    if (openLogTab != null) {
-      Disposer.dispose(openLogTab);
-    }
     openLogTab = factory.createLogUi(project, data);
+    Utils.add(openLogTab);
     JComponent mainComponent = openLogTab.getMainComponent();
     if (mainComponent != null) {
       mainComponent.setAutoscrolls(true);
@@ -133,7 +132,6 @@ public class MethodRefactoringToolbar {
       openLogTab.jumpToHash(info.getCommitId());
     }
   }
-
 
   @NotNull
   private Tree createTree(List<RefactoringInfo> refactorings) {
@@ -154,7 +152,8 @@ public class MethodRefactoringToolbar {
 
   private void showContent(String methodName, JComponent tree) {
     Content content;
-    if ((content = toolWindow.getContentManager().findContent(methodName)) != null) {
+    if ((content = toolWindow.getContentManager()
+        .findContent(methodName.substring(methodName.lastIndexOf(".") + 1))) != null) {
       content.setComponent(tree);
     } else {
       ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
