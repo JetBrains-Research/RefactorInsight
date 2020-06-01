@@ -16,13 +16,13 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.treeStructure.Tree;
-import com.intellij.vcs.log.VcsLogFilterCollection;
+import com.intellij.vcs.log.data.VcsLogData;
 import com.intellij.vcs.log.impl.VcsLogManager;
 import com.intellij.vcs.log.impl.VcsProjectLog;
+import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.visible.filters.VcsLogFilterObject;
 import data.MyCellRenderer;
 import data.RefactoringInfo;
-import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -38,6 +38,8 @@ import utils.Utils;
 
 public class MethodRefactoringToolbar {
 
+  private final VcsLogManager.VcsLogUiFactory<? extends MainVcsLogUi> factory;
+  private MainVcsLogUi openLogTab;
   private ToolWindowManager toolWindowManager;
   private ToolWindow toolWindow;
   private Project project;
@@ -50,8 +52,11 @@ public class MethodRefactoringToolbar {
   public MethodRefactoringToolbar(Project project) {
     this.project = project;
     toolWindowManager = ToolWindowManager.getInstance(project);
-    toolWindow = toolWindowManager
-        .registerToolWindow("Refactoring History", true, ToolWindowAnchor.BOTTOM);
+
+    factory = VcsProjectLog.getInstance(project).getLogManager()
+        .getMainLogUiFactory("method history", VcsLogFilterObject.collection());
+    toolWindow =
+        toolWindowManager.registerToolWindow("Refactoring History", true, ToolWindowAnchor.BOTTOM);
   }
 
   /**
@@ -66,56 +71,66 @@ public class MethodRefactoringToolbar {
     if (refactorings == null || refactorings.isEmpty()) {
       showPopup(datacontext);
     } else {
-
-      JBSplitter splitter = new JBSplitter(false, (float) 0.5);
-
+      JBSplitter splitter = new JBSplitter(false, (float) 0.3);
       Tree tree = createTree(refactorings);
       tree.setRootVisible(false);
       Utils.expandAllNodes(tree, 0, tree.getRowCount());
       tree.setCellRenderer(new MyCellRenderer(true));
-
-
-      tree.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-          if (e.getClickCount() == 2) {
-            TreePath path = tree.getPathForLocation(e.getX(), e.getY());
-            if (path == null) {
-              return;
-            }
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-                path.getLastPathComponent();
-            if (node.isLeaf()) {
-              RefactoringInfo info = (RefactoringInfo) node.getUserObjectPath()[1];
-              showLogTab(info);
-            }
-          }
-        }
-      });
-
-      splitter.setFirstComponent(tree);
-      final JBLabel component =
-          new JBLabel("Double click to jump at commit.", SwingConstants.CENTER);
-      component.setForeground(Gray._105);
-      splitter.setSecondComponent(component);
-      JBScrollPane pane = new JBScrollPane(splitter);
-      int size = refactorings.size();
-      JBLabel label =
-          new JBLabel(
-              size + (size > 1 ? " refactorings" : " refactoring") + " detected for this method");
-      label.setForeground(Gray._105);
-      pane.setColumnHeaderView(label);
-      showContent(methodName, pane);
+      addMouseListener(splitter, tree);
+      setFirstComponent(refactorings.size(), splitter, tree);
+      setSecondComponent(splitter);
+      showContent(methodName, splitter);
     }
-
   }
 
-  private void showLogTab(RefactoringInfo info) {
-    VcsLogFilterCollection filters = VcsLogFilterObject.collection();
-    VcsLogManager.LogWindowKind kind = VcsLogManager.LogWindowKind.TOOL_WINDOW;
-    VcsProjectLog.getInstance(project).openLogTab(filters, kind)
-        .getVcsLog()
-        .jumpToReference(info.getCommitId());
+  private void setSecondComponent(JBSplitter splitter) {
+    final JBLabel component =
+        new JBLabel("Double click to jump at commit.", SwingConstants.CENTER);
+    component.setForeground(Gray._105);
+    splitter.setSecondComponent(component);
+  }
+
+  private void setFirstComponent(int size, JBSplitter splitter, Tree tree) {
+    JBScrollPane pane = new JBScrollPane(tree);
+    JBLabel label =
+        new JBLabel(
+            size + (size > 1 ? " refactorings" : " refactoring") + " detected for this method");
+    label.setForeground(Gray._105);
+    pane.setColumnHeaderView(label);
+    splitter.setFirstComponent(pane);
+  }
+
+  private void addMouseListener(JBSplitter splitter, Tree tree) {
+    tree.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        if (e.getClickCount() == 2) {
+          TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+          if (path == null) {
+            return;
+          }
+          DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+              path.getLastPathComponent();
+          if (node.isLeaf()) {
+            RefactoringInfo info = (RefactoringInfo) node.getUserObjectPath()[1];
+            showLogTab(info, splitter);
+          }
+        }
+      }
+    });
+  }
+
+  private void showLogTab(RefactoringInfo info, JBSplitter splitter) {
+    VcsLogData data = VcsProjectLog.getInstance(project).getLogManager().getDataManager();
+    openLogTab = factory.createLogUi(project, data);
+    Utils.add(openLogTab);
+    JComponent mainComponent = openLogTab.getMainComponent();
+    if (mainComponent != null) {
+      mainComponent.setAutoscrolls(true);
+      mainComponent.setSize(splitter.getSecondComponent().getSize());
+      splitter.setSecondComponent(mainComponent);
+      openLogTab.jumpToHash(info.getCommitId());
+    }
   }
 
   @NotNull
@@ -137,7 +152,8 @@ public class MethodRefactoringToolbar {
 
   private void showContent(String methodName, JComponent tree) {
     Content content;
-    if ((content = toolWindow.getContentManager().findContent(methodName)) != null) {
+    if ((content = toolWindow.getContentManager()
+        .findContent(methodName.substring(methodName.lastIndexOf(".") + 1))) != null) {
       content.setComponent(tree);
     } else {
       ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();

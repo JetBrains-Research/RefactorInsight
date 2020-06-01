@@ -40,6 +40,7 @@
 
     <projectListeners>
         <listener class="processors.CommitListener" topic="git4idea.repo.GitRepositoryChangeListener"/>
+        <listener class="processors.ProjectListener" topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </projectListeners>
 
 
