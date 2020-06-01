@@ -1,6 +1,5 @@
 package services;
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;
@@ -15,13 +14,18 @@ import com.intellij.util.xmlb.annotations.MapAnnotation;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
+import data.RefactoringLine;
+import data.RefactoringOffset;
 import git4idea.history.GitHistoryUtils;
 import git4idea.repo.GitRepository;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +34,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import processors.CommitMiner;
-import ui.GitWindow;
 import ui.GitWindowInfo;
 
 @State(name = "MiningRefactoringsState",
@@ -63,7 +68,12 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
   @Override
   public void loadState(MyState state) {
-    innerState = state;
+    if (version().equals(state.map.get("version"))) {
+      innerState = state;
+    } else {
+      innerState = new MyState();
+      innerState.map.put("version", version());
+    }
   }
 
   /**
@@ -152,9 +162,10 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
   /**
    * Method for mining a single commit.
-   *  @param commit    to be mined.
-   * @param project   current project.
-   * @param info to be updated.
+   *
+   * @param commit  to be mined.
+   * @param project current project.
+   * @param info    to be updated.
    */
   public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindowInfo info) {
     System.out.println("Mining commit " + commit.getId().asString());
@@ -211,6 +222,21 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
   public RefactoringEntry getEntry(String hash) {
     return RefactoringEntry.fromString(innerState.map.get(hash));
+  }
+
+  private String version() {
+    return String.valueOf(Stream.of(
+        //all classes that can change
+        RefactoringEntry.class,
+        RefactoringInfo.class,
+        RefactoringLine.class,
+        RefactoringOffset.class
+        ).flatMap(c -> Arrays.stream(c.getDeclaredFields())
+            .map(Field::getGenericType)
+            .map(Type::getTypeName)
+        ).collect(Collectors.toList())
+            .hashCode()
+    );
   }
 
   public static class MyState {
