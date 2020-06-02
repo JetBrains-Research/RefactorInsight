@@ -22,19 +22,7 @@ import data.types.classes.MoveClassHandler;
 import data.types.classes.MoveRenameClassHandler;
 import data.types.classes.RemoveClassAnnotationHandler;
 import data.types.classes.RenameClassHandler;
-import data.types.methods.AddMethodAnnotationHandler;
-import data.types.methods.AddParameterHandler;
-import data.types.methods.ChangeReturnTypeHandler;
-import data.types.methods.ExtractOperationHandler;
-import data.types.methods.InlineOperationHandler;
-import data.types.methods.MergeOperationHandler;
-import data.types.methods.ModifyMethodAnnotationHandler;
-import data.types.methods.MoveOperationHandler;
-import data.types.methods.PullUpOperationHandler;
-import data.types.methods.PushDownOperationHandler;
-import data.types.methods.RemoveMethodAnnotationHandler;
-import data.types.methods.RemoveParameterHandler;
-import data.types.methods.RenameMethodHandler;
+import data.types.methods.*;
 import data.types.packages.MoveSourceFolderHandler;
 import data.types.packages.RenamePackageHandler;
 import data.types.variables.ChangeVariableTypeHandler;
@@ -163,6 +151,8 @@ public class InfoFactory {
         new RemoveClassAnnotationHandler());
     refactoringHandlers.put(RefactoringType.MODIFY_CLASS_ANNOTATION,
         new ModifyClassAnnotationHandler());
+    refactoringHandlers.put(RefactoringType.REORDER_PARAMETER,
+        new ReorderParameterHandler());
   }
 
   /**

@@ -13,8 +13,8 @@ public class AddParameterHandler extends Handler {
     return info.setGroup(Group.METHOD)
         .setNameBefore(calculateSignature(ref.getOperationBefore()))
         .setNameAfter(calculateSignature(ref.getOperationAfter()))
-        .setElementBefore(ref.getParameter().getVariableDeclaration().toQualifiedString())
-        .setElementAfter(null)
+        .setElementBefore(null)
+        .setElementAfter(ref.getParameter().getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOperationBefore().codeRange(), ref.getOperationAfter().codeRange(),
             line -> line.addOffset(0, 0,
                 ref.getParameter().getVariableDeclaration().getLocationInfo().getStartOffset(),
