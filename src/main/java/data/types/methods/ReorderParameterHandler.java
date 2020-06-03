@@ -7,6 +7,7 @@ import gr.uom.java.xmi.diff.ReorderParameterRefactoring;
 import org.refactoringminer.api.Refactoring;
 
 public class ReorderParameterHandler extends Handler {
+
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ReorderParameterRefactoring ref = (ReorderParameterRefactoring) refactoring;

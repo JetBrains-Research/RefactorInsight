@@ -12,8 +12,6 @@ public class ExtractClassHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ExtractClassRefactoring ref = (ExtractClassRefactoring) refactoring;
 
-    //TODO implement three file viewer
-
     return info.setGroup(Group.CLASS)
         .setElementBefore("from " + ref.getOriginalClass().getName())
         .setElementAfter("extracted " + ref.getExtractedClass().getName())

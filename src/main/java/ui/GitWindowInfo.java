@@ -20,8 +20,10 @@ import java.awt.event.MouseEvent;
 import java.util.Collection;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import org.jetbrains.annotations.NotNull;
 import services.MiningService;
 import services.RefactoringsBundle;
+import ui.renderer.CellRenderer;
 
 public class GitWindowInfo {
   private Project project;
@@ -103,7 +105,15 @@ public class GitWindowInfo {
     }
 
     Tree tree = entry.buildTree();
-    tree.addMouseListener(new MouseAdapter() {
+    tree.setCellRenderer(new CellRenderer());
+
+    tree.addMouseListener(createListener(index, tree));
+    viewport.setView(tree);
+  }
+
+  @NotNull
+  private MouseAdapter createListener(int index, Tree tree) {
+    return new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent ev) {
         if (ev.getClickCount() == 2) {
@@ -111,17 +121,14 @@ public class GitWindowInfo {
           if (path == null) {
             return;
           }
-          DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-              path.getLastPathComponent();
+          DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
           if (node.isLeaf()) {
-            RefactoringInfo info = (RefactoringInfo)
-                node.getUserObjectPath()[1];
+            RefactoringInfo info = (RefactoringInfo) node.getUserObjectPath()[1];
             showDiff(index, info);
           }
         }
       }
-    });
-    viewport.setView(tree);
+    };
   }
 
   private void showDiff(int index, RefactoringInfo info) {

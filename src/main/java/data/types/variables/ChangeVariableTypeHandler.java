@@ -22,7 +22,12 @@ public class ChangeVariableTypeHandler extends Handler {
           + ref.getChangedTypeVariable().getVariableName();
     }
     info.setGroupId(id);
-    return info.setGroup(Group.VARIABLE)
+    if (ref.getChangedTypeVariable().isParameter()) {
+      info.setGroup(Group.PARAMETER);
+    } else {
+      info.setGroup(Group.VARIABLE);
+    }
+    return info
         .setElementBefore(ref.getOriginalVariable().toQualifiedString())
         .setElementAfter(ref.getChangedTypeVariable().toQualifiedString())
         .setNameBefore("in method " + ref.getOperationAfter().getName())

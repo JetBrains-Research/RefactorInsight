@@ -19,9 +19,9 @@ import org.refactoringminer.api.RefactoringType;
 public class RefactoringInfo {
 
   @Nullable
-  String elementBefore;
+  private String elementBefore;
   @Nullable
-  String elementAfter;
+  private String elementAfter;
   private transient RefactoringEntry entry;
   private String name;
   private String nameBefore;

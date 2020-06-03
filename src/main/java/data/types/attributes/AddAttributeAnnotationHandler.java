@@ -8,6 +8,7 @@ import gr.uom.java.xmi.diff.AddAttributeAnnotationRefactoring;
 import org.refactoringminer.api.Refactoring;
 
 public class AddAttributeAnnotationHandler extends Handler {
+
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     AddAttributeAnnotationRefactoring ref = (AddAttributeAnnotationRefactoring) refactoring;

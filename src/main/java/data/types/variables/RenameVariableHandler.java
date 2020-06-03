@@ -20,7 +20,14 @@ public class RenameVariableHandler extends Handler {
           + ref.getRenamedVariable().getVariableName();
     }
     info.setGroupId(id);
-    return info.setGroup(Group.VARIABLE)
+
+    if (ref.getRenamedVariable().isParameter()) {
+      info.setGroup(Group.PARAMETER);
+    } else {
+      info.setGroup(Group.VARIABLE);
+    }
+
+    return info
         .setElementBefore(ref.getOriginalVariable().toQualifiedString())
         .setElementAfter(ref.getRenamedVariable().toQualifiedString())
         .setNameBefore("in method " + ref.getOperationAfter().getName())

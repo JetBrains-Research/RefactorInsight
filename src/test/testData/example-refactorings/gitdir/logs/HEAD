@@ -111,3 +111,5 @@ c3e62d4801ac0de22ab13e36d750cbdc5bf02986 27d8475b4db44e9a4980e65155ff387b1a67ea7
 04792cac8367a3930923decbe5cd8114982883e0 8f5b793f5c6491dde2fc5501bef422ef82e26c3a ioana <savuandreeaioana@yahoo.com> 1591194425 +0200	commit: Rename attribute.
 8f5b793f5c6491dde2fc5501bef422ef82e26c3a 10f5c41e356b04b708b64ccd7139fdd07518af1b ioana <savuandreeaioana@yahoo.com> 1591195979 +0200	commit: Change attribute type.
 10f5c41e356b04b708b64ccd7139fdd07518af1b dda8dc2feb6f5c517a1f8f6c265eb5efe700cb9d ioana <savuandreeaioana@yahoo.com> 1591199380 +0200	commit: Change attribute type.
+dda8dc2feb6f5c517a1f8f6c265eb5efe700cb9d 567c4cc09f20d4db661bcdfa3ca8334a269731a2 ioana <savuandreeaioana@yahoo.com> 1591218573 +0200	commit: Extract Abstract Class.
+567c4cc09f20d4db661bcdfa3ca8334a269731a2 b008734cbc613e74d7a570a9b33fcdd71b37fcd6 ioana <savuandreeaioana@yahoo.com> 1591220766 +0200	commit: Extract Interface.

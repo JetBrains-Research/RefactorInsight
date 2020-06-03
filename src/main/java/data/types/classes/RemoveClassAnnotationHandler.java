@@ -8,6 +8,7 @@ import gr.uom.java.xmi.diff.RemoveClassAnnotationRefactoring;
 import org.refactoringminer.api.Refactoring;
 
 public class RemoveClassAnnotationHandler extends Handler {
+
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RemoveClassAnnotationRefactoring ref = (RemoveClassAnnotationRefactoring) refactoring;

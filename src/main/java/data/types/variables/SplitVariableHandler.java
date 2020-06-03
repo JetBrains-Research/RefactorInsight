@@ -16,7 +16,13 @@ public class SplitVariableHandler extends Handler {
     ref.getSplitVariables().forEach(var ->
         info.addMarking(ref.getOldVariable().codeRange(), var.codeRange()));
 
-    return info.setGroup(Group.VARIABLE).setNameBefore(ref.getOldVariable().getVariableName())
+    if (ref.getOldVariable().isParameter()) {
+      info.setGroup(Group.PARAMETER);
+    } else {
+      info.setGroup(Group.VARIABLE);
+    }
+
+    return info.setNameBefore(ref.getOldVariable().getVariableName())
         .setNameAfter(ref.getSplitVariables().stream().map(x -> x.getVariableName()).collect(
             Collectors.joining()));
   }

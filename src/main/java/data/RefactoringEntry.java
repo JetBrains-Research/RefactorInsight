@@ -140,8 +140,6 @@ public class RefactoringEntry implements Serializable {
     Tree tree = new Tree(root);
     tree.setRootVisible(false);
     Utils.expandAllNodes(tree, 0, tree.getRowCount());
-    MyCellRenderer renderer = new MyCellRenderer();
-    tree.setCellRenderer(renderer);
     return tree;
   }
 

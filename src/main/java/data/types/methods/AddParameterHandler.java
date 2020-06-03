@@ -7,6 +7,7 @@ import gr.uom.java.xmi.diff.AddParameterRefactoring;
 import org.refactoringminer.api.Refactoring;
 
 public class AddParameterHandler extends Handler {
+
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     AddParameterRefactoring ref = (AddParameterRefactoring) refactoring;

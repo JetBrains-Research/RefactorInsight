@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.Times;
 import ui.GitWindowInfo;
+import ui.renderer.CellRenderer;
 
 /**
  * Extend GitSingleRepoTest
@@ -70,7 +71,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
     assertNull(RefactoringEntry.fromString(""));
     assertNull(RefactoringEntry.fromString(null));
 
-    assertEquals(5, entry.getRefactorings().size());
+    assertEquals(1, entry.getRefactorings().size());
     assertTrue(miner.getRefactorings(head).length() > 0);
 
     assertThrows(IllegalArgumentException.class, () -> MiningService.getInstance(null));
@@ -85,6 +86,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
   public void testTreeIsBuilt() {
     RefactoringEntry entry = miner.getEntry(head);
     Tree tree = entry.buildTree();
+    tree.setCellRenderer(new CellRenderer());
     TreeCellRenderer cellRenderer = tree.getCellRenderer();
     Object root = tree.getModel().getRoot();
     assertNotNull(cellRenderer
