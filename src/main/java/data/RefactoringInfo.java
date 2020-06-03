@@ -206,22 +206,22 @@ public class RefactoringInfo {
    * Get line markings for two sided window.
    * Should only be called if isThreeSided() evaluates to false.
    */
-  public List<LineFragment> getTwoSidedLineMarkings(int maxLineBefore, int maxLineAfter) {
+  public List<LineFragment> getTwoSidedLineMarkings(String leftText, String rightText) {
     return lineMarkings.stream().map(l ->
-        l.getTwoSidedRange(maxLineBefore, maxLineAfter)).collect(Collectors.toList());
+        l.getTwoSidedRange(leftText, rightText)).collect(Collectors.toList());
   }
 
   /**
    * Get line markings for two sided window.
    * Should only be called if isThreeSided() evaluates to true.
    */
-  public List<SimpleThreesideDiffChange> getThreeSidedLineMarkings(int maxLineLeft,
-                                                                   int maxLineMid,
-                                                                   int maxLineRight,
+  public List<SimpleThreesideDiffChange> getThreeSidedLineMarkings(String textLeft,
+                                                                   String textMid,
+                                                                   String textRight,
                                                                    SimpleThreesideDiffViewer
                                                                        viewer) {
     return lineMarkings.stream()
-        .map(line -> line.getThreeSidedRange(maxLineLeft, maxLineMid, maxLineRight, viewer))
+        .map(line -> line.getThreeSidedRange(textLeft, textMid, textRight, viewer))
         .collect(Collectors.toList());
   }
 
