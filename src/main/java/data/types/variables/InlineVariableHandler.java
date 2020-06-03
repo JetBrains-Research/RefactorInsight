@@ -19,8 +19,8 @@ public class InlineVariableHandler extends Handler {
         .addMarking(ref.getVariableDeclaration().codeRange(),
             ref.getInlinedVariableDeclarationCodeRange(), line ->
                 line.addOffset(ref.getVariableDeclaration().getLocationInfo().getStartOffset(),
-                        ref.getVariableDeclaration().getLocationInfo().getEndOffset(),
-                        0, 0));
+                    ref.getVariableDeclaration().getLocationInfo().getEndOffset(),
+                    0, 0));
 
   }
 }

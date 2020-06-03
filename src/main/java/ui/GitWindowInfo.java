@@ -54,6 +54,10 @@ public class GitWindowInfo {
     });
   }
 
+  public boolean isSelected() {
+    return state;
+  }
+
   /**
    * Applies selects or deselects the tool window.
    *
@@ -66,10 +70,6 @@ public class GitWindowInfo {
       viewport.setView(changesTree);
     }
     this.state = state;
-  }
-
-  public boolean isSelected() {
-    return state;
   }
 
   /**

@@ -1,7 +1,5 @@
 package data.types.classes;
 
-import com.intellij.vcs.log.Hash;
-import com.intellij.vcs.log.impl.HashImpl;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;

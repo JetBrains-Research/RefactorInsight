@@ -116,8 +116,9 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
     /**
      * EventListener for DiffWindow finishing diff calculation.
-     * @param viewer DiffViewer
-     * @param info RefactoringInfo
+     *
+     * @param viewer    DiffViewer
+     * @param info      RefactoringInfo
      * @param maxValues TextLengths
      */
     public MyDiffViewerListener(SimpleThreesideDiffViewer viewer,

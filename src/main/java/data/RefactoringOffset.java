@@ -1,7 +1,6 @@
 package data;
 
 import com.intellij.diff.fragments.DiffFragmentImpl;
-import com.intellij.diff.tools.simple.SimpleDiffViewer;
 import com.intellij.openapi.util.TextRange;
 
 public class RefactoringOffset {
@@ -14,7 +13,7 @@ public class RefactoringOffset {
   private int rightEnd;
 
   /**
-   * Subhighlighting two sided.
+   * Sub-highlighting two sided.
    * These params are the character where to start and where to end
    *
    * @param leftStart  int
@@ -30,7 +29,7 @@ public class RefactoringOffset {
   }
 
   /**
-   * Subhighlighting three sided.
+   * Sub-highlighting three sided.
    * These params are the character where to start and where to end
    *
    * @param leftStart  int
