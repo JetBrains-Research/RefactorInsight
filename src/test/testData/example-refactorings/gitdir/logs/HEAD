@@ -96,3 +96,18 @@ a5c324259abf5377c828229b1ef754a5e17dc0b9 a8007435707d4f2ed01eb1e50c62ae571169f4a
 a8007435707d4f2ed01eb1e50c62ae571169f4aa 066d5739078f17903dd14472f4454cd28a53e992 ioana <a.i.savu-1@student.tudelft.nl> 1590832143 +0200	rebase -i (pick): Remove parameter
 066d5739078f17903dd14472f4454cd28a53e992 4a0e32c80a0373979a13644ca7e3a13ed167b38a ioana <a.i.savu-1@student.tudelft.nl> 1590832143 +0200	rebase -i (pick): Modify class annotation.
 4a0e32c80a0373979a13644ca7e3a13ed167b38a 4a0e32c80a0373979a13644ca7e3a13ed167b38a ioana <a.i.savu-1@student.tudelft.nl> 1590832143 +0200	rebase -i (finish): returning to refs/heads/setup-repository
+4a0e32c80a0373979a13644ca7e3a13ed167b38a c3e62d4801ac0de22ab13e36d750cbdc5bf02986 ioana <a.i.savu-1@student.tudelft.nl> 1590832539 +0200	merge origin/setup-repository: Merge made by the 'recursive' strategy.
+c3e62d4801ac0de22ab13e36d750cbdc5bf02986 61b849a00cb43cecee3a76aad5fdff551a810b21 ioana <a.i.savu-1@student.tudelft.nl> 1590832661 +0200	checkout: moving from setup-repository to master
+61b849a00cb43cecee3a76aad5fdff551a810b21 c3e62d4801ac0de22ab13e36d750cbdc5bf02986 ioana <a.i.savu-1@student.tudelft.nl> 1590832720 +0200	checkout: moving from master to setup-repository
+c3e62d4801ac0de22ab13e36d750cbdc5bf02986 61b849a00cb43cecee3a76aad5fdff551a810b21 ioana <a.i.savu-1@student.tudelft.nl> 1590832727 +0200	checkout: moving from setup-repository to master
+61b849a00cb43cecee3a76aad5fdff551a810b21 c3e62d4801ac0de22ab13e36d750cbdc5bf02986 ioana <a.i.savu-1@student.tudelft.nl> 1590832730 +0200	checkout: moving from master to setup-repository
+c3e62d4801ac0de22ab13e36d750cbdc5bf02986 61b849a00cb43cecee3a76aad5fdff551a810b21 ioana <savuandreeaioana@yahoo.com> 1590832763 +0200	checkout: moving from setup-repository to master
+61b849a00cb43cecee3a76aad5fdff551a810b21 5782933215b6de058adf69483d60271d67c598b4 ioana <savuandreeaioana@yahoo.com> 1590832768 +0200	pull origin master: Fast-forward
+5782933215b6de058adf69483d60271d67c598b4 c3e62d4801ac0de22ab13e36d750cbdc5bf02986 ioana <savuandreeaioana@yahoo.com> 1590840029 +0200	checkout: moving from master to setup-repository
+c3e62d4801ac0de22ab13e36d750cbdc5bf02986 4033cda87451f2b7305f51b4245a0f41a4a18be1 ioana <savuandreeaioana@yahoo.com> 1590842151 +0200	checkout: moving from setup-repository to test
+4033cda87451f2b7305f51b4245a0f41a4a18be1 c3e62d4801ac0de22ab13e36d750cbdc5bf02986 ioana <savuandreeaioana@yahoo.com> 1591003965 +0200	checkout: moving from test to setup-repository
+c3e62d4801ac0de22ab13e36d750cbdc5bf02986 27d8475b4db44e9a4980e65155ff387b1a67ea7b ioana <savuandreeaioana@yahoo.com> 1591105846 +0200	pull origin setup-repository: Fast-forward
+27d8475b4db44e9a4980e65155ff387b1a67ea7b 04792cac8367a3930923decbe5cd8114982883e0 ioana <savuandreeaioana@yahoo.com> 1591194282 +0200	commit: Rename and change type attribute.
+04792cac8367a3930923decbe5cd8114982883e0 8f5b793f5c6491dde2fc5501bef422ef82e26c3a ioana <savuandreeaioana@yahoo.com> 1591194425 +0200	commit: Rename attribute.
+8f5b793f5c6491dde2fc5501bef422ef82e26c3a 10f5c41e356b04b708b64ccd7139fdd07518af1b ioana <savuandreeaioana@yahoo.com> 1591195979 +0200	commit: Change attribute type.
+10f5c41e356b04b708b64ccd7139fdd07518af1b dda8dc2feb6f5c517a1f8f6c265eb5efe700cb9d ioana <savuandreeaioana@yahoo.com> 1591199380 +0200	commit: Change attribute type.

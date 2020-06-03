@@ -33,16 +33,14 @@ public class MyCellRenderer extends JBDefaultTreeCellRenderer {
     }
     RefactoringInfo info = (RefactoringInfo) node.getUserObjectPath()[1];
 
-    String name = info.getType().getDisplayName();
+    String name = info.getName();
     if (node.getUserObject() instanceof RefactoringInfo) {
       if (isMethodHistory) {
-
         StringBuffer html = new StringBuffer(
             "<html> " + name + " <font color=\"#696969\"> "
                 + JBDateFormat.getFormatter()
                 .formatPrettyDateTime(info.getTimestamp()) + "</font></html>");
         setText(html.toString());
-
       } else {
         setText(name);
       }

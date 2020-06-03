@@ -70,7 +70,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
     assertNull(RefactoringEntry.fromString(""));
     assertNull(RefactoringEntry.fromString(null));
 
-    assertEquals(1, entry.getRefactorings().size());
+    assertEquals(5, entry.getRefactorings().size());
     assertTrue(miner.getRefactorings(head).length() > 0);
 
     assertThrows(IllegalArgumentException.class, () -> MiningService.getInstance(null));

@@ -51,3 +51,9 @@ f5dada09bc95f0a0b21469a64be77c368abca420 9c8b2e1e099b03513e63036f5df76a047b600dc
 9feb2da5ea8ceff142e9c43416cfbdb659d86ff5 1147da02b6a6f7df662273a9e0ababe67f27080a ioana <a.i.savu-1@student.tudelft.nl> 1590786519 +0200	commit: Remove parameter
 1147da02b6a6f7df662273a9e0ababe67f27080a 182f5bd7f166be14de6ca03e93c56bae370a91a0 ioana <a.i.savu-1@student.tudelft.nl> 1590786556 +0200	commit: Modify class annotation.
 182f5bd7f166be14de6ca03e93c56bae370a91a0 4a0e32c80a0373979a13644ca7e3a13ed167b38a ioana <a.i.savu-1@student.tudelft.nl> 1590832143 +0200	rebase -i (finish): refs/heads/setup-repository onto 7a2d371e0d0006b6916352a1c9b575908b1d9aa7
+4a0e32c80a0373979a13644ca7e3a13ed167b38a c3e62d4801ac0de22ab13e36d750cbdc5bf02986 ioana <a.i.savu-1@student.tudelft.nl> 1590832539 +0200	merge origin/setup-repository: Merge made by the 'recursive' strategy.
+c3e62d4801ac0de22ab13e36d750cbdc5bf02986 27d8475b4db44e9a4980e65155ff387b1a67ea7b ioana <savuandreeaioana@yahoo.com> 1591105846 +0200	pull origin setup-repository: Fast-forward
+27d8475b4db44e9a4980e65155ff387b1a67ea7b 04792cac8367a3930923decbe5cd8114982883e0 ioana <savuandreeaioana@yahoo.com> 1591194282 +0200	commit: Rename and change type attribute.
+04792cac8367a3930923decbe5cd8114982883e0 8f5b793f5c6491dde2fc5501bef422ef82e26c3a ioana <savuandreeaioana@yahoo.com> 1591194425 +0200	commit: Rename attribute.
+8f5b793f5c6491dde2fc5501bef422ef82e26c3a 10f5c41e356b04b708b64ccd7139fdd07518af1b ioana <savuandreeaioana@yahoo.com> 1591195979 +0200	commit: Change attribute type.
+10f5c41e356b04b708b64ccd7139fdd07518af1b dda8dc2feb6f5c517a1f8f6c265eb5efe700cb9d ioana <savuandreeaioana@yahoo.com> 1591199380 +0200	commit: Change attribute type.

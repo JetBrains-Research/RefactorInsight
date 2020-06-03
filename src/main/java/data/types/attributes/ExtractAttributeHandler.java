@@ -11,7 +11,6 @@ public class ExtractAttributeHandler extends Handler {
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ExtractAttributeRefactoring ref = (ExtractAttributeRefactoring) refactoring;
-
     info.setGroup(Group.ATTRIBUTE)
         .setElementBefore("in class " + ref.getOriginalClass().getName())
         .setElementAfter(null)

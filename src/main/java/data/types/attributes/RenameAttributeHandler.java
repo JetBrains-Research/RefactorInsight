@@ -12,16 +12,15 @@ public class RenameAttributeHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RenameAttributeRefactoring ref = (RenameAttributeRefactoring) refactoring;
     return info.setGroup(Group.ATTRIBUTE)
+        .setGroupId(ref.getClassNameAfter() + "." + ref.getRenamedAttribute().getVariableName())
         .addMarking(ref.getOriginalAttribute().codeRange(), ref.getRenamedAttribute().codeRange(),
             line -> line.addOffset(ref.getOriginalAttribute().getLocationInfo(),
                 ref.getRenamedAttribute().getLocationInfo()))
-        .setNameBefore(
-            ref.getOriginalAttribute().getVariableName() + " in class "
-                + ref.getClassNameBefore().substring(ref.getClassNameBefore().lastIndexOf(".") + 1))
-        .setNameAfter(
-            ref.getOriginalAttribute().getVariableName() + " in class "
-                + ref.getClassNameBefore().substring(ref.getClassNameBefore().lastIndexOf(".") + 1))
-        .setElementBefore(ref.getOriginalAttribute().getVariableName())
-        .setElementAfter(ref.getRenamedAttribute().getVariableName());
+        .setElementBefore(ref.getOriginalAttribute().toQualifiedString())
+        .setElementAfter(ref.getRenamedAttribute().toQualifiedString())
+        .setNameBefore("in class " + ref.getClassNameAfter()
+            .substring(ref.getClassNameBefore().lastIndexOf(".") + 1))
+        .setNameAfter("in class " + ref.getClassNameAfter()
+            .substring(ref.getClassNameBefore().lastIndexOf(".") + 1));
   }
 }

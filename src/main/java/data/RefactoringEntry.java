@@ -1,8 +1,14 @@
 package data;
 
+import static org.refactoringminer.api.RefactoringType.CHANGE_ATTRIBUTE_TYPE;
+import static org.refactoringminer.api.RefactoringType.CHANGE_VARIABLE_TYPE;
+import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
+
 import com.google.gson.Gson;
 import com.intellij.ui.treeStructure.Tree;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -30,7 +36,26 @@ public class RefactoringEntry implements Serializable {
     this.parents = parents;
     this.time = time;
     this.commitId = commitId;
-    refactorings.forEach(r -> r.setEntry(this));
+    HashMap<String, List<RefactoringInfo>> map = new HashMap<>();
+    refactorings.forEach(r -> {
+      if (r.getGroupId() != null) {
+        List<RefactoringInfo> list = map.getOrDefault(r.getGroupId(), new ArrayList<>());
+        list.add(r);
+        map.put(r.getGroupId(), list);
+      }
+      r.setEntry(this);
+    });
+
+    map.forEach((k, v) -> {
+      if (v.size() > 1) {
+        RefactoringInfo info = getMainRefactoringInfo(v);
+        v.remove(info);
+        v.forEach(r -> {
+          info.addAllMarkings(r);
+          r.setHidden(true);
+        });
+      }
+    });
   }
 
   /**
@@ -71,6 +96,34 @@ public class RefactoringEntry implements Serializable {
         commitId, parents, time).toString();
   }
 
+  private RefactoringInfo getMainRefactoringInfo(List<RefactoringInfo> v) {
+    RefactoringInfo info = null;
+    if (v.stream().filter(x1 -> x1.getType() == RENAME_ATTRIBUTE).count() > 0 && v.stream().filter(
+        x2 -> x2.getType() == CHANGE_ATTRIBUTE_TYPE)
+        .count() > 0) {
+      info = v.stream().filter(x -> x.getType() == RENAME_ATTRIBUTE).collect(Collectors.toList())
+          .get(0);
+      info.setName("Change Attribute Type & Rename Attribute");
+    } else if (v.stream().filter(x1 -> x1.getType() == RENAME_ATTRIBUTE).count() > 0) {
+      info = v.stream().filter(x -> x.getType() == RENAME_ATTRIBUTE).collect(Collectors.toList())
+          .get(0);
+      info.setName("Rename Attribute");
+    } else if (v.stream().filter(x2 -> x2.getType() == CHANGE_ATTRIBUTE_TYPE).count() > 0) {
+      info =
+          v.stream().filter(x -> x.getType() == CHANGE_ATTRIBUTE_TYPE).collect(Collectors.toList())
+              .get(0);
+      info.setName("Change Attribute Type");
+    } else {
+      if (v.stream().filter(x -> x.getType() == CHANGE_VARIABLE_TYPE).count() > 0) {
+        info =
+            v.stream().filter(x -> x.getType() == CHANGE_VARIABLE_TYPE).collect(Collectors.toList())
+                .get(0);
+        info.setName("Change Variable Type & Rename Variable");
+      }
+    }
+    return info;
+  }
+
   /**
    * Builds a UI tree.
    *
@@ -78,7 +131,11 @@ public class RefactoringEntry implements Serializable {
    */
   public Tree buildTree() {
     DefaultMutableTreeNode root = new DefaultMutableTreeNode(commitId);
-    refactorings.forEach(r -> root.add(r.makeNode()));
+    refactorings.forEach(r -> {
+      if (!r.isHidden()) {
+        root.add(r.makeNode());
+      }
+    });
 
     Tree tree = new Tree(root);
     tree.setRootVisible(false);

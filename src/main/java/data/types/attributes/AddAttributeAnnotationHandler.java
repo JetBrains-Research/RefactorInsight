@@ -12,6 +12,7 @@ public class AddAttributeAnnotationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     AddAttributeAnnotationRefactoring ref = (AddAttributeAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
+
     return info.setGroup(Group.ATTRIBUTE)
         .setNameBefore(ref.getAttributeBefore().toQualifiedString())
         .setNameAfter(ref.getAttributeAfter().toQualifiedString())

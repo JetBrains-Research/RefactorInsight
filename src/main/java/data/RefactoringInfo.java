@@ -33,6 +33,8 @@ public class RefactoringInfo {
   private List<RefactoringLine> lineMarkings = new ArrayList<>();
   private Group group;
   private boolean threeSided = false;
+  private String groupId;
+  private boolean hidden = false;
 
   /**
    * Adds this refactoring to the method history map.
@@ -71,6 +73,30 @@ public class RefactoringInfo {
     return this;
   }
 
+  public boolean isHidden() {
+    return hidden;
+  }
+
+  public void setHidden(boolean hidden) {
+    this.hidden = hidden;
+  }
+
+  public String getGroupId() {
+    return groupId;
+  }
+
+  public RefactoringInfo setGroupId(String groupId) {
+    this.groupId = groupId;
+    return this;
+  }
+
+  public List<RefactoringLine> getLineMarkings() {
+    return lineMarkings;
+  }
+
+  public void addAllMarkings(RefactoringInfo info) {
+    this.lineMarkings.addAll(info.getLineMarkings());
+  }
 
   public RefactoringEntry getEntry() {
     return entry;
