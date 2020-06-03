@@ -2,6 +2,7 @@ package ui;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.ProjectLevelVcsManager;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
@@ -23,7 +24,7 @@ import javax.swing.tree.TreePath;
 import services.MiningService;
 import services.RefactoringsBundle;
 
-public class GitWindowInfo {
+public class GitWindow {
   private Project project;
 
   private ChangesTree changesTree;
@@ -37,7 +38,7 @@ public class GitWindowInfo {
    *
    * @param e action event
    */
-  public GitWindowInfo(AnActionEvent e) {
+  public GitWindow(AnActionEvent e) {
     VcsLogChangesBrowser changesBrowser =
         (VcsLogChangesBrowser) e.getData(VcsLogChangesBrowser.DATA_KEY);
     changesTree = changesBrowser.getViewer();
@@ -128,7 +129,6 @@ public class GitWindowInfo {
     try {
       Collection<Change> changes =
           table.getModel().getFullDetails(index).getChanges(0);
-
       String left = "";
       String right = "";
       for (Change change : changes) {

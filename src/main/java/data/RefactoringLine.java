@@ -9,11 +9,8 @@ import com.intellij.diff.fragments.MergeLineFragmentImpl;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
 import com.intellij.diff.tools.util.text.MergeInnerDifferences;
-import com.intellij.diff.util.DiffUtil;
 import com.intellij.diff.util.MergeConflictType;
 import com.intellij.diff.util.TextDiffType;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.impl.DocumentImpl;
 import com.intellij.openapi.util.TextRange;
 import gr.uom.java.xmi.LocationInfo;
 import gr.uom.java.xmi.diff.CodeRange;
@@ -33,7 +30,7 @@ public class RefactoringLine {
   private int[] lines = new int[6];
   private int[] columns = new int[6];
   private List<RefactoringOffset> offsets = new ArrayList<>();
-  private ThreeSidedType type;
+  private VisualisationType type;
   private boolean hasColumns = false;
 
   /**
@@ -47,7 +44,7 @@ public class RefactoringLine {
    * @param rightEnd   int
    */
   public RefactoringLine(int leftStart, int leftEnd, int midStart, int midEnd, int rightStart,
-                         int rightEnd, ThreeSidedType type) {
+                         int rightEnd, VisualisationType type) {
     lines[LEFT_START] = leftStart;
     lines[LEFT_END] = leftEnd;
     lines[MID_START] = midStart;
@@ -57,23 +54,23 @@ public class RefactoringLine {
     this.type = type;
   }
 
-  public RefactoringLine(CodeRange left, CodeRange mid, CodeRange right, ThreeSidedType type) {
-    lines[LEFT_START] = left.getStartLine();
+  public RefactoringLine(CodeRange left, CodeRange mid, CodeRange right, VisualisationType type) {
+    lines[LEFT_START] = left.getStartLine() - 1;
     lines[LEFT_END] = left.getEndLine();
-    lines[RIGHT_START] = right.getStartLine();
+    lines[RIGHT_START] = right.getStartLine() - 1;
     lines[RIGHT_END] = right.getEndLine();
 
-    columns[LEFT_START] = left.getStartColumn();
-    columns[LEFT_END] = left.getEndColumn();
-    columns[RIGHT_START] = right.getStartColumn();
-    columns[RIGHT_END] = right.getEndColumn();
+    columns[LEFT_START] = Math.max(left.getStartColumn(), 1);
+    columns[LEFT_END] = Math.max(left.getEndColumn(), 1);
+    columns[RIGHT_START] = Math.max(right.getStartColumn(), 1);
+    columns[RIGHT_END] = Math.max(right.getEndColumn(), 1);
 
     if (mid != null) {
-      lines[MID_START] = mid.getStartLine();
+      lines[MID_START] = mid.getStartLine() - 1;
       lines[MID_END] = mid.getEndLine();
 
-      columns[MID_START] = mid.getStartColumn();
-      columns[MID_END] = mid.getEndColumn();
+      columns[MID_START] = Math.max(mid.getStartColumn(), 1);
+      columns[MID_END] = Math.max(mid.getEndColumn(), 1);
     }
     this.hasColumns = true;
     this.type = type;
@@ -87,7 +84,7 @@ public class RefactoringLine {
    * Conflict type is used to set highlighting colors and can disable
    * highlighting in the left or right editor.
    */
-  public static MergeConflictType getConflictType(ThreeSidedType type) {
+  public static MergeConflictType getConflictType(VisualisationType type) {
     switch (type) {
       case LEFT:
         return new MergeConflictType(TextDiffType.MODIFIED, true, false);
@@ -96,6 +93,19 @@ public class RefactoringLine {
       default:
         return new MergeConflictType(TextDiffType.MODIFIED, true, true);
     }
+  }
+
+  private static int getMaxLine(String text) {
+    return text.split("\r\n|\r|\n").length;
+  }
+
+  private static int getOffset(String text, int line, int column) {
+    int offset = 0;
+    String[] lines = text.split("\r\n|\r|\n");
+    for (int i = 0; i < line - 1; i++) {
+      offset += lines[i].length() + 1;
+    }
+    return offset + column - 1;
   }
 
   /**
@@ -112,29 +122,24 @@ public class RefactoringLine {
         offsets.stream().map(RefactoringOffset::getRightRange).collect(Collectors.toList());
 
     if (hasColumns) {
-      Document leftDocument = new DocumentImpl(leftText);
-      Document midDocument = new DocumentImpl(midText);
-      Document rightDocument = new DocumentImpl(rightText);
-
+      int leftStartOffset = getOffset(leftText, lines[LEFT_START] + 1, 1);
       left.add(new TextRange(
-          DiffUtil.getOffset(leftDocument, lines[LEFT_START], columns[LEFT_START]),
-          DiffUtil.getOffset(leftDocument, lines[LEFT_END], columns[LEFT_END])
+          getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]) - leftStartOffset,
+          getOffset(leftText, lines[LEFT_END], columns[LEFT_END]) - leftStartOffset
       ));
+      int midStartOffset = getOffset(midText, lines[MID_START] + 1, 1);
       mid.add(new TextRange(
-          DiffUtil.getOffset(midDocument, lines[MID_START], columns[MID_START]),
-          DiffUtil.getOffset(midDocument, lines[MID_END], columns[MID_END])
+          getOffset(midText, lines[MID_START] + 1, columns[MID_START]) - midStartOffset,
+          getOffset(midText, lines[MID_END], columns[MID_END]) - midStartOffset
       ));
+      int rightStartOffset = getOffset(rightText, lines[RIGHT_START] + 1, 1);
       right.add(new TextRange(
-          DiffUtil.getOffset(rightDocument, lines[RIGHT_START], columns[RIGHT_START]),
-          DiffUtil.getOffset(rightDocument, lines[RIGHT_END], columns[RIGHT_END])
+          getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]) - rightStartOffset,
+          getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END]) - rightStartOffset
       ));
     }
 
     return new MergeInnerDifferences(left, mid, right);
-  }
-
-  private static int getMaxLine(String text) {
-    return text.split("\r\n|\r|\n").length + 1;
   }
 
   /**
@@ -150,14 +155,12 @@ public class RefactoringLine {
     lines[LEFT_END] = lines[LEFT_END] < 0 ? maxLineRight : lines[LEFT_END];
     List<DiffFragment> fragments =
         offsets.stream().map(RefactoringOffset::toDiffFragment).collect(Collectors.toList());
-    Document leftDocument = new DocumentImpl(leftText);
-    Document rightDocument = new DocumentImpl(leftText);
     if (hasColumns) {
       fragments.add(new DiffFragmentImpl(
-          DiffUtil.getOffset(leftDocument, lines[LEFT_START], columns[LEFT_START]),
-          DiffUtil.getOffset(leftDocument, lines[LEFT_END], columns[LEFT_END]),
-          DiffUtil.getOffset(rightDocument, lines[RIGHT_START], columns[RIGHT_START]),
-          DiffUtil.getOffset(rightDocument, lines[RIGHT_END], columns[RIGHT_END])));
+          getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]),
+          getOffset(leftText, lines[LEFT_END], columns[LEFT_END]),
+          getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]),
+          getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END])));
     }
     return new LineFragmentImpl(lines[LEFT_START], lines[LEFT_END], lines[RIGHT_START],
         lines[RIGHT_END], 0, 0, 0, 0, fragments);
@@ -204,10 +207,21 @@ public class RefactoringLine {
     return this;
   }
 
-  public enum ThreeSidedType {
+  public RefactoringLine setColumns(int[] columns) {
+    assert columns.length == 6;
+    this.columns = columns;
+    for (int i = 0; i < columns.length; i++) {
+      columns[i] = Math.max(columns[i], 1);
+    }
+    this.hasColumns = true;
+    return this;
+  }
+
+  public enum VisualisationType {
     LEFT,
     RIGHT,
-    BOTH
+    BOTH,
+    TWO
   }
 
 }

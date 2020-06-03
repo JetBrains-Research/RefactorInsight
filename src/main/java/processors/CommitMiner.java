@@ -68,14 +68,7 @@ public class CommitMiner implements Consumer<GitCommit> {
           new RefactoringHandler() {
             @Override
             public void handle(String commitId, List<Refactoring> refactorings) {
-              long time = commit.getCommitTime();
-              List<String> parents = commit.getParents()
-                  .stream()
-                  .map(Hash::asString)
-                  .collect(Collectors.toList());
-              map.put(commitId,
-                  RefactoringEntry
-                      .convert(refactorings, commitId, parents, time));
+              map.put(commitId, RefactoringEntry.convert(refactorings, commit, project));
             }
           }
       );
@@ -96,15 +89,9 @@ public class CommitMiner implements Consumer<GitCommit> {
               commitId, new RefactoringHandler() {
                 @Override
                 public void handle(String commitId, List<Refactoring> refactorings) {
-                  long time = gitCommit.getCommitTime();
-                  List<String> parents = gitCommit.getParents()
-                      .stream()
-                      .map(Hash::asString)
-                      .collect(Collectors.toList());
                   map.put(commitId,
                       RefactoringEntry
-                          .convert(refactorings, commitId, parents, time));
-
+                          .convert(refactorings, gitCommit, repository.getProject()));
                   incrementProgress();
                 }
               });

@@ -1,5 +1,6 @@
 package data;
 
+import com.intellij.openapi.project.Project;
 import data.types.Handler;
 import data.types.attributes.AddAttributeAnnotationHandler;
 import data.types.attributes.ChangeAttributeTypeHandler;
@@ -50,7 +51,7 @@ import org.refactoringminer.api.RefactoringType;
 
 public class InfoFactory {
 
-  private Map<RefactoringType, Handler> refactoringHandlers = new HashMap<>();
+  private final Map<RefactoringType, Handler> refactoringHandlers = new HashMap<>();
 
   /**
    * Constructor for the infoFactory.
@@ -171,8 +172,8 @@ public class InfoFactory {
    * @param refactoring to be analyzed
    * @return resulting RefactoringInfo
    */
-  public RefactoringInfo create(Refactoring refactoring) {
+  public RefactoringInfo create(Refactoring refactoring, RefactoringEntry entry, Project project) {
     return refactoringHandlers.get(refactoring.getRefactoringType())
-        .handle(refactoring);
+        .handle(refactoring, entry, project);
   }
 }

@@ -30,7 +30,7 @@ public class RefactoringInfo {
   private String midPath;
   private String rightPath;
   private RefactoringType type;
-  private List<RefactoringLine> lineMarkings = new ArrayList<>();
+  private final List<RefactoringLine> lineMarkings = new ArrayList<>();
   private Group group;
   private boolean threeSided = false;
 
@@ -91,8 +91,7 @@ public class RefactoringInfo {
   }
 
   public RefactoringInfo addMarking(CodeRange left, CodeRange right) {
-    return addMarking(left.getStartLine(), left.getEndLine(), right.getStartLine(),
-        right.getEndLine(), left.getFilePath(), right.getFilePath());
+    return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, null);
   }
 
   /**
@@ -110,13 +109,12 @@ public class RefactoringInfo {
                                     int startAfter, int endAfter,
                                     String beforePath, String afterPath) {
     return addMarking(startBefore, endBefore, 0, 0, startAfter, endAfter, beforePath, "", afterPath,
-        RefactoringLine.ThreeSidedType.BOTH, null);
+        RefactoringLine.VisualisationType.TWO, null);
   }
 
   public RefactoringInfo addMarking(CodeRange left, CodeRange right,
                                     Consumer<RefactoringLine> offsetFunction) {
-    return addMarking(left.getStartLine(), left.getEndLine(), right.getStartLine(),
-        right.getEndLine(), left.getFilePath(), right.getFilePath(), offsetFunction);
+    return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, offsetFunction);
   }
 
   /**
@@ -137,19 +135,16 @@ public class RefactoringInfo {
                                     String beforePath, String afterPath,
                                     Consumer<RefactoringLine> offsetFunction) {
     return addMarking(startBefore, endBefore, 0, 0, startAfter, endAfter, beforePath, "", afterPath,
-        RefactoringLine.ThreeSidedType.BOTH, offsetFunction);
+        RefactoringLine.VisualisationType.TWO, offsetFunction);
   }
 
   /**
    * Add line marking for diffwindow used to display refactorings.
    */
   public RefactoringInfo addMarking(CodeRange left, CodeRange mid, CodeRange right,
-                                    RefactoringLine.ThreeSidedType type) {
+                                    RefactoringLine.VisualisationType type) {
 
-    return addMarking(left.getStartLine(), left.getEndLine(),
-        mid.getStartLine(), mid.getEndLine(),
-        right.getStartLine(), right.getEndLine(),
-        left.getFilePath(), mid.getFilePath(), right.getFilePath(), type);
+    return addMarking(left, mid, right, type, null);
   }
 
   /**
@@ -160,7 +155,7 @@ public class RefactoringInfo {
                                     int startMid, int endMid,
                                     int startRight, int endRight,
                                     String leftPath, String midPath, String rightPath,
-                                    RefactoringLine.ThreeSidedType type) {
+                                    RefactoringLine.VisualisationType type) {
     return addMarking(startLeft, endLeft, startMid, endMid, startRight, endRight, leftPath, midPath,
         rightPath, type, null);
   }
@@ -170,13 +165,20 @@ public class RefactoringInfo {
    * Includes possibility for sub-highlighting
    */
   public RefactoringInfo addMarking(CodeRange left, CodeRange mid, CodeRange right,
-                                    RefactoringLine.ThreeSidedType type,
+                                    RefactoringLine.VisualisationType type,
                                     Consumer<RefactoringLine> offsetFunction) {
 
-    return addMarking(left.getStartLine(), left.getEndLine(),
-        mid.getStartLine(), mid.getEndLine(),
-        right.getStartLine(), right.getEndLine(),
-        left.getFilePath(), mid.getFilePath(), right.getFilePath(), type, offsetFunction);
+    RefactoringLine line = new RefactoringLine(left, mid, right, type);
+    if (offsetFunction != null) {
+      offsetFunction.accept(line);
+    }
+    lineMarkings.add(line);
+    this.leftPath = left.getFilePath();
+    if (mid != null) {
+      this.midPath = mid.getFilePath();
+    }
+    this.rightPath = right.getFilePath();
+    return this;
   }
 
   /**
@@ -186,7 +188,7 @@ public class RefactoringInfo {
                                     int startMid, int endMid,
                                     int startRight, int endRight,
                                     String leftPath, String midPath, String rightPath,
-                                    RefactoringLine.ThreeSidedType type,
+                                    RefactoringLine.VisualisationType type,
                                     Consumer<RefactoringLine> offsetFunction) {
 
     RefactoringLine line =
@@ -237,6 +239,10 @@ public class RefactoringInfo {
   public RefactoringInfo setNameBefore(String nameBefore) {
     this.nameBefore = nameBefore;
     return this;
+  }
+
+  public List<String> getParents() {
+    return entry.getParents();
   }
 
   public Group getGroup() {

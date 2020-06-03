@@ -1,7 +1,10 @@
 package data;
 
 import com.google.gson.Gson;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.vcs.log.Hash;
+import com.intellij.vcs.log.VcsCommitMetadata;
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,26 +14,23 @@ import utils.Utils;
 
 public class RefactoringEntry implements Serializable {
 
-  private static InfoFactory factory = new InfoFactory();
+  private static final InfoFactory factory = new InfoFactory();
+  private final List<String> parents;
+  private final String commitId;
+  private final long time;
   private List<RefactoringInfo> refactorings;
-  private List<String> parents;
-  private String commitId;
-  private long time;
 
   /**
    * Constructor for method refactoring.
    *
-   * @param refactorings the refactoring data.
-   * @param parents      the commit ids of the parents.
-   * @param time         timestamp of the commit.
+   * @param parents the commit ids of the parents.
+   * @param time    timestamp of the commit.
    */
-  public RefactoringEntry(List<RefactoringInfo> refactorings, String commitId, List<String> parents,
+  public RefactoringEntry(String commitId, List<String> parents,
                           long time) {
-    this.refactorings = refactorings;
     this.parents = parents;
     this.time = time;
     this.commitId = commitId;
-    refactorings.forEach(r -> r.setEntry(this));
   }
 
   /**
@@ -57,18 +57,22 @@ public class RefactoringEntry implements Serializable {
    * Converter to Json.
    *
    * @param refactorings to be processed.
-   * @param commitId     current commit.
-   * @param parents      parent ids of the current commit.
-   * @param time         timestamp of the current commit.
+   * @param commit       current commit.
    * @return Json string.
    */
-  public static String convert(List<Refactoring> refactorings, String commitId,
-                               List<String> parents, long time) {
-    return new RefactoringEntry(
-        refactorings.stream()
-            .map(refactoring -> factory.create(refactoring))
-            .collect(Collectors.toList()),
-        commitId, parents, time).toString();
+  public static String convert(List<Refactoring> refactorings, VcsCommitMetadata commit,
+                               Project project) {
+    List<String> parents =
+        commit.getParents().stream().map(Hash::asString).collect(Collectors.toList());
+
+    RefactoringEntry entry =
+        new RefactoringEntry(commit.getId().asString(), parents, commit.getTimestamp());
+
+    List<RefactoringInfo> infos =
+        refactorings.stream().map(ref -> factory.create(ref, entry, project)).collect(
+            Collectors.toList());
+
+    return entry.setRefactorings(infos).toString();
   }
 
   /**
@@ -90,6 +94,11 @@ public class RefactoringEntry implements Serializable {
 
   public List<RefactoringInfo> getRefactorings() {
     return refactorings;
+  }
+
+  public RefactoringEntry setRefactorings(List<RefactoringInfo> refactorings) {
+    this.refactorings = refactorings;
+    return this;
   }
 
   public List<String> getParents() {

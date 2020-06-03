@@ -1,7 +1,6 @@
 package data;
 
 import com.intellij.diff.fragments.DiffFragmentImpl;
-import com.intellij.diff.tools.simple.SimpleDiffViewer;
 import com.intellij.openapi.util.TextRange;
 
 public class RefactoringOffset {
