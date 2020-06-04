@@ -53,7 +53,7 @@ public class Utils {
         return last;
       }
     }
-    if (index == 0 && nameAfter.length() != nameBefore.length()) {
+    if (nameAfter.length() != nameBefore.length()) {
       return last;
     }
     return index;

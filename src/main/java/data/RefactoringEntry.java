@@ -10,9 +10,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.refactoringminer.api.Refactoring;
+import org.refactoringminer.api.RefactoringType;
 import utils.Utils;
 
 public class RefactoringEntry implements Serializable {
@@ -36,17 +39,21 @@ public class RefactoringEntry implements Serializable {
     this.parents = parents;
     this.time = time;
     this.commitId = commitId;
-    HashMap<String, List<RefactoringInfo>> map = new HashMap<>();
+    combineRelated();
+  }
+
+  private void combineRelated() {
+    HashMap<String, List<RefactoringInfo>> groups = new HashMap<>();
     refactorings.forEach(r -> {
       if (r.getGroupId() != null) {
-        List<RefactoringInfo> list = map.getOrDefault(r.getGroupId(), new ArrayList<>());
+        List<RefactoringInfo> list = groups.getOrDefault(r.getGroupId(), new ArrayList<>());
         list.add(r);
-        map.put(r.getGroupId(), list);
+        groups.put(r.getGroupId(), list);
       }
       r.setEntry(this);
     });
 
-    map.forEach((k, v) -> {
+    groups.forEach((k, v) -> {
       if (v.size() > 1) {
         RefactoringInfo info = getMainRefactoringInfo(v);
         v.remove(info);
@@ -98,30 +105,24 @@ public class RefactoringEntry implements Serializable {
 
   private RefactoringInfo getMainRefactoringInfo(List<RefactoringInfo> v) {
     RefactoringInfo info = null;
-    if (v.stream().filter(x1 -> x1.getType() == RENAME_ATTRIBUTE).count() > 0 && v.stream().filter(
-        x2 -> x2.getType() == CHANGE_ATTRIBUTE_TYPE)
-        .count() > 0) {
-      info = v.stream().filter(x -> x.getType() == RENAME_ATTRIBUTE).collect(Collectors.toList())
-          .get(0);
-      info.setName("Change Attribute Type & Rename Attribute");
-    } else if (v.stream().filter(x1 -> x1.getType() == RENAME_ATTRIBUTE).count() > 0) {
-      info = v.stream().filter(x -> x.getType() == RENAME_ATTRIBUTE).collect(Collectors.toList())
-          .get(0);
+    if (v.stream().anyMatch(ofType(RENAME_ATTRIBUTE)) && v.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
+      info = v.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
+      info.setName("Rename and Change Attribute Type");
+    } else if (v.stream().anyMatch(ofType(RENAME_ATTRIBUTE))) {
+      info = v.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
       info.setName("Rename Attribute");
-    } else if (v.stream().filter(x2 -> x2.getType() == CHANGE_ATTRIBUTE_TYPE).count() > 0) {
-      info =
-          v.stream().filter(x -> x.getType() == CHANGE_ATTRIBUTE_TYPE).collect(Collectors.toList())
-              .get(0);
+    } else if (v.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
+      info = v.stream().filter(ofType(CHANGE_ATTRIBUTE_TYPE)).findFirst().get();
       info.setName("Change Attribute Type");
-    } else {
-      if (v.stream().filter(x -> x.getType() == CHANGE_VARIABLE_TYPE).count() > 0) {
-        info =
-            v.stream().filter(x -> x.getType() == CHANGE_VARIABLE_TYPE).collect(Collectors.toList())
-                .get(0);
-        info.setName("Change Variable Type & Rename Variable");
-      }
+    } else if (v.stream().anyMatch(ofType(CHANGE_VARIABLE_TYPE))) {
+      info = v.stream().filter(ofType(CHANGE_VARIABLE_TYPE)).findFirst().get();
+      info.setName("Rename and Change Variable Type");
     }
     return info;
+  }
+
+  private Predicate<RefactoringInfo> ofType(RefactoringType type) {
+    return (r) -> r.getType() == type;
   }
 
   /**
@@ -136,7 +137,6 @@ public class RefactoringEntry implements Serializable {
         root.add(r.makeNode());
       }
     });
-
     Tree tree = new Tree(root);
     tree.setRootVisible(false);
     Utils.expandAllNodes(tree, 0, tree.getRowCount());

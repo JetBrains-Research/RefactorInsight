@@ -1,37 +1,30 @@
 package ui.renderer;
 
+import com.intellij.icons.AllIcons;
 import data.Group;
 import data.RefactoringInfo;
 import java.util.HashMap;
 import javax.swing.Icon;
-import ui.renderer.handlers.AbstractClassIconHandler;
-import ui.renderer.handlers.AttributeIconHandler;
-import ui.renderer.handlers.ClassIconHandler;
-import ui.renderer.handlers.InterfaceIconHandler;
-import ui.renderer.handlers.MethodIconHandler;
-import ui.renderer.handlers.PackageIconHandler;
-import ui.renderer.handlers.ParameterIconHandler;
-import ui.renderer.handlers.VariableIconHandler;
 
 public class CellIconFactory {
 
-  HashMap<Group, CellIconHandler> map = new HashMap<>();
+  HashMap<Group, Icon> map = new HashMap<>();
 
   /**
    * Fills map with all types of handlers.
    */
   public CellIconFactory() {
-    map.put(Group.PACKAGE, new PackageIconHandler());
-    map.put(Group.ATTRIBUTE, new AttributeIconHandler());
-    map.put(Group.VARIABLE, new VariableIconHandler());
-    map.put(Group.PARAMETER, new ParameterIconHandler());
-    map.put(Group.ABSTRACT, new AbstractClassIconHandler());
-    map.put(Group.INTERFACE, new InterfaceIconHandler());
-    map.put(Group.METHOD, new MethodIconHandler());
-    map.put(Group.CLASS, new ClassIconHandler());
+    map.put(Group.PACKAGE, AllIcons.Nodes.Package);
+    map.put(Group.ATTRIBUTE, AllIcons.Nodes.Field);
+    map.put(Group.VARIABLE, AllIcons.Nodes.Variable);
+    map.put(Group.PARAMETER, AllIcons.Nodes.Parameter);
+    map.put(Group.ABSTRACT, AllIcons.Nodes.AbstractClass);
+    map.put(Group.INTERFACE, AllIcons.Nodes.Interface);
+    map.put(Group.METHOD, AllIcons.Nodes.Method);
+    map.put(Group.CLASS, AllIcons.Nodes.Class);
   }
 
   Icon create(RefactoringInfo info) {
-    return map.get(info.getGroup()).handle();
+    return map.get(info.getGroup());
   }
 }
