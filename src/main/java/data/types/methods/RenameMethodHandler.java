@@ -35,40 +35,38 @@ public class RenameMethodHandler extends Handler {
             ref.getTargetOperationCodeRangeAfterRename().getFilePath(),
             refactoringLine -> {
               List<String> parents = info.getParents();
-              if (parents.size() == 1) {
-                try {
-                  FilePath beforePath = new LocalFilePath(
-                      project.getBasePath() + "/"
-                          + ref.getSourceOperationCodeRangeBeforeRename().getFilePath(), false);
-                  FilePath afterPath = new LocalFilePath(
-                      project.getBasePath() + "/"
-                          + ref.getTargetOperationCodeRangeAfterRename().getFilePath(), false);
-                  GitRevisionNumber afterNumber = new GitRevisionNumber(info.getCommitId());
-                  GitRevisionNumber beforeNumber = new GitRevisionNumber(parents.get(0));
+              try {
+                FilePath beforePath = new LocalFilePath(
+                    project.getBasePath() + "/"
+                        + ref.getSourceOperationCodeRangeBeforeRename().getFilePath(), false);
+                FilePath afterPath = new LocalFilePath(
+                    project.getBasePath() + "/"
+                        + ref.getTargetOperationCodeRangeAfterRename().getFilePath(), false);
+                GitRevisionNumber afterNumber = new GitRevisionNumber(info.getCommitId());
+                GitRevisionNumber beforeNumber = new GitRevisionNumber(parents.get(0));
 
-                  ContentRevision
-                      before = GitContentRevision.createRevision(beforePath, beforeNumber, project);
+                ContentRevision
+                    before = GitContentRevision.createRevision(beforePath, beforeNumber, project);
 
-                  ContentRevision
-                      after = GitContentRevision.createRevision(afterPath, afterNumber, project);
+                ContentRevision
+                    after = GitContentRevision.createRevision(afterPath, afterNumber, project);
 
-                  int[] beforeColumns =
-                      findColumns(before.getContent(), ref.getOriginalOperation().getName(),
-                          ref.getOriginalOperation().getBody().getCompositeStatement().codeRange()
-                              .getStartLine());
+                int[] beforeColumns =
+                    findColumns(before.getContent(), ref.getOriginalOperation().getName(),
+                        ref.getOriginalOperation().getBody().getCompositeStatement().codeRange()
+                            .getStartLine());
 
-                  int[] afterColumns =
-                      findColumns(after.getContent(), ref.getRenamedOperation().getName(),
-                          ref.getRenamedOperation().getBody().getCompositeStatement().codeRange()
-                              .getStartLine());
+                int[] afterColumns =
+                    findColumns(after.getContent(), ref.getRenamedOperation().getName(),
+                        ref.getRenamedOperation().getBody().getCompositeStatement().codeRange()
+                            .getStartLine());
 
-                  refactoringLine.setColumns(
-                      new int[] {beforeColumns[0], beforeColumns[1], 0, 0, afterColumns[0],
-                          afterColumns[1]});
+                refactoringLine.setColumns(
+                    new int[] {beforeColumns[0], beforeColumns[1], 0, 0, afterColumns[0],
+                        afterColumns[1]});
 
-                } catch (VcsException e) {
-                  e.printStackTrace();
-                }
+              } catch (VcsException e) {
+                e.printStackTrace();
               }
             })
         .setNameBefore(calculateSignature(ref.getOriginalOperation()))
