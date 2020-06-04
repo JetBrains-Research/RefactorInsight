@@ -30,6 +30,13 @@ public abstract class Handler {
     return builder.toString();
   }
 
+  /**
+   * Finds the start and ending column of a word in a text.
+   * @param text Java Code
+   * @param word Word to look for.
+   * @param line In what line the word can be found.
+   * @return Start and ending column in an int[]
+   */
   public int[] findColumns(String text, String word, int line) {
     String[] lines = text.split("\r\n|\r|\n");
     int startColumn = lines[line - 1].indexOf(word) + 1;

@@ -38,11 +38,11 @@ public class RenameMethodHandler extends Handler {
               if (parents.size() == 1) {
                 try {
                   FilePath beforePath = new LocalFilePath(
-                      project.getBasePath() + "/" +
-                          ref.getSourceOperationCodeRangeBeforeRename().getFilePath(), false);
+                      project.getBasePath() + "/"
+                          + ref.getSourceOperationCodeRangeBeforeRename().getFilePath(), false);
                   FilePath afterPath = new LocalFilePath(
-                      project.getBasePath() + "/" +
-                          ref.getTargetOperationCodeRangeAfterRename().getFilePath(), false);
+                      project.getBasePath() + "/"
+                          + ref.getTargetOperationCodeRangeAfterRename().getFilePath(), false);
                   GitRevisionNumber afterNumber = new GitRevisionNumber(info.getCommitId());
                   GitRevisionNumber beforeNumber = new GitRevisionNumber(parents.get(0));
 

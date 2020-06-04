@@ -54,6 +54,9 @@ public class RefactoringLine {
     this.type = type;
   }
 
+  /**
+   * Data holder for three sided refactoring diff.
+   */
   public RefactoringLine(CodeRange left, CodeRange mid, CodeRange right, VisualisationType type) {
     lines[LEFT_START] = left.getStartLine() - 1;
     lines[LEFT_END] = left.getEndLine();
@@ -211,6 +214,10 @@ public class RefactoringLine {
     return this;
   }
 
+  /**
+   * Setter for columns.
+   * Checks if columns are valid.
+   */
   public RefactoringLine setColumns(int[] columns) {
     assert columns.length == 6;
     this.columns = columns;
