@@ -36,6 +36,7 @@ import data.types.methods.PushDownOperationHandler;
 import data.types.methods.RemoveMethodAnnotationHandler;
 import data.types.methods.RemoveParameterHandler;
 import data.types.methods.RenameMethodHandler;
+import data.types.methods.ReorderParameterHandler;
 import data.types.packages.MoveSourceFolderHandler;
 import data.types.packages.RenamePackageHandler;
 import data.types.variables.ChangeVariableTypeHandler;
@@ -164,6 +165,8 @@ public class InfoFactory {
         new RemoveClassAnnotationHandler());
     refactoringHandlers.put(RefactoringType.MODIFY_CLASS_ANNOTATION,
         new ModifyClassAnnotationHandler());
+    refactoringHandlers.put(RefactoringType.REORDER_PARAMETER,
+        new ReorderParameterHandler());
   }
 
   /**
