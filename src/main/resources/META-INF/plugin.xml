@@ -22,7 +22,7 @@
     </extensions>
 
     <actions>
-        <action id="ui.GitWindow" class="ui.GitWindow" text="Mine refactorings" description="ui.GitWindow">
+        <action id="actions.ToggleRefactoringViewAction" class="actions.ToggleRefactoringViewAction" text="Mine refactorings" description="actions.ToggleRefactoringViewAction">
             <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>
         </action>
         <!-- Add your actions here -->

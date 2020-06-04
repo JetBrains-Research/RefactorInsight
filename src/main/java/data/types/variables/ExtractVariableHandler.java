@@ -1,5 +1,6 @@
 package data.types.variables;
 
+import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
@@ -9,7 +10,7 @@ import org.refactoringminer.api.Refactoring;
 public class ExtractVariableHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     ExtractVariableRefactoring ref = (ExtractVariableRefactoring) refactoring;
     return info.setGroup(Group.VARIABLE)
         .setElementBefore("in method " + ref.getOperationBefore().getName())

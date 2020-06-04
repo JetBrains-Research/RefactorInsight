@@ -20,7 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.Times;
-import ui.GitWindowInfo;
+import ui.GitWindow;
 
 /**
  * Extend GitSingleRepoTest
@@ -109,7 +109,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
         parents, 0, repo.getRoot(), "subject",
         user, "message", user, 0);
 
-    GitWindowInfo gitWindow = mock(GitWindowInfo.class);
+    GitWindow gitWindow = mock(GitWindow.class);
     Mockito.doThrow(new NullPointerException()).when(gitWindow).refresh(any());
     miner.mineAtCommit(vcsCommitMetadata, myProject, gitWindow);
     verify(parent, new Times(1)).asString();
