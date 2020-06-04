@@ -1,7 +1,7 @@
 package data.types.methods;
 
-import data.Group;
 import com.intellij.openapi.project.Project;
+import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.RemoveParameterRefactoring;
@@ -21,6 +21,6 @@ public class RemoveParameterHandler extends Handler {
                 ref.getParameter().getVariableDeclaration().getLocationInfo().getStartOffset(),
                 ref.getParameter().getVariableDeclaration().getLocationInfo().getEndOffset(),
                 0, 0)
-        .setHasColumns(false));
+                .setHasColumns(false));
   }
 }
