@@ -20,6 +20,7 @@ public class RemoveParameterHandler extends Handler {
             line -> line.addOffset(
                 ref.getParameter().getVariableDeclaration().getLocationInfo().getStartOffset(),
                 ref.getParameter().getVariableDeclaration().getLocationInfo().getEndOffset(),
-                0, 0));
+                0, 0)
+        .setHasColumns(false));
   }
 }
