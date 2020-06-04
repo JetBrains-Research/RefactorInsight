@@ -14,8 +14,8 @@ public class MoveAttributeHandler extends Handler {
     return info.setGroup(Group.ATTRIBUTE)
         .setElementBefore(ref.getSourceClassName())
         .setElementAfter(ref.getTargetClassName())
-        .setNameBefore(ref.getOriginalAttribute().getName())
-        .setNameAfter(ref.getOriginalAttribute().getName())
+        .setNameBefore(ref.getOriginalAttribute().toQualifiedString())
+        .setNameAfter(ref.getOriginalAttribute().toQualifiedString())
         .addMarking(ref.getSourceAttributeCodeRangeBeforeMove(),
             ref.getTargetAttributeCodeRangeAfterMove(), line ->
                 line.addOffset(ref.getOriginalAttribute().getLocationInfo(),

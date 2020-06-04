@@ -18,9 +18,10 @@ public abstract class Handler {
         .append(".")
         .append(operation.getName())
         .append("(");
-    operation.getParameterTypeList().forEach(x -> builder.append(x).append(","));
+    operation.getParameterTypeList().forEach(x -> builder.append(x).append(", "));
 
     if (operation.getParameterTypeList().size() > 0) {
+      builder.deleteCharAt(builder.length() - 1);
       builder.deleteCharAt(builder.length() - 1);
     }
 

@@ -14,20 +14,20 @@ public class ExtractAttributeHandler extends Handler {
     info.setGroup(Group.ATTRIBUTE)
         .setElementBefore("in class " + ref.getOriginalClass().getName())
         .setElementAfter(null)
-        .setNameBefore(ref.getVariableDeclaration().getName())
-        .setNameAfter(ref.getVariableDeclaration().getName())
+        .setNameBefore(ref.getVariableDeclaration().toQualifiedString())
+        .setNameAfter(ref.getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getExtractedVariableDeclarationCodeRange().getStartLine(),
-                ref.getExtractedVariableDeclarationCodeRange().getStartLine() - 1,
+            ref.getExtractedVariableDeclarationCodeRange().getStartLine() - 1,
             ref.getExtractedVariableDeclarationCodeRange().getStartLine(),
-                ref.getExtractedVariableDeclarationCodeRange().getEndLine(),
-                ref.getOriginalClass().getLocationInfo().getFilePath(),
-                ref.getNextClass().getLocationInfo().getFilePath());
+            ref.getExtractedVariableDeclarationCodeRange().getEndLine(),
+            ref.getOriginalClass().getLocationInfo().getFilePath(),
+            ref.getNextClass().getLocationInfo().getFilePath());
     ref.leftSide().forEach(extraction ->
-            info.addMarking(extraction.getStartLine(), extraction.getEndLine(),
-                    ref.getExtractedVariableDeclarationCodeRange().getStartLine(),
-                    ref.getExtractedVariableDeclarationCodeRange().getEndLine(),
-                    extraction.getFilePath(),
-                    ref.getExtractedVariableDeclarationCodeRange().getFilePath()));
+        info.addMarking(extraction.getStartLine(), extraction.getEndLine(),
+            ref.getExtractedVariableDeclarationCodeRange().getStartLine(),
+            ref.getExtractedVariableDeclarationCodeRange().getEndLine(),
+            extraction.getFilePath(),
+            ref.getExtractedVariableDeclarationCodeRange().getFilePath()));
     return info;
   }
 }

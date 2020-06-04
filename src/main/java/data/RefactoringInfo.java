@@ -7,9 +7,11 @@ import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -22,10 +24,13 @@ public class RefactoringInfo {
   private String elementBefore;
   @Nullable
   private String elementAfter;
-  private transient RefactoringEntry entry;
+
   private String name;
   private String nameBefore;
   private String nameAfter;
+  private Set<String> includes = new HashSet<>();
+
+  private transient RefactoringEntry entry;
   private String leftPath;
   private String midPath;
   private String rightPath;
@@ -35,6 +40,7 @@ public class RefactoringInfo {
   private boolean threeSided = false;
   private String groupId;
   private boolean hidden = false;
+
 
   /**
    * Adds this refactoring to the method history map.
@@ -114,6 +120,14 @@ public class RefactoringInfo {
   public RefactoringInfo setType(RefactoringType type) {
     this.type = type;
     return this;
+  }
+
+  public void includesRefactoring(String refactoring) {
+    this.includes.add(refactoring);
+  }
+
+  public Set<String> getIncludingRefactorings() {
+    return includes;
   }
 
   public RefactoringInfo addMarking(CodeRange left, CodeRange right) {
@@ -388,4 +402,5 @@ public class RefactoringInfo {
       return before + "-> " + after;
     }
   }
+
 }

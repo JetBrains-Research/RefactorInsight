@@ -146,4 +146,7 @@ public class RefactoringLine {
     BOTH
   }
 
+  public int getRightStart() {
+    return rightStart;
+  }
 }

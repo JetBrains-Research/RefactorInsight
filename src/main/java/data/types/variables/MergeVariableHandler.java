@@ -25,8 +25,8 @@ public class MergeVariableHandler extends Handler {
     return info
         .setElementBefore(ref.getMergedVariables().stream().map(x -> x.getVariableName()).collect(
             Collectors.joining()))
-        .setElementAfter(ref.getNewVariable().getVariableName())
-        .setNameBefore(ref.getNewVariable().getVariableName())
-        .setNameAfter(ref.getNewVariable().getVariableName());
+        .setElementAfter(ref.getNewVariable().toQualifiedString())
+        .setNameBefore(ref.getNewVariable().toQualifiedString())
+        .setNameAfter(ref.getNewVariable().toQualifiedString());
   }
 }

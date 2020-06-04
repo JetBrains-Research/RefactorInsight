@@ -22,7 +22,7 @@ public class SplitVariableHandler extends Handler {
       info.setGroup(Group.VARIABLE);
     }
 
-    return info.setNameBefore(ref.getOldVariable().getVariableName())
+    return info.setNameBefore(ref.getOldVariable().toQualifiedString())
         .setNameAfter(ref.getSplitVariables().stream().map(x -> x.getVariableName()).collect(
             Collectors.joining()));
   }

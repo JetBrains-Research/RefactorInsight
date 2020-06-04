@@ -20,8 +20,8 @@ public class MergeAttributeHandler extends Handler {
         .setElementBefore(ref.getMergedAttributes().stream().map(x -> x.getVariableName()).collect(
             Collectors.joining()))
         .setElementAfter(ref.getNewAttribute().getVariableName())
-        .setNameBefore(ref.getNewAttribute().getVariableName())
-        .setNameAfter(ref.getNewAttribute().getVariableName());
+        .setNameBefore(ref.getNewAttribute().toQualifiedString())
+        .setNameAfter(ref.getNewAttribute().toQualifiedString());
 
   }
 }

@@ -54,7 +54,7 @@ public class MethodAction extends AnAction {
     PsiParameterList parameterList = method.getParameterList();
     for (int i = 0; i < parameterList.getParametersCount(); i++) {
       if (i != parameterList.getParametersCount() - 1) {
-        signature += parameterList.getParameter(i).getType().getPresentableText() + ",";
+        signature += parameterList.getParameter(i).getType().getPresentableText() + ", ";
       } else {
         signature += parameterList.getParameter(i).getType().getPresentableText();
       }

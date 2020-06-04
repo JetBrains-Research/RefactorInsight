@@ -39,11 +39,15 @@ public class CellRenderer extends JBDefaultTreeCellRenderer {
     Icon icon = factory.create(info);
 
     if (node.getUserObject() instanceof RefactoringInfo) {
-      setText(isMethodHistory ? getText(info) : info.getName());
+      setText(isMethodHistory ? getTextMethodToolbar(info) : getTextLogUI(info));
       icon = AllIcons.Actions.SuggestedRefactoringBulb;
     }
 
     if (leaf) {
+      setText(getHtml(
+          getStr2(info.getLineMarkings().size() > 0
+                  ? String.valueOf(info.getLineMarkings().get(0).getRightStart()) : "", getText(),
+              info.getRightPath() != null ? info.getRightPath() : "")));
       icon = isMethodHistory ? null : AllIcons.Actions.Diff;
     }
 
@@ -52,11 +56,45 @@ public class CellRenderer extends JBDefaultTreeCellRenderer {
   }
 
   @NotNull
-  private String getText(RefactoringInfo info) {
-    StringBuffer html = new StringBuffer(
-        "<html> " + info.getName() + " <font color=\"#696969\"> "
-            + JBDateFormat.getFormatter()
-            .formatPrettyDateTime(info.getTimestamp()) + "</font></html>");
+  private String getTextMethodToolbar(RefactoringInfo info) {
+    final String second = JBDateFormat.getFormatter()
+        .formatPrettyDateTime(info.getTimestamp());
+    final String first = info.getName();
+    return createHtml(second, first);
+  }
+
+  @NotNull
+  private String getTextLogUI(RefactoringInfo info) {
+    String second =
+        info.getIncludingRefactorings().size() > 0 ? info.getIncludingRefactorings().toString() :
+            "  ";
+    second = second.substring(1, second.length() - 1);
+    second = second.equals("") ? "" : (" implied " + second);
+    final String first = info.getName();
+    return createHtml(second, first);
+  }
+
+  @NotNull
+  private String createHtml(String second, String first) {
+    final String str = getStr(first, second);
+    return getHtml(str);
+  }
+
+  @NotNull
+  private String getHtml(String str) {
+    StringBuffer html = new StringBuffer(str);
     return html.toString();
+  }
+
+  @NotNull
+  private String getStr(String first, String second) {
+    return "<html> <b>" + first + "</b> <font color=\"#696969\"> "
+        + second + "</font></html>";
+  }
+
+  private String getStr2(String first, String second, String third) {
+    return "<html> <font color=\"#696969\"> " + first + " </font> "
+        + second + (third.equals("") ? "</html>"
+        : ("<font color=\"#696969\"> in file " + third + " </font></html>"));
   }
 }

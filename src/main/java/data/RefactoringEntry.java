@@ -56,8 +56,10 @@ public class RefactoringEntry implements Serializable {
     groups.forEach((k, v) -> {
       if (v.size() > 1) {
         RefactoringInfo info = getMainRefactoringInfo(v);
+
         v.remove(info);
         v.forEach(r -> {
+          info.includesRefactoring(r.getName());
           info.addAllMarkings(r);
           r.setHidden(true);
         });
