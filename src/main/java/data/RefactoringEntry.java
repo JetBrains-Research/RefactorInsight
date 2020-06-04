@@ -105,7 +105,8 @@ public class RefactoringEntry implements Serializable {
 
   private RefactoringInfo getMainRefactoringInfo(List<RefactoringInfo> v) {
     RefactoringInfo info = null;
-    if (v.stream().anyMatch(ofType(RENAME_ATTRIBUTE)) && v.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
+    if (v.stream().anyMatch(ofType(RENAME_ATTRIBUTE))
+        && v.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
       info = v.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
       info.setName("Rename and Change Attribute Type");
     } else if (v.stream().anyMatch(ofType(RENAME_ATTRIBUTE))) {
