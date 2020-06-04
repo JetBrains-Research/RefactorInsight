@@ -43,17 +43,20 @@ public class ExtractOperationHandler extends Handler {
             new LocalFilePath(absolutePath, false),
             new GitRevisionNumber(info.getCommitId()), project).getContent();
         midColumns = findColumns(midText, ref.getExtractedOperation().getName(),
-            ref.getExtractedOperationCodeRange().getStartLine());
+            ref.getExtractedOperation().getBody().getCompositeStatement().codeRange()
+                .getStartLine());
       } catch (VcsException e) {
         e.printStackTrace();
       }
 
-
       int[] finalMidColumns = midColumns;
       ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
-          info.addMarking(1, 1, ref.getExtractedOperationCodeRange().getStartLine(),
-              ref.getExtractedOperationCodeRange().getStartLine(), invocation.getStartLine(),
-              invocation.getEndLine(),
+          info.addMarking(1, 1,
+              ref.getExtractedOperation().getBody().getCompositeStatement().codeRange()
+                  .getStartLine(),
+              ref.getExtractedOperation().getBody().getCompositeStatement().codeRange()
+                  .getStartLine(),
+              invocation.getStartLine(), invocation.getEndLine(),
               ref.getSourceOperationCodeRangeBeforeExtraction().getFilePath(),
               ref.getExtractedOperationCodeRange().getFilePath(),
               invocation.getFilePath(), RefactoringLine.VisualisationType.RIGHT,

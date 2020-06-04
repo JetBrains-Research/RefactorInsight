@@ -209,6 +209,7 @@ public class RefactoringInfo {
    * Should only be called if isThreeSided() evaluates to false.
    */
   public List<LineFragment> getTwoSidedLineMarkings(String leftText, String rightText) {
+    assert !threeSided;
     return lineMarkings.stream().map(l ->
         l.getTwoSidedRange(leftText, rightText)).collect(Collectors.toList());
   }
@@ -222,6 +223,7 @@ public class RefactoringInfo {
                                                                    String textRight,
                                                                    SimpleThreesideDiffViewer
                                                                        viewer) {
+    assert threeSided;
     return lineMarkings.stream()
         .map(line -> line.getThreeSidedRange(textLeft, textMid, textRight, viewer))
         .collect(Collectors.toList());

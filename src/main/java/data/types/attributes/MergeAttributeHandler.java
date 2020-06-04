@@ -23,6 +23,5 @@ public class MergeAttributeHandler extends Handler {
         .setElementAfter(ref.getNewAttribute().getVariableName())
         .setNameBefore(ref.getNewAttribute().getVariableName())
         .setNameAfter(ref.getNewAttribute().getVariableName());
-
   }
 }

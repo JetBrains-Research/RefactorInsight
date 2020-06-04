@@ -24,7 +24,7 @@ public class AddAttributeAnnotationHandler extends Handler {
             annotation.getLocationInfo().getEndLine(),
             ref.getAttributeBefore().codeRange().getFilePath(),
             annotation.getLocationInfo().getFilePath(),
-            line -> line.addOffset(0, 0,
+            line -> line.addOffset(1, 1,
                 annotation.getLocationInfo().getStartOffset(),
                 annotation.getLocationInfo().getEndOffset()));
   }

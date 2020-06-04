@@ -25,10 +25,10 @@ public class RenameMethodHandler extends Handler {
     return info.setGroup(Group.METHOD)
         .setElementBefore(null)
         .setElementAfter(null)
-        .addMarking(ref.getSourceOperationCodeRangeBeforeRename().getStartLine(),
-            ref.getSourceOperationCodeRangeBeforeRename().getStartLine(),
-            ref.getTargetOperationCodeRangeAfterRename().getStartLine(),
-            ref.getTargetOperationCodeRangeAfterRename().getStartLine(),
+        .addMarking(ref.getOriginalOperation().getBody().getCompositeStatement().codeRange().getStartLine(),
+            ref.getOriginalOperation().getBody().getCompositeStatement().codeRange().getStartLine(),
+            ref.getRenamedOperation().getBody().getCompositeStatement().codeRange().getStartLine(),
+            ref.getRenamedOperation().getBody().getCompositeStatement().codeRange().getStartLine(),
             ref.getSourceOperationCodeRangeBeforeRename().getFilePath(),
             ref.getTargetOperationCodeRangeAfterRename().getFilePath(),
             refactoringLine -> {
@@ -50,11 +50,11 @@ public class RenameMethodHandler extends Handler {
 
                   int[] beforeColumns =
                       findColumns(before.getContent(), ref.getOriginalOperation().getName(),
-                          ref.getSourceOperationCodeRangeBeforeRename().getStartLine());
+                          ref.getOriginalOperation().getBody().getCompositeStatement().codeRange().getStartLine());
 
                   int[] afterColumns =
                       findColumns(after.getContent(), ref.getRenamedOperation().getName(),
-                          ref.getTargetOperationCodeRangeAfterRename().getStartLine());
+                          ref.getRenamedOperation().getBody().getCompositeStatement().codeRange().getStartLine());
 
                   refactoringLine.setColumns(
                       new int[] {beforeColumns[0], beforeColumns[1], 0, 0, afterColumns[0],

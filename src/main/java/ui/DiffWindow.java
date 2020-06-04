@@ -12,6 +12,8 @@ import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
 import com.intellij.diff.tools.simple.ThreesideDiffChangeBase;
 import com.intellij.diff.tools.util.base.DiffViewerListener;
 import com.intellij.diff.util.DiffUserDataKeysEx;
+import com.intellij.ide.actions.RecentLocationItem;
+import com.intellij.ide.actions.RecentLocationsAction;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
