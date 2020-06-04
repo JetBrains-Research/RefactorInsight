@@ -7,13 +7,11 @@ import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import data.Group;
 import data.RefactoringInfo;
-import data.RefactoringLine;
 import data.types.Handler;
 import git4idea.GitContentRevision;
 import git4idea.GitRevisionNumber;
 import gr.uom.java.xmi.diff.RenameOperationRefactoring;
 import java.util.List;
-import java.util.function.Consumer;
 import org.refactoringminer.api.Refactoring;
 
 public class RenameMethodHandler extends Handler {
@@ -25,7 +23,11 @@ public class RenameMethodHandler extends Handler {
     return info.setGroup(Group.METHOD)
         .setElementBefore(null)
         .setElementAfter(null)
-        .addMarking(ref.getOriginalOperation().getBody().getCompositeStatement().codeRange().getStartLine(),
+        .addMarking(ref.getOriginalOperation().getBody().getCompositeStatement().codeRange(),
+            ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
+            refactoringLine -> refactoringLine.setHasColumns(false))
+        .addMarking(
+            ref.getOriginalOperation().getBody().getCompositeStatement().codeRange().getStartLine(),
             ref.getOriginalOperation().getBody().getCompositeStatement().codeRange().getStartLine(),
             ref.getRenamedOperation().getBody().getCompositeStatement().codeRange().getStartLine(),
             ref.getRenamedOperation().getBody().getCompositeStatement().codeRange().getStartLine(),
@@ -36,9 +38,11 @@ public class RenameMethodHandler extends Handler {
               if (parents.size() == 1) {
                 try {
                   FilePath beforePath = new LocalFilePath(
-                      project.getBasePath() + "/" + ref.getSourceOperationCodeRangeBeforeRename().getFilePath(), false);
+                      project.getBasePath() + "/" +
+                          ref.getSourceOperationCodeRangeBeforeRename().getFilePath(), false);
                   FilePath afterPath = new LocalFilePath(
-                      project.getBasePath() + "/" + ref.getTargetOperationCodeRangeAfterRename().getFilePath(), false);
+                      project.getBasePath() + "/" +
+                          ref.getTargetOperationCodeRangeAfterRename().getFilePath(), false);
                   GitRevisionNumber afterNumber = new GitRevisionNumber(info.getCommitId());
                   GitRevisionNumber beforeNumber = new GitRevisionNumber(parents.get(0));
 
@@ -50,11 +54,13 @@ public class RenameMethodHandler extends Handler {
 
                   int[] beforeColumns =
                       findColumns(before.getContent(), ref.getOriginalOperation().getName(),
-                          ref.getOriginalOperation().getBody().getCompositeStatement().codeRange().getStartLine());
+                          ref.getOriginalOperation().getBody().getCompositeStatement().codeRange()
+                              .getStartLine());
 
                   int[] afterColumns =
                       findColumns(after.getContent(), ref.getRenamedOperation().getName(),
-                          ref.getRenamedOperation().getBody().getCompositeStatement().codeRange().getStartLine());
+                          ref.getRenamedOperation().getBody().getCompositeStatement().codeRange()
+                              .getStartLine());
 
                   refactoringLine.setColumns(
                       new int[] {beforeColumns[0], beforeColumns[1], 0, 0, afterColumns[0],

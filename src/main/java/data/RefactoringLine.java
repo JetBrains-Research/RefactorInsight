@@ -79,6 +79,10 @@ public class RefactoringLine {
   public RefactoringLine() {
   }
 
+  public void setHasColumns(boolean hasColumns) {
+    this.hasColumns = hasColumns;
+  }
+
   /**
    * Generate Conflicttype from ThreeSidedType.
    * Conflict type is used to set highlighting colors and can disable
