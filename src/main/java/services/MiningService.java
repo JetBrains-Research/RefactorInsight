@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import processors.CommitMiner;
-import ui.GitWindowInfo;
+import ui.GitWindow;
 
 @State(name = "MiningRefactoringsState",
     storages = {@Storage("refactorings.xml")})
@@ -167,7 +167,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    * @param project current project.
    * @param info    to be updated.
    */
-  public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindowInfo info) {
+  public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow info) {
     System.out.println("Mining commit " + commit.getId().asString());
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(project, "Mining at commit " + commit.getId().asString()) {

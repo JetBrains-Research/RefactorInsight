@@ -1,5 +1,6 @@
 package data.types.attributes;
 
+import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
@@ -9,7 +10,7 @@ import org.refactoringminer.api.Refactoring;
 public class ExtractAttributeHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     ExtractAttributeRefactoring ref = (ExtractAttributeRefactoring) refactoring;
     info.setGroup(Group.ATTRIBUTE)
         .setElementBefore("in class " + ref.getOriginalClass().getName())

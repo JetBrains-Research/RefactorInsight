@@ -1,5 +1,6 @@
 package data.types.attributes;
 
+import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
@@ -10,7 +11,7 @@ import org.refactoringminer.api.Refactoring;
 public class AddAttributeAnnotationHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     AddAttributeAnnotationRefactoring ref = (AddAttributeAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
 
@@ -25,7 +26,7 @@ public class AddAttributeAnnotationHandler extends Handler {
             annotation.getLocationInfo().getEndLine(),
             ref.getAttributeBefore().codeRange().getFilePath(),
             annotation.getLocationInfo().getFilePath(),
-            line -> line.addOffset(0, 0,
+            line -> line.addOffset(1, 1,
                 annotation.getLocationInfo().getStartOffset(),
                 annotation.getLocationInfo().getEndOffset()));
   }

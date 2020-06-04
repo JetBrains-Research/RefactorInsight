@@ -1,5 +1,6 @@
 package data.types.attributes;
 
+import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
@@ -9,20 +10,16 @@ import org.refactoringminer.api.Refactoring;
 public class ChangeAttributeTypeHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     ChangeAttributeTypeRefactoring ref = (ChangeAttributeTypeRefactoring) refactoring;
     return info.setGroup(Group.ATTRIBUTE)
         .setGroupId(ref.getClassNameAfter() + "." + ref.getChangedTypeAttribute().getVariableName())
-        .setElementBefore(ref.getOriginalAttribute().toQualifiedString())
-        .setElementAfter(ref.getChangedTypeAttribute().toQualifiedString())
-        .setNameBefore("in class " + ref.getClassNameAfter()
-            .substring(ref.getClassNameBefore().lastIndexOf(".") + 1))
-        .setNameAfter("in class " + ref.getClassNameAfter()
-            .substring(ref.getClassNameBefore().lastIndexOf(".") + 1))
-        .addMarking(ref.getOriginalAttribute().codeRange(),
-            ref.getChangedTypeAttribute().codeRange(), line ->
-                line.addOffset(ref.getOriginalAttribute().getType().getLocationInfo(),
-                    ref.getChangedTypeAttribute().getType().getLocationInfo()));
+        .setNameBefore(ref.getOriginalAttribute().toQualifiedString())
+        .setNameAfter(ref.getChangedTypeAttribute().toQualifiedString())
+        .setElementBefore(null)
+        .setElementAfter(null)
+        .addMarking(ref.getOriginalAttribute().getType().codeRange(),
+            ref.getChangedTypeAttribute().getType().codeRange());
 
   }
 }

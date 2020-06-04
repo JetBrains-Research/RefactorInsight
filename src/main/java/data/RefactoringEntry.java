@@ -5,14 +5,16 @@ import static org.refactoringminer.api.RefactoringType.CHANGE_VARIABLE_TYPE;
 import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
 
 import com.google.gson.Gson;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.vcs.log.Hash;
+import com.intellij.vcs.log.VcsCommitMetadata;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
@@ -20,51 +22,22 @@ import utils.Utils;
 
 public class RefactoringEntry implements Serializable {
 
-  private static InfoFactory factory = new InfoFactory();
+  private static final InfoFactory factory = new InfoFactory();
+  private final List<String> parents;
+  private final String commitId;
+  private final long time;
   private List<RefactoringInfo> refactorings;
-  private List<String> parents;
-  private String commitId;
-  private long time;
 
   /**
    * Constructor for method refactoring.
    *
-   * @param refactorings the refactoring data.
-   * @param parents      the commit ids of the parents.
-   * @param time         timestamp of the commit.
+   * @param parents the commit ids of the parents.
+   * @param time    timestamp of the commit.
    */
-  public RefactoringEntry(List<RefactoringInfo> refactorings, String commitId, List<String> parents,
-                          long time) {
-    this.refactorings = refactorings;
+  public RefactoringEntry(String commitId, List<String> parents, long time) {
     this.parents = parents;
     this.time = time;
     this.commitId = commitId;
-    combineRelated();
-  }
-
-  private void combineRelated() {
-    HashMap<String, List<RefactoringInfo>> groups = new HashMap<>();
-    refactorings.forEach(r -> {
-      if (r.getGroupId() != null) {
-        List<RefactoringInfo> list = groups.getOrDefault(r.getGroupId(), new ArrayList<>());
-        list.add(r);
-        groups.put(r.getGroupId(), list);
-      }
-      r.setEntry(this);
-    });
-
-    groups.forEach((k, v) -> {
-      if (v.size() > 1) {
-        RefactoringInfo info = getMainRefactoringInfo(v);
-
-        v.remove(info);
-        v.forEach(r -> {
-          info.includesRefactoring(r.getName());
-          info.addAllMarkings(r);
-          r.setHidden(true);
-        });
-      }
-    });
   }
 
   /**
@@ -91,18 +64,48 @@ public class RefactoringEntry implements Serializable {
    * Converter to Json.
    *
    * @param refactorings to be processed.
-   * @param commitId     current commit.
-   * @param parents      parent ids of the current commit.
-   * @param time         timestamp of the current commit.
+   * @param commit       current commit.
    * @return Json string.
    */
-  public static String convert(List<Refactoring> refactorings, String commitId,
-                               List<String> parents, long time) {
-    return new RefactoringEntry(
-        refactorings.stream()
-            .map(refactoring -> factory.create(refactoring))
-            .collect(Collectors.toList()),
-        commitId, parents, time).toString();
+  public static String convert(List<Refactoring> refactorings, VcsCommitMetadata commit,
+                               Project project) {
+    List<String> parents =
+        commit.getParents().stream().map(Hash::asString).collect(Collectors.toList());
+
+    RefactoringEntry entry =
+        new RefactoringEntry(commit.getId().asString(), parents, commit.getTimestamp());
+
+    List<RefactoringInfo> infos =
+        refactorings.stream().map(ref -> factory.create(ref, entry, project)).collect(
+            Collectors.toList());
+
+    entry.setRefactorings(infos).combineRelated();
+    return entry.toString();
+  }
+
+  private void combineRelated() {
+    HashMap<String, List<RefactoringInfo>> groups = new HashMap<>();
+    refactorings.forEach(r -> {
+      if (r.getGroupId() != null) {
+        List<RefactoringInfo> list = groups.getOrDefault(r.getGroupId(), new ArrayList<>());
+        list.add(r);
+        groups.put(r.getGroupId(), list);
+      }
+      r.setEntry(this);
+    });
+
+    groups.forEach((k, v) -> {
+      if (v.size() > 1) {
+        RefactoringInfo info = getMainRefactoringInfo(v);
+
+        v.remove(info);
+        v.forEach(r -> {
+          info.includesRefactoring(r.getName());
+          info.addAllMarkings(r);
+          r.setHidden(true);
+        });
+      }
+    });
   }
 
   private RefactoringInfo getMainRefactoringInfo(List<RefactoringInfo> v) {
@@ -148,6 +151,11 @@ public class RefactoringEntry implements Serializable {
 
   public List<RefactoringInfo> getRefactorings() {
     return refactorings;
+  }
+
+  public RefactoringEntry setRefactorings(List<RefactoringInfo> refactorings) {
+    this.refactorings = refactorings;
+    return this;
   }
 
   public List<String> getParents() {

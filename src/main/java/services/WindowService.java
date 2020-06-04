@@ -9,11 +9,11 @@ import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
-import ui.GitWindowInfo;
+import ui.GitWindow;
 
 @Service
 public class WindowService {
-  private Map<VcsLogGraphTable, GitWindowInfo> gitInfo = new HashMap<>();
+  private Map<VcsLogGraphTable, GitWindow> gitInfo = new HashMap<>();
 
   public WindowService() {
   }
@@ -30,7 +30,7 @@ public class WindowService {
    */
   public void setSelected(@NotNull AnActionEvent e, boolean state) {
     VcsLogGraphTable table = e.getData(VcsLogInternalDataKeys.MAIN_UI).getTable();
-    gitInfo.putIfAbsent(table, new GitWindowInfo(e));
+    gitInfo.putIfAbsent(table, new GitWindow(e));
     gitInfo.get(table).setSelected(state);
   }
 

@@ -23,8 +23,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
   public static Key<RefactoringInfo> REFACTORING_INFO =
       Key.create("refactoringMiner.RefactoringInfo");
-  public static Key<Integer[]> MAX_RANGE_VALUES =
-      Key.create("refactoringMiner.maxRangeValues");
+  public static Key<String[]> FILE_CONTENTS =
+      Key.create("refactoringMiner.fileContentsArray");
 
   /**
    * Requests diff window to show specific refactoring with two editors.
@@ -44,11 +44,9 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
     SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
         diffContentBefore, diffContentAfter, info.getLeftPath(), info.getRightPath());
 
-    int lineCountBefore = left.split("\r\n|\r|\n").length + 1;
-    int lineCountAfter = right.split("\r\n|\r|\n").length + 1;
     request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
         (text1, text2, policy, innerChanges, indicator) ->
-            info.getTwoSidedLineMarkings(lineCountBefore, lineCountAfter));
+            info.getTwoSidedLineMarkings(left, right));
 
     DiffManager.getInstance().showDiff(project, request);
   }
@@ -76,14 +74,10 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
         diffContentLeft, diffContentMid, diffContentRight, info.getLeftPath(), info.getMidPath(),
         info.getRightPath());
 
-    Integer[] maxRangeValues = new Integer[3];
-
-    maxRangeValues[0] = left.split("\r\n|\r|\n").length + 1;
-    maxRangeValues[1] = mid.split("\r\n|\r|\n").length + 1;
-    maxRangeValues[2] = right.split("\r\n|\r|\n").length + 1;
+    String[] texts = {left, mid, right};
 
     request.putUserData(REFACTORING_INFO, info);
-    request.putUserData(MAX_RANGE_VALUES, maxRangeValues);
+    request.putUserData(FILE_CONTENTS, texts);
 
     DiffManager.getInstance().showDiff(project, request);
 
@@ -103,29 +97,30 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
     if (info == null) {
       return;
     }
-    Integer[] maxValues = request.getUserData(MAX_RANGE_VALUES);
+
+    String[] texts = request.getUserData(FILE_CONTENTS);
     SimpleThreesideDiffViewer myViewer = (SimpleThreesideDiffViewer) viewer;
-    myViewer.addListener(new MyDiffViewerListener(myViewer, info, maxValues));
+    myViewer.addListener(new MyDiffViewerListener(myViewer, info, texts));
   }
 
-  public class MyDiffViewerListener extends DiffViewerListener {
+  public static class MyDiffViewerListener extends DiffViewerListener {
 
-    private SimpleThreesideDiffViewer viewer;
-    private RefactoringInfo info;
-    private Integer[] maxValues;
+    private final SimpleThreesideDiffViewer viewer;
+    private final RefactoringInfo info;
+    private final String[] texts;
 
     /**
      * EventListener for DiffWindow finishing diff calculation.
      *
-     * @param viewer    DiffViewer
-     * @param info      RefactoringInfo
-     * @param maxValues TextLengths
+     * @param viewer DiffViewer
+     * @param info   RefactoringInfo
+     * @param texts  File contents in String
      */
     public MyDiffViewerListener(SimpleThreesideDiffViewer viewer,
-                                RefactoringInfo info, Integer[] maxValues) {
+                                RefactoringInfo info, String[] texts) {
       this.info = info;
       this.viewer = viewer;
-      this.maxValues = maxValues;
+      this.texts = texts;
     }
 
     @Override
@@ -133,9 +128,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       List<SimpleThreesideDiffChange> oldMarkings = viewer.getChanges();
       oldMarkings.forEach(ThreesideDiffChangeBase::destroy);
       oldMarkings.clear();
-
       List<SimpleThreesideDiffChange> newMarkings =
-          info.getThreeSidedLineMarkings(maxValues[0], maxValues[1], maxValues[2], viewer);
+          info.getThreeSidedLineMarkings(texts[0], texts[1], texts[2], viewer);
 
       oldMarkings.addAll(newMarkings);
 
