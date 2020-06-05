@@ -13,16 +13,11 @@ public class RenameAttributeHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     RenameAttributeRefactoring ref = (RenameAttributeRefactoring) refactoring;
     return info.setGroup(Group.ATTRIBUTE)
+        .setGroupId(ref.getClassNameAfter() + "." + ref.getRenamedAttribute().getVariableName())
         .addMarking(ref.getOriginalAttribute().codeRange(), ref.getRenamedAttribute().codeRange(),
             line -> line.addOffset(ref.getOriginalAttribute().getLocationInfo(),
                 ref.getRenamedAttribute().getLocationInfo()))
-        .setNameBefore(
-            ref.getOriginalAttribute().getVariableName() + " in class "
-                + ref.getClassNameBefore().substring(ref.getClassNameBefore().lastIndexOf(".") + 1))
-        .setNameAfter(
-            ref.getOriginalAttribute().getVariableName() + " in class "
-                + ref.getClassNameBefore().substring(ref.getClassNameBefore().lastIndexOf(".") + 1))
-        .setElementBefore(ref.getOriginalAttribute().getVariableName())
-        .setElementAfter(ref.getRenamedAttribute().getVariableName());
+        .setNameBefore(ref.getOriginalAttribute().toQualifiedString())
+        .setNameAfter(ref.getRenamedAttribute().toQualifiedString());
   }
 }

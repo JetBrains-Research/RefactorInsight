@@ -52,6 +52,7 @@ import org.hamcrest.CustomMatcher;
 import org.hamcrest.Matcher;
 import org.junit.rules.ErrorCollector;
 import org.refactoringminer.api.RefactoringType;
+import ui.renderer.CellRenderer;
 
 /**
  * Extend GitSingleRepoTest
@@ -185,6 +186,7 @@ public class MiningServiceManualTest extends GitSingleRepoTest {
           }
           List<RefactoringInfo> refactorings = ((RefactoringEntry) o).getRefactorings();
           Tree tree = ((RefactoringEntry) o).buildTree();
+          tree.setCellRenderer(new CellRenderer());
           final TreeCellRenderer cellRenderer = tree.getCellRenderer();
           Object root = tree.getModel().getRoot();
 

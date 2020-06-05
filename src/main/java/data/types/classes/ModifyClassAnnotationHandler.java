@@ -8,6 +8,7 @@ import gr.uom.java.xmi.diff.ModifyClassAnnotationRefactoring;
 import org.refactoringminer.api.Refactoring;
 
 public class ModifyClassAnnotationHandler extends Handler {
+
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     ModifyClassAnnotationRefactoring ref = (ModifyClassAnnotationRefactoring) refactoring;

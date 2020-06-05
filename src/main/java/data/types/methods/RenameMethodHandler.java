@@ -20,6 +20,16 @@ public class RenameMethodHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     RenameOperationRefactoring ref = (RenameOperationRefactoring) refactoring;
 
+    String id = ref.getRenamedOperation().getClassName() + ".";
+    if (ref.getRenamedOperation().isGetter()) {
+      id += ref.getRenamedOperation().getBody().getAllVariables().get(0);
+      info.setGroupId(id);
+    }
+    if (ref.getRenamedOperation().isSetter()) {
+      id += ref.getRenamedOperation().getParameterNameList().get(0);
+      info.setGroupId(id);
+    }
+
     return info.setGroup(Group.METHOD)
         .setElementBefore(null)
         .setElementAfter(null)

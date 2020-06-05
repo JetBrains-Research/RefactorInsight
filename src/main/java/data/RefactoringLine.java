@@ -82,10 +82,6 @@ public class RefactoringLine {
   public RefactoringLine() {
   }
 
-  public void setHasColumns(boolean hasColumns) {
-    this.hasColumns = hasColumns;
-  }
-
   /**
    * Generate Conflicttype from ThreeSidedType.
    * Conflict type is used to set highlighting colors and can disable
@@ -113,6 +109,10 @@ public class RefactoringLine {
       offset += lines[i].length() + 1;
     }
     return offset + column - 1;
+  }
+
+  public void setHasColumns(boolean hasColumns) {
+    this.hasColumns = hasColumns;
   }
 
   /**
@@ -228,11 +228,14 @@ public class RefactoringLine {
     return this;
   }
 
+  public int getRightStart() {
+    return lines[RIGHT_START];
+  }
+
   public enum VisualisationType {
     LEFT,
     RIGHT,
     BOTH,
     TWO
   }
-
 }

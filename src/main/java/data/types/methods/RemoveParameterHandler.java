@@ -8,6 +8,7 @@ import gr.uom.java.xmi.diff.RemoveParameterRefactoring;
 import org.refactoringminer.api.Refactoring;
 
 public class RemoveParameterHandler extends Handler {
+
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     RemoveParameterRefactoring ref = (RemoveParameterRefactoring) refactoring;

@@ -17,11 +17,17 @@ public class MergeVariableHandler extends Handler {
     ref.getMergedVariables().forEach(var ->
         info.addMarking(var.codeRange(), ref.getNewVariable().codeRange()));
 
-    return info.setGroup(Group.VARIABLE)
+    if (ref.getNewVariable().isParameter()) {
+      info.setGroup(Group.PARAMETER);
+    } else {
+      info.setGroup(Group.VARIABLE);
+    }
+
+    return info
         .setElementBefore(ref.getMergedVariables().stream().map(x -> x.getVariableName()).collect(
             Collectors.joining()))
-        .setElementAfter(ref.getNewVariable().getVariableName())
-        .setNameBefore(ref.getNewVariable().getVariableName())
-        .setNameAfter(ref.getNewVariable().getVariableName());
+        .setElementAfter(ref.getNewVariable().toQualifiedString())
+        .setNameBefore(ref.getNewVariable().toQualifiedString())
+        .setNameAfter(ref.getNewVariable().toQualifiedString());
   }
 }

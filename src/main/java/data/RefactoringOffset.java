@@ -13,7 +13,7 @@ public class RefactoringOffset {
   private int rightEnd;
 
   /**
-   * Subhighlighting two sided.
+   * Sub-highlighting two sided.
    * These params are the character where to start and where to end
    *
    * @param leftStart  int
@@ -29,7 +29,7 @@ public class RefactoringOffset {
   }
 
   /**
-   * Subhighlighting three sided.
+   * Sub-highlighting three sided.
    * These params are the character where to start and where to end
    *
    * @param leftStart  int

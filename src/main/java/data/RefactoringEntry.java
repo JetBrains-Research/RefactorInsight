@@ -1,15 +1,24 @@
 package data;
 
+import static org.refactoringminer.api.RefactoringType.CHANGE_ATTRIBUTE_TYPE;
+import static org.refactoringminer.api.RefactoringType.CHANGE_VARIABLE_TYPE;
+import static org.refactoringminer.api.RefactoringType.EXTRACT_CLASS;
+import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
+
 import com.google.gson.Gson;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.Hash;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.refactoringminer.api.Refactoring;
+import org.refactoringminer.api.RefactoringType;
 import utils.Utils;
 
 public class RefactoringEntry implements Serializable {
@@ -26,8 +35,7 @@ public class RefactoringEntry implements Serializable {
    * @param parents the commit ids of the parents.
    * @param time    timestamp of the commit.
    */
-  public RefactoringEntry(String commitId, List<String> parents,
-                          long time) {
+  public RefactoringEntry(String commitId, List<String> parents, long time) {
     this.parents = parents;
     this.time = time;
     this.commitId = commitId;
@@ -72,7 +80,72 @@ public class RefactoringEntry implements Serializable {
         refactorings.stream().map(ref -> factory.create(ref, entry, project)).collect(
             Collectors.toList());
 
-    return entry.setRefactorings(infos).toString();
+    entry.setRefactorings(infos).combineRelated();
+    return entry.toString();
+  }
+
+  private void combineRelated() {
+    combineRelatedExtractClass();
+
+    HashMap<String, List<RefactoringInfo>> groups = new HashMap<>();
+    refactorings.forEach(r -> {
+      if (r.getGroupId() != null) {
+        List<RefactoringInfo> list = groups.getOrDefault(r.getGroupId(), new ArrayList<>());
+        list.add(r);
+        groups.put(r.getGroupId(), list);
+      }
+      r.setEntry(this);
+    });
+
+    groups.forEach((k, v) -> {
+      if (v.size() > 1) {
+        RefactoringInfo info = getMainRefactoringInfo(v);
+
+        v.remove(info);
+        v.forEach(r -> {
+          info.includesRefactoring(r.getName());
+          info.addAllMarkings(r);
+          r.setHidden(true);
+        });
+      }
+    });
+  }
+
+  private void combineRelatedExtractClass() {
+    List<RefactoringInfo> extractClassRefactorings = refactorings
+        .stream().filter(x -> x.getType() == EXTRACT_CLASS).collect(Collectors.toList());
+    for (RefactoringInfo extractClass : extractClassRefactorings) {
+      String displayableElement = extractClass.getDisplayableElement();
+      refactorings.stream().filter(x -> !x.equals(extractClass))
+          .filter(x -> x.getDisplayableElement().equals(displayableElement))
+          .forEach(r -> {
+            extractClass.includesRefactoring(r.getName());
+            r.setHidden(true);
+          });
+    }
+  }
+
+  private RefactoringInfo getMainRefactoringInfo(List<RefactoringInfo> v) {
+    RefactoringInfo info = null;
+    if (v.stream().anyMatch(ofType(RENAME_ATTRIBUTE))
+        && v.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
+      info = v.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
+      info.setName("Rename and Change Attribute Type");
+    } else if (v.stream().anyMatch(ofType(RENAME_ATTRIBUTE))) {
+      info = v.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
+      info.setName("Rename Attribute");
+    } else if (v.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
+      info = v.stream().filter(ofType(CHANGE_ATTRIBUTE_TYPE)).findFirst().get();
+      info.setName("Change Attribute Type");
+    } else if (v.stream().anyMatch(ofType(CHANGE_VARIABLE_TYPE))) {
+      info = v.stream().filter(ofType(CHANGE_VARIABLE_TYPE)).findFirst().get();
+      info.setName("Rename and Change Variable Type");
+    }
+    return info;
+  }
+
+  private Predicate<RefactoringInfo> ofType(RefactoringType type) {
+    return (r) -> r.getType() == type;
   }
 
   /**
@@ -82,13 +155,14 @@ public class RefactoringEntry implements Serializable {
    */
   public Tree buildTree() {
     DefaultMutableTreeNode root = new DefaultMutableTreeNode(commitId);
-    refactorings.forEach(r -> root.add(r.makeNode()));
-
+    refactorings.forEach(r -> {
+      if (!r.isHidden()) {
+        root.add(r.makeNode());
+      }
+    });
     Tree tree = new Tree(root);
     tree.setRootVisible(false);
     Utils.expandAllNodes(tree, 0, tree.getRowCount());
-    MyCellRenderer renderer = new MyCellRenderer();
-    tree.setCellRenderer(renderer);
     return tree;
   }
 

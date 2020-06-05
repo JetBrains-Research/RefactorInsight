@@ -23,7 +23,8 @@ public class ExtractOperationHandler extends Handler {
     String classAfter = ref.getExtractedOperation().getClassName();
     int index = Utils.indexOfDifference(classBefore, classAfter);
     if (ref.getRefactoringType() == RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
-      info.setThreeSided(true)
+      info.setGroup(Group.METHOD)
+          .setThreeSided(true)
           .setElementBefore(ref.getSourceOperationBeforeExtraction().getName() + " in class "
               + classBefore.substring(index))
           .setElementAfter("extracted " + ref.getExtractedOperation().getName() + " & moved in "

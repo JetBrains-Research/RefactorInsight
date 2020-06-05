@@ -13,15 +13,13 @@ public class ChangeAttributeTypeHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     ChangeAttributeTypeRefactoring ref = (ChangeAttributeTypeRefactoring) refactoring;
     return info.setGroup(Group.ATTRIBUTE)
-        .setNameBefore(
-            ref.getOriginalAttribute().getVariableName() + " in class "
-                + ref.getClassNameBefore().substring(ref.getClassNameBefore().lastIndexOf(".") + 1))
-        .setNameAfter(
-            ref.getChangedTypeAttribute().getVariableName() + " in class "
-                + ref.getClassNameAfter().substring(ref.getClassNameBefore().lastIndexOf(".") + 1))
-        .setElementBefore(ref.getOriginalAttribute().toQualifiedString())
-        .setElementAfter(ref.getChangedTypeAttribute().toQualifiedString())
+        .setGroupId(ref.getClassNameAfter() + "." + ref.getChangedTypeAttribute().getVariableName())
+        .setNameBefore(ref.getOriginalAttribute().toQualifiedString())
+        .setNameAfter(ref.getChangedTypeAttribute().toQualifiedString())
+        .setElementBefore(null)
+        .setElementAfter(null)
         .addMarking(ref.getOriginalAttribute().getType().codeRange(),
             ref.getChangedTypeAttribute().getType().codeRange());
+
   }
 }

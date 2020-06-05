@@ -21,7 +21,6 @@ import com.intellij.vcs.log.impl.VcsLogManager;
 import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.visible.filters.VcsLogFilterObject;
-import data.MyCellRenderer;
 import data.RefactoringInfo;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
@@ -33,6 +32,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.jetbrains.annotations.NotNull;
 import services.RefactoringsBundle;
+import ui.renderer.CellRenderer;
 import utils.Utils;
 
 
@@ -75,7 +75,7 @@ public class MethodRefactoringToolbar {
       Tree tree = createTree(refactorings);
       tree.setRootVisible(false);
       Utils.expandAllNodes(tree, 0, tree.getRowCount());
-      tree.setCellRenderer(new MyCellRenderer(true));
+      tree.setCellRenderer(new CellRenderer(true));
       addMouseListener(splitter, tree);
       setFirstComponent(refactorings.size(), splitter, tree);
       setSecondComponent(splitter);

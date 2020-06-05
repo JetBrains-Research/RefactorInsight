@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.Hash;
 import com.intellij.vcs.log.VcsUser;
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.Times;
 import ui.GitWindow;
+import ui.renderer.CellRenderer;
 
 /**
  * Extend GitSingleRepoTest
@@ -85,6 +87,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
   public void testTreeIsBuilt() {
     RefactoringEntry entry = miner.getEntry(head);
     Tree tree = entry.buildTree();
+    tree.setCellRenderer(new CellRenderer());
     TreeCellRenderer cellRenderer = tree.getCellRenderer();
     Object root = tree.getModel().getRoot();
     assertNotNull(cellRenderer

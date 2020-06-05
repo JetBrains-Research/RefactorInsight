@@ -9,6 +9,7 @@ import gr.uom.java.xmi.diff.RemoveAttributeAnnotationRefactoring;
 import org.refactoringminer.api.Refactoring;
 
 public class RemoveAttributeAnnotationHandler extends Handler {
+
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     RemoveAttributeAnnotationRefactoring ref = (RemoveAttributeAnnotationRefactoring) refactoring;

@@ -15,8 +15,8 @@ public class ExtractVariableHandler extends Handler {
     return info.setGroup(Group.VARIABLE)
         .setElementBefore("in method " + ref.getOperationBefore().getName())
         .setElementAfter(null)
-        .setNameBefore(ref.getVariableDeclaration().getVariableName())
-        .setNameAfter(ref.getVariableDeclaration().getVariableName())
+        .setNameBefore(ref.getVariableDeclaration().toQualifiedString())
+        .setNameAfter(ref.getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOperationBefore().codeRange(),
             ref.getExtractedVariableDeclarationCodeRange());
   }

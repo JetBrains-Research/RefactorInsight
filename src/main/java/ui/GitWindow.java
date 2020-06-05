@@ -2,7 +2,6 @@ package ui;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.ProjectLevelVcsManager;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
@@ -23,6 +22,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import services.MiningService;
 import services.RefactoringsBundle;
+import ui.renderer.CellRenderer;
 
 public class GitWindow {
   private Project project;
@@ -55,6 +55,10 @@ public class GitWindow {
     });
   }
 
+  public boolean isSelected() {
+    return state;
+  }
+
   /**
    * Applies selects or deselects the tool window.
    *
@@ -67,10 +71,6 @@ public class GitWindow {
       viewport.setView(changesTree);
     }
     this.state = state;
-  }
-
-  public boolean isSelected() {
-    return state;
   }
 
   /**
@@ -104,6 +104,7 @@ public class GitWindow {
     }
 
     Tree tree = entry.buildTree();
+    tree.setCellRenderer(new CellRenderer());
     tree.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent ev) {

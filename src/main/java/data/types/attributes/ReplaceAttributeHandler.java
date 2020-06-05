@@ -15,8 +15,8 @@ public class ReplaceAttributeHandler extends Handler {
     return info.setGroup(Group.ATTRIBUTE)
         .setElementBefore(ref.getSourceClassName())
         .setElementAfter(ref.getTargetClassName())
-        .setNameBefore(ref.getOriginalAttribute().getName())
-        .setNameAfter(ref.getMovedAttribute().getName())
+        .setNameBefore(ref.getOriginalAttribute().toQualifiedString())
+        .setNameAfter(ref.getMovedAttribute().toQualifiedString())
         .addMarking(ref.getSourceAttributeCodeRangeBeforeMove(),
             ref.getTargetAttributeCodeRangeAfterMove());
   }
