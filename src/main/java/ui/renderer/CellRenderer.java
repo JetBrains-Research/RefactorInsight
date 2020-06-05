@@ -44,9 +44,9 @@ public class CellRenderer extends JBDefaultTreeCellRenderer {
     }
 
     if (leaf) {
-      setText(getHtml(
-          getStr2(info.getLineMarkings().size() > 0
-                  ? String.valueOf(info.getLineMarkings().get(0).getRightStart()) : "", getText(),
+      setText(createHtml(
+          getStringLeaf(info.getLineMarkings().size() > 0
+                  ? String.valueOf(info.getLineMarkings().get(0).getRightStart() + 1) : "", getText(),
               info.getRightPath() != null ? info.getRightPath() : "")));
       icon = isMethodHistory ? null : AllIcons.Actions.Diff;
     }
@@ -76,23 +76,23 @@ public class CellRenderer extends JBDefaultTreeCellRenderer {
 
   @NotNull
   private String createHtml(String second, String first) {
-    final String str = getStr(first, second);
-    return getHtml(str);
+    final String str = getStringForRefactoringNode(first, second);
+    return createHtml(str);
   }
 
   @NotNull
-  private String getHtml(String str) {
+  private String createHtml(String str) {
     StringBuffer html = new StringBuffer(str);
     return html.toString();
   }
 
   @NotNull
-  private String getStr(String first, String second) {
+  private String getStringForRefactoringNode(String first, String second) {
     return "<html> <b>" + first + "</b> <font color=\"#696969\"> "
         + second + "</font></html>";
   }
 
-  private String getStr2(String first, String second, String third) {
+  private String getStringLeaf(String first, String second, String third) {
     return "<html> <font color=\"#696969\"> " + first + " </font> "
         + second + (third.equals("") ? "</html>"
         : ("<font color=\"#696969\"> in file " + third + " </font></html>"));
