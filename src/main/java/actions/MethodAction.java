@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiParameterList;
 import com.intellij.usages.PsiElementUsageTarget;
 import com.intellij.usages.UsageTarget;
 import com.intellij.usages.UsageView;
@@ -15,6 +14,7 @@ import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import services.MiningService;
 import ui.MethodRefactoringToolbar;
+import utils.Utils;
 
 public class MethodAction extends AnAction {
 
@@ -35,32 +35,22 @@ public class MethodAction extends AnAction {
     map = e.getProject().getService(MiningService.class).getMethodHistory();
     DataContext dataContext = e.getDataContext();
     UsageTarget[] usageTarget = dataContext.getData(UsageView.USAGE_TARGETS_KEY);
+    showHistoryForMethod(project, dataContext, usageTarget);
+  }
+
+  private void showHistoryForMethod(Project project, DataContext dataContext,
+                                    UsageTarget[] usageTarget) {
     if (usageTarget != null) {
       UsageTarget target = usageTarget[0];
       if (target instanceof PsiElementUsageTarget) {
         if (((PsiElementUsageTarget) target).getElement() instanceof PsiMethod) {
           PsiMethod method = (PsiMethod) ((PsiElementUsageTarget) target).getElement();
-          String signature = calculateSignature(method);
+          String signature = Utils.calculateSignature(method);
           getToolbarWindow(project).showToolbar(map.get(signature),
-              method.getName(), e.getDataContext());
+              method.getName(), dataContext);
         }
       }
     }
-  }
-
-  private String calculateSignature(PsiMethod method) {
-    String signature = method.getName();
-    signature = method.getContainingClass().getQualifiedName() + "." + signature + "(";
-    PsiParameterList parameterList = method.getParameterList();
-    for (int i = 0; i < parameterList.getParametersCount(); i++) {
-      if (i != parameterList.getParametersCount() - 1) {
-        signature += parameterList.getParameter(i).getType().getPresentableText() + ",";
-      } else {
-        signature += parameterList.getParameter(i).getType().getPresentableText();
-      }
-    }
-    signature += ")";
-    return signature;
   }
 
   @Override
