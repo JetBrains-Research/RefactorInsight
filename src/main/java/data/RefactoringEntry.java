@@ -2,6 +2,7 @@ package data;
 
 import static org.refactoringminer.api.RefactoringType.CHANGE_ATTRIBUTE_TYPE;
 import static org.refactoringminer.api.RefactoringType.CHANGE_VARIABLE_TYPE;
+import static org.refactoringminer.api.RefactoringType.EXTRACT_CLASS;
 import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
 
 import com.google.gson.Gson;
@@ -84,6 +85,8 @@ public class RefactoringEntry implements Serializable {
   }
 
   private void combineRelated() {
+    combineRelatedExtractClass();
+
     HashMap<String, List<RefactoringInfo>> groups = new HashMap<>();
     refactorings.forEach(r -> {
       if (r.getGroupId() != null) {
@@ -106,6 +109,20 @@ public class RefactoringEntry implements Serializable {
         });
       }
     });
+  }
+
+  private void combineRelatedExtractClass() {
+    List<RefactoringInfo> extractClassRefactorings = refactorings
+        .stream().filter(x -> x.getType() == EXTRACT_CLASS).collect(Collectors.toList());
+    for (RefactoringInfo extractClass : extractClassRefactorings) {
+      String displayableElement = extractClass.getDisplayableElement();
+      refactorings.stream().filter(x -> !x.equals(extractClass))
+          .filter(x -> x.getDisplayableElement().equals(displayableElement))
+          .forEach(r -> {
+            extractClass.includesRefactoring(r.getName());
+            r.setHidden(true);
+          });
+    }
   }
 
   private RefactoringInfo getMainRefactoringInfo(List<RefactoringInfo> v) {
