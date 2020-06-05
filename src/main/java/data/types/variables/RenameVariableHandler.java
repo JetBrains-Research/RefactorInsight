@@ -6,6 +6,7 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.RenameVariableRefactoring;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class RenameVariableHandler extends Handler {
 
@@ -17,7 +18,7 @@ public class RenameVariableHandler extends Handler {
         && ref.getRenamedVariable().isParameter()) {
       id += ref.getRenamedVariable().getVariableName();
     } else {
-      id = calculateSignature(ref.getOperationAfter()) + "."
+      id = Utils.calculateSignature(ref.getOperationAfter()) + "."
           + ref.getRenamedVariable().getVariableName();
     }
     info.setGroupId(id);

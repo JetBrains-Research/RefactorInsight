@@ -13,6 +13,7 @@ import git4idea.GitRevisionNumber;
 import gr.uom.java.xmi.diff.RenameOperationRefactoring;
 import java.util.List;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class RenameMethodHandler extends Handler {
 
@@ -62,12 +63,12 @@ public class RenameMethodHandler extends Handler {
                     after = GitContentRevision.createRevision(afterPath, afterNumber, project);
 
                 int[] beforeColumns =
-                    findColumns(before.getContent(), ref.getOriginalOperation().getName(),
+                    Utils.findColumns(before.getContent(), ref.getOriginalOperation().getName(),
                         ref.getOriginalOperation().getBody().getCompositeStatement().codeRange()
                             .getStartLine());
 
                 int[] afterColumns =
-                    findColumns(after.getContent(), ref.getRenamedOperation().getName(),
+                    Utils.findColumns(after.getContent(), ref.getRenamedOperation().getName(),
                         ref.getRenamedOperation().getBody().getCompositeStatement().codeRange()
                             .getStartLine());
 
@@ -79,7 +80,7 @@ public class RenameMethodHandler extends Handler {
                 e.printStackTrace();
               }
             })
-        .setNameBefore(calculateSignature(ref.getOriginalOperation()))
-        .setNameAfter(calculateSignature(ref.getRenamedOperation()));
+        .setNameBefore(Utils.calculateSignature(ref.getOriginalOperation()))
+        .setNameAfter(Utils.calculateSignature(ref.getRenamedOperation()));
   }
 }

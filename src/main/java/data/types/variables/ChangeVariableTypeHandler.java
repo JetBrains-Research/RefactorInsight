@@ -7,6 +7,7 @@ import data.types.Handler;
 import gr.uom.java.xmi.UMLOperation;
 import gr.uom.java.xmi.diff.ChangeVariableTypeRefactoring;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class ChangeVariableTypeHandler extends Handler {
 
@@ -19,7 +20,7 @@ public class ChangeVariableTypeHandler extends Handler {
         && ref.getChangedTypeVariable().isParameter()) {
       id += ref.getChangedTypeVariable().getVariableName();
     } else {
-      id = calculateSignature(ref.getOperationAfter()) + "."
+      id = Utils.calculateSignature(ref.getOperationAfter()) + "."
           + ref.getChangedTypeVariable().getVariableName();
     }
     info.setGroupId(id);

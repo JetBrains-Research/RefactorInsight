@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
-import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.VcsCommitMetadata;
@@ -21,7 +21,6 @@ import java.util.Collection;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import services.MiningService;
-import services.RefactoringsBundle;
 import ui.renderer.CellRenderer;
 
 public class GitWindow {
@@ -88,10 +87,12 @@ public class GitWindow {
 
   private void buildComponent() {
     int index = table.getSelectionModel().getAnchorSelectionIndex();
-    if (index < 0) {
-      viewport.setView(new JBLabel(RefactoringsBundle.message("not.selected")));
+
+    if (index < 0 || index >= table.getRowCount() - 1) {
+      viewport.setView(new JBList<String>());
       return;
     }
+
     String commitId = table.getModel().getCommitId(index).getHash().asString();
     VcsCommitMetadata metadata = table.getModel().getCommitMetadata(index);
 

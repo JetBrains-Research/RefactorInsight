@@ -55,7 +55,7 @@ public class InfoFactory {
   private final Map<RefactoringType, Handler> refactoringHandlers = new HashMap<>();
 
   /**
-   * Constructor for the infoFactory.
+   * Constructor for the info factory.
    */
   public InfoFactory() {
 
@@ -179,4 +179,5 @@ public class InfoFactory {
     return refactoringHandlers.get(refactoring.getRefactoringType())
         .handle(refactoring, entry, project);
   }
+
 }

@@ -11,6 +11,7 @@ import git4idea.GitContentRevision;
 import git4idea.GitRevisionNumber;
 import gr.uom.java.xmi.diff.ExtractClassRefactoring;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class ExtractClassHandler extends Handler {
 
@@ -55,7 +56,7 @@ public class ExtractClassHandler extends Handler {
                 new GitRevisionNumber(info.getCommitId()), project).getContent();
             String[] nameSpace = ref.getExtractedClass().getName().split("\\.");
             String className = nameSpace[nameSpace.length - 1];
-            midColumns = findColumns(midText, className,
+            midColumns = Utils.findColumns(midText, className,
                 ref.getExtractedClass().codeRange().getStartLine());
           } catch (VcsException e) {
             e.printStackTrace();

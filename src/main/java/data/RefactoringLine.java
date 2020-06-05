@@ -17,6 +17,7 @@ import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import utils.Utils;
 
 public class RefactoringLine {
 
@@ -79,9 +80,6 @@ public class RefactoringLine {
     this.type = type;
   }
 
-  public RefactoringLine() {
-  }
-
   /**
    * Generate Conflicttype from ThreeSidedType.
    * Conflict type is used to set highlighting colors and can disable
@@ -96,19 +94,6 @@ public class RefactoringLine {
       default:
         return new MergeConflictType(TextDiffType.MODIFIED, true, true);
     }
-  }
-
-  private static int getMaxLine(String text) {
-    return text.split("\r\n|\r|\n").length;
-  }
-
-  private static int getOffset(String text, int line, int column) {
-    int offset = 0;
-    String[] lines = text.split("\r\n|\r|\n");
-    for (int i = 0; i < line - 1; i++) {
-      offset += lines[i].length() + 1;
-    }
-    return offset + column - 1;
   }
 
   public void setHasColumns(boolean hasColumns) {
@@ -129,20 +114,22 @@ public class RefactoringLine {
         offsets.stream().map(RefactoringOffset::getRightRange).collect(Collectors.toList());
 
     if (hasColumns) {
-      int leftStartOffset = getOffset(leftText, lines[LEFT_START] + 1, 1);
+      int leftStartOffset = Utils.getOffset(leftText, lines[LEFT_START] + 1, 1);
       left.add(new TextRange(
-          getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]) - leftStartOffset,
-          getOffset(leftText, lines[LEFT_END], columns[LEFT_END]) - leftStartOffset
+          Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]) - leftStartOffset,
+          Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]) - leftStartOffset
       ));
-      int midStartOffset = getOffset(midText, lines[MID_START] + 1, 1);
+      int midStartOffset = Utils.getOffset(midText, lines[MID_START] + 1, 1);
       mid.add(new TextRange(
-          getOffset(midText, lines[MID_START] + 1, columns[MID_START]) - midStartOffset,
-          getOffset(midText, lines[MID_END], columns[MID_END]) - midStartOffset
+          Utils.getOffset(midText, lines[MID_START] + 1, columns[MID_START]) - midStartOffset,
+          Utils.getOffset(midText, lines[MID_END], columns[MID_END]) - midStartOffset
       ));
-      int rightStartOffset = getOffset(rightText, lines[RIGHT_START] + 1, 1);
+      int rightStartOffset = Utils.getOffset(rightText, lines[RIGHT_START] + 1, 1);
       right.add(new TextRange(
-          getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]) - rightStartOffset,
-          getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END]) - rightStartOffset
+          Utils.getOffset(rightText, lines[RIGHT_START] + 1,
+              columns[RIGHT_START]) - rightStartOffset,
+          Utils.getOffset(rightText, lines[RIGHT_END],
+              columns[RIGHT_END]) - rightStartOffset
       ));
     }
 
@@ -150,24 +137,24 @@ public class RefactoringLine {
   }
 
   /**
-   * Returns coderange in a LineFragment object.
+   * Returns code range in a LineFragment object.
    * This object allows highlighting in the IDEA diff window.
    *
    * @return LineFragment
    */
   public LineFragment getTwoSidedRange(String leftText, String rightText) {
-    int maxLineLeft = getMaxLine(leftText);
-    int maxLineRight = getMaxLine(rightText);
+    int maxLineLeft = Utils.getMaxLine(leftText);
+    int maxLineRight = Utils.getMaxLine(rightText);
     lines[RIGHT_END] = lines[RIGHT_END] < 0 ? maxLineLeft : lines[RIGHT_END];
     lines[LEFT_END] = lines[LEFT_END] < 0 ? maxLineRight : lines[LEFT_END];
     List<DiffFragment> fragments =
         offsets.stream().map(RefactoringOffset::toDiffFragment).collect(Collectors.toList());
     if (hasColumns) {
       fragments.add(new DiffFragmentImpl(
-          getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]),
-          getOffset(leftText, lines[LEFT_END], columns[LEFT_END]),
-          getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]),
-          getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END])));
+          Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]),
+          Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]),
+          Utils.getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]),
+          Utils.getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END])));
     }
     return new LineFragmentImpl(lines[LEFT_START], lines[LEFT_END], lines[RIGHT_START],
         lines[RIGHT_END], 0, 0, 0, 0, fragments);
@@ -179,9 +166,9 @@ public class RefactoringLine {
   public SimpleThreesideDiffChange getThreeSidedRange(String leftText, String midText,
                                                       String rightText,
                                                       SimpleThreesideDiffViewer viewer) {
-    int maxLineLeft = getMaxLine(leftText);
-    int maxLineMid = getMaxLine(midText);
-    int maxLineRight = getMaxLine(rightText);
+    int maxLineLeft = Utils.getMaxLine(leftText);
+    int maxLineMid = Utils.getMaxLine(midText);
+    int maxLineRight = Utils.getMaxLine(rightText);
     lines[RIGHT_END] = lines[RIGHT_END] < 0 ? maxLineLeft : lines[RIGHT_END];
     lines[MID_END] = lines[MID_END] < 0 ? maxLineMid : lines[MID_END];
     lines[LEFT_END] = lines[LEFT_END] < 0 ? maxLineRight : lines[LEFT_END];

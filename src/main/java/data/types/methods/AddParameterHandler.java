@@ -6,6 +6,7 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.AddParameterRefactoring;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class AddParameterHandler extends Handler {
 
@@ -13,8 +14,8 @@ public class AddParameterHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     AddParameterRefactoring ref = (AddParameterRefactoring) refactoring;
     return info.setGroup(Group.METHOD)
-        .setNameBefore(calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(calculateSignature(ref.getOperationAfter()))
+        .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()))
         .setElementAfter(null)
         .setElementBefore(ref.getParameter().getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOperationBefore().codeRange(), ref.getOperationAfter().codeRange(),

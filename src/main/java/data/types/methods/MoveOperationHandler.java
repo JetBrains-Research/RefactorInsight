@@ -22,7 +22,7 @@ public class MoveOperationHandler extends Handler {
         .setElementAfter("to class " + classAfter.substring(index))
         .addMarking(ref.getSourceOperationCodeRangeBeforeMove(),
             ref.getTargetOperationCodeRangeAfterMove())
-        .setNameBefore(calculateSignature(ref.getOriginalOperation()))
-        .setNameAfter(calculateSignature(ref.getMovedOperation()));
+        .setNameBefore(Utils.calculateSignature(ref.getOriginalOperation()))
+        .setNameAfter(Utils.calculateSignature(ref.getMovedOperation()));
   }
 }

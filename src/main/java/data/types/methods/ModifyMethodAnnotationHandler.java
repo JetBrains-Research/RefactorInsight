@@ -6,6 +6,7 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ModifyMethodAnnotationRefactoring;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class ModifyMethodAnnotationHandler extends Handler {
 
@@ -16,7 +17,7 @@ public class ModifyMethodAnnotationHandler extends Handler {
         .setElementBefore(ref.getAnnotationBefore().toString())
         .setElementAfter(ref.getAnnotationAfter().toString())
         .addMarking(ref.getAnnotationBefore().codeRange(), ref.getAnnotationAfter().codeRange())
-        .setNameBefore(calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(calculateSignature(ref.getOperationAfter()));
+        .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()));
   }
 }

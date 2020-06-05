@@ -6,6 +6,7 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ChangeReturnTypeRefactoring;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class ChangeReturnTypeHandler extends Handler {
 
@@ -20,8 +21,8 @@ public class ChangeReturnTypeHandler extends Handler {
     return info.setGroup(Group.METHOD)
         .setElementBefore(ref.getOriginalType().toString())
         .setElementAfter(ref.getChangedType().toString())
-        .setNameBefore(calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(calculateSignature(ref.getOperationBefore()))
+        .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(Utils.calculateSignature(ref.getOperationBefore()))
         .addMarking(ref.getOriginalType().codeRange(), ref.getChangedType().codeRange());
 
   }

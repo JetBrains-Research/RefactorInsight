@@ -29,8 +29,8 @@ public class ExtractOperationHandler extends Handler {
               + classBefore.substring(index))
           .setElementAfter("extracted " + ref.getExtractedOperation().getName() + " & moved in "
               + classAfter.substring(index))
-          .setNameBefore(calculateSignature(ref.getSourceOperationBeforeExtraction()))
-          .setNameAfter(calculateSignature(ref.getSourceOperationAfterExtraction()))
+          .setNameBefore(Utils.calculateSignature(ref.getSourceOperationBeforeExtraction()))
+          .setNameAfter(Utils.calculateSignature(ref.getSourceOperationAfterExtraction()))
           .addMarking(ref.getExtractedCodeRangeFromSourceOperation(),
               ref.getExtractedCodeRangeToExtractedOperation(),
               ref.getExtractedCodeRangeFromSourceOperation(),
@@ -43,7 +43,7 @@ public class ExtractOperationHandler extends Handler {
         String midText = GitContentRevision.createRevision(
             new LocalFilePath(absolutePath, false),
             new GitRevisionNumber(info.getCommitId()), project).getContent();
-        midColumns = findColumns(midText, ref.getExtractedOperation().getName(),
+        midColumns = Utils.findColumns(midText, ref.getExtractedOperation().getName(),
             ref.getExtractedOperation().getBody().getCompositeStatement().codeRange()
                 .getStartLine());
       } catch (VcsException e) {
@@ -70,8 +70,8 @@ public class ExtractOperationHandler extends Handler {
       info.setGroup(Group.METHOD)
           .setElementBefore("from " + ref.getSourceOperationBeforeExtraction().getName())
           .setElementAfter("extracted " + ref.getExtractedOperation().getName())
-          .setNameBefore(calculateSignature(ref.getSourceOperationBeforeExtraction()))
-          .setNameAfter(calculateSignature(ref.getSourceOperationAfterExtraction()))
+          .setNameBefore(Utils.calculateSignature(ref.getSourceOperationBeforeExtraction()))
+          .setNameAfter(Utils.calculateSignature(ref.getSourceOperationAfterExtraction()))
           .addMarking(ref.getExtractedCodeRangeFromSourceOperation(),
               ref.getExtractedCodeRangeToExtractedOperation());
 
