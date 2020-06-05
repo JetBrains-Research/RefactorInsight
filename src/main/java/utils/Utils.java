@@ -1,6 +1,8 @@
 package utils;
 
 import com.intellij.openapi.util.Disposer;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiParameterList;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import java.util.ArrayList;
@@ -37,7 +39,6 @@ public class Utils {
    */
   public static int indexOfDifference(String nameBefore, String nameAfter) {
     int minLen = Math.min(nameBefore.length(), nameAfter.length());
-    int index = 0;
     int last = 0;
     for (int i = 0; i != minLen; i++) {
       char chA = nameBefore.charAt(i);
@@ -45,18 +46,11 @@ public class Utils {
       if (nameBefore.charAt(i) == '.' && nameAfter.charAt(i) == '.') {
         last = i + 1;
       }
-      if (chA != chB && i > 0 && nameBefore.charAt(i - 1) == '.'
-          && nameAfter.charAt(i - 1) == '.') {
-        index = i;
-        return index;
-      } else if (chA != chB) {
+      if (chA != chB) {
         return last;
       }
     }
-    if (nameAfter.length() != nameBefore.length()) {
-      return last;
-    }
-    return index;
+    return last;
   }
 
   /**
@@ -79,4 +73,27 @@ public class Utils {
     logs.add(log);
   }
 
+  /**
+   * Calculates the signature of a PsiMethod such that it matches the once calculated
+   * for a RefactoringMiner UMLOperation.
+   *
+   * @param method to calcukate signature for.
+   * @return the signature.
+   */
+  public static String calculateSignature(PsiMethod method) {
+    String signature = method.getName();
+    signature = method.getContainingClass().getQualifiedName() + "." + signature + "(";
+    PsiParameterList parameterList = method.getParameterList();
+    int parametersCount = parameterList.getParametersCount();
+
+    for (int i = 0; i < parametersCount; i++) {
+      if (i != parametersCount - 1) {
+        signature += parameterList.getParameter(i).getType().getPresentableText() + ",";
+      } else {
+        signature += parameterList.getParameter(i).getType().getPresentableText();
+      }
+    }
+    signature += ")";
+    return signature;
+  }
 }
