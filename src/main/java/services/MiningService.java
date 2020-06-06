@@ -226,7 +226,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   }
 
   private String version() {
-    List<String> list = Stream.of(
+    return VERSION + String.valueOf(Stream.of(
         //all classes that can change
         RefactoringEntry.class,
         RefactoringInfo.class,
@@ -235,9 +235,8 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     ).flatMap(c -> Arrays.stream(c.getDeclaredFields())
         .map(Field::getGenericType)
         .map(Type::getTypeName)
-    ).collect(Collectors.toList());
-    list.add(VERSION);
-    return String.valueOf(list.hashCode());
+    ).collect(Collectors.toList()))
+        .hashCode();
   }
 
   public static class MyState {
