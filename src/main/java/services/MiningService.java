@@ -49,6 +49,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
       = new ConcurrentHashMap<>();
   private boolean mining = false;
   private MyState innerState = new MyState();
+  private static final String VERSION = "1.0.1";
 
   public MiningService() {
   }
@@ -225,18 +226,17 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   }
 
   private String version() {
-    return String.valueOf(Stream.of(
+    return VERSION + String.valueOf(Stream.of(
         //all classes that can change
         RefactoringEntry.class,
         RefactoringInfo.class,
         RefactoringLine.class,
         RefactoringOffset.class
-        ).flatMap(c -> Arrays.stream(c.getDeclaredFields())
-            .map(Field::getGenericType)
-            .map(Type::getTypeName)
-        ).collect(Collectors.toList())
-            .hashCode()
-    );
+    ).flatMap(c -> Arrays.stream(c.getDeclaredFields())
+        .map(Field::getGenericType)
+        .map(Type::getTypeName)
+    ).collect(Collectors.toList()))
+        .hashCode();
   }
 
   public static class MyState {
