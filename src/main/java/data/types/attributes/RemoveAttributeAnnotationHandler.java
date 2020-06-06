@@ -5,7 +5,6 @@ import static data.RefactoringLine.MarkingOption.REMOVE;
 import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
-import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
 import gr.uom.java.xmi.diff.RemoveAttributeAnnotationRefactoring;
@@ -24,7 +23,7 @@ public class RemoveAttributeAnnotationHandler extends Handler {
         .setElementAfter(null)
         .addMarking(
             annotation.codeRange(),
-            ref.getAttributeBefore().codeRange(),
+            ref.getAttributeAfter().codeRange(),
             line -> line.addOffset(annotation.getLocationInfo(), REMOVE),
             REMOVE);
   }

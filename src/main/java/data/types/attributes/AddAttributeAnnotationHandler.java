@@ -5,7 +5,6 @@ import static data.RefactoringLine.MarkingOption.ADD;
 import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
-import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
 import gr.uom.java.xmi.diff.AddAttributeAnnotationRefactoring;
