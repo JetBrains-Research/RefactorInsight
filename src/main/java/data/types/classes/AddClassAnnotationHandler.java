@@ -3,6 +3,7 @@ package data.types.classes;
 import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
+import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
 import gr.uom.java.xmi.diff.AddClassAnnotationRefactoring;
@@ -19,14 +20,12 @@ public class AddClassAnnotationHandler extends Handler {
         .setNameBefore(ref.getClassBefore().getName())
         .setNameAfter(ref.getClassAfter().getName())
         .setElementBefore(ref.getAnnotation().toString())
-        .setElementAfter(null).addMarking(ref.getClassBefore().codeRange().getStartLine(),
-            ref.getClassBefore().codeRange().getStartLine() - 1,
-            annotation.getLocationInfo().getStartLine(),
-            annotation.getLocationInfo().getEndLine(),
-            ref.getClassBefore().codeRange().getFilePath(),
-            annotation.getLocationInfo().getFilePath(),
-            line -> line.addOffset(0, 0,
-                annotation.getLocationInfo().getStartOffset(),
-                annotation.getLocationInfo().getEndOffset()));
+        .setElementAfter(null)
+        .addMarking(
+            ref.getClassBefore().codeRange(),
+            annotation.codeRange(),
+            line -> line.addOffset(//TODO was (0,0) not 11
+                annotation.getLocationInfo(), RefactoringLine.MarkingOption.ADD),
+            RefactoringLine.MarkingOption.ADD);
   }
 }

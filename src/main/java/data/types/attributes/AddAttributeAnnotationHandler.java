@@ -1,8 +1,11 @@
 package data.types.attributes;
 
+import static data.RefactoringLine.MarkingOption.ADD;
+
 import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
+import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
 import gr.uom.java.xmi.diff.AddAttributeAnnotationRefactoring;
@@ -20,14 +23,10 @@ public class AddAttributeAnnotationHandler extends Handler {
         .setNameAfter(ref.getAttributeAfter().toQualifiedString())
         .setElementBefore(ref.getAnnotation().toString())
         .setElementAfter(null)
-        .addMarking(ref.getAttributeBefore().codeRange().getStartLine(),
-            ref.getAttributeAfter().codeRange().getStartLine() - 1,
-            annotation.getLocationInfo().getStartLine(),
-            annotation.getLocationInfo().getEndLine(),
-            ref.getAttributeBefore().codeRange().getFilePath(),
-            annotation.getLocationInfo().getFilePath(),
-            line -> line.addOffset(1, 1,
-                annotation.getLocationInfo().getStartOffset(),
-                annotation.getLocationInfo().getEndOffset()));
+        .addMarking(
+            ref.getAttributeBefore().codeRange(),
+            annotation.codeRange(),
+            line -> line.addOffset(annotation.getLocationInfo(), ADD),
+            ADD);
   }
 }

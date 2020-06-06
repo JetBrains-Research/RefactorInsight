@@ -1,8 +1,11 @@
 package data.types.methods;
 
+import static data.RefactoringLine.MarkingOption.ADD;
+
 import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
+import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
 import gr.uom.java.xmi.diff.AddMethodAnnotationRefactoring;
@@ -17,15 +20,13 @@ public class AddMethodAnnotationHandler extends Handler {
     return info.setGroup(Group.METHOD)
         .setElementBefore(annotation.toString())
         .setElementAfter(null)
-        .addMarking(ref.getOperationBefore().codeRange().getStartLine(),
-            ref.getOperationBefore().codeRange().getStartLine() - 1,
-            annotation.getLocationInfo().getStartLine(),
-            annotation.getLocationInfo().getEndLine(),
-            ref.getOperationBefore().codeRange().getFilePath(),
-            annotation.getLocationInfo().getFilePath(),
-            line -> line.addOffset(0, 0,
-                annotation.getLocationInfo().getStartOffset(),
-                annotation.getLocationInfo().getEndOffset()))
+        .addMarking(
+            ref.getOperationBefore().codeRange(),
+            annotation.codeRange(),
+            line -> line.addOffset(//TODO 00 again instead of 11
+                annotation.getLocationInfo(),
+                ADD),
+            ADD)
         .setNameBefore(calculateSignature(ref.getOperationBefore()))
         .setNameAfter(calculateSignature(ref.getOperationBefore()));
   }

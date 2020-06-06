@@ -3,7 +3,7 @@ package data;
 import com.intellij.diff.fragments.DiffFragmentImpl;
 import com.intellij.openapi.util.TextRange;
 
-public class RefactoringOffset {
+public class  RefactoringOffset {
 
   private int leftStart;
   private int leftEnd;
@@ -47,9 +47,6 @@ public class RefactoringOffset {
     this.midEnd = midEnd;
     this.rightStart = rightStart;
     this.rightEnd = rightEnd;
-  }
-
-  public RefactoringOffset() {
   }
 
   public DiffFragmentImpl toDiffFragment() {

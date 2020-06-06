@@ -94,6 +94,8 @@ public class GitWindow {
     }
     String commitId = table.getModel().getCommitId(index).getHash().asString();
     VcsCommitMetadata metadata = table.getModel().getCommitMetadata(index);
+    Collection<Change> changes =
+        table.getModel().getFullDetails(index).getChanges(0);
 
     String refactorings = miner.getRefactorings(commitId);
     RefactoringEntry entry = RefactoringEntry.fromString(refactorings);
@@ -118,48 +120,11 @@ public class GitWindow {
           if (node.isLeaf()) {
             RefactoringInfo info = (RefactoringInfo)
                 node.getUserObjectPath()[1];
-            showDiff(index, info);
+            DiffWindow.showDiff(changes, info, project);
           }
         }
       }
     });
     viewport.setView(tree);
-  }
-
-  private void showDiff(int index, RefactoringInfo info) {
-    try {
-      Collection<Change> changes =
-          table.getModel().getFullDetails(index).getChanges(0);
-      String left = "";
-      String right = "";
-      for (Change change : changes) {
-        if (change.getBeforeRevision() != null
-            && (project.getBasePath() + "/" + info.getLeftPath())
-            .equals(change.getBeforeRevision().getFile().getPath())) {
-          left = change.getBeforeRevision().getContent();
-        }
-        if (change.getAfterRevision() != null
-            && (project.getBasePath() + "/" + info.getRightPath())
-            .equals(change.getAfterRevision().getFile().getPath())) {
-          right = change.getAfterRevision().getContent();
-        }
-      }
-      String mid = "";
-      if (info.isThreeSided()) {
-        for (Change change : changes) {
-          if (change.getAfterRevision() != null
-              && (project.getBasePath() + "/" + info.getMidPath())
-              .equals(change.getAfterRevision().getFile().getPath())) {
-            mid = change.getAfterRevision().getContent();
-          }
-        }
-        DiffWindow.showDiff(left, mid, right, info, project);
-      } else {
-        DiffWindow.showDiff(left, right, info, project);
-      }
-
-    } catch (VcsException ex) {
-      ex.printStackTrace();
-    }
   }
 }

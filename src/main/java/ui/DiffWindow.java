@@ -15,7 +15,10 @@ import com.intellij.diff.util.DiffUserDataKeysEx;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.vcs.VcsException;
+import com.intellij.openapi.vcs.changes.Change;
 import data.RefactoringInfo;
+import java.util.Collection;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -83,6 +86,40 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
   }
 
+  static void showDiff(Collection<Change> changes, RefactoringInfo info, Project project) {
+    try {
+      String left = "";
+      String right = "";
+      for (Change change : changes) {
+        if (change.getBeforeRevision() != null
+            && (project.getBasePath() + "/" + info.getLeftPath())
+            .equals(change.getBeforeRevision().getFile().getPath())) {
+          left = change.getBeforeRevision().getContent();
+        }
+        if (change.getAfterRevision() != null
+            && (project.getBasePath() + "/" + info.getRightPath())
+            .equals(change.getAfterRevision().getFile().getPath())) {
+          right = change.getAfterRevision().getContent();
+        }
+      }
+      String mid = "";
+      if (info.isThreeSided()) {
+        for (Change change : changes) {
+          if (change.getAfterRevision() != null
+              && (project.getBasePath() + "/" + info.getMidPath())
+              .equals(change.getAfterRevision().getFile().getPath())) {
+            mid = change.getAfterRevision().getContent();
+          }
+        }
+        DiffWindow.showDiff(left, mid, right, info, project);
+      } else {
+        DiffWindow.showDiff(left, right, info, project);
+      }
+
+    } catch (VcsException ex) {
+      ex.printStackTrace();
+    }
+  }
 
   /**
    * IntelliJ Diff Extension.
