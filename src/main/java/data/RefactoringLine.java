@@ -49,6 +49,14 @@ public class RefactoringLine {
     columns[RIGHT_START] = Math.max(right.getStartColumn(), 1);
     columns[RIGHT_END] = Math.max(right.getEndColumn(), 1);
 
+    if (mid != null) {
+      lines[MID_START] = mid.getStartLine() - 1;
+      lines[MID_END] = mid.getEndLine();
+
+      columns[MID_START] = Math.max(mid.getStartColumn(), 1);
+      columns[MID_END] = Math.max(mid.getEndColumn(), 1);
+    }
+
     switch (option) {
       case ADD:
         lines[LEFT_END] = lines[LEFT_START];
@@ -70,13 +78,6 @@ public class RefactoringLine {
       default:
     }
 
-    if (mid != null) {
-      lines[MID_START] = mid.getStartLine() - 1;
-      lines[MID_END] = mid.getEndLine();
-
-      columns[MID_START] = Math.max(mid.getStartColumn(), 1);
-      columns[MID_END] = Math.max(mid.getEndColumn(), 1);
-    }
     this.hasColumns = true;
     this.type = type;
   }
