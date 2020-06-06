@@ -49,7 +49,6 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
       = new ConcurrentHashMap<>();
   private boolean mining = false;
   private MyState innerState = new MyState();
-  private static final String VERSION = "1.0.1";
 
   public MiningService() {
   }
@@ -226,7 +225,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   }
 
   private String version() {
-    return VERSION + String.valueOf(Stream.of(
+    return RefactoringsBundle.message("version") + String.valueOf(Stream.of(
         //all classes that can change
         RefactoringEntry.class,
         RefactoringInfo.class,

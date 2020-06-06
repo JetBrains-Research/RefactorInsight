@@ -205,7 +205,7 @@ public class RefactoringLine {
     int afterEnd = location.getEndOffset();
     switch (option) {
       case ADD:
-        beforeStart = beforeEnd = 1;
+        beforeStart = beforeEnd = 0;
         break;
       case REMOVE:
         afterStart = afterEnd = 0;
