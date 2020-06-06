@@ -21,7 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.Times;
-import ui.GitWindow;
+import ui.windows.GitWindow;
 import ui.renderer.CellRenderer;
 
 /**

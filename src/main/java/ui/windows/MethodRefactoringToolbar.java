@@ -1,4 +1,4 @@
-package ui;
+package ui.windows;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.DataContext;

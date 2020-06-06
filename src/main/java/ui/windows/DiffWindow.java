@@ -1,4 +1,4 @@
-package ui;
+package ui.windows;
 
 import com.intellij.diff.DiffContentFactoryEx;
 import com.intellij.diff.DiffContext;

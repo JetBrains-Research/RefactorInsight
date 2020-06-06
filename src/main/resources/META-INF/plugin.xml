@@ -22,12 +22,12 @@
     </extensions>
 
     <actions>
-        <action id="actions.ToggleRefactoringViewAction" class="actions.ToggleRefactoringViewAction" text="Mine refactorings" description="actions.ToggleRefactoringViewAction">
+        <action id="actions.ToggleRefactoringViewAction" class="actions.ToggleRefactoringViewAction" text="Show refactorings" description="actions.ToggleRefactoringViewAction">
             <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>
         </action>
         <!-- Add your actions here -->
 
-        <action id="RefAction" class="actions.RefactoringAction" text="Refactorings"
+        <action id="RefAction" class="actions.RefactoringAction" text="Mine All Refactorings"
                 description="Clear refactoring cache">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
         </action>
