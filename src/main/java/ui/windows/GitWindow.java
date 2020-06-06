@@ -1,4 +1,4 @@
-package ui;
+package ui.windows;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;

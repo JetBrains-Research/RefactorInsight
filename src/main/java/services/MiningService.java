@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import processors.CommitMiner;
-import ui.GitWindow;
+import ui.windows.GitWindow;
 
 @State(name = "MiningRefactoringsState",
     storages = {@Storage("refactorings.xml")})

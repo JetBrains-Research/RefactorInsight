@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import services.MiningService;
-import ui.MethodRefactoringToolbar;
+import ui.windows.MethodRefactoringToolbar;
 import utils.Utils;
 
 public class MethodAction extends AnAction {

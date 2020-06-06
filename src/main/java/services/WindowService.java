@@ -9,7 +9,7 @@ import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
-import ui.GitWindow;
+import ui.windows.GitWindow;
 
 @Service
 public class WindowService {
