@@ -35,30 +35,10 @@ public class RefactoringLine {
   private boolean hasColumns = false;
 
   /**
-   * Data Holder for three sided code ranges.
-   *
-   * @param leftStart  int
-   * @param leftEnd    int
-   * @param midStart   int
-   * @param midEnd     int
-   * @param rightStart int
-   * @param rightEnd   int
-   */
-  public RefactoringLine(int leftStart, int leftEnd, int midStart, int midEnd, int rightStart,
-                         int rightEnd, VisualisationType type) {
-    lines[LEFT_START] = leftStart;
-    lines[LEFT_END] = leftEnd;
-    lines[MID_START] = midStart;
-    lines[MID_END] = midEnd;
-    lines[RIGHT_START] = rightStart;
-    lines[RIGHT_END] = rightEnd;
-    this.type = type;
-  }
-
-  /**
    * Data holder for three sided refactoring diff.
    */
-  public RefactoringLine(CodeRange left, CodeRange mid, CodeRange right, VisualisationType type) {
+  public RefactoringLine(CodeRange left, CodeRange mid, CodeRange right,
+                         VisualisationType type, MarkingOption option) {
     lines[LEFT_START] = left.getStartLine() - 1;
     lines[LEFT_END] = left.getEndLine();
     lines[RIGHT_START] = right.getStartLine() - 1;
@@ -68,6 +48,27 @@ public class RefactoringLine {
     columns[LEFT_END] = Math.max(left.getEndColumn(), 1);
     columns[RIGHT_START] = Math.max(right.getStartColumn(), 1);
     columns[RIGHT_END] = Math.max(right.getEndColumn(), 1);
+
+    switch (option) {
+      case ADD:
+        lines[LEFT_END] = lines[LEFT_START];
+        break;
+      case REMOVE:
+        lines[RIGHT_END] = lines[RIGHT_START];
+        break;
+      case COLLAPSE:
+        lines[LEFT_END] = lines[LEFT_START] + 1;
+        lines[RIGHT_END] = lines[RIGHT_START] + 1;
+        break;
+      case EXTRACT:
+        lines[LEFT_START] = 0;
+        lines[LEFT_END] = 1;
+        if (mid != null) {
+          lines[MID_END] = lines[MID_START] + 1;
+        }
+        break;
+      default:
+    }
 
     if (mid != null) {
       lines[MID_START] = mid.getStartLine() - 1;
@@ -79,7 +80,7 @@ public class RefactoringLine {
     this.hasColumns = true;
     this.type = type;
   }
-
+  
   /**
    * Generate Conflicttype from ThreeSidedType.
    * Conflict type is used to set highlighting colors and can disable
@@ -179,25 +180,53 @@ public class RefactoringLine {
         toMergeInnerDifferences(leftText, midText, rightText), viewer);
   }
 
-  public RefactoringLine addOffset(int beforeStart, int beforeEnd, int afterStart, int afterEnd) {
+  /**
+   * Adds offsets to offset list.
+   * @param left Location info
+   * @param right Location info
+   * @return this
+   */
+  public RefactoringLine addOffset(LocationInfo left, LocationInfo right) {
+    offsets.add(new RefactoringOffset(left.getStartOffset(), left.getEndOffset(),
+        right.getStartOffset(), right.getEndOffset()));
+    return this;
+  }
+
+  /**
+   * Adds offsets to offset list.
+   * @param location Location info of the offset
+   * @param option ADD for addition, REMOVE for removals
+   * @return this
+   */
+  public RefactoringLine addOffset(LocationInfo location, MarkingOption option) {
+    int beforeStart = location.getStartOffset();
+    int beforeEnd = location.getEndOffset();
+    int afterStart = location.getStartOffset();
+    int afterEnd = location.getEndOffset();
+    switch (option) {
+      case ADD:
+        beforeStart = beforeEnd = 1;
+        break;
+      case REMOVE:
+        afterStart = afterEnd = 0;
+        break;
+      default:
+    }
     offsets.add(new RefactoringOffset(beforeStart, beforeEnd, afterStart, afterEnd));
     return this;
   }
 
-  public RefactoringLine addOffset(LocationInfo left, LocationInfo right) {
-    return addOffset(left.getStartOffset(), left.getEndOffset(),
-        right.getStartOffset(), right.getEndOffset());
-  }
-
+  /**
+   * Adds offsets to offset list.
+   * @param left Location info
+   * @param mid Location info
+   * @param right Location info
+   * @return this
+   */
   public RefactoringLine addOffset(LocationInfo left, LocationInfo mid, LocationInfo right) {
-    return addOffset(left.getStartOffset(), left.getEndOffset(), mid.getStartOffset(),
-        mid.getEndOffset(), right.getStartOffset(), right.getEndOffset());
-  }
-
-  public RefactoringLine addOffset(int leftStart, int leftEnd,
-                                   int midStart, int midEnd,
-                                   int rightStart, int rightEnd) {
-    offsets.add(new RefactoringOffset(leftStart, leftEnd, midStart, midEnd, rightStart, rightEnd));
+    offsets
+        .add(new RefactoringOffset(left.getStartOffset(), left.getEndOffset(), mid.getStartOffset(),
+            mid.getEndOffset(), right.getStartOffset(), right.getEndOffset()));
     return this;
   }
 
@@ -224,5 +253,13 @@ public class RefactoringLine {
     RIGHT,
     BOTH,
     TWO
+  }
+
+  public enum MarkingOption {
+    ADD,
+    REMOVE,
+    COLLAPSE,
+    NONE,
+    EXTRACT
   }
 }

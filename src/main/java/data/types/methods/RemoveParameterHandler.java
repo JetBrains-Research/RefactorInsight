@@ -3,6 +3,7 @@ package data.types.methods;
 import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
+import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.RemoveParameterRefactoring;
 import org.refactoringminer.api.Refactoring;
@@ -20,9 +21,8 @@ public class RemoveParameterHandler extends Handler {
         .setElementAfter(null)
         .addMarking(ref.getOperationBefore().codeRange(), ref.getOperationAfter().codeRange(),
             line -> line.addOffset(
-                ref.getParameter().getVariableDeclaration().getLocationInfo().getStartOffset(),
-                ref.getParameter().getVariableDeclaration().getLocationInfo().getEndOffset(),
-                0, 0)
+                ref.getParameter().getVariableDeclaration().getLocationInfo(),
+                RefactoringLine.MarkingOption.REMOVE)
                 .setHasColumns(false));
   }
 }

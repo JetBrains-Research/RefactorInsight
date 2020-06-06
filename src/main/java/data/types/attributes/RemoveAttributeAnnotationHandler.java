@@ -1,8 +1,11 @@
 package data.types.attributes;
 
+import static data.RefactoringLine.MarkingOption.REMOVE;
+
 import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
+import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
 import gr.uom.java.xmi.diff.RemoveAttributeAnnotationRefactoring;
@@ -18,14 +21,11 @@ public class RemoveAttributeAnnotationHandler extends Handler {
         .setNameBefore(ref.getAttributeBefore().toQualifiedString())
         .setNameAfter(ref.getAttributeAfter().toQualifiedString())
         .setElementBefore(ref.getAnnotation().toString())
-        .setElementAfter(null).addMarking(annotation.getLocationInfo().getStartLine(),
-            annotation.getLocationInfo().getEndLine(),
-            ref.getAttributeBefore().codeRange().getStartLine(),
-            ref.getAttributeBefore().codeRange().getStartLine() - 1,
-            ref.getAttributeBefore().codeRange().getFilePath(),
-            annotation.getLocationInfo().getFilePath(),
-            line -> line.addOffset(annotation.getLocationInfo().getStartOffset(),
-                annotation.getLocationInfo().getEndOffset(),
-                0, 0));
+        .setElementAfter(null)
+        .addMarking(
+            annotation.codeRange(),
+            ref.getAttributeBefore().codeRange(),
+            line -> line.addOffset(annotation.getLocationInfo(), REMOVE),
+            REMOVE);
   }
 }

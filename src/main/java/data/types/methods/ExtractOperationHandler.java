@@ -52,19 +52,16 @@ public class ExtractOperationHandler extends Handler {
 
       int[] finalMidColumns = midColumns;
       ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
-          info.addMarking(1, 1,
-              ref.getExtractedOperation().getBody().getCompositeStatement().codeRange()
-                  .getStartLine(),
-              ref.getExtractedOperation().getBody().getCompositeStatement().codeRange()
-                  .getStartLine(),
-              invocation.getStartLine(), invocation.getEndLine(),
-              ref.getSourceOperationCodeRangeBeforeExtraction().getFilePath(),
-              ref.getExtractedOperationCodeRange().getFilePath(),
-              invocation.getFilePath(), RefactoringLine.VisualisationType.RIGHT,
+          info.addMarking(
+              ref.getSourceOperationCodeRangeBeforeExtraction(), //TODO make (1,1)
+              ref.getExtractedOperation().getBody().getCompositeStatement().codeRange(),
+              invocation,
+              RefactoringLine.VisualisationType.RIGHT,
               refactoringLine -> {
                 refactoringLine.setColumns(new int[] {1, 1, finalMidColumns[0], finalMidColumns[1],
                     invocation.getStartColumn(), invocation.getEndColumn()});
-              }));
+              },
+              RefactoringLine.MarkingOption.EXTRACT));
       return info;
     } else {
       info.setGroup(Group.METHOD)
@@ -76,11 +73,11 @@ public class ExtractOperationHandler extends Handler {
               ref.getExtractedCodeRangeToExtractedOperation());
 
       ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
-          info.addMarking(ref.getExtractedCodeRangeFromSourceOperation().getStartLine(),
-              ref.getExtractedCodeRangeFromSourceOperation().getStartLine() - 1,
-              invocation.getStartLine(), invocation.getEndLine(),
-              ref.getExtractedCodeRangeFromSourceOperation().getFilePath(),
-              invocation.getFilePath())
+          info.addMarking(
+              ref.getExtractedCodeRangeFromSourceOperation(),
+              invocation,
+              null,
+              RefactoringLine.MarkingOption.ADD)
       );
       return info;
     }

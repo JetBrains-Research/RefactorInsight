@@ -131,51 +131,21 @@ public class RefactoringInfo {
   }
 
   public RefactoringInfo addMarking(CodeRange left, CodeRange right) {
-    return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, null);
-  }
-
-  /**
-   * Add line marking for diffwindow used to display refactorings.
-   *
-   * @param startBefore int
-   * @param endBefore   int
-   * @param startAfter  int
-   * @param endAfter    int
-   * @param beforePath  String
-   * @param afterPath   String
-   * @return this
-   */
-  public RefactoringInfo addMarking(int startBefore, int endBefore,
-                                    int startAfter, int endAfter,
-                                    String beforePath, String afterPath) {
-    return addMarking(startBefore, endBefore, 0, 0, startAfter, endAfter, beforePath, "", afterPath,
-        RefactoringLine.VisualisationType.TWO, null);
+    return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, null,
+        RefactoringLine.MarkingOption.NONE);
   }
 
   public RefactoringInfo addMarking(CodeRange left, CodeRange right,
                                     Consumer<RefactoringLine> offsetFunction) {
-    return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, offsetFunction);
+    return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, offsetFunction,
+        RefactoringLine.MarkingOption.NONE);
   }
 
-  /**
-   * Add line marking for diffwindow used to display refactorings.
-   * Includes possibility for sub-highlighting
-   *
-   * @param startBefore    int
-   * @param endBefore      int
-   * @param startAfter     int
-   * @param endAfter       int
-   * @param beforePath     String
-   * @param afterPath      String
-   * @param offsetFunction Consumer for adding subhighlightings
-   * @return
-   */
-  public RefactoringInfo addMarking(int startBefore, int endBefore,
-                                    int startAfter, int endAfter,
-                                    String beforePath, String afterPath,
-                                    Consumer<RefactoringLine> offsetFunction) {
-    return addMarking(startBefore, endBefore, 0, 0, startAfter, endAfter, beforePath, "", afterPath,
-        RefactoringLine.VisualisationType.TWO, offsetFunction);
+  public RefactoringInfo addMarking(CodeRange left, CodeRange right,
+                                    Consumer<RefactoringLine> offsetFunction,
+                                    RefactoringLine.MarkingOption option) {
+    return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, offsetFunction,
+        option);
   }
 
   /**
@@ -184,20 +154,7 @@ public class RefactoringInfo {
   public RefactoringInfo addMarking(CodeRange left, CodeRange mid, CodeRange right,
                                     RefactoringLine.VisualisationType type) {
 
-    return addMarking(left, mid, right, type, null);
-  }
-
-  /**
-   * Add line marking for diffwindow used to display refactorings.
-   * Includes possibility for sub-highlighting
-   */
-  public RefactoringInfo addMarking(int startLeft, int endLeft,
-                                    int startMid, int endMid,
-                                    int startRight, int endRight,
-                                    String leftPath, String midPath, String rightPath,
-                                    RefactoringLine.VisualisationType type) {
-    return addMarking(startLeft, endLeft, startMid, endMid, startRight, endRight, leftPath, midPath,
-        rightPath, type, null);
+    return addMarking(left, mid, right, type, null, RefactoringLine.MarkingOption.NONE);
   }
 
   /**
@@ -206,9 +163,10 @@ public class RefactoringInfo {
    */
   public RefactoringInfo addMarking(CodeRange left, CodeRange mid, CodeRange right,
                                     RefactoringLine.VisualisationType type,
-                                    Consumer<RefactoringLine> offsetFunction) {
+                                    Consumer<RefactoringLine> offsetFunction,
+                                    RefactoringLine.MarkingOption option) {
 
-    RefactoringLine line = new RefactoringLine(left, mid, right, type);
+    RefactoringLine line = new RefactoringLine(left, mid, right, type, option);
     if (offsetFunction != null) {
       offsetFunction.accept(line);
     }
@@ -218,29 +176,6 @@ public class RefactoringInfo {
       this.midPath = mid.getFilePath();
     }
     this.rightPath = right.getFilePath();
-    return this;
-  }
-
-  /**
-   * Add line marking for diffwindow used to display refactorings.
-   */
-  public RefactoringInfo addMarking(int startLeft, int endLeft,
-                                    int startMid, int endMid,
-                                    int startRight, int endRight,
-                                    String leftPath, String midPath, String rightPath,
-                                    RefactoringLine.VisualisationType type,
-                                    Consumer<RefactoringLine> offsetFunction) {
-
-    RefactoringLine line =
-        new RefactoringLine(startLeft - 1, endLeft, startMid - 1, endMid, startRight - 1, endRight,
-            type);
-    if (offsetFunction != null) {
-      offsetFunction.accept(line);
-    }
-    lineMarkings.add(line);
-    this.leftPath = leftPath;
-    this.midPath = midPath;
-    this.rightPath = rightPath;
     return this;
   }
 
@@ -388,7 +323,6 @@ public class RefactoringInfo {
     return info;
   }
 
-
   /**
    * Method for create a presentable String out of the
    * name refactoring.
@@ -410,5 +344,4 @@ public class RefactoringInfo {
       return before + "-> " + after;
     }
   }
-
 }

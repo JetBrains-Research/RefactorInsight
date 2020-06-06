@@ -27,24 +27,26 @@ public class ExtractClassHandler extends Handler {
         .setThreeSided(true);
 
     ref.getExtractedOperations().forEach(operation -> {
-      info.addMarking(operation.codeRange(), ref.getExtractedClass().codeRange(),
+      info.addMarking(
+          operation.codeRange(),
+          ref.getExtractedClass().codeRange(),
           ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange(),
           RefactoringLine.VisualisationType.LEFT);
     });
 
     ref.getExtractedAttributes().forEach(operation -> {
-      info.addMarking(operation.codeRange(), ref.getExtractedClass().codeRange(),
+      info.addMarking(
+          operation.codeRange(),
+          ref.getExtractedClass().codeRange(),
           ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange(),
           RefactoringLine.VisualisationType.LEFT);
     });
 
-    info.addMarking(1, 1, ref.getExtractedClass().codeRange().getStartLine(),
-        ref.getExtractedClass().codeRange().getStartLine(),
-        ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange().getStartLine(),
-        ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange().getEndLine(),
-        ref.getOriginalClass().codeRange().getFilePath(),
-        ref.getExtractedClass().codeRange().getFilePath(),
-        ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange().getFilePath(),
+    info.addMarking(
+        ref.getOriginalClass().codeRange(),
+        ref.getExtractedClass().codeRange(),
+        ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange(),
+
         RefactoringLine.VisualisationType.RIGHT,
         refactoringLine -> {
           int[] midColumns = new int[] {1, 1};
@@ -67,7 +69,8 @@ public class ExtractClassHandler extends Handler {
                   .codeRange().getStartColumn(),
               ref.getAttributeOfExtractedClassTypeInOriginalClass()
                   .codeRange().getEndColumn()});
-        });
+        },
+        RefactoringLine.MarkingOption.EXTRACT);
 
     return info;
   }

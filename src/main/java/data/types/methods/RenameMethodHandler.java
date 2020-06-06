@@ -7,6 +7,7 @@ import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import data.Group;
 import data.RefactoringInfo;
+import data.RefactoringLine;
 import data.types.Handler;
 import git4idea.GitContentRevision;
 import git4idea.GitRevisionNumber;
@@ -38,12 +39,8 @@ public class RenameMethodHandler extends Handler {
             ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
             refactoringLine -> refactoringLine.setHasColumns(false))
         .addMarking(
-            ref.getOriginalOperation().getBody().getCompositeStatement().codeRange().getStartLine(),
-            ref.getOriginalOperation().getBody().getCompositeStatement().codeRange().getStartLine(),
-            ref.getRenamedOperation().getBody().getCompositeStatement().codeRange().getStartLine(),
-            ref.getRenamedOperation().getBody().getCompositeStatement().codeRange().getStartLine(),
-            ref.getSourceOperationCodeRangeBeforeRename().getFilePath(),
-            ref.getTargetOperationCodeRangeAfterRename().getFilePath(),
+            ref.getOriginalOperation().getBody().getCompositeStatement().codeRange(),
+            ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
             refactoringLine -> {
               List<String> parents = info.getParents();
               try {
@@ -79,7 +76,8 @@ public class RenameMethodHandler extends Handler {
               } catch (VcsException e) {
                 e.printStackTrace();
               }
-            })
+            },
+            RefactoringLine.MarkingOption.COLLAPSE)
         .setNameBefore(Utils.calculateSignature(ref.getOriginalOperation()))
         .setNameAfter(Utils.calculateSignature(ref.getRenamedOperation()));
   }
