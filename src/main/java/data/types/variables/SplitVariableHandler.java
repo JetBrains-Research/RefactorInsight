@@ -15,7 +15,7 @@ public class SplitVariableHandler extends Handler {
     SplitVariableRefactoring ref = (SplitVariableRefactoring) refactoring;
 
     ref.getSplitVariables().forEach(var ->
-        info.addMarking(ref.getOldVariable().codeRange(), var.codeRange()));
+        info.addMarking(ref.getOldVariable().codeRange(), var.codeRange(), true));
 
     if (ref.getOldVariable().isParameter()) {
       info.setGroup(Group.PARAMETER);

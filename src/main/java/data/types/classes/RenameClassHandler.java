@@ -15,7 +15,7 @@ public class RenameClassHandler extends Handler {
 
     return info.setGroup(Group.CLASS)
         .addMarking(ref.getOriginalClass().codeRange(),
-            ref.getRenamedClass().codeRange())
+            ref.getRenamedClass().codeRange(), true)
         .setNameBefore(ref.getOriginalClassName())
         .setNameAfter(ref.getRenamedClassName())
         .setElementBefore(null)

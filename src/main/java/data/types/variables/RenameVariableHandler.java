@@ -35,7 +35,7 @@ public class RenameVariableHandler extends Handler {
         .setNameBefore("in method " + ref.getOperationAfter().getName())
         .setNameAfter("in method " + ref.getOperationAfter().getName())
         .addMarking(ref.getOriginalVariable().getVariableDeclaration().codeRange(),
-            ref.getRenamedVariable().codeRange());
+            ref.getRenamedVariable().codeRange(), true);
 
   }
 }

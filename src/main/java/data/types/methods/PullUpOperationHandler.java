@@ -20,7 +20,7 @@ public class PullUpOperationHandler extends Handler {
         .setElementBefore("from class " + classBefore.substring(index))
         .setElementAfter("to class " + classAfter.substring(index))
         .addMarking(ref.getSourceOperationCodeRangeBeforeMove(),
-            ref.getTargetOperationCodeRangeAfterMove())
+            ref.getTargetOperationCodeRangeAfterMove(), true)
         .setNameBefore(Utils.calculateSignature(ref.getOriginalOperation()))
         .setNameAfter(Utils.calculateSignature(ref.getMovedOperation()));
   }

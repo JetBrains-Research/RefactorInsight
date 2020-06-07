@@ -26,6 +26,7 @@ public class AddAttributeAnnotationHandler extends Handler {
             ref.getAttributeBefore().codeRange(),
             annotation.codeRange(),
             line -> line.addOffset(annotation.getLocationInfo(), ADD),
-            ADD);
+            ADD,
+            false);
   }
 }

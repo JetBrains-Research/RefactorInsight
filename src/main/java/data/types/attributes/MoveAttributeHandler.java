@@ -19,6 +19,6 @@ public class MoveAttributeHandler extends Handler {
         .setNameBefore(ref.getOriginalAttribute().toQualifiedString())
         .setNameAfter(ref.getOriginalAttribute().toQualifiedString())
         .addMarking(ref.getOriginalAttribute().codeRange(),
-            ref.getMovedAttribute().codeRange());
+            ref.getMovedAttribute().codeRange(), true);
   }
 }

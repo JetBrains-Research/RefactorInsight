@@ -18,6 +18,6 @@ public class PullUpAttributeHandler extends Handler {
         .setNameBefore(ref.getOriginalAttribute().toQualifiedString())
         .setNameAfter(ref.getMovedAttribute().toQualifiedString())
         .addMarking(ref.getSourceAttributeCodeRangeBeforeMove(),
-            ref.getTargetAttributeCodeRangeAfterMove());
+            ref.getTargetAttributeCodeRangeAfterMove(), true);
   }
 }

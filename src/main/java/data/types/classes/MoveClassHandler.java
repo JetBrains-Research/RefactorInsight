@@ -14,7 +14,7 @@ public class MoveClassHandler extends Handler {
     MoveClassRefactoring ref = (MoveClassRefactoring) refactoring;
 
     return info.setGroup(Group.CLASS)
-        .addMarking(ref.getOriginalClass().codeRange(), ref.getMovedClass().codeRange())
+        .addMarking(ref.getOriginalClass().codeRange(), ref.getMovedClass().codeRange(), true)
         .setNameBefore(ref.getOriginalClassName())
         .setNameAfter(ref.getMovedClassName())
         .setElementBefore(ref.getOriginalClass().getPackageName())

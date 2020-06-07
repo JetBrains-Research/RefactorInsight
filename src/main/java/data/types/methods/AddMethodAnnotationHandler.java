@@ -27,7 +27,8 @@ public class AddMethodAnnotationHandler extends Handler {
             line -> line.addOffset(//TODO 00 again instead of 11
                 annotation.getLocationInfo(),
                 ADD),
-            ADD)
+            ADD,
+            false)
         .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(Utils.calculateSignature(ref.getOperationBefore()));
   }

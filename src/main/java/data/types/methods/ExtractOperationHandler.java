@@ -34,7 +34,8 @@ public class ExtractOperationHandler extends Handler {
           .addMarking(ref.getExtractedCodeRangeFromSourceOperation(),
               ref.getExtractedCodeRangeToExtractedOperation(),
               ref.getExtractedCodeRangeFromSourceOperation(),
-              RefactoringLine.VisualisationType.LEFT);
+              RefactoringLine.VisualisationType.LEFT,
+              true);
 
       int[] midColumns = new int[] {1, 1};
       try {
@@ -61,7 +62,8 @@ public class ExtractOperationHandler extends Handler {
                 refactoringLine.setColumns(new int[] {1, 1, finalMidColumns[0], finalMidColumns[1],
                     invocation.getStartColumn(), invocation.getEndColumn()});
               },
-              RefactoringLine.MarkingOption.EXTRACT));
+              RefactoringLine.MarkingOption.EXTRACT,
+              false));
       return info;
     } else {
       info.setGroup(Group.METHOD)
@@ -70,14 +72,16 @@ public class ExtractOperationHandler extends Handler {
           .setNameBefore(Utils.calculateSignature(ref.getSourceOperationBeforeExtraction()))
           .setNameAfter(Utils.calculateSignature(ref.getSourceOperationAfterExtraction()))
           .addMarking(ref.getExtractedCodeRangeFromSourceOperation(),
-              ref.getExtractedCodeRangeToExtractedOperation());
+              ref.getExtractedCodeRangeToExtractedOperation(),
+              true);
 
       ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
           info.addMarking(
               ref.getExtractedCodeRangeFromSourceOperation(),
               invocation,
               null,
-              RefactoringLine.MarkingOption.ADD)
+              RefactoringLine.MarkingOption.ADD,
+              false)
       );
       return info;
     }

@@ -25,6 +25,7 @@ public class RemoveAttributeAnnotationHandler extends Handler {
             annotation.codeRange(),
             ref.getAttributeAfter().codeRange(),
             line -> line.addOffset(annotation.getLocationInfo(), REMOVE),
-            REMOVE);
+            REMOVE,
+            false);
   }
 }

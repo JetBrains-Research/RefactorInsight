@@ -23,7 +23,8 @@ public class ChangeReturnTypeHandler extends Handler {
         .setElementAfter(ref.getChangedType().toString())
         .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(Utils.calculateSignature(ref.getOperationBefore()))
-        .addMarking(ref.getOriginalType().codeRange(), ref.getChangedType().codeRange());
+        .addMarking(ref.getOriginalType().codeRange(), ref.getChangedType().codeRange(),
+            true);
 
   }
 

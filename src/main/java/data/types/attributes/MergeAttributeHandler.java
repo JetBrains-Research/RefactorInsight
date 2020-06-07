@@ -15,7 +15,7 @@ public class MergeAttributeHandler extends Handler {
     MergeAttributeRefactoring ref = (MergeAttributeRefactoring) refactoring;
 
     ref.getMergedAttributes().forEach(attr ->
-        info.addMarking(attr.codeRange(), ref.getNewAttribute().codeRange()));
+        info.addMarking(attr.codeRange(), ref.getNewAttribute().codeRange(), true));
 
     return info.setGroup(Group.ATTRIBUTE)
         .setElementBefore(ref.getMergedAttributes().stream().map(x -> x.getVariableName()).collect(

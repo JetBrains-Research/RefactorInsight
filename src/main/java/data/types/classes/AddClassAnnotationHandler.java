@@ -26,6 +26,7 @@ public class AddClassAnnotationHandler extends Handler {
             annotation.codeRange(),
             line -> line.addOffset(//TODO was (0,0) not 11
                 annotation.getLocationInfo(), RefactoringLine.MarkingOption.ADD),
-            RefactoringLine.MarkingOption.ADD);
+            RefactoringLine.MarkingOption.ADD,
+            false);
   }
 }

@@ -19,7 +19,8 @@ public class ChangeAttributeTypeHandler extends Handler {
         .setElementBefore(null)
         .setElementAfter(null)
         .addMarking(ref.getOriginalAttribute().getType().codeRange(),
-            ref.getChangedTypeAttribute().getType().codeRange());
+            ref.getChangedTypeAttribute().getType().codeRange(),
+            true);
 
   }
 }

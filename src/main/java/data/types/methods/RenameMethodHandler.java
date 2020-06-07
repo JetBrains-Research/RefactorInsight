@@ -37,7 +37,7 @@ public class RenameMethodHandler extends Handler {
         .setElementAfter(null)
         .addMarking(ref.getOriginalOperation().getBody().getCompositeStatement().codeRange(),
             ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
-            refactoringLine -> refactoringLine.setHasColumns(false))
+            refactoringLine -> refactoringLine.setHasColumns(false), false)
         .addMarking(
             ref.getOriginalOperation().getBody().getCompositeStatement().codeRange(),
             ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
@@ -77,7 +77,8 @@ public class RenameMethodHandler extends Handler {
                 e.printStackTrace();
               }
             },
-            RefactoringLine.MarkingOption.COLLAPSE)
+            RefactoringLine.MarkingOption.COLLAPSE,
+            true)
         .setNameBefore(Utils.calculateSignature(ref.getOriginalOperation()))
         .setNameAfter(Utils.calculateSignature(ref.getRenamedOperation()));
   }

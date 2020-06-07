@@ -18,6 +18,6 @@ public class ExtractVariableHandler extends Handler {
         .setNameBefore(ref.getVariableDeclaration().toQualifiedString())
         .setNameAfter(ref.getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOperationBefore().codeRange(),
-            ref.getExtractedVariableDeclarationCodeRange());
+            ref.getExtractedVariableDeclarationCodeRange(), true);
   }
 }

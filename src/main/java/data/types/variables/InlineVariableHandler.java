@@ -18,7 +18,7 @@ public class InlineVariableHandler extends Handler {
         .setNameBefore(ref.getVariableDeclaration().toQualifiedString())
         .setNameAfter(ref.getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getVariableDeclaration().codeRange(),
-            ref.getInlinedVariableDeclarationCodeRange());
+            ref.getInlinedVariableDeclarationCodeRange(), true);
 
 
   }

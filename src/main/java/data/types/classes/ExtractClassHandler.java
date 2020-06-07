@@ -32,7 +32,8 @@ public class ExtractClassHandler extends Handler {
             operation.codeRange(),
             ref.getExtractedClass().codeRange(),
             ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange(),
-            RefactoringLine.VisualisationType.LEFT);
+            RefactoringLine.VisualisationType.LEFT,
+            true);
       });
 
       ref.getExtractedAttributes().forEach(operation -> {
@@ -40,7 +41,8 @@ public class ExtractClassHandler extends Handler {
             operation.codeRange(),
             ref.getExtractedClass().codeRange(),
             ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange(),
-            RefactoringLine.VisualisationType.LEFT);
+            RefactoringLine.VisualisationType.LEFT,
+            true);
       });
 
       info.addMarking(
@@ -71,7 +73,8 @@ public class ExtractClassHandler extends Handler {
                 ref.getAttributeOfExtractedClassTypeInOriginalClass()
                     .codeRange().getEndColumn()});
           },
-          RefactoringLine.MarkingOption.EXTRACT);
+          RefactoringLine.MarkingOption.EXTRACT,
+          false);
     }
     return info;
   }

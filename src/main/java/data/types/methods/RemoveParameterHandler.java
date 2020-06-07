@@ -23,6 +23,6 @@ public class RemoveParameterHandler extends Handler {
             line -> line.addOffset(
                 ref.getParameter().getVariableDeclaration().getLocationInfo(),
                 RefactoringLine.MarkingOption.REMOVE)
-                .setHasColumns(false));
+                .setHasColumns(false), true);
   }
 }

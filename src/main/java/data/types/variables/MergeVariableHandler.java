@@ -15,7 +15,7 @@ public class MergeVariableHandler extends Handler {
     MergeVariableRefactoring ref = (MergeVariableRefactoring) refactoring;
 
     ref.getMergedVariables().forEach(var ->
-        info.addMarking(var.codeRange(), ref.getNewVariable().codeRange()));
+        info.addMarking(var.codeRange(), ref.getNewVariable().codeRange(), true));
 
     if (ref.getNewVariable().isParameter()) {
       info.setGroup(Group.PARAMETER);

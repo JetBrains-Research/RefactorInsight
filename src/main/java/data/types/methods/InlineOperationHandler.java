@@ -16,7 +16,7 @@ public class InlineOperationHandler extends Handler {
     InlineOperationRefactoring ref = (InlineOperationRefactoring) refactoring;
 
     ref.getInlinedOperationInvocations().forEach(c -> {
-      info.addMarking(c.codeRange(), ref.getInlinedCodeRangeInTargetOperation());
+      info.addMarking(c.codeRange(), ref.getInlinedCodeRangeInTargetOperation(), true);
     });
 
     return info.setGroup(Group.METHOD)
@@ -27,7 +27,8 @@ public class InlineOperationHandler extends Handler {
         .addMarking(ref.getInlinedOperationCodeRange(),
             ref.getInlinedCodeRangeInTargetOperation(),
             null,
-            RefactoringLine.MarkingOption.REMOVE);
+            RefactoringLine.MarkingOption.REMOVE,
+            false);
 
 
   }

@@ -19,6 +19,6 @@ public class ModifyClassAnnotationHandler extends Handler {
         .setElementAfter(ref.getAnnotationAfter().toString())
         .addMarking(ref.getAnnotationBefore().codeRange(), ref.getAnnotationAfter().codeRange(),
             line -> line.addOffset(ref.getAnnotationBefore().getLocationInfo(),
-                ref.getAnnotationAfter().getLocationInfo()));
+                ref.getAnnotationAfter().getLocationInfo()), true);
   }
 }

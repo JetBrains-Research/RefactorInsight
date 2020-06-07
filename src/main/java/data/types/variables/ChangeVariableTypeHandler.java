@@ -35,7 +35,7 @@ public class ChangeVariableTypeHandler extends Handler {
         .setNameBefore("in method " + ref.getOperationAfter().getName())
         .setNameAfter("in method " + ref.getOperationAfter().getName())
         .addMarking(ref.getOriginalVariable().getType().codeRange(),
-            ref.getChangedTypeVariable().getType().codeRange());
+            ref.getChangedTypeVariable().getType().codeRange(), true);
 
   }
 }

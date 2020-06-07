@@ -14,7 +14,7 @@ public class SplitAttributeHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     SplitAttributeRefactoring ref = (SplitAttributeRefactoring) refactoring;
     ref.getSplitAttributes().forEach(attr ->
-        info.addMarking(ref.getOldAttribute().codeRange(), attr.codeRange()));
+        info.addMarking(ref.getOldAttribute().codeRange(), attr.codeRange(), true));
 
     return info.setGroup(Group.ATTRIBUTE)
         .setElementBefore(ref.getOldAttribute().getVariableName())

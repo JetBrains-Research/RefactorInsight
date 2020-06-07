@@ -15,7 +15,8 @@ public class ExtractAttributeHandler extends Handler {
     ref.leftSide().forEach(extraction ->
         info.addMarking(
             extraction,
-            ref.getExtractedVariableDeclarationCodeRange()
+            ref.getExtractedVariableDeclarationCodeRange(),
+            true
         ));
     return info.setGroup(Group.ATTRIBUTE)
         .setElementBefore("in class " + ref.getOriginalClass().getName())
