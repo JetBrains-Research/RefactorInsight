@@ -12,7 +12,14 @@ public class MoveRenameClassHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     MoveAndRenameClassRefactoring ref = (MoveAndRenameClassRefactoring) refactoring;
 
-    return info.setGroup(Group.CLASS)
+    if (ref.getRenamedClass().isAbstract()) {
+      info.setGroup(Group.ABSTRACT);
+    } else if (ref.getRenamedClass().isInterface()) {
+      info.setGroup(Group.INTERFACE);
+    } else {
+      info.setGroup(Group.CLASS);
+    }
+    return info
         .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(), true)
         .setNameBefore(ref.getOriginalClassName())
         .setNameAfter(ref.getRenamedClassName())

@@ -144,3 +144,26 @@ e778d0585d4731017a66bea10570bdf476a1ef36 d05bb23fa3baaeadbc34ddb7dc72ae4152b43df
 d05bb23fa3baaeadbc34ddb7dc72ae4152b43df3 babf79246edb3240537b59a11389fb5e42a52064 ioana <savuandreeaioana@yahoo.com> 1591546748 +0200	commit: Change Attribute Type.
 babf79246edb3240537b59a11389fb5e42a52064 3cffbaa67220745a42ae37eeb1fe5e3cf36b0686 ioana <savuandreeaioana@yahoo.com> 1591550828 +0200	commit: Prepare code for parametrize variable.
 3cffbaa67220745a42ae37eeb1fe5e3cf36b0686 e3a1be00389ba8a71678b726c211c56268e7e5a2 ioana <savuandreeaioana@yahoo.com> 1591550850 +0200	commit: Parametrize variable
+e3a1be00389ba8a71678b726c211c56268e7e5a2 ed06a6fb9912e23d470c845be912af1777dd8045 ioana <savuandreeaioana@yahoo.com> 1591558808 +0200	commit: Move and Rename Abstract Class.
+ed06a6fb9912e23d470c845be912af1777dd8045 1655559aaad05b1d1eed4407fdd3979a39913b02 ioana <savuandreeaioana@yahoo.com> 1591559039 +0200	commit: Add Abstract Class Annotation.
+1655559aaad05b1d1eed4407fdd3979a39913b02 aa55261852cbb43b1b7878c455089c7d8d19b626 ioana <savuandreeaioana@yahoo.com> 1591559070 +0200	commit: Add Abstract Class Annotation.
+aa55261852cbb43b1b7878c455089c7d8d19b626 792561571f7886d152b7249f4ab6d8f2bc7eb179 ioana <savuandreeaioana@yahoo.com> 1591559119 +0200	commit: Modify abstract class annotation
+792561571f7886d152b7249f4ab6d8f2bc7eb179 40cb3ac59752b2851fa361a6406caa847048b3fb ioana <savuandreeaioana@yahoo.com> 1591559219 +0200	commit: Add abstract class annotation
+40cb3ac59752b2851fa361a6406caa847048b3fb aa55261852cbb43b1b7878c455089c7d8d19b626 ioana <savuandreeaioana@yahoo.com> 1591559258 +0200	rebase -i (start): checkout aa55261852cbb43b1b7878c455089c7d8d19b626
+aa55261852cbb43b1b7878c455089c7d8d19b626 792561571f7886d152b7249f4ab6d8f2bc7eb179 ioana <savuandreeaioana@yahoo.com> 1591559258 +0200	rebase -i: fast-forward
+792561571f7886d152b7249f4ab6d8f2bc7eb179 65ea848952a67536180f1374dacda96fe229b061 ioana <savuandreeaioana@yahoo.com> 1591559258 +0200	rebase -i (reword): Modify abstract class annotation - NOT RECOGNIZED
+65ea848952a67536180f1374dacda96fe229b061 784080e82213714e295540c9234c55e084c1f767 ioana <savuandreeaioana@yahoo.com> 1591559258 +0200	rebase -i (pick): Add abstract class annotation
+784080e82213714e295540c9234c55e084c1f767 784080e82213714e295540c9234c55e084c1f767 ioana <savuandreeaioana@yahoo.com> 1591559258 +0200	rebase -i (finish): returning to refs/heads/setup-repository
+784080e82213714e295540c9234c55e084c1f767 1655559aaad05b1d1eed4407fdd3979a39913b02 ioana <savuandreeaioana@yahoo.com> 1591559268 +0200	rebase -i (start): checkout 1655559aaad05b1d1eed4407fdd3979a39913b02
+1655559aaad05b1d1eed4407fdd3979a39913b02 aa55261852cbb43b1b7878c455089c7d8d19b626 ioana <savuandreeaioana@yahoo.com> 1591559268 +0200	rebase -i: fast-forward
+aa55261852cbb43b1b7878c455089c7d8d19b626 d84f8b7af92fe59f61f3d173b313814e9be29502 ioana <savuandreeaioana@yahoo.com> 1591559268 +0200	rebase -i (reword): Add Abstract Class Annotation. - NOT RECOGNIZED
+d84f8b7af92fe59f61f3d173b313814e9be29502 160f77cf84c7c26babc0a11480240099c74dd360 ioana <savuandreeaioana@yahoo.com> 1591559268 +0200	rebase -i (pick): Modify abstract class annotation - NOT RECOGNIZED
+160f77cf84c7c26babc0a11480240099c74dd360 93bb1f1914565c40275216ab9298e6f07fd0d0bb ioana <savuandreeaioana@yahoo.com> 1591559268 +0200	rebase -i (pick): Add abstract class annotation
+93bb1f1914565c40275216ab9298e6f07fd0d0bb 93bb1f1914565c40275216ab9298e6f07fd0d0bb ioana <savuandreeaioana@yahoo.com> 1591559268 +0200	rebase -i (finish): returning to refs/heads/setup-repository
+93bb1f1914565c40275216ab9298e6f07fd0d0bb ed06a6fb9912e23d470c845be912af1777dd8045 ioana <savuandreeaioana@yahoo.com> 1591559281 +0200	rebase -i (start): checkout ed06a6fb9912e23d470c845be912af1777dd8045
+ed06a6fb9912e23d470c845be912af1777dd8045 1655559aaad05b1d1eed4407fdd3979a39913b02 ioana <savuandreeaioana@yahoo.com> 1591559281 +0200	rebase -i: fast-forward
+1655559aaad05b1d1eed4407fdd3979a39913b02 808ae40dad986ca0ec492bb6f70d123160cf810e ioana <savuandreeaioana@yahoo.com> 1591559281 +0200	rebase -i (reword): Add Abstract Class Annotation. - NOT RECOGNIZED
+808ae40dad986ca0ec492bb6f70d123160cf810e 230b0e0a8ab7766806fa0ec15040347315d4ebd9 ioana <savuandreeaioana@yahoo.com> 1591559282 +0200	rebase -i (pick): Add Abstract Class Annotation. - NOT RECOGNIZED
+230b0e0a8ab7766806fa0ec15040347315d4ebd9 6a2899976dc0926b4d0c7f1adad69ca4d4b509c7 ioana <savuandreeaioana@yahoo.com> 1591559282 +0200	rebase -i (pick): Modify abstract class annotation - NOT RECOGNIZED
+6a2899976dc0926b4d0c7f1adad69ca4d4b509c7 b0fedaafc269f85b553a0212d80a31d37ff540a6 ioana <savuandreeaioana@yahoo.com> 1591559282 +0200	rebase -i (pick): Add abstract class annotation
+b0fedaafc269f85b553a0212d80a31d37ff540a6 b0fedaafc269f85b553a0212d80a31d37ff540a6 ioana <savuandreeaioana@yahoo.com> 1591559282 +0200	rebase -i (finish): returning to refs/heads/setup-repository

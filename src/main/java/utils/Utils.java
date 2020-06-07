@@ -302,7 +302,8 @@ public class Utils {
    */
   public static void makeNameNode(DefaultMutableTreeNode root, RefactoringInfo info) {
     DefaultMutableTreeNode child = new DefaultMutableTreeNode(
-        info.getGroup() == Group.METHOD
+        (info.getGroup() == Group.METHOD || info.getGroup() == Group.CLASS
+            || info.getGroup() == Group.INTERFACE || info.getGroup() == Group.ABSTRACT)
             ? info.getDisplayableName()
             : getDisplayableDetails(info.getNameBefore(), info.getNameAfter()));
     root.add(child);

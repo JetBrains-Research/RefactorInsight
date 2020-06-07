@@ -15,7 +15,14 @@ public class RemoveClassAnnotationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RemoveClassAnnotationRefactoring ref = (RemoveClassAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
-    return info.setGroup(Group.CLASS)
+    if (ref.getClassAfter().isAbstract()) {
+      info.setGroup(Group.ABSTRACT);
+    } else if (ref.getClassAfter().isInterface()) {
+      info.setGroup(Group.INTERFACE);
+    } else {
+      info.setGroup(Group.CLASS);
+    }
+    return info
         .setNameBefore(ref.getClassBefore().getName())
         .setNameAfter(ref.getClassAfter().getName())
         .setElementBefore(ref.getAnnotation().toString())
