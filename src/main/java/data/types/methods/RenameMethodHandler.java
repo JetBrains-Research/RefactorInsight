@@ -13,7 +13,7 @@ import git4idea.GitRevisionNumber;
 import gr.uom.java.xmi.diff.RenameOperationRefactoring;
 import java.util.List;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
+import utils.StringUtils;
 
 public class RenameMethodHandler extends Handler {
 
@@ -86,7 +86,7 @@ public class RenameMethodHandler extends Handler {
                 e.printStackTrace();
               }
             })
-        .setNameBefore(Utils.calculateSignature(ref.getOriginalOperation()))
-        .setNameAfter(Utils.calculateSignature(ref.getRenamedOperation()));
+        .setNameBefore(StringUtils.calculateSignature(ref.getOriginalOperation()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getRenamedOperation()));
   }
 }

@@ -6,7 +6,7 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.InlineOperationRefactoring;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
+import utils.StringUtils;
 
 public class InlineOperationHandler extends Handler {
 
@@ -20,10 +20,10 @@ public class InlineOperationHandler extends Handler {
     return info.setGroup(Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
-        .setElementBefore(Utils.calculateSignature(ref.getInlinedOperation()))
+        .setElementBefore(StringUtils.calculateSignature(ref.getInlinedOperation()))
         .setElementAfter(null)
-        .setNameBefore(Utils.calculateSignature(ref.getTargetOperationBeforeInline()))
-        .setNameAfter(Utils.calculateSignature(ref.getTargetOperationAfterInline()))
+        .setNameBefore(StringUtils.calculateSignature(ref.getTargetOperationBeforeInline()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getTargetOperationAfterInline()))
         .addMarking(ref.getInlinedCodeRangeFromInlinedOperation(),
             ref.getInlinedCodeRangeInTargetOperation());
   }

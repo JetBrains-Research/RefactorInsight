@@ -1,4 +1,4 @@
-package ui.renderer;
+package ui.tree.renderer;
 
 import data.RefactoringInfo;
 import javax.swing.Icon;

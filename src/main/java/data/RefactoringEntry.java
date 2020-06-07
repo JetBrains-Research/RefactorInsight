@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
-import utils.Utils;
+import ui.tree.TreeUtils;
 
 public class RefactoringEntry implements Serializable {
 
@@ -115,14 +115,14 @@ public class RefactoringEntry implements Serializable {
     List<RefactoringInfo> extractClassRefactorings = refactorings
         .stream().filter(x -> x.getType() == EXTRACT_CLASS).collect(Collectors.toList());
     for (RefactoringInfo extractClass : extractClassRefactorings) {
-      String displayableElement = Utils
+      String displayableElement = TreeUtils
           .getDisplayableElement(extractClass.getElementBefore(), extractClass.getElementAfter());
       refactorings.stream().filter(x -> !x.equals(extractClass))
           .filter(x -> {
             String displayableDetails =
-                Utils.getDisplayableElement(x.getDetailsBefore(), x.getDetailsAfter());
+                TreeUtils.getDisplayableElement(x.getDetailsBefore(), x.getDetailsAfter());
             String displayableName =
-                Utils.getDisplayableElement(x.getNameBefore(), x.getNameAfter());
+                TreeUtils.getDisplayableElement(x.getNameBefore(), x.getNameAfter());
             if (displayableDetails == null) {
               return displayableName.equals(displayableElement);
             }
@@ -168,12 +168,12 @@ public class RefactoringEntry implements Serializable {
     DefaultMutableTreeNode root = new DefaultMutableTreeNode(commitId);
     refactorings.forEach(r -> {
       if (!r.isHidden()) {
-        root.add(r.makeNode());
+        root.add(TreeUtils.makeNode(r));
       }
     });
     Tree tree = new Tree(root);
     tree.setRootVisible(false);
-    Utils.expandAllNodes(tree, 0, tree.getRowCount());
+    TreeUtils.expandAllNodes(tree, 0, tree.getRowCount());
     return tree;
   }
 

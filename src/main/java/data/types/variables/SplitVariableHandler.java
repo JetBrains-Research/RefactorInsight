@@ -7,7 +7,7 @@ import data.types.Handler;
 import gr.uom.java.xmi.diff.SplitVariableRefactoring;
 import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
+import utils.StringUtils;
 
 public class SplitVariableHandler extends Handler {
 
@@ -27,8 +27,8 @@ public class SplitVariableHandler extends Handler {
     }
 
     return info
-        .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()))
+        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
         .setElementBefore(ref.getOldVariable().getVariableDeclaration().toQualifiedString())
         .setElementAfter(ref.getSplitVariables().stream().map(x -> x.getVariableName()).collect(
             Collectors.joining()));

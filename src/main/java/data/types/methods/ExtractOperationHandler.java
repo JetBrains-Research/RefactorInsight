@@ -12,7 +12,7 @@ import git4idea.GitRevisionNumber;
 import gr.uom.java.xmi.diff.ExtractOperationRefactoring;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
-import utils.Utils;
+import utils.StringUtils;
 
 public class ExtractOperationHandler extends Handler {
 
@@ -23,7 +23,7 @@ public class ExtractOperationHandler extends Handler {
     String classNameBefore = ref.getSourceOperationBeforeExtraction().getClassName();
     String classNameAfter = ref.getExtractedOperation().getClassName();
 
-    String extractedMethod = Utils.calculateSignature(ref.getExtractedOperation());
+    String extractedMethod = StringUtils.calculateSignature(ref.getExtractedOperation());
 
     if (ref.getRefactoringType() == RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
       info.setGroup(Group.METHOD)
@@ -32,8 +32,8 @@ public class ExtractOperationHandler extends Handler {
           .setDetailsAfter(classNameAfter)
           .setElementBefore(extractedMethod.substring(extractedMethod.lastIndexOf(".") + 1))
           .setElementAfter(null)
-          .setNameBefore(Utils.calculateSignature(ref.getSourceOperationBeforeExtraction()))
-          .setNameAfter(Utils.calculateSignature(ref.getSourceOperationAfterExtraction()))
+          .setNameBefore(StringUtils.calculateSignature(ref.getSourceOperationBeforeExtraction()))
+          .setNameAfter(StringUtils.calculateSignature(ref.getSourceOperationAfterExtraction()))
           .addMarking(ref.getExtractedCodeRangeFromSourceOperation(),
               ref.getExtractedCodeRangeToExtractedOperation(),
               ref.getExtractedCodeRangeFromSourceOperation(),
@@ -75,8 +75,8 @@ public class ExtractOperationHandler extends Handler {
           .setDetailsAfter(classNameAfter)
           .setElementBefore(extractedMethod.substring(extractedMethod.lastIndexOf(".") + 1))
           .setElementAfter(null)
-          .setNameBefore(Utils.calculateSignature(ref.getSourceOperationBeforeExtraction()))
-          .setNameAfter(Utils.calculateSignature(ref.getSourceOperationAfterExtraction()))
+          .setNameBefore(StringUtils.calculateSignature(ref.getSourceOperationBeforeExtraction()))
+          .setNameAfter(StringUtils.calculateSignature(ref.getSourceOperationAfterExtraction()))
           .addMarking(ref.getExtractedCodeRangeFromSourceOperation(),
               ref.getExtractedCodeRangeToExtractedOperation());
 

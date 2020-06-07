@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.Times;
 import ui.windows.GitWindow;
-import ui.renderer.CellRenderer;
+import ui.tree.renderer.CellRenderer;
 
 /**
  * Extend GitSingleRepoTest

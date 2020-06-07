@@ -45,7 +45,6 @@ public class RefactoringInfo {
   private String groupId;
   private boolean hidden = false;
 
-
   /**
    * Adds this refactoring to the method history map.
    * Note that it should be called in chronological order.
@@ -339,60 +338,6 @@ public class RefactoringInfo {
   }
 
   /**
-   * Creates a DefaultMutableTreeNode for the UI.
-   *
-   * @return the node.
-   */
-  public DefaultMutableTreeNode makeNode() {
-    DefaultMutableTreeNode node = new DefaultMutableTreeNode(this);
-    DefaultMutableTreeNode root = makeDetailsNode(node);
-    makeNameNode(root);
-    return node;
-  }
-
-  /**
-   * Creates a node based on the nameBefore & nameAfter attributes.
-   * @param root to add node to.
-   */
-  public void makeNameNode(DefaultMutableTreeNode root) {
-    DefaultMutableTreeNode child = new DefaultMutableTreeNode(
-        group == Group.METHOD
-            ? getDisplayableName()
-            : Utils.getDisplayableDetails(nameBefore, nameAfter));
-    root.add(child);
-    addLeaves(child);
-  }
-
-  /**
-   * Creates a node iff the detailsBefore & detailsAfter attributes are not null.
-   * @param root current root of the tree.
-   * @return the same root if no node was created.
-   */
-  private DefaultMutableTreeNode makeDetailsNode(DefaultMutableTreeNode root) {
-    if (Utils.getDisplayableDetails(detailsBefore, detailsAfter) != null) {
-      DefaultMutableTreeNode details =
-          new DefaultMutableTreeNode(Utils.getDisplayableDetails(detailsBefore, detailsAfter));
-      root.add(details);
-      return details;
-    }
-    return root;
-  }
-
-  /**
-   * Adds leaves for refactorings where the element
-   * is not null.
-   *
-   * @param node to add leaves to.
-   */
-  public void addLeaves(DefaultMutableTreeNode node) {
-    String displayableElement = Utils.getDisplayableElement(elementBefore, elementAfter);
-    if (displayableElement == null) {
-      return;
-    }
-    node.add(new DefaultMutableTreeNode(displayableElement));
-  }
-
-  /**
    * Method for create a presentable String out of the
    * name refactoring.
    *
@@ -410,7 +355,7 @@ public class RefactoringInfo {
     if (before.equals(after)) {
       return before;
     } else {
-      return before + "-> " + after;
+      return before + " -> " + after;
     }
   }
 

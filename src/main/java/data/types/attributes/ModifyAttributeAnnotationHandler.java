@@ -6,7 +6,6 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ModifyAttributeAnnotationRefactoring;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
 
 public class ModifyAttributeAnnotationHandler extends Handler {
   @Override

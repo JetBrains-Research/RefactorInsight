@@ -1,4 +1,4 @@
-package ui.renderer;
+package ui.tree.renderer;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.JBDefaultTreeCellRenderer;

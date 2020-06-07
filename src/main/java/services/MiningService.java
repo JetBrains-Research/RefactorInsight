@@ -45,11 +45,11 @@ import ui.windows.GitWindow;
 @Service
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
+  private static final String VERSION = "1.0.1";
   public static ConcurrentHashMap<String, List<RefactoringInfo>> methodHistory
       = new ConcurrentHashMap<>();
   private boolean mining = false;
   private MyState innerState = new MyState();
-  private static final String VERSION = "1.0.1";
 
   public MiningService() {
   }
@@ -109,6 +109,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             int cores = 8; //Runtime.getRuntime().availableProcessors();
             ExecutorService pool = Executors.newFixedThreadPool(cores);
             System.out.println("Mining started on " + cores + " cores");
+            long timeStart = System.currentTimeMillis();
             AtomicInteger commitsDone = new AtomicInteger(0);
             CommitMiner miner =
                 new CommitMiner(pool, innerState.map, repository, commitsDone,
@@ -130,7 +131,9 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             } catch (InterruptedException e) {
               e.printStackTrace();
             }
-            System.out.println("Mining done");
+            long timeEnd = System.currentTimeMillis();
+            double time = ((double) (timeEnd - timeStart)) / 1000.0;
+            System.out.println("Mining done in " + time + " sec");
 
             computeMethodHistory(repository.getCurrentRevision());
             System.out.println("Method history computed");

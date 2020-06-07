@@ -7,7 +7,7 @@ import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
 import gr.uom.java.xmi.diff.RemoveMethodAnnotationRefactoring;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
+import utils.StringUtils;
 
 public class RemoveMethodAnnotationHandler extends Handler {
 
@@ -33,7 +33,7 @@ public class RemoveMethodAnnotationHandler extends Handler {
             line -> line.addOffset(annotation.getLocationInfo().getStartOffset(),
                 annotation.getLocationInfo().getEndOffset(),
                 0, 0))
-        .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()));
+        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()));
   }
 }

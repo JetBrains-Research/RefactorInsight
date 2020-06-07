@@ -16,28 +16,28 @@ public class UtilsTest {
 
   @Test
   public void indexOfDifferenceEquals() {
-    assertEquals(8, Utils.indexOfDifference("src.com.test", "src.com.test"));
+    assertEquals(8, StringUtils.indexOfDifference("src.com.test", "src.com.test"));
   }
 
   @Test
   public void indexOfDifferenceDifferentClasses() {
-    assertEquals(4, Utils.indexOfDifference("com.test1", "com.test2"));
+    assertEquals(4, StringUtils.indexOfDifference("com.test1", "com.test2"));
   }
 
   @Test
   public void indexOfDifferenceDifferentLengths() {
-    assertEquals(4, Utils.indexOfDifference("com.test", "com.testNew"));
+    assertEquals(4, StringUtils.indexOfDifference("com.test", "com.testNew"));
   }
 
   @Test
   public void indexOfDifference() {
-    assertEquals(4, Utils.indexOfDifference("com.interface", "com.class"));
+    assertEquals(4, StringUtils.indexOfDifference("com.interface", "com.class"));
   }
 
 
   @Test
   public void indexOfDifferenceDifferentPackages() {
-    assertEquals(0, Utils.indexOfDifference("src.interface", "src2.class"));
+    assertEquals(0, StringUtils.indexOfDifference("src.interface", "src2.class"));
   }
 
   @Test
@@ -56,7 +56,7 @@ public class UtilsTest {
     PsiType type = mock(PsiType.class);
     when(parameter.getType()).thenReturn(type);
     when(type.getPresentableText()).thenReturn("String");
-    assertEquals("testClass.testMethod(String, String)", Utils.calculateSignature(psiMethod));
+    assertEquals("testClass.testMethod(String, String)", StringUtils.calculateSignature(psiMethod));
   }
 
 

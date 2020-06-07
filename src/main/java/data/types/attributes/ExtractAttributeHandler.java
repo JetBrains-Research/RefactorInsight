@@ -14,13 +14,13 @@ public class ExtractAttributeHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     ExtractAttributeRefactoring ref = (ExtractAttributeRefactoring) refactoring;
 
-    String classNameBefore = ref.getOriginalClass().getName();
-
     info.setGroup(Group.ATTRIBUTE)
-        .setNameBefore(classNameBefore)
-        .setNameAfter(classNameBefore)
-        .setElementBefore(ref.getVariableDeclaration().getVariableDeclaration().toQualifiedString())
-        .setElementAfter(null)
+        .setDetailsBefore(ref.getOriginalClass().getName())
+        .setDetailsAfter(ref.getOriginalClass().getName())
+        .setNameBefore(
+            ref.getVariableDeclaration().getName() + " : " + ref.getVariableDeclaration().getType())
+        .setNameAfter(ref.getVariableDeclaration().getName() + " : "
+            + ref.getVariableDeclaration().getType())
         .addMarking(ref.getExtractedVariableDeclarationCodeRange().getStartLine(),
             ref.getExtractedVariableDeclarationCodeRange().getStartLine() - 1,
             ref.getExtractedVariableDeclarationCodeRange().getStartLine(),
