@@ -44,44 +44,27 @@ public class RefactoringLine {
     lines[RIGHT_START] = right.getStartLine() - 1;
     lines[RIGHT_END] = right.getEndLine();
 
-    columns[LEFT_START] = Math.max(left.getStartColumn(), 1);
-    columns[LEFT_END] = Math.max(left.getEndColumn(), 1);
-    columns[RIGHT_START] = Math.max(right.getStartColumn(), 1);
-    columns[RIGHT_END] = Math.max(right.getEndColumn(), 1);
+    if (hasColumns) {
+      columns[LEFT_START] = Math.max(left.getStartColumn(), 1);
+      columns[LEFT_END] = Math.max(left.getEndColumn(), 1);
+      columns[RIGHT_START] = Math.max(right.getStartColumn(), 1);
+      columns[RIGHT_END] = Math.max(right.getEndColumn(), 1);
+    }
 
     if (mid != null) {
       lines[MID_START] = mid.getStartLine() - 1;
       lines[MID_END] = mid.getEndLine();
-
-      columns[MID_START] = Math.max(mid.getStartColumn(), 1);
-      columns[MID_END] = Math.max(mid.getEndColumn(), 1);
+      if (hasColumns) {
+        columns[MID_START] = Math.max(mid.getStartColumn(), 1);
+        columns[MID_END] = Math.max(mid.getEndColumn(), 1);
+      }
     }
 
-    switch (option) {
-      case ADD:
-        lines[LEFT_END] = lines[LEFT_START];
-        break;
-      case REMOVE:
-        lines[RIGHT_END] = lines[RIGHT_START];
-        break;
-      case COLLAPSE:
-        lines[LEFT_END] = lines[LEFT_START] + 1;
-        lines[RIGHT_END] = lines[RIGHT_START] + 1;
-        break;
-      case EXTRACT:
-        lines[LEFT_START] = 0;
-        lines[LEFT_END] = 1;
-        if (mid != null) {
-          lines[MID_END] = lines[MID_START] + 1;
-        }
-        break;
-      default:
-    }
+    processOption(mid, option);
 
-    this.hasColumns = true;
     this.type = type;
   }
-  
+
   /**
    * Generate Conflicttype from ThreeSidedType.
    * Conflict type is used to set highlighting colors and can disable
@@ -183,7 +166,8 @@ public class RefactoringLine {
 
   /**
    * Adds offsets to offset list.
-   * @param left Location info
+   *
+   * @param left  Location info
    * @param right Location info
    * @return this
    */
@@ -195,8 +179,9 @@ public class RefactoringLine {
 
   /**
    * Adds offsets to offset list.
+   *
    * @param location Location info of the offset
-   * @param option ADD for addition, REMOVE for removals
+   * @param option   ADD for addition, REMOVE for removals
    * @return this
    */
   public RefactoringLine addOffset(LocationInfo location, MarkingOption option) {
@@ -219,8 +204,9 @@ public class RefactoringLine {
 
   /**
    * Adds offsets to offset list.
-   * @param left Location info
-   * @param mid Location info
+   *
+   * @param left  Location info
+   * @param mid   Location info
    * @param right Location info
    * @return this
    */
@@ -247,6 +233,29 @@ public class RefactoringLine {
 
   public int getRightStart() {
     return lines[RIGHT_START];
+  }
+
+  private void processOption(CodeRange mid, MarkingOption option) {
+    switch (option) {
+      case ADD:
+        lines[LEFT_END] = lines[LEFT_START];
+        break;
+      case REMOVE:
+        lines[RIGHT_END] = lines[RIGHT_START];
+        break;
+      case COLLAPSE:
+        lines[LEFT_END] = lines[LEFT_START] + 1;
+        lines[RIGHT_END] = lines[RIGHT_START] + 1;
+        break;
+      case EXTRACT:
+        lines[LEFT_START] = 0;
+        lines[LEFT_END] = 1;
+        if (mid != null) {
+          lines[MID_END] = lines[MID_START] + 1;
+        }
+        break;
+      default:
+    }
   }
 
   public enum VisualisationType {
