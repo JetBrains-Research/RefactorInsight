@@ -1,6 +1,5 @@
 package data.types.classes;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.RefactoringLine;
@@ -13,7 +12,7 @@ import org.refactoringminer.api.Refactoring;
 public class AddClassAnnotationHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     AddClassAnnotationRefactoring ref = (AddClassAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
     return info.setGroup(Group.CLASS)
@@ -24,7 +23,7 @@ public class AddClassAnnotationHandler extends Handler {
         .addMarking(
             ref.getClassBefore().codeRange(),
             annotation.codeRange(),
-            line -> line.addOffset(//TODO was (0,0) not 11
+            line -> line.addOffset(
                 annotation.getLocationInfo(), RefactoringLine.MarkingOption.ADD),
             RefactoringLine.MarkingOption.ADD,
             false);

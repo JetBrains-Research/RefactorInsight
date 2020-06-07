@@ -16,7 +16,7 @@ import utils.Utils;
 public class ExtractClassHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ExtractClassRefactoring ref = (ExtractClassRefactoring) refactoring;
 
     info.setGroup(Group.CLASS)
@@ -45,6 +45,10 @@ public class ExtractClassHandler extends Handler {
             true);
       });
 
+
+      String[] nameSpace = ref.getExtractedClass().getName().split("\\.");
+      String className = nameSpace[nameSpace.length - 1];
+
       info.addMarking(
           ref.getOriginalClass().codeRange(),
           ref.getExtractedClass().codeRange(),
@@ -52,26 +56,11 @@ public class ExtractClassHandler extends Handler {
 
           RefactoringLine.VisualisationType.RIGHT,
           refactoringLine -> {
-            int[] midColumns = new int[] {1, 1};
-            try {
-              String path = project.getBasePath() + "/"
-                  + ref.getExtractedClass().codeRange().getFilePath();
-              String midText = GitContentRevision.createRevision(
-                  new LocalFilePath(path, false),
-                  new GitRevisionNumber(info.getCommitId()), project).getContent();
-              String[] nameSpace = ref.getExtractedClass().getName().split("\\.");
-              String className = nameSpace[nameSpace.length - 1];
-              midColumns = Utils.findColumns(midText, className,
-                  ref.getExtractedClass().codeRange().getStartLine());
-            } catch (VcsException e) {
-              e.printStackTrace();
-            }
-
-            refactoringLine.setColumns(new int[] {1, 1, midColumns[0], midColumns[1],
-                ref.getAttributeOfExtractedClassTypeInOriginalClass()
-                    .codeRange().getStartColumn(),
-                ref.getAttributeOfExtractedClassTypeInOriginalClass()
-                    .codeRange().getEndColumn()});
+            refactoringLine.setLazyNames(new String[]{
+                null,
+                className,
+                null
+            });
           },
           RefactoringLine.MarkingOption.EXTRACT,
           false);

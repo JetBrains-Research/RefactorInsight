@@ -68,8 +68,7 @@ public class RefactoringEntry implements Serializable {
    * @param commit       current commit.
    * @return Json string.
    */
-  public static String convert(List<Refactoring> refactorings, VcsCommitMetadata commit,
-                               Project project) {
+  public static String convert(List<Refactoring> refactorings, VcsCommitMetadata commit) {
     List<String> parents =
         commit.getParents().stream().map(Hash::asString).collect(Collectors.toList());
 
@@ -77,7 +76,7 @@ public class RefactoringEntry implements Serializable {
         new RefactoringEntry(commit.getId().asString(), parents, commit.getTimestamp());
 
     List<RefactoringInfo> infos =
-        refactorings.stream().map(ref -> factory.create(ref, entry, project)).collect(
+        refactorings.stream().map(ref -> factory.create(ref, entry)).collect(
             Collectors.toList());
 
     entry.setRefactorings(infos).combineRelated();

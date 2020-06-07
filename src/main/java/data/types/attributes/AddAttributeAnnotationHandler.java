@@ -2,7 +2,6 @@ package data.types.attributes;
 
 import static data.RefactoringLine.MarkingOption.ADD;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
@@ -13,7 +12,7 @@ import org.refactoringminer.api.Refactoring;
 public class AddAttributeAnnotationHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     AddAttributeAnnotationRefactoring ref = (AddAttributeAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
 

@@ -2,10 +2,8 @@ package data.types.methods;
 
 import static data.RefactoringLine.MarkingOption.REMOVE;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
-import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
 import gr.uom.java.xmi.diff.RemoveMethodAnnotationRefactoring;
@@ -15,7 +13,7 @@ import utils.Utils;
 public class RemoveMethodAnnotationHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RemoveMethodAnnotationRefactoring ref = (RemoveMethodAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
     return info.setGroup(Group.METHOD)

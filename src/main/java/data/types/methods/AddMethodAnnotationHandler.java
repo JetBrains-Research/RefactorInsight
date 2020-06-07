@@ -2,10 +2,8 @@ package data.types.methods;
 
 import static data.RefactoringLine.MarkingOption.ADD;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
-import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
 import gr.uom.java.xmi.diff.AddMethodAnnotationRefactoring;
@@ -15,7 +13,7 @@ import utils.Utils;
 public class AddMethodAnnotationHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     AddMethodAnnotationRefactoring ref = (AddMethodAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
     return info.setGroup(Group.METHOD)
@@ -24,7 +22,7 @@ public class AddMethodAnnotationHandler extends Handler {
         .addMarking(
             ref.getOperationBefore().codeRange(),
             annotation.codeRange(),
-            line -> line.addOffset(//TODO 00 again instead of 11
+            line -> line.addOffset(
                 annotation.getLocationInfo(),
                 ADD),
             ADD,

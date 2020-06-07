@@ -35,6 +35,9 @@ public class RefactoringLine {
   private VisualisationType type;
   private boolean hasColumns = false;
 
+  private String[] lazyNames;
+  private boolean lazy = false;
+
   /**
    * Data holder for three sided refactoring diff.
    */
@@ -60,7 +63,6 @@ public class RefactoringLine {
         columns[MID_END] = Math.max(mid.getEndColumn(), 1);
       }
     }
-
     processOption(mid, option);
 
     this.type = type;
@@ -167,10 +169,11 @@ public class RefactoringLine {
     int maxLineRight = Utils.getMaxLine(rightText);
     lines[RIGHT_END] = lines[RIGHT_END] < 0 ? maxLineRight : lines[RIGHT_END];
     lines[LEFT_END] = lines[LEFT_END] < 0 ? maxLineLeft : lines[LEFT_END];
-    if(midText != null) {
+    if (midText != null) {
       int maxLineMid = Utils.getMaxLine(midText);
       lines[MID_END] = lines[MID_END] < 0 ? maxLineMid : lines[MID_END];
     }
+    lazy(leftText, midText, rightText);
   }
 
   /**
@@ -226,22 +229,42 @@ public class RefactoringLine {
     return this;
   }
 
-  /**
-   * Setter for columns.
-   * Checks if columns are valid.
-   */
-  public RefactoringLine setColumns(int[] columns) {
-    assert columns.length == 6;
-    this.columns = columns;
-    for (int i = 0; i < columns.length; i++) {
-      columns[i] = Math.max(columns[i], 1);
-    }
-    this.hasColumns = true;
-    return this;
+  public void setLazyNames(String[] lazyNames) {
+    this.lazyNames = lazyNames;
+    lazy = true;
   }
 
   public int getRightStart() {
     return lines[RIGHT_START];
+  }
+
+  private void lazy(String leftText, String midText, String rightText) {
+    if (!lazy) {
+      return;
+    }
+    this.hasColumns = true;
+    this.columns = new int[]{1, 1, 0, 0, columns[RIGHT_START], columns[RIGHT_END]};
+    if(midText == null) {
+      int[] beforeColumns =
+          Utils.findColumns(leftText, lazyNames[0], lines[LEFT_START] + 1);
+
+      int[] afterColumns =
+          Utils.findColumns(rightText, lazyNames[2], lines[RIGHT_START] + 1);
+
+      this.columns[LEFT_START] = beforeColumns[0];
+      this.columns[LEFT_END] = beforeColumns[1];
+      this.columns[RIGHT_START] = afterColumns[0];
+      this.columns[RIGHT_END] = afterColumns[1];
+    } else {
+      int[] midColumns =
+          Utils.findColumns(midText, lazyNames[1], lines[MID_START] + 1);
+
+      this.columns[MID_START] = midColumns[0];
+      this.columns[MID_END] = midColumns[1];
+    }
+    for (int i = 0; i < columns.length; i++) {
+      columns[i] = Math.max(columns[i], 1);
+    }
   }
 
   private void processOption(CodeRange mid, MarkingOption option) {

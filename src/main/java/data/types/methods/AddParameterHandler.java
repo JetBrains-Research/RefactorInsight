@@ -1,9 +1,7 @@
 package data.types.methods;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
-import data.RefactoringLine;
 import data.RefactoringLine.MarkingOption;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.AddParameterRefactoring;
@@ -13,7 +11,7 @@ import utils.Utils;
 public class AddParameterHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     AddParameterRefactoring ref = (AddParameterRefactoring) refactoring;
     return info.setGroup(Group.METHOD)
         .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
@@ -21,7 +19,7 @@ public class AddParameterHandler extends Handler {
         .setElementAfter(null)
         .setElementBefore(ref.getParameter().getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOperationBefore().codeRange(), ref.getOperationAfter().codeRange(),
-            line -> line.addOffset(//TODO 00
+            line -> line.addOffset(
                 ref.getParameter().getVariableDeclaration().getLocationInfo(), MarkingOption.ADD), true);
   }
 }

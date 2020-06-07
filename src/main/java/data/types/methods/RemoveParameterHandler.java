@@ -1,6 +1,5 @@
 package data.types.methods;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.RefactoringLine;
@@ -12,7 +11,7 @@ import utils.Utils;
 public class RemoveParameterHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RemoveParameterRefactoring ref = (RemoveParameterRefactoring) refactoring;
     return info.setGroup(Group.METHOD)
         .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))

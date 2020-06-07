@@ -17,7 +17,7 @@ import utils.Utils;
 public class ExtractOperationHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ExtractOperationRefactoring ref = (ExtractOperationRefactoring) refactoring;
     String classBefore = ref.getSourceOperationBeforeExtraction().getClassName();
     String classAfter = ref.getExtractedOperation().getClassName();
@@ -37,30 +37,18 @@ public class ExtractOperationHandler extends Handler {
               RefactoringLine.VisualisationType.LEFT,
               true);
 
-      int[] midColumns = new int[] {1, 1};
-      try {
-        String absolutePath =
-            project.getBasePath() + "/" + ref.getExtractedOperationCodeRange().getFilePath();
-        String midText = GitContentRevision.createRevision(
-            new LocalFilePath(absolutePath, false),
-            new GitRevisionNumber(info.getCommitId()), project).getContent();
-        midColumns = Utils.findColumns(midText, ref.getExtractedOperation().getName(),
-            ref.getExtractedOperation().getBody().getCompositeStatement().codeRange()
-                .getStartLine());
-      } catch (VcsException e) {
-        e.printStackTrace();
-      }
-
-      int[] finalMidColumns = midColumns;
       ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
           info.addMarking(
-              ref.getSourceOperationCodeRangeBeforeExtraction(), //TODO make (1,1)
+              ref.getSourceOperationCodeRangeBeforeExtraction(),
               ref.getExtractedOperation().getBody().getCompositeStatement().codeRange(),
               invocation,
               RefactoringLine.VisualisationType.RIGHT,
               refactoringLine -> {
-                refactoringLine.setColumns(new int[] {1, 1, finalMidColumns[0], finalMidColumns[1],
-                    invocation.getStartColumn(), invocation.getEndColumn()});
+                refactoringLine.setLazyNames(new String[]{
+                    null,
+                    ref.getExtractedOperation().getName(),
+                    null
+                });
               },
               RefactoringLine.MarkingOption.EXTRACT,
               false));
@@ -86,5 +74,4 @@ public class ExtractOperationHandler extends Handler {
       return info;
     }
   }
-
 }

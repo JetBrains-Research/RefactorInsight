@@ -1,6 +1,5 @@
 package data.types.variables;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
@@ -12,7 +11,7 @@ import utils.Utils;
 public class ChangeVariableTypeHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ChangeVariableTypeRefactoring ref = (ChangeVariableTypeRefactoring) refactoring;
     final UMLOperation operationAfter = ref.getOperationAfter();
     String id = operationAfter.getClassName() + ".";
