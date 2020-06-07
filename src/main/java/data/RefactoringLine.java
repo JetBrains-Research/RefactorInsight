@@ -229,19 +229,19 @@ public class RefactoringLine {
     }
     hasColumns = true;
     columns = new int[] {1, 1, 0, 0, columns[RIGHT_START], columns[RIGHT_END]};
-    if (leftText != null) {
+    if (lazilyHighlightableWords[0] != null) {
       int[] beforeColumns =
           Utils.findColumns(leftText, lazilyHighlightableWords[0], lines[LEFT_START] + 1);
       columns[LEFT_START] = beforeColumns[0];
       columns[LEFT_END] = beforeColumns[1];
     }
-    if (midText != null) {
+    if (lazilyHighlightableWords[1] != null) {
       int[] midColumns =
           Utils.findColumns(midText, lazilyHighlightableWords[1], lines[MID_START] + 1);
       columns[MID_START] = midColumns[0];
       columns[MID_END] = midColumns[1];
     }
-    if (rightText != null) {
+    if (lazilyHighlightableWords[2] != null) {
       int[] afterColumns =
           Utils.findColumns(rightText, lazilyHighlightableWords[2], lines[RIGHT_START] + 1);
       columns[RIGHT_START] = afterColumns[0];

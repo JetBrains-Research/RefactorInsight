@@ -174,6 +174,8 @@ public class Utils {
    * @return text
    */
   public static String getStringLeaf(String first, String second, String third) {
+    second = second.replace("<", "&lt;");
+    second = second.replace(">", "&gt;");
     return "<html> <font color=\"#696969\"> " + first + " </font> "
         + second + (third.equals("") ? "</html>"
         : ("<font color=\"#696969\"> in file " + third + " </font></html>"));

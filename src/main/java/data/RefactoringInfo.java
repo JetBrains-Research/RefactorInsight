@@ -408,4 +408,8 @@ public class RefactoringInfo {
     this.detailsAfter = detailsAfter;
     return this;
   }
+
+  public String getNameBefore() {
+    return nameBefore;
+  }
 }

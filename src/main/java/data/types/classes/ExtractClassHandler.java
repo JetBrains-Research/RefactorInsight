@@ -63,7 +63,7 @@ public class ExtractClassHandler extends Handler {
             });
           },
           RefactoringLine.MarkingOption.EXTRACT,
-          false);
+          true);
     }
     return info;
   }
