@@ -1,14 +1,9 @@
 package data.types.methods;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.LocalFilePath;
-import com.intellij.openapi.vcs.VcsException;
 import data.Group;
 import data.RefactoringInfo;
 import data.RefactoringLine;
 import data.types.Handler;
-import git4idea.GitContentRevision;
-import git4idea.GitRevisionNumber;
 import gr.uom.java.xmi.diff.ExtractOperationRefactoring;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
@@ -35,6 +30,8 @@ public class ExtractOperationHandler extends Handler {
               ref.getExtractedCodeRangeToExtractedOperation(),
               ref.getExtractedCodeRangeFromSourceOperation(),
               RefactoringLine.VisualisationType.LEFT,
+              null,
+              RefactoringLine.MarkingOption.NONE,
               true);
 
       ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
@@ -44,7 +41,7 @@ public class ExtractOperationHandler extends Handler {
               invocation,
               RefactoringLine.VisualisationType.RIGHT,
               refactoringLine -> {
-                refactoringLine.setLazyNames(new String[]{
+                refactoringLine.setLazilyHighlightableWords(new String[]{
                     null,
                     ref.getExtractedOperation().getName(),
                     null

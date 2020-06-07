@@ -29,12 +29,13 @@ public class RenameMethodHandler extends Handler {
         .setElementAfter(null)
         .addMarking(ref.getOriginalOperation().getBody().getCompositeStatement().codeRange(),
             ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
-            refactoringLine -> refactoringLine.setHasColumns(false), false)
+            refactoringLine -> refactoringLine.setHasColumns(false),
+            RefactoringLine.MarkingOption.NONE,false)
         .addMarking(
             ref.getOriginalOperation().getBody().getCompositeStatement().codeRange(),
             ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
             refactoringLine -> {
-              refactoringLine.setLazyNames(new String[]{
+              refactoringLine.setLazilyHighlightableWords(new String[]{
                   ref.getOriginalOperation().getName(),
                   null,
                   ref.getRenamedOperation().getName()

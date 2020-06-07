@@ -1,17 +1,11 @@
 package data.types.classes;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.LocalFilePath;
-import com.intellij.openapi.vcs.VcsException;
 import data.Group;
 import data.RefactoringInfo;
 import data.RefactoringLine;
 import data.types.Handler;
-import git4idea.GitContentRevision;
-import git4idea.GitRevisionNumber;
 import gr.uom.java.xmi.diff.ExtractClassRefactoring;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
 
 public class ExtractClassHandler extends Handler {
 
@@ -33,6 +27,8 @@ public class ExtractClassHandler extends Handler {
             ref.getExtractedClass().codeRange(),
             ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange(),
             RefactoringLine.VisualisationType.LEFT,
+            null,
+            RefactoringLine.MarkingOption.NONE,
             true);
       });
 
@@ -42,6 +38,8 @@ public class ExtractClassHandler extends Handler {
             ref.getExtractedClass().codeRange(),
             ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange(),
             RefactoringLine.VisualisationType.LEFT,
+            null,
+            RefactoringLine.MarkingOption.NONE,
             true);
       });
 
@@ -56,7 +54,7 @@ public class ExtractClassHandler extends Handler {
 
           RefactoringLine.VisualisationType.RIGHT,
           refactoringLine -> {
-            refactoringLine.setLazyNames(new String[]{
+            refactoringLine.setLazilyHighlightableWords(new String[]{
                 null,
                 className,
                 null

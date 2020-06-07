@@ -2,6 +2,7 @@ package data.types.classes;
 
 import data.Group;
 import data.RefactoringInfo;
+import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ModifyClassAnnotationRefactoring;
 import org.refactoringminer.api.Refactoring;
@@ -18,6 +19,7 @@ public class ModifyClassAnnotationHandler extends Handler {
         .setElementAfter(ref.getAnnotationAfter().toString())
         .addMarking(ref.getAnnotationBefore().codeRange(), ref.getAnnotationAfter().codeRange(),
             line -> line.addOffset(ref.getAnnotationBefore().getLocationInfo(),
-                ref.getAnnotationAfter().getLocationInfo()), true);
+                ref.getAnnotationAfter().getLocationInfo()),
+            RefactoringLine.MarkingOption.NONE,true);
   }
 }

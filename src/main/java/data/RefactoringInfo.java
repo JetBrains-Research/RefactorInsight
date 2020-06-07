@@ -109,10 +109,6 @@ public class RefactoringInfo {
     this.lineMarkings.addAll(info.getLineMarkings());
   }
 
-  public RefactoringEntry getEntry() {
-    return entry;
-  }
-
   public RefactoringInfo setEntry(RefactoringEntry entry) {
     this.entry = entry;
     return this;
@@ -141,26 +137,11 @@ public class RefactoringInfo {
   }
 
   public RefactoringInfo addMarking(CodeRange left, CodeRange right,
-                                    Consumer<RefactoringLine> offsetFunction, boolean hasColumns) {
-    return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, offsetFunction,
-        RefactoringLine.MarkingOption.NONE, hasColumns);
-  }
-
-  public RefactoringInfo addMarking(CodeRange left, CodeRange right,
                                     Consumer<RefactoringLine> offsetFunction,
                                     RefactoringLine.MarkingOption option,
                                     boolean hasColumns) {
     return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, offsetFunction,
         option, hasColumns);
-  }
-
-  /**
-   * Add line marking for diffwindow used to display refactorings.
-   */
-  public RefactoringInfo addMarking(CodeRange left, CodeRange mid, CodeRange right,
-                                    RefactoringLine.VisualisationType type, boolean hasColumns) {
-
-    return addMarking(left, mid, right, type, null, RefactoringLine.MarkingOption.NONE, hasColumns);
   }
 
   /**
@@ -213,17 +194,9 @@ public class RefactoringInfo {
     return new Gson().toJson(this);
   }
 
-  public String getNameBefore() {
-    return nameBefore;
-  }
-
   public RefactoringInfo setNameBefore(String nameBefore) {
     this.nameBefore = nameBefore;
     return this;
-  }
-
-  public List<String> getParents() {
-    return entry.getParents();
   }
 
   public Group getGroup() {
@@ -330,8 +303,8 @@ public class RefactoringInfo {
   /**
    * Creates a diff request for this refactoring.
    *
-   * @param contents array or diffcontents
-   * @return
+   * @param contents array of diffcontents
+   * @return the diff request created
    */
   public SimpleDiffRequest createDiffRequest(DiffContent[] contents) {
     SimpleDiffRequest request;
