@@ -227,25 +227,25 @@ public class RefactoringLine {
     if (!lazy) {
       return;
     }
-    this.hasColumns = true;
-    this.columns = new int[] {1, 1, 0, 0, columns[RIGHT_START], columns[RIGHT_END]};
-    if (midText == null) {
+    hasColumns = true;
+    columns = new int[] {1, 1, 0, 0, columns[RIGHT_START], columns[RIGHT_END]};
+    if (leftText != null) {
       int[] beforeColumns =
           Utils.findColumns(leftText, lazilyHighlightableWords[0], lines[LEFT_START] + 1);
-
-      int[] afterColumns =
-          Utils.findColumns(rightText, lazilyHighlightableWords[2], lines[RIGHT_START] + 1);
-
-      this.columns[LEFT_START] = beforeColumns[0];
-      this.columns[LEFT_END] = beforeColumns[1];
-      this.columns[RIGHT_START] = afterColumns[0];
-      this.columns[RIGHT_END] = afterColumns[1];
-    } else {
+      columns[LEFT_START] = beforeColumns[0];
+      columns[LEFT_END] = beforeColumns[1];
+    }
+    if (midText != null) {
       int[] midColumns =
           Utils.findColumns(midText, lazilyHighlightableWords[1], lines[MID_START] + 1);
-
-      this.columns[MID_START] = midColumns[0];
-      this.columns[MID_END] = midColumns[1];
+      columns[MID_START] = midColumns[0];
+      columns[MID_END] = midColumns[1];
+    }
+    if (rightText != null) {
+      int[] afterColumns =
+          Utils.findColumns(rightText, lazilyHighlightableWords[2], lines[RIGHT_START] + 1);
+      columns[RIGHT_START] = afterColumns[0];
+      columns[RIGHT_END] = afterColumns[1];
     }
     for (int i = 0; i < columns.length; i++) {
       columns[i] = Math.max(columns[i], 1);
