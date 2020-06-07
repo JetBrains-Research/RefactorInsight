@@ -166,7 +166,7 @@ public class RefactoringEntry implements Serializable {
     DefaultMutableTreeNode root = new DefaultMutableTreeNode(commitId);
     refactorings.forEach(r -> {
       if (!r.isHidden()) {
-        root.add(r.makeNode());
+        root.add(Utils.makeNode(r));
       }
     });
     Tree tree = new Tree(root);

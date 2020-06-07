@@ -22,7 +22,7 @@ public class ExtractAttributeHandler extends Handler {
         .setDetailsAfter(ref.getOriginalClass().getName())
         .setNameBefore(
             ref.getVariableDeclaration().getName() + " : " + ref.getVariableDeclaration().getType())
-        .setNameAfter(ref.getVariableDeclaration().getName() + " : " +
-            ref.getVariableDeclaration().getType());
+        .setNameAfter(ref.getVariableDeclaration().getName() + " : "
+            + ref.getVariableDeclaration().getType());
   }
 }

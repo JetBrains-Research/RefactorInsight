@@ -68,13 +68,13 @@ public class ExtractClassHandler extends Handler {
       ref.getExtractedOperations().forEach(operation -> {
         info.addMarking(
             operation.codeRange(),
-            ref.getExtractedClass().codeRange(), false);
+            ref.getExtractedClass().codeRange(), true);
       });
 
       ref.getExtractedAttributes().forEach(operation -> {
         info.addMarking(
             operation.codeRange(),
-            ref.getExtractedClass().codeRange(), false);
+            ref.getExtractedClass().codeRange(), true);
       });
     }
     return info;

@@ -6,9 +6,11 @@ import com.intellij.psi.PsiParameterList;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.text.JBDateFormat;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
+import data.Group;
 import data.RefactoringInfo;
 import gr.uom.java.xmi.UMLOperation;
 import java.util.ArrayList;
+import javax.swing.tree.DefaultMutableTreeNode;
 import org.jetbrains.annotations.NotNull;
 
 public class Utils {
@@ -279,5 +281,64 @@ public class Utils {
     } else {
       return beforeNew + " -> " + afterNew;
     }
+  }
+
+  /**
+   * Creates a DefaultMutableTreeNode for the UI.
+   *
+   * @return the node.
+   */
+  public static DefaultMutableTreeNode makeNode(RefactoringInfo info) {
+    DefaultMutableTreeNode node = new DefaultMutableTreeNode(info);
+    DefaultMutableTreeNode root = makeDetailsNode(node, info);
+    makeNameNode(root, info);
+    return node;
+  }
+
+  /**
+   * Creates a node based on the nameBefore & nameAfter attributes.
+   *
+   * @param root to add node to.
+   */
+  public static void makeNameNode(DefaultMutableTreeNode root, RefactoringInfo info) {
+    DefaultMutableTreeNode child = new DefaultMutableTreeNode(
+        info.getGroup() == Group.METHOD
+            ? info.getDisplayableName()
+            : getDisplayableDetails(info.getNameBefore(), info.getNameAfter()));
+    root.add(child);
+    addLeaves(child, info);
+  }
+
+  /**
+   * Creates a node iff the detailsBefore & detailsAfter attributes are not null.
+   *
+   * @param root current root of the tree.
+   * @return the same root if no node was created.
+   */
+  private static DefaultMutableTreeNode makeDetailsNode(DefaultMutableTreeNode root,
+                                                        RefactoringInfo info) {
+    if (getDisplayableDetails(info.getDetailsBefore(), info.getDetailsAfter()) != null) {
+      DefaultMutableTreeNode details =
+          new DefaultMutableTreeNode(
+              getDisplayableDetails(info.getDetailsBefore(), info.getDetailsAfter()));
+      root.add(details);
+      return details;
+    }
+    return root;
+  }
+
+  /**
+   * Adds leaves for refactorings where the element
+   * is not null.
+   *
+   * @param node to add leaves to.
+   */
+  public static void addLeaves(DefaultMutableTreeNode node, RefactoringInfo info) {
+    String displayableElement =
+        getDisplayableElement(info.getElementBefore(), info.getElementAfter());
+    if (displayableElement == null) {
+      return;
+    }
+    node.add(new DefaultMutableTreeNode(displayableElement));
   }
 }

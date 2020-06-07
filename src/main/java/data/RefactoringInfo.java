@@ -19,9 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import javax.swing.tree.DefaultMutableTreeNode;
 import org.refactoringminer.api.RefactoringType;
-import utils.Utils;
 
 public class RefactoringInfo {
 
@@ -131,63 +129,6 @@ public class RefactoringInfo {
   }
 
   /**
-   * Creates a DefaultMutableTreeNode for the UI.
-   *
-   * @return the node.
-   */
-  public DefaultMutableTreeNode makeNode() {
-    DefaultMutableTreeNode node = new DefaultMutableTreeNode(this);
-    DefaultMutableTreeNode root = makeDetailsNode(node);
-    makeNameNode(root);
-    return node;
-  }
-
-  /**
-   * Creates a node based on the nameBefore & nameAfter attributes.
-   *
-   * @param root to add node to.
-   */
-  public void makeNameNode(DefaultMutableTreeNode root) {
-    DefaultMutableTreeNode child = new DefaultMutableTreeNode(
-        group == Group.METHOD
-            ? getDisplayableName()
-            : Utils.getDisplayableDetails(getNameBefore(), getNameAfter()));
-    root.add(child);
-    addLeaves(child);
-  }
-
-  /**
-   * Creates a node iff the detailsBefore & detailsAfter attributes are not null.
-   *
-   * @param root current root of the tree.
-   * @return the same root if no node was created.
-   */
-  private DefaultMutableTreeNode makeDetailsNode(DefaultMutableTreeNode root) {
-    if (Utils.getDisplayableDetails(getDetailsBefore(), getDetailsAfter()) != null) {
-      DefaultMutableTreeNode details =
-          new DefaultMutableTreeNode(
-              Utils.getDisplayableDetails(getDetailsBefore(), getDetailsAfter()));
-      root.add(details);
-      return details;
-    }
-    return root;
-  }
-
-  /**
-   * Adds leaves for refactorings where the element
-   * is not null.
-   *
-   * @param node to add leaves to.
-   */
-  public void addLeaves(DefaultMutableTreeNode node) {
-    String displayableElement = Utils.getDisplayableElement(getElementBefore(), getElementAfter());
-    if (displayableElement == null) {
-      return;
-    }
-    node.add(new DefaultMutableTreeNode(displayableElement));
-  }
-
-  /**
    * Creates a diff request for this refactoring.
    *
    * @param contents array of diffcontents
@@ -231,7 +172,6 @@ public class RefactoringInfo {
       return before + "-> " + after;
     }
   }
-
 
   @Override
   public String toString() {
@@ -279,6 +219,7 @@ public class RefactoringInfo {
     this.threeSided = threeSided;
     return this;
   }
+
   public RefactoringEntry getEntry() {
     return entry;
   }
