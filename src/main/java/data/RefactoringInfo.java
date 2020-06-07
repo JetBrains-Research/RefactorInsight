@@ -287,7 +287,25 @@ public class RefactoringInfo {
   }
 
   public RefactoringInfo setRightPath(String rightPath) {
-    paths[0] = rightPath;
+    paths[2] = rightPath;
+    return this;
+  }
+
+  public String getNameBefore() {
+    return uiStrings[0][0];
+  }
+
+  public RefactoringInfo setNameBefore(String nameBefore) {
+    uiStrings[0][0] = nameBefore;
+    return this;
+  }
+
+  public String getNameAfter() {
+    return uiStrings[0][1];
+  }
+
+  public RefactoringInfo setNameAfter(String nameAfter) {
+    uiStrings[0][1] = nameAfter;
     return this;
   }
 
@@ -324,24 +342,6 @@ public class RefactoringInfo {
 
   public RefactoringInfo setDetailsAfter(String detailsAfter) {
     uiStrings[2][1] = detailsAfter;
-    return this;
-  }
-
-  public String getNameBefore() {
-    return uiStrings[0][0];
-  }
-
-  public RefactoringInfo setNameBefore(String nameBefore) {
-    uiStrings[0][0] = nameBefore;
-    return this;
-  }
-
-  public String getNameAfter() {
-    return uiStrings[0][1];
-  }
-
-  public RefactoringInfo setNameAfter(String nameAfter) {
-    uiStrings[0][1] = nameAfter;
     return this;
   }
 }
