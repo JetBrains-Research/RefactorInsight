@@ -130,31 +130,32 @@ public class RefactoringInfo {
     return includes;
   }
 
-  public RefactoringInfo addMarking(CodeRange left, CodeRange right) {
+  public RefactoringInfo addMarking(CodeRange left, CodeRange right, boolean hasColumns) {
     return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, null,
-        RefactoringLine.MarkingOption.NONE);
+        RefactoringLine.MarkingOption.NONE, hasColumns);
   }
 
   public RefactoringInfo addMarking(CodeRange left, CodeRange right,
-                                    Consumer<RefactoringLine> offsetFunction) {
+                                    Consumer<RefactoringLine> offsetFunction, boolean hasColumns) {
     return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, offsetFunction,
-        RefactoringLine.MarkingOption.NONE);
+        RefactoringLine.MarkingOption.NONE, hasColumns);
   }
 
   public RefactoringInfo addMarking(CodeRange left, CodeRange right,
                                     Consumer<RefactoringLine> offsetFunction,
-                                    RefactoringLine.MarkingOption option) {
+                                    RefactoringLine.MarkingOption option,
+                                    boolean hasColumns) {
     return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, offsetFunction,
-        option);
+        option, hasColumns);
   }
 
   /**
    * Add line marking for diffwindow used to display refactorings.
    */
   public RefactoringInfo addMarking(CodeRange left, CodeRange mid, CodeRange right,
-                                    RefactoringLine.VisualisationType type) {
+                                    RefactoringLine.VisualisationType type, boolean hasColumns) {
 
-    return addMarking(left, mid, right, type, null, RefactoringLine.MarkingOption.NONE);
+    return addMarking(left, mid, right, type, null, RefactoringLine.MarkingOption.NONE, hasColumns);
   }
 
   /**
@@ -164,9 +165,10 @@ public class RefactoringInfo {
   public RefactoringInfo addMarking(CodeRange left, CodeRange mid, CodeRange right,
                                     RefactoringLine.VisualisationType type,
                                     Consumer<RefactoringLine> offsetFunction,
-                                    RefactoringLine.MarkingOption option) {
+                                    RefactoringLine.MarkingOption option,
+                                    boolean hasColumns) {
 
-    RefactoringLine line = new RefactoringLine(left, mid, right, type, option);
+    RefactoringLine line = new RefactoringLine(left, mid, right, type, option, hasColumns);
     if (offsetFunction != null) {
       offsetFunction.accept(line);
     }

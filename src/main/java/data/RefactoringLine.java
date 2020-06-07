@@ -38,12 +38,12 @@ public class RefactoringLine {
    * Data holder for three sided refactoring diff.
    */
   public RefactoringLine(CodeRange left, CodeRange mid, CodeRange right,
-                         VisualisationType type, MarkingOption option) {
+                         VisualisationType type, MarkingOption option, boolean hasColumns) {
     lines[LEFT_START] = left.getStartLine() - 1;
     lines[LEFT_END] = left.getEndLine();
     lines[RIGHT_START] = right.getStartLine() - 1;
     lines[RIGHT_END] = right.getEndLine();
-
+    this.hasColumns = hasColumns;
     if (hasColumns) {
       columns[LEFT_START] = Math.max(left.getStartColumn(), 1);
       columns[LEFT_END] = Math.max(left.getEndColumn(), 1);
