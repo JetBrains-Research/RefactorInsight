@@ -6,7 +6,6 @@ import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ModifyAttributeAnnotationRefactoring;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
 
 public class ModifyAttributeAnnotationHandler extends Handler {
   @Override
@@ -26,6 +25,6 @@ public class ModifyAttributeAnnotationHandler extends Handler {
         .addMarking(ref.getAnnotationBefore().codeRange(), ref.getAnnotationAfter().codeRange(),
             line -> line.addOffset(ref.getAnnotationBefore().getLocationInfo(),
                 ref.getAnnotationAfter().getLocationInfo()),
-            RefactoringLine.MarkingOption.NONE,true);
+            RefactoringLine.MarkingOption.NONE, true);
   }
 }

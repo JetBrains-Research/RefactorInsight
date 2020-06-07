@@ -36,12 +36,12 @@ public class RenameMethodHandler extends Handler {
         .addMarking(ref.getOriginalOperation().getBody().getCompositeStatement().codeRange(),
             ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
             refactoringLine -> refactoringLine.setHasColumns(false),
-            RefactoringLine.MarkingOption.NONE,false)
+            RefactoringLine.MarkingOption.NONE, false)
         .addMarking(
             ref.getOriginalOperation().getBody().getCompositeStatement().codeRange(),
             ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
             refactoringLine -> {
-              refactoringLine.setLazilyHighlightableWords(new String[]{
+              refactoringLine.setLazilyHighlightableWords(new String[] {
                   ref.getOriginalOperation().getName(),
                   null,
                   ref.getRenamedOperation().getName()

@@ -29,6 +29,6 @@ public class RemoveParameterHandler extends Handler {
                 ref.getParameter().getVariableDeclaration().getLocationInfo(),
                 RefactoringLine.MarkingOption.REMOVE)
                 .setHasColumns(false),
-            RefactoringLine.MarkingOption.NONE,true);
+            RefactoringLine.MarkingOption.NONE, true);
   }
 }

@@ -1,25 +1,17 @@
 package ui.windows;
 
-import com.intellij.diff.DiffContentFactoryEx;
 import com.intellij.diff.DiffContext;
 import com.intellij.diff.DiffManager;
 import com.intellij.diff.FrameDiffTool;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.DiffRequest;
-import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
 import com.intellij.diff.tools.simple.ThreesideDiffChangeBase;
 import com.intellij.diff.tools.util.base.DiffViewerListener;
-import com.intellij.diff.util.DiffUserDataKeysEx;
-import com.intellij.diff.util.ThreeSide;
-import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.vcs.VcsException;
-import com.intellij.openapi.vcs.changes.Change;
 import data.RefactoringInfo;
-import java.util.Collection;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,8 +24,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
    * Requests diff window to show specific refactoring with two editors.
    *
    * @param contents array with the diffContents
-   * @param info    RefactoringInfo
-   * @param project Current project
+   * @param info     RefactoringInfo
+   * @param project  Current project
    */
   public static void showDiff(DiffContent[] contents, RefactoringInfo info, Project project) {
     DiffManager.getInstance().showDiff(project, info.createDiffRequest(contents));

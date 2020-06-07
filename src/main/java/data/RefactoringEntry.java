@@ -6,7 +6,6 @@ import static org.refactoringminer.api.RefactoringType.EXTRACT_CLASS;
 import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
 
 import com.google.gson.Gson;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.Hash;
 import com.intellij.vcs.log.VcsCommitMetadata;

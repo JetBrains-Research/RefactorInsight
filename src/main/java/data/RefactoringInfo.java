@@ -198,11 +198,6 @@ public class RefactoringInfo {
     return new Gson().toJson(this);
   }
 
-  public RefactoringInfo setNameBefore(String nameBefore) {
-    this.nameBefore = nameBefore;
-    return this;
-  }
-
   public Group getGroup() {
     return group;
   }
@@ -264,6 +259,7 @@ public class RefactoringInfo {
 
   /**
    * Creates a node based on the nameBefore & nameAfter attributes.
+   *
    * @param root to add node to.
    */
   public void makeNameNode(DefaultMutableTreeNode root) {
@@ -277,6 +273,7 @@ public class RefactoringInfo {
 
   /**
    * Creates a node iff the detailsBefore & detailsAfter attributes are not null.
+   *
    * @param root current root of the tree.
    * @return the same root if no node was created.
    */
@@ -306,7 +303,7 @@ public class RefactoringInfo {
 
   /**
    * Method for create a presentable String out of the
-<<<<<<< HEAD
+   * <<<<<<< HEAD
    * element changes for a refactoring.
    *
    * @return presentable String that shows the changes.
@@ -347,8 +344,8 @@ public class RefactoringInfo {
 
   /**
    * Method for create a presentable String out of the
-=======
->>>>>>> 70-improve-tree-displaying
+   * =======
+   * >>>>>>> 70-improve-tree-displaying
    * name refactoring.
    *
    * @return presentable String that shows the changes if existent, else shows a presentable name.
@@ -411,5 +408,10 @@ public class RefactoringInfo {
 
   public String getNameBefore() {
     return nameBefore;
+  }
+
+  public RefactoringInfo setNameBefore(String nameBefore) {
+    this.nameBefore = nameBefore;
+    return this;
   }
 }

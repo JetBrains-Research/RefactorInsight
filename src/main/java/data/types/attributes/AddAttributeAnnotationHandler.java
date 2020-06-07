@@ -8,7 +8,6 @@ import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
 import gr.uom.java.xmi.diff.AddAttributeAnnotationRefactoring;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
 
 public class AddAttributeAnnotationHandler extends Handler {
 

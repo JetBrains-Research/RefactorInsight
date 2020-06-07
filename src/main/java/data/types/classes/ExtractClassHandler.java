@@ -19,10 +19,10 @@ public class ExtractClassHandler extends Handler {
         .setElementBefore(ref.getOriginalClass().getName())
         .setElementAfter(ref.getExtractedClass().getName())
         .setNameBefore(ref.getExtractedClass().getName())
-        .setNameAfter(ref.getExtractedClass().getName())
-        .setThreeSided(true);
+        .setNameAfter(ref.getExtractedClass().getName());
 
     if (ref.getAttributeOfExtractedClassTypeInOriginalClass() != null) {
+      info.setThreeSided(true);
       ref.getExtractedOperations().forEach(operation -> {
         info.addMarking(
             operation.codeRange(),
@@ -56,7 +56,7 @@ public class ExtractClassHandler extends Handler {
 
           RefactoringLine.VisualisationType.RIGHT,
           refactoringLine -> {
-            refactoringLine.setLazilyHighlightableWords(new String[]{
+            refactoringLine.setLazilyHighlightableWords(new String[] {
                 null,
                 className,
                 null
@@ -64,6 +64,18 @@ public class ExtractClassHandler extends Handler {
           },
           RefactoringLine.MarkingOption.EXTRACT,
           true);
+    } else {
+      ref.getExtractedOperations().forEach(operation -> {
+        info.addMarking(
+            operation.codeRange(),
+            ref.getExtractedClass().codeRange(), false);
+      });
+
+      ref.getExtractedAttributes().forEach(operation -> {
+        info.addMarking(
+            operation.codeRange(),
+            ref.getExtractedClass().codeRange(), false);
+      });
     }
     return info;
   }

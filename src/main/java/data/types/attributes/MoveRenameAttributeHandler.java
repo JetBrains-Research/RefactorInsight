@@ -5,7 +5,6 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MoveAndRenameAttributeRefactoring;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
 
 public class MoveRenameAttributeHandler extends Handler {
 

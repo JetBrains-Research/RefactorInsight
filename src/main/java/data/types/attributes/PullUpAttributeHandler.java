@@ -5,7 +5,6 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.PullUpAttributeRefactoring;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
 
 public class PullUpAttributeHandler extends Handler {
 
