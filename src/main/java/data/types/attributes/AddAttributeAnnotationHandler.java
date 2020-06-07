@@ -8,6 +8,7 @@ import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
 import gr.uom.java.xmi.diff.AddAttributeAnnotationRefactoring;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class AddAttributeAnnotationHandler extends Handler {
 
@@ -16,9 +17,14 @@ public class AddAttributeAnnotationHandler extends Handler {
     AddAttributeAnnotationRefactoring ref = (AddAttributeAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
 
+    String classNameBefore = ref.getAttributeBefore().getClassName();
+    String classNameAfter = ref.getAttributeAfter().getClassName();
+
     return info.setGroup(Group.ATTRIBUTE)
-        .setNameBefore(ref.getAttributeBefore().toQualifiedString())
-        .setNameAfter(ref.getAttributeAfter().toQualifiedString())
+        .setDetailsBefore(classNameBefore)
+        .setDetailsAfter(classNameAfter)
+        .setNameBefore(ref.getAttributeBefore().getVariableDeclaration().toQualifiedString())
+        .setNameAfter(ref.getAttributeAfter().getVariableDeclaration().toQualifiedString())
         .setElementBefore(ref.getAnnotation().toString())
         .setElementAfter(null)
         .addMarking(

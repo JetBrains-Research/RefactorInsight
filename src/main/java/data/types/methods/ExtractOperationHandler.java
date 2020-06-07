@@ -14,16 +14,19 @@ public class ExtractOperationHandler extends Handler {
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ExtractOperationRefactoring ref = (ExtractOperationRefactoring) refactoring;
-    String classBefore = ref.getSourceOperationBeforeExtraction().getClassName();
-    String classAfter = ref.getExtractedOperation().getClassName();
-    int index = Utils.indexOfDifference(classBefore, classAfter);
+
+    String classNameBefore = ref.getSourceOperationBeforeExtraction().getClassName();
+    String classNameAfter = ref.getExtractedOperation().getClassName();
+
+    String extractedMethod = Utils.calculateSignature(ref.getExtractedOperation());
+
     if (ref.getRefactoringType() == RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
       info.setGroup(Group.METHOD)
           .setThreeSided(true)
-          .setElementBefore(ref.getSourceOperationBeforeExtraction().getName() + " in class "
-              + classBefore.substring(index))
-          .setElementAfter("extracted " + ref.getExtractedOperation().getName() + " & moved in "
-              + classAfter.substring(index))
+          .setDetailsBefore(classNameBefore)
+          .setDetailsAfter(classNameAfter)
+          .setElementBefore(extractedMethod.substring(extractedMethod.lastIndexOf(".") + 1))
+          .setElementAfter(null)
           .setNameBefore(Utils.calculateSignature(ref.getSourceOperationBeforeExtraction()))
           .setNameAfter(Utils.calculateSignature(ref.getSourceOperationAfterExtraction()))
           .addMarking(ref.getExtractedCodeRangeFromSourceOperation(),
@@ -52,8 +55,10 @@ public class ExtractOperationHandler extends Handler {
       return info;
     } else {
       info.setGroup(Group.METHOD)
-          .setElementBefore("from " + ref.getSourceOperationBeforeExtraction().getName())
-          .setElementAfter("extracted " + ref.getExtractedOperation().getName())
+          .setDetailsBefore(classNameBefore)
+          .setDetailsAfter(classNameAfter)
+          .setElementBefore(extractedMethod.substring(extractedMethod.lastIndexOf(".") + 1))
+          .setElementAfter(null)
           .setNameBefore(Utils.calculateSignature(ref.getSourceOperationBeforeExtraction()))
           .setNameAfter(Utils.calculateSignature(ref.getSourceOperationAfterExtraction()))
           .addMarking(ref.getExtractedCodeRangeFromSourceOperation(),

@@ -5,6 +5,7 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ExtractVariableRefactoring;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class ExtractVariableHandler extends Handler {
 
@@ -12,10 +13,10 @@ public class ExtractVariableHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ExtractVariableRefactoring ref = (ExtractVariableRefactoring) refactoring;
     return info.setGroup(Group.VARIABLE)
-        .setElementBefore("in method " + ref.getOperationBefore().getName())
+        .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()))
+        .setElementBefore(ref.getVariableDeclaration().getVariableDeclaration().toQualifiedString())
         .setElementAfter(null)
-        .setNameBefore(ref.getVariableDeclaration().toQualifiedString())
-        .setNameAfter(ref.getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOperationBefore().codeRange(),
             ref.getExtractedVariableDeclarationCodeRange(), true);
   }

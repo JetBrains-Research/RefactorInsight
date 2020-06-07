@@ -16,6 +16,8 @@ public class AddClassAnnotationHandler extends Handler {
     AddClassAnnotationRefactoring ref = (AddClassAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
     return info.setGroup(Group.CLASS)
+        .setDetailsBefore(ref.getClassBefore().getPackageName())
+        .setDetailsAfter(ref.getClassAfter().getPackageName())
         .setNameBefore(ref.getClassBefore().getName())
         .setNameAfter(ref.getClassAfter().getName())
         .setElementBefore(ref.getAnnotation().toString())

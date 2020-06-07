@@ -13,7 +13,13 @@ public class RemoveParameterHandler extends Handler {
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RemoveParameterRefactoring ref = (RemoveParameterRefactoring) refactoring;
+
+    String classNameBefore = ref.getOperationBefore().getClassName();
+    String classNameAfter = ref.getOperationAfter().getClassName();
+
     return info.setGroup(Group.METHOD)
+        .setDetailsBefore(classNameBefore)
+        .setDetailsAfter(classNameAfter)
         .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()))
         .setElementBefore(ref.getParameter().getVariableDeclaration().toQualifiedString())

@@ -5,6 +5,7 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ExtractAttributeRefactoring;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class ExtractAttributeHandler extends Handler {
 

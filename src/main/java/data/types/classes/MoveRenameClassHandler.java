@@ -16,7 +16,7 @@ public class MoveRenameClassHandler extends Handler {
         .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(), true)
         .setNameBefore(ref.getOriginalClassName())
         .setNameAfter(ref.getRenamedClassName())
-        .setElementBefore(ref.getOriginalClass().getPackageName())
-        .setElementAfter(ref.getRenamedClass().getPackageName());
+        .setDetailsBefore(ref.getOriginalClass().getPackageName())
+        .setDetailsAfter(ref.getRenamedClass().getPackageName());
   }
 }

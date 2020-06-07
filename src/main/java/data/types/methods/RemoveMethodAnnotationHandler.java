@@ -16,7 +16,13 @@ public class RemoveMethodAnnotationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RemoveMethodAnnotationRefactoring ref = (RemoveMethodAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
+
+    String classNameBefore = ref.getOperationBefore().getClassName();
+    String classNameAfter = ref.getOperationAfter().getClassName();
+
     return info.setGroup(Group.METHOD)
+        .setDetailsBefore(classNameBefore)
+        .setDetailsAfter(classNameAfter)
         .setElementBefore(ref.getAnnotation().toString())
         .setElementAfter(null)
         .addMarking(

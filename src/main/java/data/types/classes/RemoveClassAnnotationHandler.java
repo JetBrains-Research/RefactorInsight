@@ -20,6 +20,8 @@ public class RemoveClassAnnotationHandler extends Handler {
         .setNameAfter(ref.getClassAfter().getName())
         .setElementBefore(ref.getAnnotation().toString())
         .setElementAfter(null)
+        .setDetailsBefore(ref.getClassBefore().getPackageName())
+        .setDetailsAfter(ref.getClassAfter().getPackageName())
         .addMarking(
             annotation.codeRange(),
             ref.getClassBefore().codeRange(),

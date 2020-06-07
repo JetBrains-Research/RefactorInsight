@@ -23,18 +23,19 @@ public class RenameVariableHandler extends Handler {
     info.setGroupId(id);
 
     if (ref.getRenamedVariable().isParameter()) {
-      info.setGroup(Group.PARAMETER);
+      info.setGroup(Group.METHOD)
+      .setDetailsBefore(ref.getOperationBefore().getClassName())
+      .setDetailsAfter(ref.getOperationAfter().getClassName());
     } else {
       info.setGroup(Group.VARIABLE);
     }
 
     return info
-        .setElementBefore(ref.getOriginalVariable().toQualifiedString())
-        .setElementAfter(ref.getRenamedVariable().toQualifiedString())
-        .setNameBefore("in method " + ref.getOperationAfter().getName())
-        .setNameAfter("in method " + ref.getOperationAfter().getName())
+        .setElementBefore(ref.getOriginalVariable().getVariableDeclaration().toQualifiedString())
+        .setElementAfter(ref.getRenamedVariable().getVariableDeclaration().toQualifiedString())
+        .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()))
         .addMarking(ref.getOriginalVariable().getVariableDeclaration().codeRange(),
             ref.getRenamedVariable().codeRange(), true);
-
   }
 }

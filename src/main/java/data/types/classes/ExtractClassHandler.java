@@ -14,6 +14,8 @@ public class ExtractClassHandler extends Handler {
     ExtractClassRefactoring ref = (ExtractClassRefactoring) refactoring;
 
     info.setGroup(Group.CLASS)
+        .setDetailsBefore(ref.getOriginalClass().getPackageName())
+        .setDetailsAfter(ref.getExtractedClass().getPackageName())
         .setElementBefore(ref.getOriginalClass().getName())
         .setElementAfter(ref.getExtractedClass().getName())
         .setNameBefore(ref.getExtractedClass().getName())

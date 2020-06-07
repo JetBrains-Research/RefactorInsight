@@ -15,10 +15,10 @@ public class MoveOperationHandler extends Handler {
 
     String classBefore = ref.getOriginalOperation().getClassName();
     String classAfter = ref.getMovedOperation().getClassName();
-    int index = Utils.indexOfDifference(classBefore, classAfter);
+
     return info.setGroup(Group.METHOD)
-        .setElementBefore("from class " + classBefore.substring(index))
-        .setElementAfter("to class " + classAfter.substring(index))
+        .setDetailsBefore(classBefore)
+        .setDetailsAfter(classAfter)
         .addMarking(ref.getSourceOperationCodeRangeBeforeMove(),
             ref.getTargetOperationCodeRangeAfterMove(), true)
         .setNameBefore(Utils.calculateSignature(ref.getOriginalOperation()))

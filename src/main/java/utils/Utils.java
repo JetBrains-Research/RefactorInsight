@@ -92,7 +92,7 @@ public class Utils {
 
     for (int i = 0; i < parametersCount; i++) {
       if (i != parametersCount - 1) {
-        signature += parameterList.getParameter(i).getType().getPresentableText() + ",";
+        signature += parameterList.getParameter(i).getType().getPresentableText() + ", ";
       } else {
         signature += parameterList.getParameter(i).getType().getPresentableText();
       }
@@ -113,8 +113,8 @@ public class Utils {
         .append(".")
         .append(operation.getName())
         .append("(");
-    operation.getParameterTypeList()
-        .forEach(x -> builder.append(x).append(", "));
+
+    operation.getParameterTypeList().forEach(x -> builder.append(x).append(", "));
 
     if (operation.getParameterTypeList().size() > 0) {
       builder.deleteCharAt(builder.length() - 1);
@@ -126,6 +126,7 @@ public class Utils {
   }
 
   /**
+   * <<<<<<< HEAD
    * Creates presentable text for a refactoring info.
    * Displayed in Method History Toolbar.
    *
@@ -236,5 +237,45 @@ public class Utils {
    */
   public static int getMaxLine(String text) {
     return text.split("\r\n|\r|\n").length;
+  }
+
+  /**
+   * Method for create a presentable String out of the
+   * element changes for a refactoring.
+   *
+   * @return presentable String that shows the changes.
+   */
+  public static String getDisplayableElement(String elementBefore, String elementAfter) {
+    if (elementBefore == null) {
+      return null;
+    }
+    String info = elementBefore;
+    if (elementAfter != null) {
+      info += " -> " + elementAfter;
+    }
+    return info;
+  }
+
+  /**
+   * Method for create a presentable String out of the
+   * element changes for a refactoring.
+   *
+   * @return presentable String that shows the changes.
+   */
+  public static String getDisplayableDetails(String before, String after) {
+    if (before == null || after == null) {
+      return null;
+    }
+
+    int index = indexOfDifference(before, after);
+
+    String afterNew = after.substring(index);
+    String beforeNew = before.substring(index);
+
+    if (beforeNew.equals(afterNew)) {
+      return beforeNew;
+    } else {
+      return beforeNew + " -> " + afterNew;
+    }
   }
 }

@@ -24,15 +24,17 @@ public class ChangeVariableTypeHandler extends Handler {
     }
     info.setGroupId(id);
     if (ref.getChangedTypeVariable().isParameter()) {
-      info.setGroup(Group.PARAMETER);
+      info.setGroup(Group.METHOD)
+          .setDetailsBefore(ref.getOperationBefore().getClassName())
+          .setDetailsAfter(ref.getOperationAfter().getClassName());
     } else {
       info.setGroup(Group.VARIABLE);
     }
     return info
-        .setElementBefore(ref.getOriginalVariable().toQualifiedString())
-        .setElementAfter(ref.getChangedTypeVariable().toQualifiedString())
-        .setNameBefore("in method " + ref.getOperationAfter().getName())
-        .setNameAfter("in method " + ref.getOperationAfter().getName())
+        .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()))
+        .setElementBefore(ref.getOriginalVariable().getVariableDeclaration().toQualifiedString())
+        .setElementAfter(ref.getChangedTypeVariable().getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOriginalVariable().getType().codeRange(),
             ref.getChangedTypeVariable().getType().codeRange(), true);
 

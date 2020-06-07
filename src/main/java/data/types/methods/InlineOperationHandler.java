@@ -17,10 +17,14 @@ public class InlineOperationHandler extends Handler {
     ref.getInlinedOperationInvocations().forEach(c -> {
       info.addMarking(c.codeRange(), ref.getInlinedCodeRangeInTargetOperation(), true);
     });
+    String classNameBefore = ref.getTargetOperationBeforeInline().getClassName();
+    String classNameAfter = ref.getTargetOperationAfterInline().getClassName();
 
     return info.setGroup(Group.METHOD)
-        .setElementBefore(ref.getInlinedOperation().getName())
-        .setElementAfter(" in method " + ref.getTargetOperationAfterInline().getName())
+        .setDetailsBefore(classNameBefore)
+        .setDetailsAfter(classNameAfter)
+        .setElementBefore(Utils.calculateSignature(ref.getInlinedOperation()))
+        .setElementAfter(null)
         .setNameBefore(Utils.calculateSignature(ref.getTargetOperationBeforeInline()))
         .setNameAfter(Utils.calculateSignature(ref.getTargetOperationAfterInline()))
         .addMarking(ref.getInlinedOperationCodeRange(),
@@ -28,7 +32,6 @@ public class InlineOperationHandler extends Handler {
             null,
             RefactoringLine.MarkingOption.REMOVE,
             false);
-
 
   }
 }
