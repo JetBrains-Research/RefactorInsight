@@ -96,8 +96,7 @@ public class RefactoringLine {
                                                         String rightText) {
     List<TextRange> left =
         offsets.stream().map(RefactoringOffset::getLeftRange).collect(Collectors.toList());
-    List<TextRange> mid =
-        offsets.stream().map(RefactoringOffset::getMidRange).collect(Collectors.toList());
+    List<TextRange> mid = new ArrayList<>();
     List<TextRange> right =
         offsets.stream().map(RefactoringOffset::getRightRange).collect(Collectors.toList());
 
