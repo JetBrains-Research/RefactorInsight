@@ -5,7 +5,6 @@ public enum Group {
   CLASS,
   ATTRIBUTE,
   VARIABLE,
-  PARAMETER,
   INTERFACE,
   ABSTRACT,
   PACKAGE

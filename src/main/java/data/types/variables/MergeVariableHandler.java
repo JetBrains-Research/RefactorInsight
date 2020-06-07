@@ -19,7 +19,9 @@ public class MergeVariableHandler extends Handler {
         info.addMarking(var.codeRange(), ref.getNewVariable().codeRange()));
 
     if (ref.getNewVariable().isParameter()) {
-      info.setGroup(Group.PARAMETER);
+      info.setGroup(Group.METHOD)
+          .setDetailsBefore(ref.getOperationBefore().getClassName())
+          .setDetailsAfter(ref.getOperationAfter().getClassName());
     } else {
       info.setGroup(Group.VARIABLE);
     }

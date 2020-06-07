@@ -24,7 +24,9 @@ public class RenameVariableHandler extends Handler {
     info.setGroupId(id);
 
     if (ref.getRenamedVariable().isParameter()) {
-      info.setGroup(Group.PARAMETER);
+      info.setGroup(Group.METHOD)
+          .setDetailsBefore(ref.getOperationBefore().getClassName())
+          .setDetailsAfter(ref.getOperationAfter().getClassName());
     } else {
       info.setGroup(Group.VARIABLE);
     }

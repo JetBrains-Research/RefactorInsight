@@ -19,7 +19,9 @@ public class SplitVariableHandler extends Handler {
         info.addMarking(ref.getOldVariable().codeRange(), var.codeRange()));
 
     if (ref.getOldVariable().isParameter()) {
-      info.setGroup(Group.PARAMETER);
+      info.setGroup(Group.METHOD)
+          .setDetailsBefore(ref.getOperationBefore().getClassName())
+          .setDetailsAfter(ref.getOperationAfter().getClassName());
     } else {
       info.setGroup(Group.VARIABLE);
     }

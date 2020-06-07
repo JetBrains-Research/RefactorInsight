@@ -10,7 +10,6 @@ import ui.renderer.handlers.ClassHandler;
 import ui.renderer.handlers.InterfaceHandler;
 import ui.renderer.handlers.MethodHandler;
 import ui.renderer.handlers.PackageHandler;
-import ui.renderer.handlers.ParameterHandler;
 import ui.renderer.handlers.VariableHandler;
 
 public class CellIconFactory {
@@ -24,7 +23,6 @@ public class CellIconFactory {
     map.put(Group.PACKAGE, new PackageHandler());
     map.put(Group.ATTRIBUTE, new AttributeHandler());
     map.put(Group.VARIABLE, new VariableHandler());
-    map.put(Group.PARAMETER, new ParameterHandler());
     map.put(Group.ABSTRACT, new AbstractClassHandler());
     map.put(Group.INTERFACE, new InterfaceHandler());
     map.put(Group.METHOD, new MethodHandler());

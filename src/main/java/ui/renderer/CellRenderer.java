@@ -46,7 +46,7 @@ public class CellRenderer extends JBDefaultTreeCellRenderer {
       icon = AllIcons.Actions.SuggestedRefactoringBulb;
     }
 
-    if (leaf) {
+    if (leaf && !isMethodHistory) {
       setText(createHtml(
           getStringLeaf(info.getLineMarkings().size() > 0
                   ? String.valueOf(info.getLineMarkings().get(0).getRightStart() + 1)
