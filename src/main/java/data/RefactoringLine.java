@@ -243,8 +243,8 @@ public class RefactoringLine {
       return;
     }
     this.hasColumns = true;
-    this.columns = new int[]{1, 1, 0, 0, columns[RIGHT_START], columns[RIGHT_END]};
-    if(midText == null) {
+    this.columns = new int[] {1, 1, 0, 0, columns[RIGHT_START], columns[RIGHT_END]};
+    if (midText == null) {
       int[] beforeColumns =
           Utils.findColumns(leftText, lazyNames[0], lines[LEFT_START] + 1);
 

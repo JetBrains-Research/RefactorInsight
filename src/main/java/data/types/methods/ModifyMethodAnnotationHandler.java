@@ -15,7 +15,8 @@ public class ModifyMethodAnnotationHandler extends Handler {
     return info.setGroup(Group.METHOD)
         .setElementBefore(ref.getAnnotationBefore().toString())
         .setElementAfter(ref.getAnnotationAfter().toString())
-        .addMarking(ref.getAnnotationBefore().codeRange(), ref.getAnnotationAfter().codeRange(), true)
+        .addMarking(ref.getAnnotationBefore().codeRange(), ref.getAnnotationAfter().codeRange(),
+            true)
         .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()));
   }

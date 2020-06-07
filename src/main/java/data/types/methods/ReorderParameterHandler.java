@@ -18,7 +18,8 @@ public class ReorderParameterHandler extends Handler {
         .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()))
         .setElementBefore(ref.getOperationBefore().toQualifiedString())
         .setElementAfter(ref.getOperationAfter().toQualifiedString())
-        .addMarking(ref.getOperationBefore().codeRange(), ref.getOperationAfter().codeRange(), true);
+        .addMarking(ref.getOperationBefore().codeRange(), ref.getOperationAfter().codeRange(),
+            true);
 
   }
 }

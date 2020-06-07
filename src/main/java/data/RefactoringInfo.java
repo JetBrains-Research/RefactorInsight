@@ -327,7 +327,13 @@ public class RefactoringInfo {
     return info;
   }
 
-  public SimpleDiffRequest createDiffRequest(DiffContent[] contents){
+  /**
+   * Creates a diff request for this refactoring.
+   *
+   * @param contents array or diffcontents
+   * @return
+   */
+  public SimpleDiffRequest createDiffRequest(DiffContent[] contents) {
     SimpleDiffRequest request;
     if (!threeSided) {
       request = new SimpleDiffRequest(name,

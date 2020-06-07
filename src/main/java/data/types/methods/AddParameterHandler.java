@@ -20,6 +20,7 @@ public class AddParameterHandler extends Handler {
         .setElementBefore(ref.getParameter().getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOperationBefore().codeRange(), ref.getOperationAfter().codeRange(),
             line -> line.addOffset(
-                ref.getParameter().getVariableDeclaration().getLocationInfo(), MarkingOption.ADD), true);
+                ref.getParameter().getVariableDeclaration().getLocationInfo(), MarkingOption.ADD),
+            true);
   }
 }
