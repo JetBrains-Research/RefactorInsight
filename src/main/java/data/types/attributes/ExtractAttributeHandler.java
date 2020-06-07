@@ -6,17 +6,21 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ExtractAttributeRefactoring;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class ExtractAttributeHandler extends Handler {
 
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     ExtractAttributeRefactoring ref = (ExtractAttributeRefactoring) refactoring;
+
+    String classNameBefore = ref.getOriginalClass().getName();
+
     info.setGroup(Group.ATTRIBUTE)
-        .setElementBefore("in class " + ref.getOriginalClass().getName())
+        .setNameBefore(classNameBefore)
+        .setNameAfter(classNameBefore)
+        .setElementBefore(ref.getVariableDeclaration().getVariableDeclaration().toQualifiedString())
         .setElementAfter(null)
-        .setNameBefore(ref.getVariableDeclaration().toQualifiedString())
-        .setNameAfter(ref.getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getExtractedVariableDeclarationCodeRange().getStartLine(),
             ref.getExtractedVariableDeclarationCodeRange().getStartLine() - 1,
             ref.getExtractedVariableDeclarationCodeRange().getStartLine(),

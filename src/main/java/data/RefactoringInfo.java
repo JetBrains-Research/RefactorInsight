@@ -17,25 +17,29 @@ import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.jetbrains.annotations.Nullable;
 import org.refactoringminer.api.RefactoringType;
+import utils.Utils;
 
 public class RefactoringInfo {
 
+  private final List<RefactoringLine> lineMarkings = new ArrayList<>();
   @Nullable
   private String elementBefore;
   @Nullable
   private String elementAfter;
-
   private String name;
   private String nameBefore;
   private String nameAfter;
-  private Set<String> includes = new HashSet<>();
+  @Nullable
+  private String detailsBefore;
+  @Nullable
+  private String detailsAfter;
 
+  private Set<String> includes = new HashSet<>();
   private transient RefactoringEntry entry;
   private String leftPath;
   private String midPath;
   private String rightPath;
   private RefactoringType type;
-  private final List<RefactoringLine> lineMarkings = new ArrayList<>();
   private Group group;
   private boolean threeSided = false;
   private String groupId;
@@ -334,16 +338,6 @@ public class RefactoringInfo {
     return this;
   }
 
-  public RefactoringInfo setElementBefore(@Nullable String elementBefore) {
-    this.elementBefore = elementBefore;
-    return this;
-  }
-
-  public RefactoringInfo setElementAfter(@Nullable String elementAfter) {
-    this.elementAfter = elementAfter;
-    return this;
-  }
-
   /**
    * Creates a DefaultMutableTreeNode for the UI.
    *
@@ -351,10 +345,37 @@ public class RefactoringInfo {
    */
   public DefaultMutableTreeNode makeNode() {
     DefaultMutableTreeNode node = new DefaultMutableTreeNode(this);
-    DefaultMutableTreeNode child = new DefaultMutableTreeNode(getDisplayableName());
-    node.add(child);
-    addLeaves(child);
+    DefaultMutableTreeNode root = makeDetailsNode(node);
+    makeNameNode(root);
     return node;
+  }
+
+  /**
+   * Creates a node based on the nameBefore & nameAfter attributes.
+   * @param root to add node to.
+   */
+  public void makeNameNode(DefaultMutableTreeNode root) {
+    DefaultMutableTreeNode child = new DefaultMutableTreeNode(
+        group == Group.METHOD
+            ? getDisplayableName()
+            : Utils.getDisplayableDetails(nameBefore, nameAfter));
+    root.add(child);
+    addLeaves(child);
+  }
+
+  /**
+   * Creates a node iff the detailsBefore & detailsAfter attributes are not null.
+   * @param root current root of the tree.
+   * @return the same root if no node was created.
+   */
+  private DefaultMutableTreeNode makeDetailsNode(DefaultMutableTreeNode root) {
+    if (Utils.getDisplayableDetails(detailsBefore, detailsAfter) != null) {
+      DefaultMutableTreeNode details =
+          new DefaultMutableTreeNode(Utils.getDisplayableDetails(detailsBefore, detailsAfter));
+      root.add(details);
+      return details;
+    }
+    return root;
   }
 
   /**
@@ -364,30 +385,12 @@ public class RefactoringInfo {
    * @param node to add leaves to.
    */
   public void addLeaves(DefaultMutableTreeNode node) {
-    String displayableElement = getDisplayableElement();
+    String displayableElement = Utils.getDisplayableElement(elementBefore, elementAfter);
     if (displayableElement == null) {
       return;
     }
     node.add(new DefaultMutableTreeNode(displayableElement));
   }
-
-  /**
-   * Method for create a presentable String out of the
-   * element changes for a refactoring.
-   *
-   * @return presentable String that shows the changes.
-   */
-  public String getDisplayableElement() {
-    if (elementBefore == null) {
-      return null;
-    }
-    String info = elementBefore;
-    if (elementAfter != null) {
-      info += " -> " + elementAfter;
-    }
-    return info;
-  }
-
 
   /**
    * Method for create a presentable String out of the
@@ -411,4 +414,43 @@ public class RefactoringInfo {
     }
   }
 
+  @Nullable
+  public String getElementBefore() {
+    return elementBefore;
+  }
+
+  public RefactoringInfo setElementBefore(@Nullable String elementBefore) {
+    this.elementBefore = elementBefore;
+    return this;
+  }
+
+  @Nullable
+  public String getElementAfter() {
+    return elementAfter;
+  }
+
+  public RefactoringInfo setElementAfter(@Nullable String elementAfter) {
+    this.elementAfter = elementAfter;
+    return this;
+  }
+
+  @Nullable
+  public String getDetailsBefore() {
+    return detailsBefore;
+  }
+
+  public RefactoringInfo setDetailsBefore(String detailsBefore) {
+    this.detailsBefore = detailsBefore;
+    return this;
+  }
+
+  @Nullable
+  public String getDetailsAfter() {
+    return detailsAfter;
+  }
+
+  public RefactoringInfo setDetailsAfter(String detailsAfter) {
+    this.detailsAfter = detailsAfter;
+    return this;
+  }
 }

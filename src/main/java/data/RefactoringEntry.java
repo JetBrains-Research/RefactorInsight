@@ -115,9 +115,20 @@ public class RefactoringEntry implements Serializable {
     List<RefactoringInfo> extractClassRefactorings = refactorings
         .stream().filter(x -> x.getType() == EXTRACT_CLASS).collect(Collectors.toList());
     for (RefactoringInfo extractClass : extractClassRefactorings) {
-      String displayableElement = extractClass.getDisplayableElement();
+      String displayableElement = Utils
+          .getDisplayableElement(extractClass.getElementBefore(), extractClass.getElementAfter());
       refactorings.stream().filter(x -> !x.equals(extractClass))
-          .filter(x -> x.getDisplayableElement().equals(displayableElement))
+          .filter(x -> {
+            String displayableDetails =
+                Utils.getDisplayableElement(x.getDetailsBefore(), x.getDetailsAfter());
+            String displayableName =
+                Utils.getDisplayableElement(x.getNameBefore(), x.getNameAfter());
+            if (displayableDetails == null) {
+              return displayableName.equals(displayableElement);
+            }
+            return (displayableDetails.equals(displayableElement)
+                || displayableName.equals(displayableElement));
+          })
           .forEach(r -> {
             extractClass.includesRefactoring(r.getName());
             r.setHidden(true);

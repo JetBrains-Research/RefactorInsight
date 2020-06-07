@@ -13,6 +13,8 @@ public class ModifyClassAnnotationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     ModifyClassAnnotationRefactoring ref = (ModifyClassAnnotationRefactoring) refactoring;
     return info.setGroup(Group.CLASS)
+        .setDetailsBefore(ref.getClassBefore().getPackageName())
+        .setDetailsAfter(ref.getClassAfter().getPackageName())
         .setNameBefore(ref.getClassBefore().getName())
         .setNameAfter(ref.getClassAfter().getName())
         .setElementBefore(ref.getAnnotationBefore().toString())

@@ -17,7 +17,7 @@ public class MoveClassHandler extends Handler {
         .addMarking(ref.getOriginalClass().codeRange(), ref.getMovedClass().codeRange())
         .setNameBefore(ref.getOriginalClassName())
         .setNameAfter(ref.getMovedClassName())
-        .setElementBefore(ref.getOriginalClass().getPackageName())
-        .setElementAfter(ref.getMovedClass().getPackageName());
+        .setDetailsBefore(ref.getOriginalClass().getPackageName())
+        .setDetailsAfter(ref.getMovedClass().getPackageName());
   }
 }

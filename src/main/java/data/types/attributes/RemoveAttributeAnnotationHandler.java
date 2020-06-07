@@ -7,6 +7,7 @@ import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
 import gr.uom.java.xmi.diff.RemoveAttributeAnnotationRefactoring;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class RemoveAttributeAnnotationHandler extends Handler {
 
@@ -14,11 +15,18 @@ public class RemoveAttributeAnnotationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     RemoveAttributeAnnotationRefactoring ref = (RemoveAttributeAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
+
+    String classNameBefore = ref.getAttributeBefore().getClassName();
+    String classNameAfter = ref.getAttributeAfter().getClassName();
+
     return info.setGroup(Group.ATTRIBUTE)
-        .setNameBefore(ref.getAttributeBefore().toQualifiedString())
-        .setNameAfter(ref.getAttributeAfter().toQualifiedString())
+        .setDetailsBefore(classNameBefore)
+        .setDetailsAfter(classNameAfter)
+        .setNameBefore(ref.getAttributeBefore().getVariableDeclaration().toQualifiedString())
+        .setNameAfter(ref.getAttributeAfter().getVariableDeclaration().toQualifiedString())
         .setElementBefore(ref.getAnnotation().toString())
-        .setElementAfter(null).addMarking(annotation.getLocationInfo().getStartLine(),
+        .setElementAfter(null)
+        .addMarking(annotation.getLocationInfo().getStartLine(),
             annotation.getLocationInfo().getEndLine(),
             ref.getAttributeBefore().codeRange().getStartLine(),
             ref.getAttributeBefore().codeRange().getStartLine() - 1,

@@ -7,6 +7,7 @@ import data.types.Handler;
 import gr.uom.java.xmi.diff.MergeVariableRefactoring;
 import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class MergeVariableHandler extends Handler {
 
@@ -26,8 +27,8 @@ public class MergeVariableHandler extends Handler {
     return info
         .setElementBefore(ref.getMergedVariables().stream().map(x -> x.getVariableName()).collect(
             Collectors.joining()))
-        .setElementAfter(ref.getNewVariable().toQualifiedString())
-        .setNameBefore(ref.getNewVariable().toQualifiedString())
-        .setNameAfter(ref.getNewVariable().toQualifiedString());
+        .setElementAfter(ref.getNewVariable().getVariableDeclaration().toQualifiedString())
+        .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()));
   }
 }

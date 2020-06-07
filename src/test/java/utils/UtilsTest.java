@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
@@ -55,7 +56,7 @@ public class UtilsTest {
     PsiType type = mock(PsiType.class);
     when(parameter.getType()).thenReturn(type);
     when(type.getPresentableText()).thenReturn("String");
-    assertEquals("testClass.testMethod(String,String)", Utils.calculateSignature(psiMethod));
+    assertEquals("testClass.testMethod(String, String)", Utils.calculateSignature(psiMethod));
   }
 
 

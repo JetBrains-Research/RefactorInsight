@@ -36,7 +36,10 @@ public class CellRenderer extends JBDefaultTreeCellRenderer {
     }
 
     RefactoringInfo info = (RefactoringInfo) node.getUserObjectPath()[1];
-    Icon icon = factory.create(info);
+
+    Icon icon = factory.create(info, leaf, node.getUserObjectPath().length > 2
+        && node.getUserObject().equals(node.getUserObjectPath()[2]));
+
 
     if (node.getUserObject() instanceof RefactoringInfo) {
       setText(isMethodHistory ? getTextMethodToolbar(info) : getTextLogUI(info));
@@ -49,7 +52,6 @@ public class CellRenderer extends JBDefaultTreeCellRenderer {
                   ? String.valueOf(info.getLineMarkings().get(0).getRightStart() + 1)
                   : "", getText(),
               info.getRightPath() != null ? info.getRightPath() : "")));
-      icon = isMethodHistory ? null : AllIcons.Actions.Diff;
     }
 
     setIcon(icon);

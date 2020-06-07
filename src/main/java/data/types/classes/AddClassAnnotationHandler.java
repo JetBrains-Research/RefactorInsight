@@ -16,10 +16,13 @@ public class AddClassAnnotationHandler extends Handler {
     AddClassAnnotationRefactoring ref = (AddClassAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
     return info.setGroup(Group.CLASS)
+        .setDetailsBefore(ref.getClassBefore().getPackageName())
+        .setDetailsAfter(ref.getClassAfter().getPackageName())
         .setNameBefore(ref.getClassBefore().getName())
         .setNameAfter(ref.getClassAfter().getName())
         .setElementBefore(ref.getAnnotation().toString())
-        .setElementAfter(null).addMarking(ref.getClassBefore().codeRange().getStartLine(),
+        .setElementAfter(null)
+        .addMarking(ref.getClassBefore().codeRange().getStartLine(),
             ref.getClassBefore().codeRange().getStartLine() - 1,
             annotation.getLocationInfo().getStartLine(),
             annotation.getLocationInfo().getEndLine(),

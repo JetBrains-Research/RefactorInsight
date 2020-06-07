@@ -15,13 +15,13 @@ public class PushDownOperationHandler extends Handler {
     PushDownOperationRefactoring ref = (PushDownOperationRefactoring) refactoring;
     String classBefore = ref.getOriginalOperation().getClassName();
     String classAfter = ref.getMovedOperation().getClassName();
-    int index = Utils.indexOfDifference(classBefore, classAfter);
+
     return info.setGroup(Group.METHOD)
-        .setElementBefore("from class " + classBefore.substring(index))
-        .setElementAfter("to class " + classAfter.substring(index))
+        .setDetailsBefore(classBefore)
+        .setDetailsAfter(classAfter)
         .addMarking(ref.getSourceOperationCodeRangeBeforeMove(),
             ref.getTargetOperationCodeRangeAfterMove())
-        .setNameBefore(calculateSignature(ref.getOriginalOperation()))
-        .setNameAfter(calculateSignature(ref.getMovedOperation()));
+        .setNameBefore(Utils.calculateSignature(ref.getOriginalOperation()))
+        .setNameAfter(Utils.calculateSignature(ref.getMovedOperation()));
   }
 }

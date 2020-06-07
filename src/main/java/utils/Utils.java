@@ -5,6 +5,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameterList;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
+import gr.uom.java.xmi.UMLOperation;
 import java.util.ArrayList;
 
 public class Utils {
@@ -88,12 +89,76 @@ public class Utils {
 
     for (int i = 0; i < parametersCount; i++) {
       if (i != parametersCount - 1) {
-        signature += parameterList.getParameter(i).getType().getPresentableText() + ",";
+        signature += parameterList.getParameter(i).getType().getPresentableText() + ", ";
       } else {
         signature += parameterList.getParameter(i).getType().getPresentableText();
       }
     }
     signature += ")";
     return signature;
+  }
+
+  /**
+   * Builder for a method's signature.
+   *
+   * @param operation retrieved from RefactoringMiner
+   * @return a String signature of the operation.
+   */
+  public static String calculateSignature(UMLOperation operation) {
+    StringBuilder builder = new StringBuilder();
+    builder.append(operation.getClassName())
+        .append(".")
+        .append(operation.getName())
+        .append("(");
+
+    operation.getParameterTypeList().forEach(x -> builder.append(x).append(", "));
+
+    if (operation.getParameterTypeList().size() > 0) {
+      builder.deleteCharAt(builder.length() - 1);
+      builder.deleteCharAt(builder.length() - 1);
+    }
+
+    builder.append(")");
+    return builder.toString();
+  }
+
+  /**
+   * Method for create a presentable String out of the
+   * element changes for a refactoring.
+   *
+   * @return presentable String that shows the changes.
+   */
+  public static String getDisplayableElement(String elementBefore, String elementAfter) {
+    if (elementBefore == null) {
+      return null;
+    }
+    String info = elementBefore;
+    if (elementAfter != null) {
+      info += " -> " + elementAfter;
+    }
+    return info;
+  }
+
+  /**
+   * Method for create a presentable String out of the
+   * element changes for a refactoring.
+   *
+   * @return presentable String that shows the changes.
+   */
+  public static String getDisplayableDetails(String before, String after) {
+    if (before == null || after == null) {
+      return null;
+    }
+
+    int index = indexOfDifference(before, after);
+
+    String afterNew = after.substring(index);
+    String beforeNew = before.substring(index);
+
+    if (beforeNew.equals(afterNew)) {
+      return beforeNew;
+    } else {
+      return beforeNew + " -> " + afterNew;
+    }
   }
 }
