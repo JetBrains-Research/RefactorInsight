@@ -1,9 +1,11 @@
 package data;
 
 import static org.refactoringminer.api.RefactoringType.CHANGE_ATTRIBUTE_TYPE;
+import static org.refactoringminer.api.RefactoringType.CHANGE_PARAMETER_TYPE;
 import static org.refactoringminer.api.RefactoringType.CHANGE_VARIABLE_TYPE;
 import static org.refactoringminer.api.RefactoringType.EXTRACT_CLASS;
 import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
+import static org.refactoringminer.api.RefactoringType.RENAME_PARAMETER;
 
 import com.google.gson.Gson;
 import com.intellij.ui.treeStructure.Tree;
@@ -147,6 +149,10 @@ public class RefactoringEntry implements Serializable {
     } else if (v.stream().anyMatch(ofType(CHANGE_VARIABLE_TYPE))) {
       info = v.stream().filter(ofType(CHANGE_VARIABLE_TYPE)).findFirst().get();
       info.setName("Rename and Change Variable Type");
+    } else if (v.stream().anyMatch(ofType(RENAME_PARAMETER))
+        && v.stream().anyMatch(ofType(CHANGE_PARAMETER_TYPE))) {
+      info = v.stream().filter(ofType(RENAME_PARAMETER)).findFirst().get();
+      info.setName("Rename and Change Parameter Type");
     }
     return info;
   }
