@@ -1,5 +1,8 @@
 package ui.windows;
 
+import com.intellij.diff.DiffContentFactoryEx;
+import com.intellij.diff.contents.DiffContent;
+import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.VcsException;
@@ -132,33 +135,30 @@ public class GitWindow {
     Collection<Change> changes =
         table.getModel().getFullDetails(index).getChanges(0);
     try {
-      String left = "";
-      String right = "";
+      DiffContentFactoryEx myDiffContentFactory = DiffContentFactoryEx.getInstanceEx();
+      DiffContent[] contents = {null, null, null};
       for (Change change : changes) {
         if (change.getBeforeRevision() != null
-            && (project.getBasePath() + "/" + info.getLeftPath())
-            .equals(change.getBeforeRevision().getFile().getPath())) {
-          left = change.getBeforeRevision().getContent();
+            && change.getBeforeRevision().getFile().getPath().contains(info.getLeftPath())) {
+          contents[0] = myDiffContentFactory.create(project,
+              change.getBeforeRevision().getContent(),
+              JavaClassFileType.INSTANCE);
+        }
+        if (info.isThreeSided()
+            && change.getAfterRevision() != null
+            && change.getAfterRevision().getFile().getPath().contains(info.getMidPath())) {
+          contents[1] = myDiffContentFactory.create(project,
+              change.getAfterRevision().getContent(),
+              JavaClassFileType.INSTANCE);
         }
         if (change.getAfterRevision() != null
-            && (project.getBasePath() + "/" + info.getRightPath())
-            .equals(change.getAfterRevision().getFile().getPath())) {
-          right = change.getAfterRevision().getContent();
+            && change.getAfterRevision().getFile().getPath().contains(info.getRightPath())) {
+          contents[2] = myDiffContentFactory.create(project,
+              change.getAfterRevision().getContent(),
+              JavaClassFileType.INSTANCE);
         }
       }
-      String mid = "";
-      if (info.isThreeSided()) {
-        for (Change change : changes) {
-          if (change.getAfterRevision() != null
-              && (project.getBasePath() + "/" + info.getMidPath())
-              .equals(change.getAfterRevision().getFile().getPath())) {
-            mid = change.getAfterRevision().getContent();
-          }
-        }
-        DiffWindow.showDiff(left, mid, right, info, project);
-      } else {
-        DiffWindow.showDiff(left, right, info, project);
-      }
+      DiffWindow.showDiff(contents, info, project);
 
     } catch (VcsException ex) {
       ex.printStackTrace();

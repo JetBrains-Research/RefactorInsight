@@ -1,9 +1,14 @@
 package data;
 
+import static ui.windows.DiffWindow.REFACTORING_INFO;
+
 import com.google.gson.Gson;
+import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.fragments.LineFragment;
+import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
+import com.intellij.diff.util.DiffUserDataKeysEx;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -195,14 +200,11 @@ public class RefactoringInfo {
    * Get line markings for two sided window.
    * Should only be called if isThreeSided() evaluates to true.
    */
-  public List<SimpleThreesideDiffChange> getThreeSidedLineMarkings(String textLeft,
-                                                                   String textMid,
-                                                                   String textRight,
-                                                                   SimpleThreesideDiffViewer
+  public List<SimpleThreesideDiffChange> getThreeSidedLineMarkings(SimpleThreesideDiffViewer
                                                                        viewer) {
     assert threeSided;
     return lineMarkings.stream()
-        .map(line -> line.getThreeSidedRange(textLeft, textMid, textRight, viewer))
+        .map(line -> line.getThreeSidedRange(viewer))
         .collect(Collectors.toList());
   }
 
@@ -323,6 +325,23 @@ public class RefactoringInfo {
       info += " -> " + elementAfter;
     }
     return info;
+  }
+
+  public SimpleDiffRequest createDiffRequest(DiffContent[] contents){
+    SimpleDiffRequest request;
+    if (!threeSided) {
+      request = new SimpleDiffRequest(name,
+          contents[0], contents[2], leftPath, rightPath);
+      request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
+          (text1, text2, policy, innerChanges, indicator)
+              -> getTwoSidedLineMarkings(text1.toString(), text2.toString()));
+    } else {
+      request = new SimpleDiffRequest(getName(),
+          contents[0], contents[1], contents[2],
+          leftPath, midPath, rightPath);
+      request.putUserData(REFACTORING_INFO, this);
+    }
+    return request;
   }
 
   /**

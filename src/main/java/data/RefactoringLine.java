@@ -11,6 +11,7 @@ import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
 import com.intellij.diff.tools.util.text.MergeInnerDifferences;
 import com.intellij.diff.util.MergeConflictType;
 import com.intellij.diff.util.TextDiffType;
+import com.intellij.diff.util.ThreeSide;
 import com.intellij.openapi.util.TextRange;
 import gr.uom.java.xmi.LocationInfo;
 import gr.uom.java.xmi.diff.CodeRange;
@@ -117,7 +118,6 @@ public class RefactoringLine {
               columns[RIGHT_END]) - rightStartOffset
       ));
     }
-
     return new MergeInnerDifferences(left, mid, right);
   }
 
@@ -128,10 +128,8 @@ public class RefactoringLine {
    * @return LineFragment
    */
   public LineFragment getTwoSidedRange(String leftText, String rightText) {
-    int maxLineLeft = Utils.getMaxLine(leftText);
-    int maxLineRight = Utils.getMaxLine(rightText);
-    lines[RIGHT_END] = lines[RIGHT_END] < 0 ? maxLineRight : lines[RIGHT_END];
-    lines[LEFT_END] = lines[LEFT_END] < 0 ? maxLineLeft : lines[LEFT_END];
+    correctLines(leftText, null, rightText);
+
     List<DiffFragment> fragments =
         offsets.stream().map(RefactoringOffset::toDiffFragment).collect(Collectors.toList());
     if (hasColumns) {
@@ -148,20 +146,31 @@ public class RefactoringLine {
   /**
    * Three sided range.
    */
-  public SimpleThreesideDiffChange getThreeSidedRange(String leftText, String midText,
-                                                      String rightText,
-                                                      SimpleThreesideDiffViewer viewer) {
-    int maxLineLeft = Utils.getMaxLine(leftText);
-    int maxLineMid = Utils.getMaxLine(midText);
-    int maxLineRight = Utils.getMaxLine(rightText);
-    lines[RIGHT_END] = lines[RIGHT_END] < 0 ? maxLineLeft : lines[RIGHT_END];
-    lines[MID_END] = lines[MID_END] < 0 ? maxLineMid : lines[MID_END];
-    lines[LEFT_END] = lines[LEFT_END] < 0 ? maxLineRight : lines[LEFT_END];
-    MergeLineFragment line =
-        new MergeLineFragmentImpl(lines[LEFT_START], lines[LEFT_END], lines[MID_START],
-            lines[MID_END], lines[RIGHT_START], lines[RIGHT_END]);
+  public SimpleThreesideDiffChange getThreeSidedRange(SimpleThreesideDiffViewer viewer) {
+    String leftText = viewer.getContent(ThreeSide.LEFT).getDocument().getText();
+    String midText = viewer.getContent(ThreeSide.BASE).getDocument().getText();
+    String rightText = viewer.getContent(ThreeSide.RIGHT).getDocument().getText();
+
+    correctLines(leftText, midText, rightText);
+
+    MergeLineFragment line = new MergeLineFragmentImpl(
+        lines[LEFT_START], lines[LEFT_END],
+        lines[MID_START], lines[MID_END],
+        lines[RIGHT_START], lines[RIGHT_END]);
+
     return new SimpleThreesideDiffChange(line, getConflictType(type),
         toMergeInnerDifferences(leftText, midText, rightText), viewer);
+  }
+
+  private void correctLines(String leftText, String midText, String rightText) {
+    int maxLineLeft = Utils.getMaxLine(leftText);
+    int maxLineRight = Utils.getMaxLine(rightText);
+    lines[RIGHT_END] = lines[RIGHT_END] < 0 ? maxLineRight : lines[RIGHT_END];
+    lines[LEFT_END] = lines[LEFT_END] < 0 ? maxLineLeft : lines[LEFT_END];
+    if(midText != null) {
+      int maxLineMid = Utils.getMaxLine(midText);
+      lines[MID_END] = lines[MID_END] < 0 ? maxLineMid : lines[MID_END];
+    }
   }
 
   /**
