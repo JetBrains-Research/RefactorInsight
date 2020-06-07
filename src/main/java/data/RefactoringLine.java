@@ -130,8 +130,8 @@ public class RefactoringLine {
   public LineFragment getTwoSidedRange(String leftText, String rightText) {
     int maxLineLeft = Utils.getMaxLine(leftText);
     int maxLineRight = Utils.getMaxLine(rightText);
-    lines[RIGHT_END] = lines[RIGHT_END] < 0 ? maxLineLeft : lines[RIGHT_END];
-    lines[LEFT_END] = lines[LEFT_END] < 0 ? maxLineRight : lines[LEFT_END];
+    lines[RIGHT_END] = lines[RIGHT_END] < 0 ? maxLineRight : lines[RIGHT_END];
+    lines[LEFT_END] = lines[LEFT_END] < 0 ? maxLineLeft : lines[LEFT_END];
     List<DiffFragment> fragments =
         offsets.stream().map(RefactoringOffset::toDiffFragment).collect(Collectors.toList());
     if (hasColumns) {
