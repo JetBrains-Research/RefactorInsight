@@ -1,14 +1,9 @@
 package data;
 
-import static ui.windows.DiffWindow.REFACTORING_INFO;
-
 import com.google.gson.Gson;
-import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.fragments.LineFragment;
-import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
-import com.intellij.diff.util.DiffUserDataKeysEx;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -126,51 +121,6 @@ public class RefactoringInfo {
     return lineMarkings.stream()
         .map(line -> line.getThreeSidedRange(viewer))
         .collect(Collectors.toList());
-  }
-
-  /**
-   * Creates a diff request for this refactoring.
-   *
-   * @param contents array of diffcontents
-   * @return the diff request created
-   */
-  public SimpleDiffRequest createDiffRequest(DiffContent[] contents) {
-    SimpleDiffRequest request;
-    if (!threeSided) {
-      request = new SimpleDiffRequest(name,
-          contents[0], contents[2], getLeftPath(), getRightPath());
-      request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
-          (text1, text2, policy, innerChanges, indicator)
-              -> getTwoSidedLineMarkings(text1.toString(), text2.toString()));
-    } else {
-      request = new SimpleDiffRequest(getName(),
-          contents[0], contents[1], contents[2],
-          getLeftPath(), getMidPath(), getRightPath());
-      request.putUserData(REFACTORING_INFO, this);
-    }
-    return request;
-  }
-
-  /**
-   * Method for create a presentable String out of the
-   * name refactoring.
-   *
-   * @return presentable String that shows the changes if existent, else shows a presentable name.
-   */
-  public String getDisplayableName() {
-    String before = getNameBefore();
-    if (before.contains(".")) {
-      before = getNameBefore().substring(getNameBefore().lastIndexOf(".") + 1);
-    }
-    String after = getNameAfter();
-    if (after.contains(".")) {
-      after = getNameAfter().substring(getNameAfter().lastIndexOf(".") + 1);
-    }
-    if (before.equals(after)) {
-      return before;
-    } else {
-      return before + "-> " + after;
-    }
   }
 
   @Override

@@ -14,6 +14,7 @@ import com.intellij.openapi.util.Key;
 import data.RefactoringInfo;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
+import utils.Utils;
 
 public class DiffWindow extends com.intellij.diff.DiffExtension {
 
@@ -28,7 +29,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
    * @param project  Current project
    */
   public static void showDiff(DiffContent[] contents, RefactoringInfo info, Project project) {
-    DiffManager.getInstance().showDiff(project, info.createDiffRequest(contents));
+    DiffManager.getInstance().showDiff(project, Utils.createDiffRequest(contents, info));
   }
 
   /**
