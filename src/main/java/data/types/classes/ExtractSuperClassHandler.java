@@ -5,8 +5,6 @@ import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ExtractSuperclassRefactoring;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
 
 public class ExtractSuperClassHandler extends Handler {

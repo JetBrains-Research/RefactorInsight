@@ -12,8 +12,15 @@ public class RenameClassHandler extends Handler {
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     RenameClassRefactoring ref = (RenameClassRefactoring) refactoring;
+    if (ref.getRenamedClass().isInterface()) {
+      info.setGroup(Group.INTERFACE);
+    } else if (ref.getRenamedClass().isAbstract()) {
+      info.setGroup(Group.ABSTRACT);
+    } else {
+      info.setGroup(Group.CLASS);
+    }
 
-    return info.setGroup(Group.CLASS)
+    return info
         .addMarking(ref.getOriginalClass().codeRange(),
             ref.getRenamedClass().codeRange())
         .setNameBefore(ref.getOriginalClassName())
