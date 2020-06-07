@@ -214,7 +214,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
       RefactoringEntry refactoringEntry = RefactoringEntry.fromString(innerState.map.get(commitId));
       assert refactoringEntry != null;
       refs.addAll(refactoringEntry.getRefactorings());
-      commitId = refactoringEntry.getParents().get(0);
+      commitId = refactoringEntry.getParent();
     }
     Collections.reverse(refs);
     refs.forEach(r -> r.addToHistory(methodHistory));

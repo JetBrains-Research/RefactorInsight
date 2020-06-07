@@ -166,7 +166,7 @@ public class MiningServiceManualTest extends GitSingleRepoTest {
     for (int i = 1; i < hashes.length; i++) {
       RefactoringEntry entry = miner.getEntry(hashes[i]);
       collector.checkThat(entry.getCommitId(), equalTo(hashes[i]));
-      collector.checkThat(entry.getParents().get(0), equalTo(hashes[i - 1]));
+      collector.checkThat(entry.getParent(), equalTo(hashes[i - 1]));
       collector.checkThat("Issue in: " + commitDirs[i], entry, matches[i]);
     }
     collector.verify();
