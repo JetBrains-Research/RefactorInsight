@@ -1,10 +1,14 @@
 package data.types.methods;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
+import gr.uom.java.xmi.decomposition.VariableDeclaration;
 import gr.uom.java.xmi.diff.ReorderParameterRefactoring;
+import java.util.List;
+import java.util.stream.IntStream;
 import org.refactoringminer.api.Refactoring;
 import utils.Utils;
 
@@ -16,12 +20,21 @@ public class ReorderParameterHandler extends Handler {
     String classNameBefore = ref.getOperationBefore().getClassName();
     String classNameAfter = ref.getOperationAfter().getClassName();
 
+    List<VariableDeclaration> as = ref.getParametersBefore();
+    List<VariableDeclaration> bs = ref.getParametersAfter();
+    IntStream.range(0, Math.min(as.size(), bs.size()))
+        .mapToObj(i -> new Pair<>(as.get(i), bs.get(i)))
+        .forEach(x -> {
+          if (!x.first.getVariableDeclaration().getType()
+              .equals(x.second.getVariableDeclaration().getType())
+              || !x.first.getVariableName().equals(x.second.getVariableName())) {
+            info.addMarking(x.first.codeRange(), x.second.codeRange());
+          }
+        });
     return info.setGroup(Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
         .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()))
-        .addMarking(ref.getOperationBefore().codeRange(), ref.getOperationAfter().codeRange());
-
+        .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()));
   }
 }
