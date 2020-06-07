@@ -7,7 +7,6 @@ import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
 
 import com.google.gson.Gson;
 import com.intellij.ui.treeStructure.Tree;
-import com.intellij.vcs.log.Hash;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ import utils.Utils;
 public class RefactoringEntry implements Serializable {
 
   private static final InfoFactory factory = new InfoFactory();
-  private final List<String> parents;
+  private final String parent;
   private final String commitId;
   private final long time;
   private List<RefactoringInfo> refactorings;
@@ -31,11 +30,11 @@ public class RefactoringEntry implements Serializable {
   /**
    * Constructor for method refactoring.
    *
-   * @param parents the commit ids of the parents.
+   * @param parent the commit id of the parent.
    * @param time    timestamp of the commit.
    */
-  public RefactoringEntry(String commitId, List<String> parents, long time) {
-    this.parents = parents;
+  public RefactoringEntry(String commitId, String parent, long time) {
+    this.parent = parent;
     this.time = time;
     this.commitId = commitId;
   }
@@ -68,11 +67,10 @@ public class RefactoringEntry implements Serializable {
    * @return Json string.
    */
   public static String convert(List<Refactoring> refactorings, VcsCommitMetadata commit) {
-    List<String> parents =
-        commit.getParents().stream().map(Hash::asString).collect(Collectors.toList());
 
     RefactoringEntry entry =
-        new RefactoringEntry(commit.getId().asString(), parents, commit.getTimestamp());
+        new RefactoringEntry(commit.getId().asString(),
+            commit.getParents().get(0).asString(), commit.getTimestamp());
 
     List<RefactoringInfo> infos =
         refactorings.stream().map(ref -> factory.create(ref, entry)).collect(
@@ -184,8 +182,8 @@ public class RefactoringEntry implements Serializable {
     return this;
   }
 
-  public List<String> getParents() {
-    return parents;
+  public String getParent() {
+    return parent;
   }
 
   @Override

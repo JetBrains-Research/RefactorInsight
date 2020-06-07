@@ -1,5 +1,10 @@
 package utils;
 
+import static ui.windows.DiffWindow.REFACTORING_INFO;
+
+import com.intellij.diff.contents.DiffContent;
+import com.intellij.diff.requests.SimpleDiffRequest;
+import com.intellij.diff.util.DiffUserDataKeysEx;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameterList;
@@ -304,7 +309,7 @@ public class Utils {
     DefaultMutableTreeNode child = new DefaultMutableTreeNode(
         (info.getGroup() == Group.METHOD || info.getGroup() == Group.CLASS
             || info.getGroup() == Group.INTERFACE || info.getGroup() == Group.ABSTRACT)
-            ? info.getDisplayableName()
+            ? getDisplayableName(info)
             : getDisplayableDetails(info.getNameBefore(), info.getNameAfter()));
     root.add(child);
     addLeaves(child, info);
@@ -341,5 +346,50 @@ public class Utils {
       return;
     }
     node.add(new DefaultMutableTreeNode(displayableElement));
+  }
+
+  /**
+   * Method for create a presentable String out of the
+   * name refactoring.
+   *
+   * @return presentable String that shows the changes if existent, else shows a presentable name.
+   */
+  public static String getDisplayableName(RefactoringInfo info) {
+    String before = info.getNameBefore();
+    if (before.contains(".")) {
+      before = info.getNameBefore().substring(info.getNameBefore().lastIndexOf(".") + 1);
+    }
+    String after = info.getNameAfter();
+    if (after.contains(".")) {
+      after = info.getNameAfter().substring(info.getNameAfter().lastIndexOf(".") + 1);
+    }
+    if (before.equals(after)) {
+      return before;
+    } else {
+      return before + "-> " + after;
+    }
+  }
+
+  /**
+   * Creates a diff request for this refactoring.
+   *
+   * @param contents array of diffcontents
+   * @return the diff request created
+   */
+  public static SimpleDiffRequest createDiffRequest(DiffContent[] contents, RefactoringInfo info) {
+    SimpleDiffRequest request;
+    if (!info.isThreeSided()) {
+      request = new SimpleDiffRequest(info.getName(),
+          contents[0], contents[2], info.getLeftPath(), info.getRightPath());
+      request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
+          (text1, text2, policy, innerChanges, indicator)
+              -> info.getTwoSidedLineMarkings(text1.toString(), text2.toString()));
+    } else {
+      request = new SimpleDiffRequest(info.getName(),
+          contents[0], contents[1], contents[2],
+          info.getLeftPath(), info.getMidPath(), info.getRightPath());
+      request.putUserData(REFACTORING_INFO, info);
+    }
+    return request;
   }
 }
