@@ -20,35 +20,28 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
-import org.jetbrains.annotations.Nullable;
 import org.refactoringminer.api.RefactoringType;
 import utils.Utils;
 
 public class RefactoringInfo {
 
   private final List<RefactoringLine> lineMarkings = new ArrayList<>();
-  @Nullable
-  private String elementBefore;
-  @Nullable
-  private String elementAfter;
+
+  private transient RefactoringEntry entry;
+
   private String name;
-  private String nameBefore;
-  private String nameAfter;
-  @Nullable
-  private String detailsBefore;
-  @Nullable
-  private String detailsAfter;
+
+  private String[][] uiStrings = new String[3][2];
+  private String[] paths = new String[3];
 
   private Set<String> includes = new HashSet<>();
-  private transient RefactoringEntry entry;
-  private String leftPath;
-  private String midPath;
-  private String rightPath;
+
   private RefactoringType type;
   private Group group;
-  private boolean threeSided = false;
   private String groupId;
+
   private boolean hidden = false;
+  private boolean threeSided = false;
 
 
   /**
@@ -60,7 +53,7 @@ public class RefactoringInfo {
   public void addToHistory(Map<String, List<RefactoringInfo>> map) {
     if (group == Group.CLASS) {
       Map<String, String> renames = new HashMap<>();
-      renames.put(nameBefore, nameAfter);
+      renames.put(getNameBefore(), getNameAfter());
       renames.forEach((before, after) -> map.keySet().stream()
           .filter(x -> x.substring(0, x.lastIndexOf("."))
               .equals(before))
@@ -72,67 +65,11 @@ public class RefactoringInfo {
     }
 
     if (group == Group.METHOD) {
-      List<RefactoringInfo> refs = map.getOrDefault(nameBefore, new LinkedList<>());
-      map.remove(nameBefore);
+      List<RefactoringInfo> refs = map.getOrDefault(getNameBefore(), new LinkedList<>());
+      map.remove(getNameBefore());
       refs.add(0, this);
-      map.put(nameAfter, refs);
+      map.put(getNameAfter(), refs);
     }
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public RefactoringInfo setName(String name) {
-    this.name = name;
-    return this;
-  }
-
-  public boolean isHidden() {
-    return hidden;
-  }
-
-  public void setHidden(boolean hidden) {
-    this.hidden = hidden;
-  }
-
-  public String getGroupId() {
-    return groupId;
-  }
-
-  public RefactoringInfo setGroupId(String groupId) {
-    this.groupId = groupId;
-    return this;
-  }
-
-  public List<RefactoringLine> getLineMarkings() {
-    return lineMarkings;
-  }
-
-  public void addAllMarkings(RefactoringInfo info) {
-    this.lineMarkings.addAll(info.getLineMarkings());
-  }
-
-  public RefactoringInfo setEntry(RefactoringEntry entry) {
-    this.entry = entry;
-    return this;
-  }
-
-  public RefactoringType getType() {
-    return type;
-  }
-
-  public RefactoringInfo setType(RefactoringType type) {
-    this.type = type;
-    return this;
-  }
-
-  public void includesRefactoring(String refactoring) {
-    this.includes.add(refactoring);
-  }
-
-  public Set<String> getIncludingRefactorings() {
-    return includes;
   }
 
   public RefactoringInfo addMarking(CodeRange left, CodeRange right, boolean hasColumns) {
@@ -163,11 +100,11 @@ public class RefactoringInfo {
       offsetFunction.accept(line);
     }
     lineMarkings.add(line);
-    this.leftPath = left.getFilePath();
+    setLeftPath(left.getFilePath());
     if (mid != null) {
-      this.midPath = mid.getFilePath();
+      setMidPath(mid.getFilePath());
     }
-    this.rightPath = right.getFilePath();
+    setRightPath(right.getFilePath());
     return this;
   }
 
@@ -193,58 +130,6 @@ public class RefactoringInfo {
         .collect(Collectors.toList());
   }
 
-  @Override
-  public String toString() {
-    return new Gson().toJson(this);
-  }
-
-  public Group getGroup() {
-    return group;
-  }
-
-  public RefactoringInfo setGroup(Group group) {
-    this.group = group;
-    return this;
-  }
-
-  public String getLeftPath() {
-    return leftPath;
-  }
-
-  public String getMidPath() {
-    return midPath;
-  }
-
-  public String getRightPath() {
-    return rightPath;
-  }
-
-  public String getNameAfter() {
-    return nameAfter;
-  }
-
-  public RefactoringInfo setNameAfter(String nameAfter) {
-    this.nameAfter = nameAfter;
-    return this;
-  }
-
-  public long getTimestamp() {
-    return entry.getTimeStamp();
-  }
-
-  public String getCommitId() {
-    return entry.getCommitId();
-  }
-
-  public boolean isThreeSided() {
-    return threeSided;
-  }
-
-  public RefactoringInfo setThreeSided(boolean threeSided) {
-    this.threeSided = threeSided;
-    return this;
-  }
-
   /**
    * Creates a DefaultMutableTreeNode for the UI.
    *
@@ -266,7 +151,7 @@ public class RefactoringInfo {
     DefaultMutableTreeNode child = new DefaultMutableTreeNode(
         group == Group.METHOD
             ? getDisplayableName()
-            : Utils.getDisplayableDetails(nameBefore, nameAfter));
+            : Utils.getDisplayableDetails(getNameBefore(), getNameAfter()));
     root.add(child);
     addLeaves(child);
   }
@@ -278,9 +163,10 @@ public class RefactoringInfo {
    * @return the same root if no node was created.
    */
   private DefaultMutableTreeNode makeDetailsNode(DefaultMutableTreeNode root) {
-    if (Utils.getDisplayableDetails(detailsBefore, detailsAfter) != null) {
+    if (Utils.getDisplayableDetails(getDetailsBefore(), getDetailsAfter()) != null) {
       DefaultMutableTreeNode details =
-          new DefaultMutableTreeNode(Utils.getDisplayableDetails(detailsBefore, detailsAfter));
+          new DefaultMutableTreeNode(
+              Utils.getDisplayableDetails(getDetailsBefore(), getDetailsAfter()));
       root.add(details);
       return details;
     }
@@ -294,29 +180,11 @@ public class RefactoringInfo {
    * @param node to add leaves to.
    */
   public void addLeaves(DefaultMutableTreeNode node) {
-    String displayableElement = Utils.getDisplayableElement(elementBefore, elementAfter);
+    String displayableElement = Utils.getDisplayableElement(getElementBefore(), getElementAfter());
     if (displayableElement == null) {
       return;
     }
     node.add(new DefaultMutableTreeNode(displayableElement));
-  }
-
-  /**
-   * Method for create a presentable String out of the
-   * <<<<<<< HEAD
-   * element changes for a refactoring.
-   *
-   * @return presentable String that shows the changes.
-   */
-  public String getDisplayableElement() {
-    if (elementBefore == null) {
-      return null;
-    }
-    String info = elementBefore;
-    if (elementAfter != null) {
-      info += " -> " + elementAfter;
-    }
-    return info;
   }
 
   /**
@@ -329,14 +197,14 @@ public class RefactoringInfo {
     SimpleDiffRequest request;
     if (!threeSided) {
       request = new SimpleDiffRequest(name,
-          contents[0], contents[2], leftPath, rightPath);
+          contents[0], contents[2], getLeftPath(), getRightPath());
       request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
           (text1, text2, policy, innerChanges, indicator)
               -> getTwoSidedLineMarkings(text1.toString(), text2.toString()));
     } else {
       request = new SimpleDiffRequest(getName(),
           contents[0], contents[1], contents[2],
-          leftPath, midPath, rightPath);
+          getLeftPath(), getMidPath(), getRightPath());
       request.putUserData(REFACTORING_INFO, this);
     }
     return request;
@@ -344,20 +212,18 @@ public class RefactoringInfo {
 
   /**
    * Method for create a presentable String out of the
-   * =======
-   * >>>>>>> 70-improve-tree-displaying
    * name refactoring.
    *
    * @return presentable String that shows the changes if existent, else shows a presentable name.
    */
   public String getDisplayableName() {
-    String before = nameBefore;
+    String before = getNameBefore();
     if (before.contains(".")) {
-      before = nameBefore.substring(nameBefore.lastIndexOf(".") + 1);
+      before = getNameBefore().substring(getNameBefore().lastIndexOf(".") + 1);
     }
-    String after = nameAfter;
+    String after = getNameAfter();
     if (after.contains(".")) {
-      after = nameAfter.substring(nameAfter.lastIndexOf(".") + 1);
+      after = getNameAfter().substring(getNameAfter().lastIndexOf(".") + 1);
     }
     if (before.equals(after)) {
       return before;
@@ -366,52 +232,175 @@ public class RefactoringInfo {
     }
   }
 
-  @Nullable
+
+  @Override
+  public String toString() {
+    return new Gson().toJson(this);
+  }
+
+  public void addAllMarkings(RefactoringInfo info) {
+    this.lineMarkings.addAll(info.getLineMarkings());
+  }
+
+  public void addIncludedRefactoring(String refactoring) {
+    this.includes.add(refactoring);
+  }
+
+  public Set<String> getIncludingRefactorings() {
+    return includes;
+  }
+
+  public List<RefactoringLine> getLineMarkings() {
+    return lineMarkings;
+  }
+
+  public long getTimestamp() {
+    return entry.getTimeStamp();
+  }
+
+  public String getCommitId() {
+    return entry.getCommitId();
+  }
+
+  public Group getGroup() {
+    return group;
+  }
+
+  public RefactoringInfo setGroup(Group group) {
+    this.group = group;
+    return this;
+  }
+
+  public boolean isThreeSided() {
+    return threeSided;
+  }
+
+  public RefactoringInfo setThreeSided(boolean threeSided) {
+    this.threeSided = threeSided;
+    return this;
+  }
+  public RefactoringEntry getEntry() {
+    return entry;
+  }
+
+  public RefactoringInfo setEntry(RefactoringEntry entry) {
+    this.entry = entry;
+    return this;
+  }
+
+  public RefactoringType getType() {
+    return type;
+  }
+
+  public RefactoringInfo setType(RefactoringType type) {
+    this.type = type;
+    return this;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public RefactoringInfo setName(String name) {
+    this.name = name;
+    return this;
+  }
+
+  public boolean isHidden() {
+    return hidden;
+  }
+
+  public void setHidden(boolean hidden) {
+    this.hidden = hidden;
+  }
+
+  public String getGroupId() {
+    return groupId;
+  }
+
+  public RefactoringInfo setGroupId(String groupId) {
+    this.groupId = groupId;
+    return this;
+  }
+
+  public String getLeftPath() {
+    return paths[0];
+  }
+
+  public RefactoringInfo setLeftPath(String leftPath) {
+    paths[0] = leftPath;
+    return this;
+  }
+
+  public String getMidPath() {
+    return paths[1];
+  }
+
+  public RefactoringInfo setMidPath(String midPath) {
+    paths[1] = midPath;
+    return this;
+  }
+
+  public String getRightPath() {
+    return paths[2];
+  }
+
+  public RefactoringInfo setRightPath(String rightPath) {
+    paths[0] = rightPath;
+    return this;
+  }
+
   public String getElementBefore() {
-    return elementBefore;
+    return uiStrings[1][0];
   }
 
-  public RefactoringInfo setElementBefore(@Nullable String elementBefore) {
-    this.elementBefore = elementBefore;
+  public RefactoringInfo setElementBefore(String elementBefore) {
+    uiStrings[1][0] = elementBefore;
     return this;
   }
 
-  @Nullable
   public String getElementAfter() {
-    return elementAfter;
+    return uiStrings[1][1];
   }
 
-  public RefactoringInfo setElementAfter(@Nullable String elementAfter) {
-    this.elementAfter = elementAfter;
+  public RefactoringInfo setElementAfter(String elementAfter) {
+    uiStrings[1][1] = elementAfter;
     return this;
   }
 
-  @Nullable
   public String getDetailsBefore() {
-    return detailsBefore;
+    return uiStrings[2][0];
   }
 
   public RefactoringInfo setDetailsBefore(String detailsBefore) {
-    this.detailsBefore = detailsBefore;
+    uiStrings[2][0] = detailsBefore;
     return this;
   }
 
-  @Nullable
   public String getDetailsAfter() {
-    return detailsAfter;
+    return uiStrings[2][1];
   }
 
   public RefactoringInfo setDetailsAfter(String detailsAfter) {
-    this.detailsAfter = detailsAfter;
+    uiStrings[2][1] = detailsAfter;
     return this;
   }
 
   public String getNameBefore() {
-    return nameBefore;
+    return uiStrings[0][0];
   }
 
   public RefactoringInfo setNameBefore(String nameBefore) {
-    this.nameBefore = nameBefore;
+    uiStrings[0][0] = nameBefore;
+    return this;
+  }
+
+  public String getNameAfter() {
+    return uiStrings[0][1];
+  }
+
+  public RefactoringInfo setNameAfter(String nameAfter) {
+    uiStrings[0][1] = nameAfter;
     return this;
   }
 }

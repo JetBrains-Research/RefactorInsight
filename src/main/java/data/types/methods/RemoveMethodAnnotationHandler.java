@@ -27,7 +27,7 @@ public class RemoveMethodAnnotationHandler extends Handler {
         .setElementAfter(null)
         .addMarking(
             annotation.codeRange(),
-            ref.getOperationBefore().codeRange(),
+            ref.getOperationAfter().codeRange(),
             line -> line.addOffset(annotation.getLocationInfo(),
                 REMOVE),
             REMOVE,

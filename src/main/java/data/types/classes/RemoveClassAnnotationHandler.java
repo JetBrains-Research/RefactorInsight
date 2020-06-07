@@ -24,7 +24,7 @@ public class RemoveClassAnnotationHandler extends Handler {
         .setDetailsAfter(ref.getClassAfter().getPackageName())
         .addMarking(
             annotation.codeRange(),
-            ref.getClassBefore().codeRange(),
+            ref.getClassAfter().codeRange(),
             line -> line.addOffset(annotation.getLocationInfo(),
                 REMOVE),
             REMOVE,

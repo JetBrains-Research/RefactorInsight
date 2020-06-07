@@ -101,7 +101,7 @@ public class RefactoringEntry implements Serializable {
 
         v.remove(info);
         v.forEach(r -> {
-          info.includesRefactoring(r.getName());
+          info.addIncludedRefactoring(r.getName());
           info.addAllMarkings(r);
           r.setHidden(true);
         });
@@ -128,7 +128,7 @@ public class RefactoringEntry implements Serializable {
                 || displayableName.equals(displayableElement));
           })
           .forEach(r -> {
-            extractClass.includesRefactoring(r.getName());
+            extractClass.addIncludedRefactoring(r.getName());
             r.setHidden(true);
           });
     }
