@@ -51,7 +51,7 @@ public class ExtractOperationHandler extends Handler {
                 });
               },
               RefactoringLine.MarkingOption.EXTRACT,
-              false));
+              true));
       return info;
     } else {
       info.setGroup(Group.METHOD)
