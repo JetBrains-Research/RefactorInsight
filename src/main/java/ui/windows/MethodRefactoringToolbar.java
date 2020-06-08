@@ -32,8 +32,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.jetbrains.annotations.NotNull;
 import services.RefactoringsBundle;
-import ui.tree.renderer.CellRenderer;
 import ui.tree.TreeUtils;
+import ui.tree.renderer.CellRenderer;
 import utils.Utils;
 
 
