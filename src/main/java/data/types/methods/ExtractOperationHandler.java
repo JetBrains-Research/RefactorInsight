@@ -85,5 +85,4 @@ public class ExtractOperationHandler extends Handler {
       return info;
     }
   }
-
 }
