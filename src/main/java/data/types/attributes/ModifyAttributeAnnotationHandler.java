@@ -11,9 +11,15 @@ public class ModifyAttributeAnnotationHandler extends Handler {
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     ModifyAttributeAnnotationRefactoring ref = (ModifyAttributeAnnotationRefactoring) refactoring;
+
+    String classNameBefore = ref.getAttributeBefore().getClassName();
+    String classNameAfter = ref.getAttributeAfter().getClassName();
+
     return info.setGroup(Group.ATTRIBUTE)
-        .setNameBefore(ref.getAttributeBefore().toQualifiedString())
-        .setNameAfter(ref.getAttributeAfter().toQualifiedString())
+        .setDetailsBefore(classNameBefore)
+        .setDetailsAfter(classNameAfter)
+        .setNameBefore(ref.getAttributeBefore().getVariableDeclaration().toQualifiedString())
+        .setNameAfter(ref.getAttributeAfter().getVariableDeclaration().toQualifiedString())
         .setElementBefore(ref.getAnnotationBefore().toString())
         .setElementAfter(ref.getAnnotationAfter().toString())
         .addMarking(ref.getAnnotationBefore().codeRange(), ref.getAnnotationAfter().codeRange(),

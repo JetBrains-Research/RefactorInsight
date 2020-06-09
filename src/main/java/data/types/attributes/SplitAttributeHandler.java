@@ -7,6 +7,7 @@ import data.types.Handler;
 import gr.uom.java.xmi.diff.SplitAttributeRefactoring;
 import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class SplitAttributeHandler extends Handler {
 
@@ -16,11 +17,14 @@ public class SplitAttributeHandler extends Handler {
     ref.getSplitAttributes().forEach(attr ->
         info.addMarking(ref.getOldAttribute().codeRange(), attr.codeRange()));
 
+    String classNameBefore = ref.getClassNameBefore();
+    String classNameAfter = ref.getClassNameAfter();
+
     return info.setGroup(Group.ATTRIBUTE)
+        .setNameBefore(classNameBefore)
+        .setNameAfter(classNameAfter)
         .setElementBefore(ref.getOldAttribute().getVariableName())
         .setElementAfter(ref.getSplitAttributes().stream().map(x -> x.getVariableName()).collect(
-            Collectors.joining()))
-        .setNameBefore(ref.getOldAttribute().getVariableName())
-        .setNameAfter(ref.getOldAttribute().getVariableName());
+            Collectors.joining()));
   }
 }

@@ -6,6 +6,7 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MoveAttributeRefactoring;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class MoveAttributeHandler extends Handler {
 
@@ -13,11 +14,14 @@ public class MoveAttributeHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     MoveAttributeRefactoring ref = (MoveAttributeRefactoring) refactoring;
 
+    String classNameBefore = ref.getSourceClassName();
+    String classNameAfter = ref.getTargetClassName();
+
     return info.setGroup(Group.ATTRIBUTE)
-        .setElementBefore(ref.getSourceClassName())
-        .setElementAfter(ref.getTargetClassName())
-        .setNameBefore(ref.getOriginalAttribute().toQualifiedString())
-        .setNameAfter(ref.getOriginalAttribute().toQualifiedString())
+        .setNameBefore(classNameBefore)
+        .setNameAfter(classNameAfter)
+        .setElementBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())
+        .setElementAfter(null)
         .addMarking(ref.getOriginalAttribute().codeRange(),
             ref.getMovedAttribute().codeRange());
   }

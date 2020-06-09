@@ -1,9 +1,11 @@
 package data;
 
 import static org.refactoringminer.api.RefactoringType.CHANGE_ATTRIBUTE_TYPE;
+import static org.refactoringminer.api.RefactoringType.CHANGE_PARAMETER_TYPE;
 import static org.refactoringminer.api.RefactoringType.CHANGE_VARIABLE_TYPE;
 import static org.refactoringminer.api.RefactoringType.EXTRACT_CLASS;
 import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
+import static org.refactoringminer.api.RefactoringType.RENAME_PARAMETER;
 
 import com.google.gson.Gson;
 import com.intellij.openapi.project.Project;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
-import utils.Utils;
+import ui.tree.TreeUtils;
 
 public class RefactoringEntry implements Serializable {
 
@@ -115,9 +117,20 @@ public class RefactoringEntry implements Serializable {
     List<RefactoringInfo> extractClassRefactorings = refactorings
         .stream().filter(x -> x.getType() == EXTRACT_CLASS).collect(Collectors.toList());
     for (RefactoringInfo extractClass : extractClassRefactorings) {
-      String displayableElement = extractClass.getDisplayableElement();
+      String displayableElement = TreeUtils
+          .getDisplayableElement(extractClass.getElementBefore(), extractClass.getElementAfter());
       refactorings.stream().filter(x -> !x.equals(extractClass))
-          .filter(x -> x.getDisplayableElement().equals(displayableElement))
+          .filter(x -> {
+            String displayableDetails =
+                TreeUtils.getDisplayableElement(x.getDetailsBefore(), x.getDetailsAfter());
+            String displayableName =
+                TreeUtils.getDisplayableElement(x.getNameBefore(), x.getNameAfter());
+            if (displayableDetails == null) {
+              return displayableName.equals(displayableElement);
+            }
+            return (displayableDetails.equals(displayableElement)
+                || displayableName.equals(displayableElement));
+          })
           .forEach(r -> {
             extractClass.includesRefactoring(r.getName());
             r.setHidden(true);
@@ -140,6 +153,10 @@ public class RefactoringEntry implements Serializable {
     } else if (v.stream().anyMatch(ofType(CHANGE_VARIABLE_TYPE))) {
       info = v.stream().filter(ofType(CHANGE_VARIABLE_TYPE)).findFirst().get();
       info.setName("Rename and Change Variable Type");
+    } else if (v.stream().anyMatch(ofType(CHANGE_PARAMETER_TYPE))
+        && v.stream().anyMatch(ofType(RENAME_PARAMETER))) {
+      info = v.stream().filter(ofType(CHANGE_PARAMETER_TYPE)).findFirst().get();
+      info.setName("Rename and Change Parameter Type");
     }
     return info;
   }
@@ -157,12 +174,12 @@ public class RefactoringEntry implements Serializable {
     DefaultMutableTreeNode root = new DefaultMutableTreeNode(commitId);
     refactorings.forEach(r -> {
       if (!r.isHidden()) {
-        root.add(r.makeNode());
+        root.add(TreeUtils.makeNode(r));
       }
     });
     Tree tree = new Tree(root);
     tree.setRootVisible(false);
-    Utils.expandAllNodes(tree, 0, tree.getRowCount());
+    TreeUtils.expandAllNodes(tree, 0, tree.getRowCount());
     return tree;
   }
 

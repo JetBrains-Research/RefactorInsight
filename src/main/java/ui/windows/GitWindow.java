@@ -22,7 +22,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import services.MiningService;
 import services.RefactoringsBundle;
-import ui.renderer.CellRenderer;
+import ui.tree.renderer.CellRenderer;
 
 public class GitWindow {
   private Project project;

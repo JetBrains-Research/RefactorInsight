@@ -6,7 +6,7 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MoveOperationRefactoring;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
+import utils.StringUtils;
 
 public class MoveOperationHandler extends Handler {
 
@@ -16,13 +16,13 @@ public class MoveOperationHandler extends Handler {
 
     String classBefore = ref.getOriginalOperation().getClassName();
     String classAfter = ref.getMovedOperation().getClassName();
-    int index = Utils.indexOfDifference(classBefore, classAfter);
+
     return info.setGroup(Group.METHOD)
-        .setElementBefore("from class " + classBefore.substring(index))
-        .setElementAfter("to class " + classAfter.substring(index))
+        .setDetailsBefore(classBefore)
+        .setDetailsAfter(classAfter)
         .addMarking(ref.getSourceOperationCodeRangeBeforeMove(),
             ref.getTargetOperationCodeRangeAfterMove())
-        .setNameBefore(calculateSignature(ref.getOriginalOperation()))
-        .setNameAfter(calculateSignature(ref.getMovedOperation()));
+        .setNameBefore(StringUtils.calculateSignature(ref.getOriginalOperation()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getMovedOperation()));
   }
 }

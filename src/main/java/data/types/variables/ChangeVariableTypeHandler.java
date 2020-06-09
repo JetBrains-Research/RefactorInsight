@@ -7,6 +7,7 @@ import data.types.Handler;
 import gr.uom.java.xmi.UMLOperation;
 import gr.uom.java.xmi.diff.ChangeVariableTypeRefactoring;
 import org.refactoringminer.api.Refactoring;
+import utils.StringUtils;
 
 public class ChangeVariableTypeHandler extends Handler {
 
@@ -19,20 +20,22 @@ public class ChangeVariableTypeHandler extends Handler {
         && ref.getChangedTypeVariable().isParameter()) {
       id += ref.getChangedTypeVariable().getVariableName();
     } else {
-      id = calculateSignature(ref.getOperationAfter()) + "."
+      id = StringUtils.calculateSignature(ref.getOperationAfter()) + "."
           + ref.getChangedTypeVariable().getVariableName();
     }
     info.setGroupId(id);
     if (ref.getChangedTypeVariable().isParameter()) {
-      info.setGroup(Group.PARAMETER);
+      info.setGroup(Group.METHOD)
+          .setDetailsBefore(ref.getOperationBefore().getClassName())
+          .setDetailsAfter(ref.getOperationAfter().getClassName());
     } else {
       info.setGroup(Group.VARIABLE);
     }
     return info
-        .setElementBefore(ref.getOriginalVariable().toQualifiedString())
-        .setElementAfter(ref.getChangedTypeVariable().toQualifiedString())
-        .setNameBefore("in method " + ref.getOperationAfter().getName())
-        .setNameAfter("in method " + ref.getOperationAfter().getName())
+        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
+        .setElementBefore(ref.getOriginalVariable().getVariableDeclaration().toQualifiedString())
+        .setElementAfter(ref.getChangedTypeVariable().getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOriginalVariable().getType().codeRange(),
             ref.getChangedTypeVariable().getType().codeRange());
 

@@ -7,6 +7,7 @@ import data.types.Handler;
 import gr.uom.java.xmi.diff.MergeAttributeRefactoring;
 import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
+import utils.Utils;
 
 public class MergeAttributeHandler extends Handler {
 
@@ -14,15 +15,18 @@ public class MergeAttributeHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     MergeAttributeRefactoring ref = (MergeAttributeRefactoring) refactoring;
 
+    String classNameAfter = ref.getClassNameAfter();
+    String classNameBefore = ref.getClassNameBefore();
+
     ref.getMergedAttributes().forEach(attr ->
         info.addMarking(attr.codeRange(), ref.getNewAttribute().codeRange()));
 
     return info.setGroup(Group.ATTRIBUTE)
+        .setNameBefore(classNameBefore)
+        .setNameAfter(classNameAfter)
         .setElementBefore(ref.getMergedAttributes().stream().map(x -> x.getVariableName()).collect(
             Collectors.joining()))
-        .setElementAfter(ref.getNewAttribute().getVariableName())
-        .setNameBefore(ref.getNewAttribute().toQualifiedString())
-        .setNameAfter(ref.getNewAttribute().toQualifiedString());
+        .setElementAfter(ref.getNewAttribute().getVariableDeclaration().getVariableName());
 
   }
 }
