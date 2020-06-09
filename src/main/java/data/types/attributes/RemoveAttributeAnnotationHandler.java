@@ -28,9 +28,9 @@ public class RemoveAttributeAnnotationHandler extends Handler {
         .setElementAfter(null)
         .addMarking(annotation.getLocationInfo().getStartLine(),
             annotation.getLocationInfo().getEndLine(),
-            ref.getAttributeBefore().codeRange().getStartLine(),
-            ref.getAttributeBefore().codeRange().getStartLine() - 1,
-            ref.getAttributeBefore().codeRange().getFilePath(),
+            ref.getAttributeAfter().codeRange().getStartLine(),
+            ref.getAttributeAfter().codeRange().getStartLine() - 1,
+            ref.getAttributeAfter().codeRange().getFilePath(),
             annotation.getLocationInfo().getFilePath(),
             line -> line.addOffset(annotation.getLocationInfo().getStartOffset(),
                 annotation.getLocationInfo().getEndOffset(),

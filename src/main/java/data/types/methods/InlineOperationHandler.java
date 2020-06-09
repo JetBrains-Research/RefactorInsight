@@ -20,7 +20,7 @@ public class InlineOperationHandler extends Handler {
     return info.setGroup(Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
-        .setElementBefore(StringUtils.calculateSignature(ref.getInlinedOperation()))
+        .setElementBefore(ref.getInlinedOperation().getName())
         .setElementAfter(null)
         .setNameBefore(StringUtils.calculateSignature(ref.getTargetOperationBeforeInline()))
         .setNameAfter(StringUtils.calculateSignature(ref.getTargetOperationAfterInline()))

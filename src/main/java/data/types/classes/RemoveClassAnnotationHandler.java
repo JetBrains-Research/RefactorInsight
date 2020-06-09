@@ -31,9 +31,9 @@ public class RemoveClassAnnotationHandler extends Handler {
         .setDetailsAfter(ref.getClassAfter().getPackageName())
         .addMarking(annotation.getLocationInfo().getStartLine(),
             annotation.getLocationInfo().getEndLine(),
-            ref.getClassBefore().codeRange().getStartLine(),
-            ref.getClassBefore().codeRange().getStartLine() - 1,
-            ref.getClassBefore().codeRange().getFilePath(),
+            ref.getClassAfter().codeRange().getStartLine(),
+            ref.getClassAfter().codeRange().getStartLine() - 1,
+            ref.getClassAfter().codeRange().getFilePath(),
             annotation.getLocationInfo().getFilePath(),
             line -> line.addOffset(annotation.getLocationInfo().getStartOffset(),
                 annotation.getLocationInfo().getEndOffset(),
