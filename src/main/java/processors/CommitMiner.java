@@ -66,7 +66,7 @@ public class CommitMiner implements Consumer<GitCommit> {
           new RefactoringHandler() {
             @Override
             public void handle(String commitId, List<Refactoring> refactorings) {
-              map.put(commitId, RefactoringEntry.convert(refactorings, commit));
+              map.put(commitId, RefactoringEntry.convert(refactorings, commit, project));
             }
           }
       );
@@ -89,7 +89,7 @@ public class CommitMiner implements Consumer<GitCommit> {
                 public void handle(String commitId, List<Refactoring> refactorings) {
                   map.put(commitId,
                       RefactoringEntry
-                          .convert(refactorings, gitCommit));
+                          .convert(refactorings, gitCommit, repository.getProject()));
                   incrementProgress();
                 }
               });

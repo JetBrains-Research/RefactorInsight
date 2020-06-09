@@ -105,10 +105,10 @@ public class RefactoringInfo {
    * Get line markings for two sided window.
    * Should only be called if isThreeSided() evaluates to false.
    */
-  public List<LineFragment> getTwoSidedLineMarkings(String leftText, String rightText) {
+  public List<LineFragment> getTwoSidedLineMarkings() {
     assert !threeSided;
-    return lineMarkings.stream().map(l ->
-        l.getTwoSidedRange(leftText, rightText)).collect(Collectors.toList());
+    return lineMarkings.stream().map(RefactoringLine::getTwoSidedRange)
+        .collect(Collectors.toList());
   }
 
   /**
@@ -138,6 +138,10 @@ public class RefactoringInfo {
 
   public Set<String> getIncludingRefactorings() {
     return includes;
+  }
+
+  public String getParent() {
+    return entry.getParent();
   }
 
   public List<RefactoringLine> getLineMarkings() {

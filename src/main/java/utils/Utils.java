@@ -383,7 +383,7 @@ public class Utils {
           contents[0], contents[2], info.getLeftPath(), info.getRightPath());
       request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
           (text1, text2, policy, innerChanges, indicator)
-              -> info.getTwoSidedLineMarkings(text1.toString(), text2.toString()));
+              -> info.getTwoSidedLineMarkings());
     } else {
       request = new SimpleDiffRequest(info.getName(),
           contents[0], contents[1], contents[2],

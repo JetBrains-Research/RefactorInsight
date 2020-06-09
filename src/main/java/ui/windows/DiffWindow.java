@@ -45,7 +45,6 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
     if (info == null) {
       return;
     }
-
     SimpleThreesideDiffViewer myViewer = (SimpleThreesideDiffViewer) viewer;
     myViewer.addListener(new MyDiffViewerListener(myViewer, info));
   }

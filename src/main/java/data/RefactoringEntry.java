@@ -8,9 +8,23 @@ import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
 import static org.refactoringminer.api.RefactoringType.RENAME_PARAMETER;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.intellij.diff.fragments.DiffFragment;
+import com.intellij.diff.fragments.DiffFragmentImpl;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +47,7 @@ public class RefactoringEntry implements Serializable {
    * Constructor for method refactoring.
    *
    * @param parent the commit id of the parent.
-   * @param time    timestamp of the commit.
+   * @param time   timestamp of the commit.
    */
   public RefactoringEntry(String commitId, String parent, long time) {
     this.parent = parent;
@@ -52,7 +66,11 @@ public class RefactoringEntry implements Serializable {
       return null;
     }
     try {
-      RefactoringEntry entry = new Gson().fromJson(value, RefactoringEntry.class);
+      Gson gson = new GsonBuilder()
+          .registerTypeAdapter(DiffFragment.class,
+              InterfaceSerializer.interfaceSerializer(DiffFragmentImpl.class))
+          .create();
+      RefactoringEntry entry = gson.fromJson(value, RefactoringEntry.class);
       entry.getRefactorings().forEach(r -> r.setEntry(entry));
       return entry;
     } catch (Exception e) {
@@ -68,14 +86,15 @@ public class RefactoringEntry implements Serializable {
    * @param commit       current commit.
    * @return Json string.
    */
-  public static String convert(List<Refactoring> refactorings, VcsCommitMetadata commit) {
+  public static String convert(List<Refactoring> refactorings, VcsCommitMetadata commit,
+                               Project project) {
 
     RefactoringEntry entry =
         new RefactoringEntry(commit.getId().asString(),
             commit.getParents().get(0).asString(), commit.getTimestamp());
 
     List<RefactoringInfo> infos =
-        refactorings.stream().map(ref -> factory.create(ref, entry)).collect(
+        refactorings.stream().map(ref -> factory.create(ref, entry, project)).collect(
             Collectors.toList());
 
     entry.setRefactorings(infos).combineRelated();
@@ -205,3 +224,4 @@ public class RefactoringEntry implements Serializable {
     return commitId;
   }
 }
+

@@ -16,6 +16,7 @@ import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.RefactoringLine;
 import data.RefactoringOffset;
+import data.types.Handler;
 import git4idea.history.GitHistoryUtils;
 import git4idea.repo.GitRepository;
 import java.io.BufferedReader;
@@ -85,7 +86,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     int limit = 100;
     try {
       limit = getCommitCount(repository);
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     } finally {
       mineRepo(repository, limit);
@@ -133,7 +134,10 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             long timeEnd = System.currentTimeMillis();
             double time = ((double) (timeEnd - timeStart)) / 1000.0;
             System.out.println("Mining done in " + time + " sec");
-
+            if (Handler.time < 100) {
+              System.out.println("bla");
+            }
+            Handler.time = time;
             computeMethodHistory(repository.getCurrentRevision());
             System.out.println("Method history computed");
 
@@ -179,7 +183,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             super.onFinished();
             System.out.println("Mining commit done");
             ApplicationManager.getApplication()
-                .invokeLater(() -> info.refresh(commit.getId().asString()));
+                .invokeLater(() -> info. refresh(commit.getId().asString()));
           }
 
           public void run(@NotNull ProgressIndicator progressIndicator) {

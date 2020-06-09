@@ -1,5 +1,6 @@
 package data;
 
+import com.intellij.openapi.project.Project;
 import data.types.Handler;
 import data.types.attributes.AddAttributeAnnotationHandler;
 import data.types.attributes.ChangeAttributeTypeHandler;
@@ -174,9 +175,9 @@ public class InfoFactory {
    * @param refactoring to be analyzed
    * @return resulting RefactoringInfo
    */
-  public RefactoringInfo create(Refactoring refactoring, RefactoringEntry entry) {
+  public RefactoringInfo create(Refactoring refactoring, RefactoringEntry entry, Project project) {
     return refactoringHandlers.get(refactoring.getRefactoringType())
-        .handle(refactoring, entry);
+        .handle(refactoring, entry, project);
   }
 
 }
