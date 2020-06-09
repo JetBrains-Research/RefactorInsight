@@ -181,9 +181,13 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
           public void onFinished() {
             super.onFinished();
-            System.out.println("Mining commit done");
-            ApplicationManager.getApplication()
-                .invokeLater(() -> info. refresh(commit.getId().asString()));
+            if(innerState.map.containsKey(commit.getId().asString())) {
+              System.out.println("Mining commit done");
+              ApplicationManager.getApplication()
+                  .invokeLater(() -> info. refresh(commit.getId().asString()));
+            } else {
+              System.out.println("Mining commit FAILED!");
+            }
           }
 
           public void run(@NotNull ProgressIndicator progressIndicator) {

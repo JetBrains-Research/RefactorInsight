@@ -94,7 +94,7 @@ public class GitWindow {
     int index = table.getSelectionModel().getAnchorSelectionIndex();
 
     if (index < 0 || index >= table.getRowCount() - 1) {
-      viewport.setView(new JBLabel("time22: " + Handler.time));//new JBList<String>());
+      viewport.setView(new JBList<String>());
       return;
     }
 
