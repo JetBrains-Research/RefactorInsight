@@ -1,6 +1,5 @@
 package data.types.attributes;
 
-import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MergeAttributeRefactoring;
@@ -19,7 +18,7 @@ public class MergeAttributeHandler extends Handler {
     ref.getMergedAttributes().forEach(attr ->
         info.addMarking(attr.codeRange(), ref.getNewAttribute().codeRange(), true));
 
-    return info.setGroup(Group.ATTRIBUTE)
+    return info.setGroup(RefactoringInfo.Group.ATTRIBUTE)
         .setNameBefore(classNameBefore)
         .setNameAfter(classNameAfter)
         .setElementBefore(ref.getMergedAttributes().stream().map(x -> x.getVariableName()).collect(

@@ -1,6 +1,5 @@
 package data.types.variables;
 
-import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ExtractVariableRefactoring;
@@ -12,7 +11,7 @@ public class ExtractVariableHandler extends Handler {
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ExtractVariableRefactoring ref = (ExtractVariableRefactoring) refactoring;
-    return info.setGroup(Group.VARIABLE)
+    return info.setGroup(RefactoringInfo.Group.VARIABLE)
         .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()))
         .setElementBefore(ref.getVariableDeclaration().getVariableDeclaration().toQualifiedString())

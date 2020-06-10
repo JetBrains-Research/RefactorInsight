@@ -1,38 +1,34 @@
 package data;
 
-import static org.refactoringminer.api.RefactoringType.CHANGE_ATTRIBUTE_TYPE;
-import static org.refactoringminer.api.RefactoringType.CHANGE_PARAMETER_TYPE;
-import static org.refactoringminer.api.RefactoringType.CHANGE_VARIABLE_TYPE;
 import static org.refactoringminer.api.RefactoringType.EXTRACT_CLASS;
-import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
-import static org.refactoringminer.api.RefactoringType.RENAME_PARAMETER;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.intellij.diff.fragments.DiffFragment;
 import com.intellij.diff.fragments.DiffFragmentImpl;
+import com.intellij.diff.fragments.LineFragment;
+import com.intellij.diff.fragments.LineFragmentImpl;
+import com.intellij.diff.fragments.MergeLineFragment;
+import com.intellij.diff.fragments.MergeLineFragmentImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.VcsCommitMetadata;
+import data.diffRequests.DiffRequestGenerator;
+import data.diffRequests.ThreeSidedDiffRequestGenerator;
+import data.diffRequests.TwoSidedDiffRequestGenerator;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 import utils.Utils;
 
 public class RefactoringEntry implements Serializable {
@@ -69,6 +65,12 @@ public class RefactoringEntry implements Serializable {
       Gson gson = new GsonBuilder()
           .registerTypeAdapter(DiffFragment.class,
               InterfaceSerializer.interfaceSerializer(DiffFragmentImpl.class))
+          .registerTypeAdapter(MergeLineFragment.class,
+              InterfaceSerializer.interfaceSerializer(MergeLineFragmentImpl.class))
+          .registerTypeAdapter(LineFragment.class,
+              InterfaceSerializer.interfaceSerializer(LineFragmentImpl.class))
+          .registerTypeAdapter(DiffRequestGenerator.class,
+              InterfaceSerializer.interfaceSerializer(TwoSidedDiffRequestGenerator.class))
           .create();
       RefactoringEntry entry = gson.fromJson(value, RefactoringEntry.class);
       entry.getRefactorings().forEach(r -> r.setEntry(entry));
@@ -94,10 +96,12 @@ public class RefactoringEntry implements Serializable {
             commit.getParents().get(0).asString(), commit.getTimestamp());
 
     List<RefactoringInfo> infos =
-        refactorings.stream().map(ref -> factory.create(ref, entry, project)).collect(
+        refactorings.stream().map(ref -> factory.create(ref, entry)).collect(
             Collectors.toList());
 
     entry.setRefactorings(infos).combineRelated();
+
+    entry.refactorings.forEach(info -> Utils.check(info, project));
     return entry.toString();
   }
 
@@ -116,7 +120,12 @@ public class RefactoringEntry implements Serializable {
 
     groups.forEach((k, v) -> {
       if (v.size() > 1) {
-        RefactoringInfo info = getMainRefactoringInfo(v);
+        RefactoringInfo info = Utils.getMainRefactoringInfo(v);
+
+        if(info == null) {
+          System.out.println("Grouping failed");
+          return;
+        }
 
         v.remove(info);
         v.forEach(r -> {
@@ -151,33 +160,6 @@ public class RefactoringEntry implements Serializable {
             r.setHidden(true);
           });
     }
-  }
-
-  private RefactoringInfo getMainRefactoringInfo(List<RefactoringInfo> v) {
-    RefactoringInfo info = null;
-    if (v.stream().anyMatch(ofType(RENAME_ATTRIBUTE))
-        && v.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
-      info = v.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
-      info.setName("Rename and Change Attribute Type");
-    } else if (v.stream().anyMatch(ofType(RENAME_ATTRIBUTE))) {
-      info = v.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
-      info.setName("Rename Attribute");
-    } else if (v.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
-      info = v.stream().filter(ofType(CHANGE_ATTRIBUTE_TYPE)).findFirst().get();
-      info.setName("Change Attribute Type");
-    } else if (v.stream().anyMatch(ofType(CHANGE_VARIABLE_TYPE))) {
-      info = v.stream().filter(ofType(CHANGE_VARIABLE_TYPE)).findFirst().get();
-      info.setName("Rename and Change Variable Type");
-    } else if (v.stream().anyMatch(ofType(RENAME_PARAMETER))
-        && v.stream().anyMatch(ofType(CHANGE_PARAMETER_TYPE))) {
-      info = v.stream().filter(ofType(RENAME_PARAMETER)).findFirst().get();
-      info.setName("Rename and Change Parameter Type");
-    }
-    return info;
-  }
-
-  private Predicate<RefactoringInfo> ofType(RefactoringType type) {
-    return (r) -> r.getType() == type;
   }
 
   /**
@@ -222,6 +204,50 @@ public class RefactoringEntry implements Serializable {
 
   public String getCommitId() {
     return commitId;
+  }
+
+  static final class InterfaceSerializer<T>
+      implements JsonSerializer<T>, JsonDeserializer<T> {
+
+    private final Class<T> implementationClass;
+
+    InterfaceSerializer(final Class<T> implementationClass) {
+      this.implementationClass = implementationClass;
+    }
+
+    static <T> InterfaceSerializer<T> interfaceSerializer(final Class<T> implementationClass) {
+      return new InterfaceSerializer<>(implementationClass);
+    }
+
+    @Override
+    public JsonElement serialize(final T value, final Type type,
+                                 final JsonSerializationContext context) {
+      if (value != null && value.getClass().equals(ThreeSidedDiffRequestGenerator.class)) {
+        return context.serialize(value, ThreeSidedDiffRequestGenerator.class);
+      }
+      final Type targetType = value != null
+          ? value.getClass()
+          : type;
+      return context.serialize(value, targetType);
+    }
+
+    @Override
+    public T deserialize(final JsonElement jsonElement, final Type typeOfT,
+                         final JsonDeserializationContext context) {
+      try {
+        T obj = context.deserialize(jsonElement, implementationClass);
+        if(obj.getClass().equals(TwoSidedDiffRequestGenerator.class)){
+          var v = (TwoSidedDiffRequestGenerator)obj;
+          if(v.fragments == null){
+            throw new Exception("wrong side number");
+          }
+        }
+        return obj;
+      } catch (Exception e) {
+        return context.deserialize(jsonElement, ThreeSidedDiffRequestGenerator.class);
+      }
+    }
+
   }
 }
 

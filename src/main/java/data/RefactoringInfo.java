@@ -1,9 +1,11 @@
 package data;
 
 import com.google.gson.Gson;
-import com.intellij.diff.fragments.LineFragment;
-import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
-import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
+import com.intellij.diff.contents.DiffContent;
+import com.intellij.diff.requests.SimpleDiffRequest;
+import data.diffRequests.DiffRequestGenerator;
+import data.diffRequests.ThreeSidedDiffRequestGenerator;
+import data.diffRequests.TwoSidedDiffRequestGenerator;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,13 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import org.refactoringminer.api.RefactoringType;
 
 public class RefactoringInfo {
 
-  private final List<RefactoringLine> lineMarkings = new ArrayList<>();
-
+  private DiffRequestGenerator requestGenerator = new TwoSidedDiffRequestGenerator();
   private transient RefactoringEntry entry;
 
   private String name;
@@ -36,6 +36,10 @@ public class RefactoringInfo {
   private boolean hidden = false;
   private boolean threeSided = false;
 
+
+  public SimpleDiffRequest generate(DiffContent[] contents) {
+    return requestGenerator.generate(contents, this);
+  }
 
   /**
    * Adds this refactoring to the method history map.
@@ -88,11 +92,7 @@ public class RefactoringInfo {
                                     RefactoringLine.MarkingOption option,
                                     boolean hasColumns) {
 
-    RefactoringLine line = new RefactoringLine(left, mid, right, type, option, hasColumns);
-    if (offsetFunction != null) {
-      offsetFunction.accept(line);
-    }
-    lineMarkings.add(line);
+    requestGenerator.addMarking(left, mid, right, type, offsetFunction, option, hasColumns);
     setLeftPath(left.getFilePath());
     if (mid != null) {
       setMidPath(mid.getFilePath());
@@ -101,35 +101,13 @@ public class RefactoringInfo {
     return this;
   }
 
-  /**
-   * Get line markings for two sided window.
-   * Should only be called if isThreeSided() evaluates to false.
-   */
-  public List<LineFragment> getTwoSidedLineMarkings() {
-    assert !threeSided;
-    return lineMarkings.stream().map(RefactoringLine::getTwoSidedRange)
-        .collect(Collectors.toList());
-  }
-
-  /**
-   * Get line markings for two sided window.
-   * Should only be called if isThreeSided() evaluates to true.
-   */
-  public List<SimpleThreesideDiffChange> getThreeSidedLineMarkings(SimpleThreesideDiffViewer
-                                                                       viewer) {
-    assert threeSided;
-    return lineMarkings.stream()
-        .map(line -> line.getThreeSidedRange(viewer))
-        .collect(Collectors.toList());
-  }
-
   @Override
   public String toString() {
     return new Gson().toJson(this);
   }
 
   public void addAllMarkings(RefactoringInfo info) {
-    this.lineMarkings.addAll(info.getLineMarkings());
+    requestGenerator.getMarkings().addAll(info.getLineMarkings());
   }
 
   public void addIncludedRefactoring(String refactoring) {
@@ -145,7 +123,7 @@ public class RefactoringInfo {
   }
 
   public List<RefactoringLine> getLineMarkings() {
-    return lineMarkings;
+    return requestGenerator.getMarkings();
   }
 
   public long getTimestamp() {
@@ -171,6 +149,9 @@ public class RefactoringInfo {
 
   public RefactoringInfo setThreeSided(boolean threeSided) {
     this.threeSided = threeSided;
+    if (threeSided) {
+      requestGenerator = new ThreeSidedDiffRequestGenerator();
+    }
     return this;
   }
 
@@ -297,5 +278,19 @@ public class RefactoringInfo {
   public RefactoringInfo setDetailsAfter(String detailsAfter) {
     uiStrings[2][1] = detailsAfter;
     return this;
+  }
+
+  public void correctLines(String before, String mid, String after) {
+    requestGenerator.correct(before, mid, after);
+  }
+
+  public enum Group {
+    METHOD,
+    CLASS,
+    ATTRIBUTE,
+    VARIABLE,
+    INTERFACE,
+    ABSTRACT,
+    PACKAGE
   }
 }

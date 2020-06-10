@@ -134,17 +134,22 @@ public class GitWindow {
   }
 
   private void showDiff(int index, RefactoringInfo info, Project project) {
+    if(info.getLeftPath() == null){
+      return;
+    }
     Collection<Change> changes =
         table.getModel().getFullDetails(index).getChanges(0);
     try {
       DiffContentFactoryEx myDiffContentFactory = DiffContentFactoryEx.getInstanceEx();
       DiffContent[] contents = {null, null, null};
       for (Change change : changes) {
-        if (change.getBeforeRevision() != null
-            && change.getBeforeRevision().getFile().getPath().contains(info.getLeftPath())) {
-          contents[0] = myDiffContentFactory.create(project,
-              change.getBeforeRevision().getContent(),
-              JavaClassFileType.INSTANCE);
+        if (change.getBeforeRevision() != null) {
+          change.getBeforeRevision().getFile().getPath();
+          if (change.getBeforeRevision().getFile().getPath().contains(info.getLeftPath())) {
+            contents[0] = myDiffContentFactory.create(project,
+                change.getBeforeRevision().getContent(),
+                JavaClassFileType.INSTANCE);
+          }
         }
         if (info.isThreeSided()
             && change.getAfterRevision() != null

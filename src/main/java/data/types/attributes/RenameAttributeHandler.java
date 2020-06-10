@@ -1,6 +1,5 @@
 package data.types.attributes;
 
-import data.Group;
 import data.RefactoringInfo;
 import data.RefactoringLine;
 import data.types.Handler;
@@ -16,7 +15,7 @@ public class RenameAttributeHandler extends Handler {
     String classNameBefore = ref.getClassNameBefore();
     String classNameAfter = ref.getClassNameAfter();
 
-    return info.setGroup(Group.ATTRIBUTE)
+    return info.setGroup(RefactoringInfo.Group.ATTRIBUTE)
         .setGroupId(ref.getClassNameAfter() + "." + ref.getRenamedAttribute().getVariableName())
         .addMarking(ref.getOriginalAttribute().codeRange(),
             ref.getRenamedAttribute().codeRange(),

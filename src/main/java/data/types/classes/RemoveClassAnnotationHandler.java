@@ -2,7 +2,6 @@ package data.types.classes;
 
 import static data.RefactoringLine.MarkingOption.REMOVE;
 
-import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
@@ -16,11 +15,11 @@ public class RemoveClassAnnotationHandler extends Handler {
     RemoveClassAnnotationRefactoring ref = (RemoveClassAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
     if (ref.getClassAfter().isAbstract()) {
-      info.setGroup(Group.ABSTRACT);
+      info.setGroup(RefactoringInfo.Group.ABSTRACT);
     } else if (ref.getClassAfter().isInterface()) {
-      info.setGroup(Group.INTERFACE);
+      info.setGroup(RefactoringInfo.Group.INTERFACE);
     } else {
-      info.setGroup(Group.CLASS);
+      info.setGroup(RefactoringInfo.Group.CLASS);
     }
     return info
         .setNameBefore(ref.getClassBefore().getName())

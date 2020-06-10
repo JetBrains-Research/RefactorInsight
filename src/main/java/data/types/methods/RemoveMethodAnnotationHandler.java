@@ -2,7 +2,6 @@ package data.types.methods;
 
 import static data.RefactoringLine.MarkingOption.REMOVE;
 
-import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
@@ -20,7 +19,7 @@ public class RemoveMethodAnnotationHandler extends Handler {
     String classNameBefore = ref.getOperationBefore().getClassName();
     String classNameAfter = ref.getOperationAfter().getClassName();
 
-    return info.setGroup(Group.METHOD)
+    return info.setGroup(RefactoringInfo.Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
         .setElementBefore(ref.getAnnotation().toString())

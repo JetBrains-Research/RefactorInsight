@@ -1,22 +1,31 @@
 package utils;
 
-import static ui.windows.DiffWindow.REFACTORING_INFO;
+import static org.refactoringminer.api.RefactoringType.CHANGE_ATTRIBUTE_TYPE;
+import static org.refactoringminer.api.RefactoringType.CHANGE_PARAMETER_TYPE;
+import static org.refactoringminer.api.RefactoringType.CHANGE_VARIABLE_TYPE;
+import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
+import static org.refactoringminer.api.RefactoringType.RENAME_PARAMETER;
 
-import com.intellij.diff.contents.DiffContent;
-import com.intellij.diff.requests.SimpleDiffRequest;
-import com.intellij.diff.util.DiffUserDataKeysEx;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.vcs.FilePath;
+import com.intellij.openapi.vcs.LocalFilePath;
+import com.intellij.openapi.vcs.VcsException;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameterList;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.text.JBDateFormat;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
-import data.Group;
 import data.RefactoringInfo;
+import git4idea.GitContentRevision;
+import git4idea.GitRevisionNumber;
 import gr.uom.java.xmi.UMLOperation;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.jetbrains.annotations.NotNull;
+import org.refactoringminer.api.RefactoringType;
 
 public class Utils {
 
@@ -232,6 +241,9 @@ public class Utils {
   public static int getOffset(String text, int line, int column) {
     int offset = 0;
     String[] lines = text.split("\r\n|\r|\n");
+    if (lines.length <= line - 2) {
+      System.out.println(text);
+    }
     for (int i = 0; i < line - 1; i++) {
       offset += lines[i].length() + 1;
     }
@@ -307,8 +319,8 @@ public class Utils {
    */
   public static void makeNameNode(DefaultMutableTreeNode root, RefactoringInfo info) {
     DefaultMutableTreeNode child = new DefaultMutableTreeNode(
-        (info.getGroup() == Group.METHOD || info.getGroup() == Group.CLASS
-            || info.getGroup() == Group.INTERFACE || info.getGroup() == Group.ABSTRACT)
+        (info.getGroup() == RefactoringInfo.Group.METHOD || info.getGroup() == RefactoringInfo.Group.CLASS
+            || info.getGroup() == RefactoringInfo.Group.INTERFACE || info.getGroup() == RefactoringInfo.Group.ABSTRACT)
             ? getDisplayableName(info)
             : getDisplayableDetails(info.getNameBefore(), info.getNameAfter()));
     root.add(child);
@@ -370,26 +382,61 @@ public class Utils {
     }
   }
 
-  /**
-   * Creates a diff request for this refactoring.
-   *
-   * @param contents array of diffcontents
-   * @return the diff request created
-   */
-  public static SimpleDiffRequest createDiffRequest(DiffContent[] contents, RefactoringInfo info) {
-    SimpleDiffRequest request;
-    if (!info.isThreeSided()) {
-      request = new SimpleDiffRequest(info.getName(),
-          contents[0], contents[2], info.getLeftPath(), info.getRightPath());
-      request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
-          (text1, text2, policy, innerChanges, indicator)
-              -> info.getTwoSidedLineMarkings());
-    } else {
-      request = new SimpleDiffRequest(info.getName(),
-          contents[0], contents[1], contents[2],
-          info.getLeftPath(), info.getMidPath(), info.getRightPath());
-      request.putUserData(REFACTORING_INFO, info);
+  public static RefactoringInfo getMainRefactoringInfo(List<RefactoringInfo> v) {
+    RefactoringInfo info = null;
+    if (v.stream().anyMatch(ofType(RENAME_ATTRIBUTE))
+        && v.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
+      info = v.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
+      info.setName("Rename and Change Attribute Type");
+    } else if (v.stream().anyMatch(ofType(RENAME_ATTRIBUTE))) {
+      info = v.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
+      info.setName("Rename Attribute");
+    } else if (v.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
+      info = v.stream().filter(ofType(CHANGE_ATTRIBUTE_TYPE)).findFirst().get();
+      info.setName("Change Attribute Type");
+    } else if (v.stream().anyMatch(ofType(CHANGE_VARIABLE_TYPE))) {
+      info = v.stream().filter(ofType(CHANGE_VARIABLE_TYPE)).findFirst().get();
+      info.setName("Rename and Change Variable Type");
+    } else if (v.stream().anyMatch(ofType(RENAME_PARAMETER))
+        && v.stream().anyMatch(ofType(CHANGE_PARAMETER_TYPE))) {
+      info = v.stream().filter(ofType(RENAME_PARAMETER)).findFirst().get();
+      info.setName("Rename and Change Parameter Type");
     }
-    return request;
+    return info;
+  }
+
+  private static Predicate<RefactoringInfo> ofType(RefactoringType type) {
+    return (r) -> r.getType() == type;
+  }
+
+  public static RefactoringInfo check(RefactoringInfo info, Project project) {
+
+    FilePath beforePath = new LocalFilePath(
+        project.getBasePath() + "/"
+            + info.getLeftPath(), false);
+    FilePath midPath = !info.isThreeSided() ? null : new LocalFilePath(
+        project.getBasePath() + "/"
+            + info.getMidPath(), false);
+    FilePath afterPath = new LocalFilePath(
+        project.getBasePath() + "/"
+            + info.getRightPath(), false);
+    GitRevisionNumber afterNumber = new GitRevisionNumber(info.getCommitId());
+    GitRevisionNumber beforeNumber = new GitRevisionNumber(info.getParent());
+
+    try {
+      String before = GitContentRevision
+          .createRevision(beforePath, beforeNumber, project).getContent();
+      String mid = !info.isThreeSided() ? null : GitContentRevision
+          .createRevision(midPath, afterNumber, project).getContent();
+      String after = GitContentRevision
+          .createRevision(afterPath, afterNumber, project).getContent();
+
+      info.correctLines(before, mid, after);
+
+    } catch (VcsException e) {
+      System.out.println(info.getName()+" refactoring not implemented yet");
+    }
+
+    return info;
   }
 }

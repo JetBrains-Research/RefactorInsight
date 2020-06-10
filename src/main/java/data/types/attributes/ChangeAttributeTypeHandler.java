@@ -1,6 +1,5 @@
 package data.types.attributes;
 
-import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ChangeAttributeTypeRefactoring;
@@ -15,7 +14,7 @@ public class ChangeAttributeTypeHandler extends Handler {
     String classNameBefore = ref.getClassNameBefore();
     String classNameAfter = ref.getClassNameAfter();
 
-    return info.setGroup(Group.ATTRIBUTE)
+    return info.setGroup(RefactoringInfo.Group.ATTRIBUTE)
         .setGroupId(ref.getClassNameAfter() + "." + ref.getChangedTypeAttribute().getVariableName())
         .setNameBefore(classNameBefore)
         .setNameAfter(classNameAfter)

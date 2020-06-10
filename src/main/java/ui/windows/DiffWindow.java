@@ -12,14 +12,16 @@ import com.intellij.diff.tools.util.base.DiffViewerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import data.RefactoringInfo;
+import data.diffRequests.ThreeSidedRange;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
-import utils.Utils;
 
 public class DiffWindow extends com.intellij.diff.DiffExtension {
 
-  public static Key<RefactoringInfo> REFACTORING_INFO =
-      Key.create("refactoringMiner.RefactoringInfo");
+  public static Key<List<ThreeSidedRange>> REFACTORING_RANGES =
+      Key.create("refactoringMiner.List<ThreeSidedRange>");
+
 
   /**
    * Requests diff window to show specific refactoring with two editors.
@@ -29,7 +31,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
    * @param project  Current project
    */
   public static void showDiff(DiffContent[] contents, RefactoringInfo info, Project project) {
-    DiffManager.getInstance().showDiff(project, Utils.createDiffRequest(contents, info));
+    DiffManager.getInstance().showDiff(project, info.generate(contents));
   }
 
   /**
@@ -41,28 +43,28 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
   @Override
   public void onViewerCreated(@NotNull FrameDiffTool.DiffViewer viewer,
                               @NotNull DiffContext context, @NotNull DiffRequest request) {
-    RefactoringInfo info = request.getUserData(REFACTORING_INFO);
-    if (info == null) {
+    List<ThreeSidedRange> ranges = request.getUserData(REFACTORING_RANGES);
+    if (ranges == null) {
       return;
     }
     SimpleThreesideDiffViewer myViewer = (SimpleThreesideDiffViewer) viewer;
-    myViewer.addListener(new MyDiffViewerListener(myViewer, info));
+    myViewer.addListener(new MyDiffViewerListener(myViewer, ranges));
   }
 
   public static class MyDiffViewerListener extends DiffViewerListener {
 
     private final SimpleThreesideDiffViewer viewer;
-    private final RefactoringInfo info;
+    private final List<ThreeSidedRange> ranges;
 
     /**
      * EventListener for DiffWindow finishing diff calculation.
      *
      * @param viewer DiffViewer
-     * @param info   RefactoringInfo
+     * @param ranges List of ThreeSidedRanges
      */
     public MyDiffViewerListener(SimpleThreesideDiffViewer viewer,
-                                RefactoringInfo info) {
-      this.info = info;
+                                List<ThreeSidedRange> ranges) {
+      this.ranges = ranges;
       this.viewer = viewer;
     }
 
@@ -71,7 +73,10 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       List<SimpleThreesideDiffChange> oldMarkings = viewer.getChanges();
       oldMarkings.forEach(ThreesideDiffChangeBase::destroy);
       oldMarkings.clear();
-      oldMarkings.addAll(info.getThreeSidedLineMarkings(viewer));
+      oldMarkings.addAll(ranges.stream()
+          .map(r -> r.getDiffChange(viewer))
+          .collect(Collectors.toList())
+      );
     }
   }
 }

@@ -1,6 +1,5 @@
 package data.types.methods;
 
-import data.Group;
 import data.RefactoringInfo;
 import data.RefactoringLine;
 import data.types.Handler;
@@ -20,7 +19,7 @@ public class InlineOperationHandler extends Handler {
     String classNameBefore = ref.getTargetOperationBeforeInline().getClassName();
     String classNameAfter = ref.getTargetOperationAfterInline().getClassName();
 
-    return info.setGroup(Group.METHOD)
+    return info.setGroup(RefactoringInfo.Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
         .setElementBefore(Utils.calculateSignature(ref.getInlinedOperation()))

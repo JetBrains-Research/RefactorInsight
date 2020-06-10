@@ -1,6 +1,5 @@
 package data.types.classes;
 
-import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ExtractSuperclassRefactoring;
@@ -15,11 +14,11 @@ public class ExtractSuperClassHandler extends Handler {
     ExtractSuperclassRefactoring ref = (ExtractSuperclassRefactoring) refactoring;
 
     if (ref.getExtractedClass().isInterface()) {
-      info.setGroup(Group.INTERFACE);
+      info.setGroup(RefactoringInfo.Group.INTERFACE);
     } else if (ref.getExtractedClass().isAbstract()) {
-      info.setGroup(Group.ABSTRACT);
+      info.setGroup(RefactoringInfo.Group.ABSTRACT);
     } else {
-      info.setGroup(Group.CLASS);
+      info.setGroup(RefactoringInfo.Group.CLASS);
     }
 
     return info

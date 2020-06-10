@@ -1,6 +1,5 @@
 package data.types.classes;
 
-import data.Group;
 import data.RefactoringInfo;
 import data.RefactoringLine;
 import data.types.Handler;
@@ -13,7 +12,7 @@ public class ExtractClassHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ExtractClassRefactoring ref = (ExtractClassRefactoring) refactoring;
 
-    info.setGroup(Group.CLASS)
+    info.setGroup(RefactoringInfo.Group.CLASS)
         .setDetailsBefore(ref.getOriginalClass().getPackageName())
         .setDetailsAfter(ref.getExtractedClass().getPackageName())
         .setElementBefore(ref.getOriginalClass().getName())

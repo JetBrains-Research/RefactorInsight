@@ -1,6 +1,5 @@
 package data.types.methods;
 
-import data.Group;
 import data.RefactoringInfo;
 import data.RefactoringLine;
 import data.types.Handler;
@@ -21,7 +20,7 @@ public class ExtractOperationHandler extends Handler {
     String extractedMethod = Utils.calculateSignature(ref.getExtractedOperation());
 
     if (ref.getRefactoringType() == RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
-      info.setGroup(Group.METHOD)
+      info.setGroup(RefactoringInfo.Group.METHOD)
           .setThreeSided(true)
           .setDetailsBefore(classNameBefore)
           .setDetailsAfter(classNameAfter)
@@ -54,7 +53,7 @@ public class ExtractOperationHandler extends Handler {
               true));
       return info;
     } else {
-      info.setGroup(Group.METHOD)
+      info.setGroup(RefactoringInfo.Group.METHOD)
           .setDetailsBefore(classNameBefore)
           .setDetailsAfter(classNameAfter)
           .setElementBefore(extractedMethod.substring(extractedMethod.lastIndexOf(".") + 1))

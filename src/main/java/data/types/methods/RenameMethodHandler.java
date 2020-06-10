@@ -1,10 +1,11 @@
 package data.types.methods;
 
-import data.Group;
 import data.RefactoringInfo;
 import data.RefactoringLine;
 import data.types.Handler;
+import gr.uom.java.xmi.UMLOperation;
 import gr.uom.java.xmi.diff.RenameOperationRefactoring;
+import java.util.List;
 import org.refactoringminer.api.Refactoring;
 import utils.Utils;
 
@@ -16,19 +17,24 @@ public class RenameMethodHandler extends Handler {
 
     String id = ref.getRenamedOperation().getClassName() + ".";
     if (ref.getRenamedOperation().isGetter()) {
-      id += ref.getRenamedOperation().getBody().getAllVariables().get(0);
-      info.setGroupId(id);
+      List<String> variables = ref.getRenamedOperation().getBody().getAllVariables();
+      if (!variables.isEmpty()) {
+        id += variables.get(0);
+        info.setGroupId(id);
+      }
     }
     if (ref.getRenamedOperation().isSetter()) {
-      id += ref.getRenamedOperation().getParameterNameList().get(0);
-      info.setGroupId(id);
+      if (!ref.getRenamedOperation().getParameterNameList().isEmpty()) {
+        id += ref.getRenamedOperation().getParameterNameList().get(0);
+        info.setGroupId(id);
+      }
     }
 
     String classNameBefore = ref.getOriginalOperation().getClassName();
     String classNameAfter = ref.getRenamedOperation().getClassName();
 
 
-    return info.setGroup(Group.METHOD)
+    return info.setGroup(RefactoringInfo.Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
         .setElementBefore(null)

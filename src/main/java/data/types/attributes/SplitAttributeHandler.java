@@ -1,6 +1,5 @@
 package data.types.attributes;
 
-import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.SplitAttributeRefactoring;
@@ -18,7 +17,7 @@ public class SplitAttributeHandler extends Handler {
     String classNameBefore = ref.getClassNameBefore();
     String classNameAfter = ref.getClassNameAfter();
 
-    return info.setGroup(Group.ATTRIBUTE)
+    return info.setGroup(RefactoringInfo.Group.ATTRIBUTE)
         .setNameBefore(classNameBefore)
         .setNameAfter(classNameAfter)
         .setElementBefore(ref.getOldAttribute().getVariableName())

@@ -1,6 +1,5 @@
 package data.types.attributes;
 
-import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ExtractAttributeRefactoring;
@@ -17,7 +16,7 @@ public class ExtractAttributeHandler extends Handler {
             ref.getExtractedVariableDeclarationCodeRange(),
             true
         ));
-    return info.setGroup(Group.ATTRIBUTE)
+    return info.setGroup(RefactoringInfo.Group.ATTRIBUTE)
         .setDetailsBefore(ref.getOriginalClass().getName())
         .setDetailsAfter(ref.getOriginalClass().getName())
         .setNameBefore(

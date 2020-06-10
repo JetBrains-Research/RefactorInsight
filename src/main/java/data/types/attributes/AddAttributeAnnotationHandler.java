@@ -2,7 +2,6 @@ package data.types.attributes;
 
 import static data.RefactoringLine.MarkingOption.ADD;
 
-import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
@@ -19,7 +18,7 @@ public class AddAttributeAnnotationHandler extends Handler {
     String classNameBefore = ref.getAttributeBefore().getClassName();
     String classNameAfter = ref.getAttributeAfter().getClassName();
 
-    return info.setGroup(Group.ATTRIBUTE)
+    return info.setGroup(RefactoringInfo.Group.ATTRIBUTE)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
         .setNameBefore(ref.getAttributeBefore().getVariableDeclaration().toQualifiedString())
