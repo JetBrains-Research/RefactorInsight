@@ -34,7 +34,6 @@ public class RenameMethodHandler extends Handler {
     String classNameBefore = ref.getOriginalOperation().getClassName();
     String classNameAfter = ref.getRenamedOperation().getClassName();
 
-
     info.setGroup(Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
