@@ -4,6 +4,8 @@ import com.intellij.diff.DiffContentFactoryEx;
 import com.intellij.diff.DiffContext;
 import com.intellij.diff.DiffManager;
 import com.intellij.diff.FrameDiffTool;
+import com.intellij.diff.chains.DiffRequestChain;
+import com.intellij.diff.chains.SimpleDiffRequestChain;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.DiffRequest;
 import com.intellij.diff.requests.SimpleDiffRequest;
@@ -78,7 +80,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
     request.putUserData(REFACTORING_INFO, info);
     request.putUserData(FILE_CONTENTS, texts);
-
+    SimpleDiffRequestChain bla;
     DiffManager.getInstance().showDiff(project, request);
 
   }

@@ -9,12 +9,16 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.LogicalPosition;
+import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.editor.impl.DocumentImpl;
 import com.intellij.openapi.editor.impl.EditorImpl;
+import com.intellij.openapi.editor.impl.ScrollingModelImpl;
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.psi.JavaCodeFragmentFactory;
+import com.intellij.testFramework.fixtures.EditorHintFixture;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
@@ -73,12 +77,19 @@ public class TestDiffAction extends AnAction {
 
   @Override
   public void actionPerformed(@NotNull AnActionEvent e) {
-
+    //TODO check if scrolling works if editor in a viewport
     Editor editor1 = EditorFactory.getInstance().createEditor(new DocumentImpl(text), e.getProject(), JavaFileType.INSTANCE, true);
-    editor1.getScrollingModel().scrollVertically(10);
-    Editor editor2 = EditorFactory.getInstance().createEditor(new DocumentImpl(text), e.getProject(), JavaFileType.INSTANCE, true);
-    editor2.getScrollingModel().scrollVertically(15);
+    editor1.getComponent().setPreferredSize(new Dimension(400, 200));
 
+
+    Editor editor2 = EditorFactory.getInstance().createEditor(new DocumentImpl(text), e.getProject(), JavaFileType.INSTANCE, true);
+    editor2.getComponent().setPreferredSize(new Dimension(400, 200));
+    ScrollingModelImpl scrollingModel = (ScrollingModelImpl) editor2.getScrollingModel();
+    scrollingModel.getVerticalScrollBar().setOpaque(false);
+
+    editor2.getScrollingModel().scrollTo(new LogicalPosition(20, 0), ScrollType.CENTER);
+    scrollingModel.flushViewportChanges();
+//    editor2.getComponent().repaint();
 
     JBList<Editor> list = new JBList<>(JBList.createDefaultListModel(editor1, editor2));
     list.setCellRenderer(new MyRenderer());
@@ -96,10 +107,7 @@ public class TestDiffAction extends AnAction {
     public Component getListCellRendererComponent(JList<? extends Editor> jList, Editor editor,
                                                   int i, boolean b, boolean b1) {
 
-      JBViewport port = new JBViewport();
-      port.add(editor.getComponent().size);
-      port.setPreferredSize(new Dimension(400, 200));
-      return port;
+      return editor.getComponent();
     }
   }
 
