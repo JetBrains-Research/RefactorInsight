@@ -3,9 +3,9 @@ package data;
 import com.google.gson.Gson;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
-import data.diffRequests.DiffRequestGenerator;
-import data.diffRequests.ThreeSidedDiffRequestGenerator;
-import data.diffRequests.TwoSidedDiffRequestGenerator;
+import data.diff.DiffRequestGenerator;
+import data.diff.ThreeSidedDiffRequestGenerator;
+import data.diff.TwoSidedDiffRequestGenerator;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -147,6 +147,12 @@ public class RefactoringInfo {
     return threeSided;
   }
 
+  /**
+   * Sets the refactoring info as three sided.
+   *
+   * @param threeSided boolean
+   * @return this
+   */
   public RefactoringInfo setThreeSided(boolean threeSided) {
     this.threeSided = threeSided;
     if (threeSided) {
@@ -242,6 +248,28 @@ public class RefactoringInfo {
   public RefactoringInfo setNameAfter(String nameAfter) {
     uiStrings[0][1] = nameAfter;
     return this;
+  }
+
+  /**
+   * Method for create a presentable String out of the
+   * name refactoring.
+   *
+   * @return presentable String that shows the changes if existent, else shows a presentable name.
+   */
+  public String getDisplayableName() {
+    String before = getNameBefore();
+    if (before.contains(".")) {
+      before = getNameBefore().substring(getNameBefore().lastIndexOf(".") + 1);
+    }
+    String after = getNameAfter();
+    if (after.contains(".")) {
+      after = getNameAfter().substring(getNameAfter().lastIndexOf(".") + 1);
+    }
+    if (before.equals(after)) {
+      return before;
+    } else {
+      return before + " -> " + after;
+    }
   }
 
   public String getElementBefore() {

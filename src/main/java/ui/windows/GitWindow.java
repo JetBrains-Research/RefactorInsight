@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
-import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.ui.treeStructure.Tree;
@@ -19,7 +18,6 @@ import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
-import data.types.Handler;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
@@ -134,7 +132,7 @@ public class GitWindow {
   }
 
   private void showDiff(int index, RefactoringInfo info, Project project) {
-    if(info.getLeftPath() == null){
+    if (info.getLeftPath() == null) {
       return;
     }
     Collection<Change> changes =

@@ -1,4 +1,4 @@
-package data.diffRequests;
+package data.diff;
 
 import static ui.windows.DiffWindow.REFACTORING_RANGES;
 

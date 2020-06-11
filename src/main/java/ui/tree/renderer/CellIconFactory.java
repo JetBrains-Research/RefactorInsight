@@ -1,15 +1,15 @@
-package ui.renderer;
+package ui.tree.renderer;
 
 import data.RefactoringInfo;
 import java.util.HashMap;
 import javax.swing.Icon;
-import ui.renderer.handlers.AbstractClassHandler;
-import ui.renderer.handlers.AttributeHandler;
-import ui.renderer.handlers.ClassHandler;
-import ui.renderer.handlers.InterfaceHandler;
-import ui.renderer.handlers.MethodHandler;
-import ui.renderer.handlers.PackageHandler;
-import ui.renderer.handlers.VariableHandler;
+import ui.tree.renderer.handlers.AbstractClassHandler;
+import ui.tree.renderer.handlers.AttributeHandler;
+import ui.tree.renderer.handlers.ClassHandler;
+import ui.tree.renderer.handlers.InterfaceHandler;
+import ui.tree.renderer.handlers.MethodHandler;
+import ui.tree.renderer.handlers.PackageHandler;
+import ui.tree.renderer.handlers.VariableHandler;
 
 public class CellIconFactory {
 
@@ -28,7 +28,7 @@ public class CellIconFactory {
     map.put(RefactoringInfo.Group.CLASS, new ClassHandler());
   }
 
-  Icon create(RefactoringInfo info, boolean leaf, boolean path) {
+  public Icon create(RefactoringInfo info, boolean leaf, boolean path) {
     return map.get(info.getGroup()).getIcon(info, leaf, path);
   }
 }

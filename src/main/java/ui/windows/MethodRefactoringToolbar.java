@@ -32,7 +32,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.jetbrains.annotations.NotNull;
 import services.RefactoringsBundle;
-import ui.renderer.CellRenderer;
+import ui.tree.TreeUtils;
+import ui.tree.renderer.CellRenderer;
 import utils.Utils;
 
 
@@ -74,7 +75,7 @@ public class MethodRefactoringToolbar {
       JBSplitter splitter = new JBSplitter(false, (float) 0.3);
       Tree tree = createTree(refactorings);
       tree.setRootVisible(false);
-      Utils.expandAllNodes(tree, 0, tree.getRowCount());
+      TreeUtils.expandAllNodes(tree, 0, tree.getRowCount());
       tree.setCellRenderer(new CellRenderer(true));
       addMouseListener(splitter, tree);
       setFirstComponent(refactorings.size(), splitter, tree);
@@ -138,21 +139,24 @@ public class MethodRefactoringToolbar {
     DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
 
     for (RefactoringInfo refactoringInfo : refactorings) {
-      final String displayableDetails = Utils
+      final String displayableDetails = TreeUtils
           .getDisplayableDetails(refactoringInfo.getDetailsBefore(),
               refactoringInfo.getDetailsAfter());
       if (displayableDetails != null && displayableDetails.contains("->")) {
-        DefaultMutableTreeNode node = Utils.makeNode(refactoringInfo);
+
+        DefaultMutableTreeNode node = TreeUtils.makeNode(refactoringInfo);
         root.add(node);
-      } else if (Utils
+      } else if (TreeUtils
           .getDisplayableDetails(refactoringInfo.getNameBefore(), refactoringInfo.getNameAfter())
           .contains("->")) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(refactoringInfo);
-        Utils.makeNameNode(node, refactoringInfo);
+
+        TreeUtils.makeNameNode(node, refactoringInfo);
         root.add(node);
       } else {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(refactoringInfo);
-        Utils.addLeaves(node, refactoringInfo);
+        TreeUtils.addLeaves(node, refactoringInfo);
+
         root.add(node);
       }
     }

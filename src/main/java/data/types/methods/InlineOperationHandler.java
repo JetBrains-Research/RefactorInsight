@@ -5,7 +5,7 @@ import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.InlineOperationRefactoring;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
+import utils.StringUtils;
 
 public class InlineOperationHandler extends Handler {
 
@@ -22,15 +22,14 @@ public class InlineOperationHandler extends Handler {
     return info.setGroup(RefactoringInfo.Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
-        .setElementBefore(Utils.calculateSignature(ref.getInlinedOperation()))
+        .setElementBefore(ref.getInlinedOperation().getName())
         .setElementAfter(null)
-        .setNameBefore(Utils.calculateSignature(ref.getTargetOperationBeforeInline()))
-        .setNameAfter(Utils.calculateSignature(ref.getTargetOperationAfterInline()))
+        .setNameBefore(StringUtils.calculateSignature(ref.getTargetOperationBeforeInline()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getTargetOperationAfterInline()))
         .addMarking(ref.getInlinedOperationCodeRange(),
             ref.getInlinedCodeRangeInTargetOperation(),
             null,
             RefactoringLine.MarkingOption.REMOVE,
             false);
-
   }
 }

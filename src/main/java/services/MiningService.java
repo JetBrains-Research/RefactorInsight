@@ -15,7 +15,6 @@ import com.intellij.vcs.log.VcsCommitMetadata;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.RefactoringLine;
-import data.types.Handler;
 import git4idea.history.GitHistoryUtils;
 import git4idea.repo.GitRepository;
 import java.io.BufferedReader;
@@ -45,6 +44,7 @@ import ui.windows.GitWindow;
 @Service
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
+  private static final String VERSION = "1.0.1";
   public static ConcurrentHashMap<String, List<RefactoringInfo>> methodHistory
       = new ConcurrentHashMap<>();
   private boolean mining = false;
@@ -177,10 +177,10 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
           public void onFinished() {
             super.onFinished();
-            if(innerState.map.containsKey(commit.getId().asString())) {
+            if (innerState.map.containsKey(commit.getId().asString())) {
               System.out.println("Mining commit done");
               ApplicationManager.getApplication()
-                  .invokeLater(() -> info. refresh(commit.getId().asString()));
+                  .invokeLater(() -> info.refresh(commit.getId().asString()));
             } else {
               System.out.println("Mining commit FAILED!");
             }

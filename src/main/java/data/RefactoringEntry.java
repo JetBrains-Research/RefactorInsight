@@ -18,17 +18,20 @@ import com.intellij.diff.fragments.MergeLineFragmentImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.VcsCommitMetadata;
-import data.diffRequests.DiffRequestGenerator;
-import data.diffRequests.ThreeSidedDiffRequestGenerator;
-import data.diffRequests.TwoSidedDiffRequestGenerator;
+import data.diff.DiffRequestGenerator;
+import data.diff.ThreeSidedDiffRequestGenerator;
+import data.diff.TwoSidedDiffRequestGenerator;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.refactoringminer.api.Refactoring;
+import org.refactoringminer.api.RefactoringType;
+import ui.tree.TreeUtils;
 import utils.Utils;
 
 public class RefactoringEntry implements Serializable {
@@ -122,7 +125,7 @@ public class RefactoringEntry implements Serializable {
       if (v.size() > 1) {
         RefactoringInfo info = Utils.getMainRefactoringInfo(v);
 
-        if(info == null) {
+        if (info == null) {
           System.out.println("Grouping failed");
           return;
         }
@@ -141,14 +144,14 @@ public class RefactoringEntry implements Serializable {
     List<RefactoringInfo> extractClassRefactorings = refactorings
         .stream().filter(x -> x.getType() == EXTRACT_CLASS).collect(Collectors.toList());
     for (RefactoringInfo extractClass : extractClassRefactorings) {
-      String displayableElement = Utils
+      String displayableElement = TreeUtils
           .getDisplayableElement(extractClass.getElementBefore(), extractClass.getElementAfter());
       refactorings.stream().filter(x -> !x.equals(extractClass))
           .filter(x -> {
             String displayableDetails =
-                Utils.getDisplayableElement(x.getDetailsBefore(), x.getDetailsAfter());
+                TreeUtils.getDisplayableElement(x.getDetailsBefore(), x.getDetailsAfter());
             String displayableName =
-                Utils.getDisplayableElement(x.getNameBefore(), x.getNameAfter());
+                TreeUtils.getDisplayableElement(x.getNameBefore(), x.getNameAfter());
             if (displayableDetails == null) {
               return displayableName.equals(displayableElement);
             }
@@ -162,6 +165,10 @@ public class RefactoringEntry implements Serializable {
     }
   }
 
+  private Predicate<RefactoringInfo> ofType(RefactoringType type) {
+    return (r) -> r.getType() == type;
+  }
+
   /**
    * Builds a UI tree.
    *
@@ -171,12 +178,12 @@ public class RefactoringEntry implements Serializable {
     DefaultMutableTreeNode root = new DefaultMutableTreeNode(commitId);
     refactorings.forEach(r -> {
       if (!r.isHidden()) {
-        root.add(Utils.makeNode(r));
+        root.add(TreeUtils.makeNode(r));
       }
     });
     Tree tree = new Tree(root);
     tree.setRootVisible(false);
-    Utils.expandAllNodes(tree, 0, tree.getRowCount());
+    TreeUtils.expandAllNodes(tree, 0, tree.getRowCount());
     return tree;
   }
 
@@ -236,9 +243,9 @@ public class RefactoringEntry implements Serializable {
                          final JsonDeserializationContext context) {
       try {
         T obj = context.deserialize(jsonElement, implementationClass);
-        if(obj.getClass().equals(TwoSidedDiffRequestGenerator.class)){
-          var v = (TwoSidedDiffRequestGenerator)obj;
-          if(v.fragments == null){
+        if (obj.getClass().equals(TwoSidedDiffRequestGenerator.class)) {
+          var v = (TwoSidedDiffRequestGenerator) obj;
+          if (v.fragments == null) {
             throw new Exception("wrong side number");
           }
         }

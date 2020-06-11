@@ -1,5 +1,7 @@
 package data.types.classes;
 
+import static data.RefactoringInfo.Group;
+
 import data.RefactoringInfo;
 import data.RefactoringLine;
 import data.types.Handler;
@@ -12,13 +14,14 @@ public class ModifyClassAnnotationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ModifyClassAnnotationRefactoring ref = (ModifyClassAnnotationRefactoring) refactoring;
 
-    if (ref.getClassAfter().isAbstract()) {
-      info.setGroup(RefactoringInfo.Group.ABSTRACT);
-    } else if (ref.getClassAfter().isInterface()) {
-      info.setGroup(RefactoringInfo.Group.INTERFACE);
+    if (ref.getClassAfter().isInterface()) {
+      info.setGroup(Group.INTERFACE);
+    } else if (ref.getClassAfter().isAbstract()) {
+      info.setGroup(Group.ABSTRACT);
     } else {
-      info.setGroup(RefactoringInfo.Group.CLASS);
+      info.setGroup(Group.CLASS);
     }
+
     return info
         .setDetailsBefore(ref.getClassBefore().getPackageName())
         .setDetailsAfter(ref.getClassAfter().getPackageName())

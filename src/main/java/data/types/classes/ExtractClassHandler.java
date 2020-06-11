@@ -12,8 +12,14 @@ public class ExtractClassHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ExtractClassRefactoring ref = (ExtractClassRefactoring) refactoring;
 
-    info.setGroup(RefactoringInfo.Group.CLASS)
-        .setDetailsBefore(ref.getOriginalClass().getPackageName())
+    if (ref.getExtractedClass().isInterface()) {
+      info.setGroup(RefactoringInfo.Group.INTERFACE);
+    } else if (ref.getExtractedClass().isAbstract()) {
+      info.setGroup(RefactoringInfo.Group.ABSTRACT);
+    } else {
+      info.setGroup(RefactoringInfo.Group.CLASS);
+    }
+    info.setDetailsBefore(ref.getOriginalClass().getPackageName())
         .setDetailsAfter(ref.getExtractedClass().getPackageName())
         .setElementBefore(ref.getOriginalClass().getName())
         .setElementAfter(ref.getExtractedClass().getName())

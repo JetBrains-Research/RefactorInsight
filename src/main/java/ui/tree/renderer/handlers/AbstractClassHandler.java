@@ -1,11 +1,11 @@
-package ui.renderer.handlers;
+package ui.tree.renderer.handlers;
 
 import com.intellij.icons.AllIcons;
 import data.RefactoringInfo;
 import javax.swing.Icon;
-import ui.renderer.IconHandler;
+import ui.tree.renderer.IconHandler;
 
-public class ClassHandler implements IconHandler {
+public class AbstractClassHandler implements IconHandler {
   @Override
   public Icon getIcon(RefactoringInfo info, boolean leaf, boolean path) {
     if (!leaf && path) {
@@ -14,6 +14,6 @@ public class ClassHandler implements IconHandler {
     if (leaf && info.getName().contains("Annotation")) {
       return AllIcons.Nodes.Annotationtype;
     }
-    return AllIcons.Nodes.Class;
+    return AllIcons.Nodes.AbstractClass;
   }
 }

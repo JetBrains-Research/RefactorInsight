@@ -18,6 +18,7 @@ public class RenameClassHandler extends Handler {
     } else {
       info.setGroup(RefactoringInfo.Group.CLASS);
     }
+
     return info
         .addMarking(ref.getOriginalClass().codeRange(),
             ref.getRenamedClass().codeRange(), true)

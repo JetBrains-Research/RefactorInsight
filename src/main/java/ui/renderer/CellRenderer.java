@@ -7,6 +7,9 @@ import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import ui.tree.TreeUtils;
+import ui.tree.renderer.CellIconFactory;
+import utils.StringUtils;
 import utils.Utils;
 
 public class CellRenderer extends JBDefaultTreeCellRenderer {

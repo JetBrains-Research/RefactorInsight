@@ -52,7 +52,7 @@ import org.hamcrest.CustomMatcher;
 import org.hamcrest.Matcher;
 import org.junit.rules.ErrorCollector;
 import org.refactoringminer.api.RefactoringType;
-import ui.renderer.CellRenderer;
+import ui.tree.renderer.CellRenderer;
 
 /**
  * Extend GitSingleRepoTest

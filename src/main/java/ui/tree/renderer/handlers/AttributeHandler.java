@@ -1,9 +1,9 @@
-package ui.renderer.handlers;
+package ui.tree.renderer.handlers;
 
 import com.intellij.icons.AllIcons;
 import data.RefactoringInfo;
 import javax.swing.Icon;
-import ui.renderer.IconHandler;
+import ui.tree.renderer.IconHandler;
 
 public class AttributeHandler implements IconHandler {
   @Override

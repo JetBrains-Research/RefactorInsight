@@ -1,4 +1,4 @@
-package data.diffRequests;
+package data.diff;
 
 import com.intellij.diff.fragments.MergeLineFragment;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;

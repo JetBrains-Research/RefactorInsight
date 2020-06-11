@@ -8,7 +8,7 @@ import gr.uom.java.xmi.diff.ReorderParameterRefactoring;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
+import utils.StringUtils;
 
 public class ReorderParameterHandler extends Handler {
 
@@ -32,7 +32,7 @@ public class ReorderParameterHandler extends Handler {
     return info.setGroup(RefactoringInfo.Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
-        .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()));
+        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()));
   }
 }

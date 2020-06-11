@@ -12,7 +12,7 @@ import com.intellij.diff.tools.util.base.DiffViewerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import data.RefactoringInfo;
-import data.diffRequests.ThreeSidedRange;
+import data.diff.ThreeSidedRange;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +21,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
   public static Key<List<ThreeSidedRange>> REFACTORING_RANGES =
       Key.create("refactoringMiner.List<ThreeSidedRange>");
+  public static Key<Boolean> REFACTORING = //todo
+      Key.create("refactoringMiner.isRefactoringDiff");
 
 
   /**
@@ -32,6 +34,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
    */
   public static void showDiff(DiffContent[] contents, RefactoringInfo info, Project project) {
     DiffManager.getInstance().showDiff(project, info.generate(contents));
+
   }
 
   /**
@@ -49,6 +52,12 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
     }
     SimpleThreesideDiffViewer myViewer = (SimpleThreesideDiffViewer) viewer;
     myViewer.addListener(new MyDiffViewerListener(myViewer, ranges));
+
+    Boolean isRefactoring = request.getUserData(REFACTORING);
+
+    if (isRefactoring != null) {
+      myViewer.getTextSettings().setExpandByDefault(false);
+    }
   }
 
   public static class MyDiffViewerListener extends DiffViewerListener {
