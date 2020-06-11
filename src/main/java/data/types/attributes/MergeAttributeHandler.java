@@ -22,11 +22,11 @@ public class MergeAttributeHandler extends Handler {
         info.addMarking(attr.codeRange(), ref.getNewAttribute().codeRange()));
 
     return info.setGroup(Group.ATTRIBUTE)
-        .setNameBefore(classNameBefore)
-        .setNameAfter(classNameAfter)
-        .setElementBefore(ref.getMergedAttributes().stream().map(x -> x.getVariableName()).collect(
+        .setDetailsBefore(classNameBefore)
+        .setDetailsAfter(classNameAfter)
+        .setNameBefore(ref.getMergedAttributes().stream().map(x -> x.getVariableName()).collect(
             Collectors.joining()))
-        .setElementAfter(ref.getNewAttribute().getVariableDeclaration().getVariableName());
+        .setNameAfter(ref.getNewAttribute().getVariableDeclaration().getVariableName());
 
   }
 }

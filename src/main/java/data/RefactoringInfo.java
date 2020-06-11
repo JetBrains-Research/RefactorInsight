@@ -8,16 +8,14 @@ import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import javax.swing.tree.DefaultMutableTreeNode;
 import org.jetbrains.annotations.Nullable;
 import org.refactoringminer.api.RefactoringType;
-import utils.Utils;
 
 public class RefactoringInfo {
 
@@ -51,25 +49,55 @@ public class RefactoringInfo {
    *
    * @param map for method history
    */
-  public void addToHistory(Map<String, List<RefactoringInfo>> map) {
-    if (group == Group.CLASS) {
+  public void addToHistory(Map<String, HistoryData> map) {
+    changeKeys(map);
+    String before = nameBefore;
+    String after = nameAfter;
+    if (group == Group.ATTRIBUTE) {
+      before = detailsBefore + "|" + nameBefore;
+      after = detailsAfter + "|" + nameAfter;
+    }
+
+    if (group != Group.VARIABLE) {
+      HistoryData data = map.getOrDefault(before, new HistoryData());
+      HistoryData data2 = map.getOrDefault(after, new HistoryData());
+      map.remove(before);
+      data2.addRefactorings(data.getRefactoringInfoList());
+      data2.addRefactoring(this);
+      data2.addOldName(before);
+      data.getNamesBefore().forEach(name -> data2.addOldName(name));
+      map.put(after, data2);
+    }
+  }
+
+  private void changeKeys(Map<String, HistoryData> map) {
+    if ((group == Group.CLASS || group == Group.ABSTRACT || group == Group.INTERFACE)
+        && !nameBefore.equals(nameAfter)) {
       Map<String, String> renames = new HashMap<>();
       renames.put(nameBefore, nameAfter);
       renames.forEach((before, after) -> map.keySet().stream()
-          .filter(x -> x.substring(0, x.lastIndexOf("."))
+          .filter(x -> x.contains("|")).filter(x -> x.substring(0, x.lastIndexOf("|"))
+              .equals(before))
+          .forEach(signature -> {
+            String newKey = after + signature.substring(signature.lastIndexOf("|"));
+            HistoryData data = map.get(signature);
+            map.remove(signature);
+            data.addOldName(signature);
+            map.put(newKey, data);
+          }));
+
+      renames.forEach((before, after) -> map.keySet().stream()
+          .filter(x -> !x.contains("|"))
+          .filter(x -> x.contains(".")).filter(x -> x.substring(0, x.lastIndexOf("."))
               .equals(before))
           .forEach(signature -> {
             String newKey = after + signature.substring(signature.lastIndexOf("."));
-            map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
+            HistoryData data = map.get(signature);
+            map.remove(signature);
+            data.addOldName(signature);
+            map.put(newKey, data);
           }));
-      return;
-    }
 
-    if (group == Group.METHOD) {
-      List<RefactoringInfo> refs = map.getOrDefault(nameBefore, new LinkedList<>());
-      map.remove(nameBefore);
-      refs.add(0, this);
-      map.put(nameAfter, refs);
     }
   }
 
@@ -345,11 +373,11 @@ public class RefactoringInfo {
    */
   public String getDisplayableName() {
     String before = nameBefore;
-    if (before.contains(".")) {
+    if (before.contains(".") && group != Group.ATTRIBUTE) {
       before = nameBefore.substring(nameBefore.lastIndexOf(".") + 1);
     }
     String after = nameAfter;
-    if (after.contains(".")) {
+    if (after.contains(".") && group != Group.ATTRIBUTE) {
       after = nameAfter.substring(nameAfter.lastIndexOf(".") + 1);
     }
     if (before.equals(after)) {
@@ -398,4 +426,26 @@ public class RefactoringInfo {
     this.detailsAfter = detailsAfter;
     return this;
   }
+
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof RefactoringInfo)) {
+      return false;
+    }
+    RefactoringInfo that = (RefactoringInfo) o;
+    return Objects.equals(getElementBefore(), that.getElementBefore())
+        && Objects.equals(getElementAfter(), that.getElementAfter())
+        && getName().equals(that.getName())
+        && getNameBefore().equals(that.getNameBefore())
+        && getNameAfter().equals(that.getNameAfter())
+        && getDetailsBefore().equals(that.getDetailsBefore())
+        && getDetailsAfter().equals(that.getDetailsAfter())
+        && getType() == that.getType()
+        && getGroup() == that.getGroup();
+  }
+
 }

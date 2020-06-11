@@ -2,7 +2,10 @@ package utils;
 
 import com.intellij.openapi.util.Disposer;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
+import data.RefactoringInfo;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class Utils {
 
@@ -31,4 +34,17 @@ public class Utils {
     logs.add(log);
   }
 
+  /**
+   * Sorts the info list for a better displaying.
+   *
+   * @param infos to be sorted.
+   */
+  public static void chronologicalOrder(List<RefactoringInfo> infos) {
+    infos.sort(new Comparator<RefactoringInfo>() {
+      @Override
+      public int compare(RefactoringInfo o1, RefactoringInfo o2) {
+        return Long.compare(o1.getEntry().getTimeStamp(), o2.getEntry().getTimeStamp());
+      }
+    });
+  }
 }

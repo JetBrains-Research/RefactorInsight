@@ -23,9 +23,9 @@ public class RenameAttributeHandler extends Handler {
             ref.getRenamedAttribute().codeRange(),
             line -> line.addOffset(ref.getOriginalAttribute().getLocationInfo(),
                 ref.getRenamedAttribute().getLocationInfo()))
-        .setElementBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())
-        .setElementAfter(ref.getRenamedAttribute().getVariableDeclaration().toQualifiedString())
-        .setNameBefore(classNameBefore)
-        .setNameAfter(classNameAfter);
+        .setNameBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())
+        .setNameAfter(ref.getRenamedAttribute().getVariableDeclaration().toQualifiedString())
+        .setDetailsBefore(classNameBefore)
+        .setDetailsAfter(classNameAfter);
   }
 }

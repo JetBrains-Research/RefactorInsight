@@ -21,8 +21,8 @@ import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.Times;
+import ui.tree.renderers.MainCellRenderer;
 import ui.windows.GitWindow;
-import ui.tree.renderer.CellRenderer;
 
 /**
  * Extend GitSingleRepoTest
@@ -87,7 +87,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
   public void testTreeIsBuilt() {
     RefactoringEntry entry = miner.getEntry(head);
     Tree tree = entry.buildTree();
-    tree.setCellRenderer(new CellRenderer());
+    tree.setCellRenderer(new MainCellRenderer());
     TreeCellRenderer cellRenderer = tree.getCellRenderer();
     Object root = tree.getModel().getRoot();
     assertNotNull(cellRenderer

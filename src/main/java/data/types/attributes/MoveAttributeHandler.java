@@ -18,10 +18,10 @@ public class MoveAttributeHandler extends Handler {
     String classNameAfter = ref.getTargetClassName();
 
     return info.setGroup(Group.ATTRIBUTE)
-        .setNameBefore(classNameBefore)
-        .setNameAfter(classNameAfter)
-        .setElementBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())
-        .setElementAfter(null)
+        .setDetailsBefore(classNameBefore)
+        .setDetailsAfter(classNameAfter)
+        .setNameBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())
+        .setNameAfter(ref.getMovedAttribute().getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOriginalAttribute().codeRange(),
             ref.getMovedAttribute().codeRange());
   }

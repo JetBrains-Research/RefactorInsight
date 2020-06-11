@@ -31,6 +31,7 @@ public class ChangeVariableTypeHandler extends Handler {
     } else {
       info.setGroup(Group.VARIABLE);
     }
+
     return info
         .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))

@@ -19,10 +19,10 @@ public class ChangeAttributeTypeHandler extends Handler {
 
     return info.setGroup(Group.ATTRIBUTE)
         .setGroupId(ref.getClassNameAfter() + "." + ref.getChangedTypeAttribute().getVariableName())
-        .setNameBefore(classNameBefore)
-        .setNameAfter(classNameAfter)
-        .setElementBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())
-        .setElementAfter(ref.getChangedTypeAttribute().getVariableDeclaration().toQualifiedString())
+        .setDetailsBefore(classNameBefore)
+        .setDetailsAfter(classNameAfter)
+        .setNameBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())
+        .setNameAfter(ref.getChangedTypeAttribute().getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOriginalAttribute().getType().codeRange(),
             ref.getChangedTypeAttribute().getType().codeRange());
 

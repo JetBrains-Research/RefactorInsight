@@ -16,7 +16,7 @@ public class ExtractAttributeHandler extends Handler {
 
     info.setGroup(Group.ATTRIBUTE)
         .setDetailsBefore(ref.getOriginalClass().getName())
-        .setDetailsAfter(ref.getOriginalClass().getName())
+        .setDetailsAfter(ref.getNextClass().getName())
         .setNameBefore(
             ref.getVariableDeclaration().getName() + " : " + ref.getVariableDeclaration().getType())
         .setNameAfter(ref.getVariableDeclaration().getName() + " : "

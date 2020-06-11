@@ -12,6 +12,7 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.annotations.MapAnnotation;
 import com.intellij.vcs.log.VcsCommitMetadata;
+import data.HistoryData;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.RefactoringLine;
@@ -46,8 +47,8 @@ import ui.windows.GitWindow;
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
   private static final String VERSION = "1.0.1";
-  public static ConcurrentHashMap<String, List<RefactoringInfo>> methodHistory
-      = new ConcurrentHashMap<>();
+  public static ConcurrentHashMap<String, HistoryData> methodHistory
+      = new ConcurrentHashMap<String, HistoryData>();
   private boolean mining = false;
   private MyState innerState = new MyState();
 
@@ -86,6 +87,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     int limit = 100;
     try {
       limit = getCommitCount(repository);
+      limit = 1000;
     } catch (IOException e) {
       e.printStackTrace();
     } finally {
@@ -136,8 +138,9 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             System.out.println("Mining done in " + time + " sec");
 
             computeMethodHistory(repository.getCurrentRevision());
-            System.out.println("Method history computed");
-
+            long timeEnd2 = System.currentTimeMillis();
+            double time2 = ((double) (timeEnd2 - timeEnd)) / 1000.0;
+            System.out.println("Method history computed in " + time2);
             progressIndicator.setText("Finished");
           }
         });
@@ -208,7 +211,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     return Integer.parseInt(output);
   }
 
-  public Map<String, List<RefactoringInfo>> getMethodHistory() {
+  public Map<String, HistoryData> getMethodHistory() {
     return methodHistory;
   }
 
