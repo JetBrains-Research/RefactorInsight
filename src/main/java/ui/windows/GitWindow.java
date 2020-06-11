@@ -108,9 +108,6 @@ public class GitWindow {
       return;
     }
 
-    SimpleDiffRequestChain chain = (SimpleDiffRequestChain) DiffWindow.buildDiffChain(entry,
-            table.getModel().getFullDetails(index).getChanges(0), project);
-
     Tree tree = entry.buildTree();
     tree.setCellRenderer(new CellRenderer());
     tree.addMouseListener(new MouseAdapter() {
@@ -126,6 +123,8 @@ public class GitWindow {
           if (node.isLeaf()) {
             RefactoringInfo info = (RefactoringInfo)
                 node.getUserObjectPath()[1];
+            SimpleDiffRequestChain chain = (SimpleDiffRequestChain) DiffWindow.buildDiffChain(entry,
+                table.getModel().getFullDetails(index).getChanges(0), project);
             chain.setIndex(0);
             DiffWindow.showChain(chain, project);
           }
