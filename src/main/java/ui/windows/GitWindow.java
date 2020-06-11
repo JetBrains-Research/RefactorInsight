@@ -126,7 +126,7 @@ public class GitWindow {
           if (node.isLeaf()) {
             RefactoringInfo info = (RefactoringInfo)
                 node.getUserObjectPath()[1];
-            chain.setIndex(0);
+            chain.setIndex(entry.getRefactorings().indexOf(info));
             DiffWindow.showChain(chain, project);
           }
         }
