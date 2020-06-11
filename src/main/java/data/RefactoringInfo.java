@@ -43,24 +43,25 @@ public class RefactoringInfo {
    * @param map for method history
    */
   public void addToHistory(Map<String, List<RefactoringInfo>> map) {
-    if (group == Group.CLASS) {
-      Map<String, String> renames = new HashMap<>();
-      renames.put(getNameBefore(), getNameAfter());
-      renames.forEach((before, after) -> map.keySet().stream()
+    final String nameBefore = getNameBefore();
+    final String nameAfter = getNameAfter();
+
+    if (group == Group.CLASS || group == Group.ABSTRACT || group == Group.INTERFACE) {
+      map.keySet().stream()
           .filter(x -> x.substring(0, x.lastIndexOf("."))
-              .equals(before))
+              .equals(nameBefore))
           .forEach(signature -> {
-            String newKey = after + signature.substring(signature.lastIndexOf("."));
+            String newKey = nameAfter + signature.substring(signature.lastIndexOf("."));
             map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
-          }));
+          });
       return;
     }
 
     if (group == Group.METHOD) {
-      List<RefactoringInfo> refs = map.getOrDefault(getNameBefore(), new LinkedList<>());
-      map.remove(getNameBefore());
+      List<RefactoringInfo> refs = map.getOrDefault(nameBefore, new LinkedList<>());
+      map.remove(nameBefore);
       refs.add(0, this);
-      map.put(getNameAfter(), refs);
+      map.put(nameAfter, refs);
     }
   }
 

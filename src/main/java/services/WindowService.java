@@ -13,7 +13,7 @@ import ui.windows.GitWindow;
 
 @Service
 public class WindowService {
-  private Map<VcsLogGraphTable, GitWindow> gitInfo = new HashMap<>();
+  public Map<VcsLogGraphTable, GitWindow> gitInfo = new HashMap<>();
 
   public WindowService() {
   }

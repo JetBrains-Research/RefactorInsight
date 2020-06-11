@@ -1,10 +1,15 @@
 package ui.windows;
 
+import com.intellij.dvcs.ui.RepositoryChangesBrowserNode;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.vcs.changes.ChangesViewEx;
+import com.intellij.openapi.vcs.changes.ChangesViewManager;
+import com.intellij.openapi.vcs.changes.committed.ChangesBrowserDialog;
+import com.intellij.openapi.vcs.changes.committed.RepositoryChangesBrowser;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -20,11 +25,16 @@ import com.intellij.vcs.log.data.VcsLogData;
 import com.intellij.vcs.log.impl.VcsLogManager;
 import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
+import com.intellij.vcs.log.ui.actions.VcsLogToolbarPopupActionGroup;
+import com.intellij.vcs.log.ui.frame.VcsLogChangeProcessor;
+import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
 import com.intellij.vcs.log.visible.filters.VcsLogFilterObject;
 import data.RefactoringInfo;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.SwingConstants;
@@ -32,6 +42,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.jetbrains.annotations.NotNull;
 import services.RefactoringsBundle;
+import services.WindowService;
 import ui.tree.TreeUtils;
 import ui.tree.renderer.CellRenderer;
 import utils.Utils;
@@ -40,6 +51,7 @@ import utils.Utils;
 public class MethodRefactoringToolbar {
 
   private final VcsLogManager.VcsLogUiFactory<? extends MainVcsLogUi> factory;
+
   private MainVcsLogUi openLogTab;
   private ToolWindowManager toolWindowManager;
   private ToolWindow toolWindow;
@@ -53,7 +65,6 @@ public class MethodRefactoringToolbar {
   public MethodRefactoringToolbar(Project project) {
     this.project = project;
     toolWindowManager = ToolWindowManager.getInstance(project);
-
     factory = VcsProjectLog.getInstance(project).getLogManager()
         .getMainLogUiFactory("method history", VcsLogFilterObject.collection());
     toolWindow =
@@ -123,11 +134,15 @@ public class MethodRefactoringToolbar {
 
   private void showLogTab(RefactoringInfo info, JBSplitter splitter) {
     VcsLogData data = VcsProjectLog.getInstance(project).getLogManager().getDataManager();
+
     openLogTab = factory.createLogUi(project, data);
+
+
     Utils.add(openLogTab);
     JComponent mainComponent = openLogTab.getMainComponent();
     if (mainComponent != null) {
       mainComponent.setAutoscrolls(true);
+      
       mainComponent.setSize(splitter.getSecondComponent().getSize());
       splitter.setSecondComponent(mainComponent);
       openLogTab.jumpToHash(info.getCommitId());

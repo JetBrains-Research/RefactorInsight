@@ -22,6 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.Times;
+import ui.tree.TreeUtils;
 import ui.tree.renderer.CellRenderer;
 import ui.windows.GitWindow;
 
@@ -91,7 +92,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
 
     miner.getState().map.values().stream().map(RefactoringEntry::fromString)
         .forEach(x -> {
-          Tree tree1 = x.buildTree();
+          Tree tree1 = TreeUtils.buildTree(x.getRefactorings());
           tree1.setCellRenderer(cellRenderer);
           assertNotNull(tree1);
           Object root1 = tree1.getModel().getRoot();
