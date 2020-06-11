@@ -102,7 +102,10 @@ public class RefactoringEntry implements Serializable {
     groups.forEach((k, v) -> {
       if (v.size() > 1) {
         RefactoringInfo info = getMainRefactoringInfo(v);
-
+        if (info == null) {
+          System.out.println(v);
+          return;
+        }
         v.remove(info);
         v.forEach(r -> {
           info.includesRefactoring(r.getName());

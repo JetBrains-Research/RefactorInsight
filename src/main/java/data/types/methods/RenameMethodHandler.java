@@ -34,15 +34,18 @@ public class RenameMethodHandler extends Handler {
     String classNameBefore = ref.getOriginalOperation().getClassName();
     String classNameAfter = ref.getRenamedOperation().getClassName();
 
-
-    return info.setGroup(Group.METHOD)
+    info.setGroup(Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
         .setElementBefore(null)
-        .setElementAfter(null)
-        .addMarking(ref.getOriginalOperation().getBody().getCompositeStatement().codeRange(),
-            ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
-            refactoringLine -> refactoringLine.setHasColumns(false))
+        .setElementAfter(null);
+    if (ref.getOriginalOperation().getBody() == null) {
+      return info.addMarking(ref.getOriginalOperation().codeRange(),
+          ref.getRenamedOperation().codeRange());
+    }
+    return info.addMarking(ref.getOriginalOperation().getBody().getCompositeStatement().codeRange(),
+        ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
+        refactoringLine -> refactoringLine.setHasColumns(false))
         .addMarking(
             ref.getOriginalOperation().getBody().getCompositeStatement().codeRange().getStartLine(),
             ref.getOriginalOperation().getBody().getCompositeStatement().codeRange().getStartLine(),
