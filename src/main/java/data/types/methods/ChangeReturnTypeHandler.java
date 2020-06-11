@@ -13,7 +13,7 @@ public class ChangeReturnTypeHandler extends Handler {
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
     ChangeReturnTypeRefactoring ref = (ChangeReturnTypeRefactoring) refactoring;
-    if (ref.getOperationAfter().isGetter()) {
+    if (ref.getOperationAfter().isGetter() && !ref.getOperationAfter().getBody().getAllVariables().isEmpty()) {
       String id = ref.getOperationAfter().getClassName() + "."
           + ref.getOperationAfter().getBody().getAllVariables().get(0);
       info.setGroupId(id);
