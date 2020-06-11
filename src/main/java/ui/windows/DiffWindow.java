@@ -97,49 +97,63 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
   }
 
   /**
-   * Method that builds the chain of diff windows.
+   * Method that returns a diff request from a refactoring and given file changes from a commit.
+   *
+   * @param info the info about a refactoring
+   * @param changes given changes from a commit
+   * @param project current active project
+   * @return a diff request
+   */
+  public static DiffRequest createDiffFromChanges(
+          RefactoringInfo info, Collection<Change> changes, Project project) {
+    try {
+      String left = "";
+      String right = "";
+      for (Change change : changes) {
+        if (change.getBeforeRevision() != null
+                && (project.getBasePath() + "/" + info.getLeftPath())
+                .equals(change.getBeforeRevision().getFile().getPath())) {
+          left = change.getBeforeRevision().getContent();
+        }
+        if (change.getAfterRevision() != null
+                && (project.getBasePath() + "/" + info.getRightPath())
+                .equals(change.getAfterRevision().getFile().getPath())) {
+          right = change.getAfterRevision().getContent();
+        }
+      }
+      String mid = "";
+      if (info.isThreeSided()) {
+        for (Change change : changes) {
+          if (change.getAfterRevision() != null
+                  && (project.getBasePath() + "/" + info.getMidPath())
+                  .equals(change.getAfterRevision().getFile().getPath())) {
+            mid = change.getAfterRevision().getContent();
+          }
+        }
+        return createDiff(left, mid, right, info, project);
+      } else {
+        return createDiff(left, right, info, project);
+      }
+
+    } catch (VcsException ex) {
+      ex.printStackTrace();
+    }
+    return null;
+  }
+
+  /**
+   * Method that builds the chain of diff requests.
    *
    * @param entry set of refactorings
    * @param changes all changes made in a commit
    * @param project current open project
-   * @return the chain of diff windows
+   * @return the chain of diff requests
    */
   public static DiffRequestChain buildDiffChain(
           RefactoringEntry entry, Collection<Change> changes, Project project) {
     List<DiffRequest> requests = new ArrayList<>();
     for (RefactoringInfo info : entry.getRefactorings()) {
-      try {
-        String left = "";
-        String right = "";
-        for (Change change : changes) {
-          if (change.getBeforeRevision() != null
-                  && (project.getBasePath() + "/" + info.getLeftPath())
-                  .equals(change.getBeforeRevision().getFile().getPath())) {
-            left = change.getBeforeRevision().getContent();
-          }
-          if (change.getAfterRevision() != null
-                  && (project.getBasePath() + "/" + info.getRightPath())
-                  .equals(change.getAfterRevision().getFile().getPath())) {
-            right = change.getAfterRevision().getContent();
-          }
-        }
-        String mid = "";
-        if (info.isThreeSided()) {
-          for (Change change : changes) {
-            if (change.getAfterRevision() != null
-                    && (project.getBasePath() + "/" + info.getMidPath())
-                    .equals(change.getAfterRevision().getFile().getPath())) {
-              mid = change.getAfterRevision().getContent();
-            }
-          }
-          requests.add(createDiff(left, mid, right, info, project));
-        } else {
-          requests.add(createDiff(left, right, info, project));
-        }
-
-      } catch (VcsException ex) {
-        ex.printStackTrace();
-      }
+      requests.add(createDiffFromChanges(info, changes, project));
     }
     return new SimpleDiffRequestChain(requests);
   }
