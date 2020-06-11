@@ -23,6 +23,7 @@ import data.types.Handler;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
+import java.util.function.Function;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import services.MiningService;
@@ -102,8 +103,7 @@ public class GitWindow {
     VcsCommitMetadata metadata = table.getModel().getCommitMetadata(index);
 
 
-    String refactorings = miner.getRefactorings(commitId);
-    RefactoringEntry entry = RefactoringEntry.fromString(refactorings);
+    RefactoringEntry entry = miner.getRefactorings(commitId);
 
     if (entry == null || miner.isMining()) {
       miner.mineAtCommit(metadata, project, this);

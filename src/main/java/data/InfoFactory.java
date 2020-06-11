@@ -47,6 +47,7 @@ import data.types.variables.RenameVariableHandler;
 import data.types.variables.SplitVariableHandler;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
 

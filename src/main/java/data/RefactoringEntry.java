@@ -24,8 +24,10 @@ import data.diffRequests.TwoSidedDiffRequestGenerator;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.refactoringminer.api.Refactoring;
@@ -33,9 +35,9 @@ import utils.Utils;
 
 public class RefactoringEntry implements Serializable {
 
-  private static final InfoFactory factory = new InfoFactory();
-  private final String parent;
+  private static transient final InfoFactory factory = new InfoFactory();
   private final String commitId;
+  private final String parent;
   private final long time;
   private List<RefactoringInfo> refactorings;
 
@@ -46,39 +48,57 @@ public class RefactoringEntry implements Serializable {
    * @param time   timestamp of the commit.
    */
   public RefactoringEntry(String commitId, String parent, long time) {
+    this.commitId = commitId;
     this.parent = parent;
     this.time = time;
-    this.commitId = commitId;
+  }
+//
+//  /**
+//   * Deserialize a refactoring info json.
+//   *
+//   * @param value json string
+//   * @return a new data.RefactoringInfo object
+//   */
+//  public static RefactoringEntry fromString(String value) {
+//    if (value == null || value.equals("")) {
+//      return null;
+//    }
+//    try {
+//      Gson gson = new GsonBuilder()
+//          .registerTypeAdapter(DiffFragment.class,
+//              InterfaceSerializer.interfaceSerializer(DiffFragmentImpl.class))
+//          .registerTypeAdapter(MergeLineFragment.class,
+//              InterfaceSerializer.interfaceSerializer(MergeLineFragmentImpl.class))
+//          .registerTypeAdapter(LineFragment.class,
+//              InterfaceSerializer.interfaceSerializer(LineFragmentImpl.class))
+//          .registerTypeAdapter(DiffRequestGenerator.class,
+//              InterfaceSerializer.interfaceSerializer(TwoSidedDiffRequestGenerator.class))
+//          .create();
+//      RefactoringEntry
+//          entry = gson.fromJson(value, RefactoringEntry.class);
+//      entry.getRefactorings().forEach(r -> r.setEntry(entry));
+//      return entry;
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//      return null;
+//    }
+//  }
+
+  public static RefactoringEntry fromString(String value) {
+    String[] tokens = value.split(",", 4);
+    String[] refs = tokens[3].split(",");
+    RefactoringEntry entry = new RefactoringEntry(
+        tokens[0], tokens[1], Long.parseLong(tokens[2]))
+        .setRefactorings(Arrays.stream(refs)
+            .map(RefactoringInfo::fromString).collect(Collectors.toList()));
+    entry.getRefactorings().forEach(r -> r.setEntry(entry));
+    return entry;
   }
 
-  /**
-   * Deserialize a refactoring info json.
-   *
-   * @param value json string
-   * @return a new data.RefactoringInfo object
-   */
-  public static RefactoringEntry fromString(String value) {
-    if (value == null || value.equals("")) {
-      return null;
-    }
-    try {
-      Gson gson = new GsonBuilder()
-          .registerTypeAdapter(DiffFragment.class,
-              InterfaceSerializer.interfaceSerializer(DiffFragmentImpl.class))
-          .registerTypeAdapter(MergeLineFragment.class,
-              InterfaceSerializer.interfaceSerializer(MergeLineFragmentImpl.class))
-          .registerTypeAdapter(LineFragment.class,
-              InterfaceSerializer.interfaceSerializer(LineFragmentImpl.class))
-          .registerTypeAdapter(DiffRequestGenerator.class,
-              InterfaceSerializer.interfaceSerializer(TwoSidedDiffRequestGenerator.class))
-          .create();
-      RefactoringEntry entry = gson.fromJson(value, RefactoringEntry.class);
-      entry.getRefactorings().forEach(r -> r.setEntry(entry));
-      return entry;
-    } catch (Exception e) {
-      e.printStackTrace();
-      return null;
-    }
+  @Override
+  public String toString() {
+    return commitId + "," + parent + "," + time + "," + refactorings.stream()
+        .map(RefactoringInfo::toString).collect(Collectors.joining(","));
   }
 
   /**
@@ -88,8 +108,8 @@ public class RefactoringEntry implements Serializable {
    * @param commit       current commit.
    * @return Json string.
    */
-  public static String convert(List<Refactoring> refactorings, VcsCommitMetadata commit,
-                               Project project) {
+  public static RefactoringEntry convert(List<Refactoring> refactorings, VcsCommitMetadata commit,
+                                         Project project) {
 
     RefactoringEntry entry =
         new RefactoringEntry(commit.getId().asString(),
@@ -102,7 +122,7 @@ public class RefactoringEntry implements Serializable {
     entry.setRefactorings(infos).combineRelated();
 
     entry.refactorings.forEach(info -> Utils.check(info, project));
-    return entry.toString();
+    return entry;
   }
 
   private void combineRelated() {
@@ -122,7 +142,7 @@ public class RefactoringEntry implements Serializable {
       if (v.size() > 1) {
         RefactoringInfo info = Utils.getMainRefactoringInfo(v);
 
-        if(info == null) {
+        if (info == null) {
           System.out.println("Grouping failed");
           return;
         }
@@ -193,11 +213,6 @@ public class RefactoringEntry implements Serializable {
     return parent;
   }
 
-  @Override
-  public String toString() {
-    return new Gson().toJson(this);
-  }
-
   public long getTimeStamp() {
     return time;
   }
@@ -236,9 +251,9 @@ public class RefactoringEntry implements Serializable {
                          final JsonDeserializationContext context) {
       try {
         T obj = context.deserialize(jsonElement, implementationClass);
-        if(obj.getClass().equals(TwoSidedDiffRequestGenerator.class)){
-          var v = (TwoSidedDiffRequestGenerator)obj;
-          if(v.fragments == null){
+        if (obj.getClass().equals(TwoSidedDiffRequestGenerator.class)) {
+          var v = (TwoSidedDiffRequestGenerator) obj;
+          if (v.fragments == null) {
             throw new Exception("wrong side number");
           }
         }

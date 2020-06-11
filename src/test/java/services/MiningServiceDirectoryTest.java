@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 import org.apache.commons.io.FileUtils;
@@ -74,12 +75,12 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
     assertNull(RefactoringEntry.fromString(null));
 
     assertEquals(1, entry.getRefactorings().size());
-    assertTrue(miner.getRefactorings(head).length() > 0);
+    assertTrue(miner.getRefactorings(head).getRefactorings().size() > 0);
 
     assertThrows(IllegalArgumentException.class, () -> MiningService.getInstance(null));
     assertEquals(miner, MiningService.getInstance(myProject));
     assertNotNull(miner.getState());
-    assertFalse(miner.getState().map.isEmpty());
+    assertFalse(miner.getState().refactoringsMap.map.isEmpty());
     assertTrue(!miner.isMining());
     assertFalse(miner.getMethodHistory().isEmpty());
     assertThrows(NullPointerException.class, () -> miner.mineAndWait(null));
@@ -89,7 +90,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
 
     TreeCellRenderer cellRenderer = new CellRenderer();
 
-    miner.getState().map.values().stream().map(RefactoringEntry::fromString)
+    miner.getState().refactoringsMap.map.values()
         .forEach(x -> {
           Tree tree1 = x.buildTree();
           tree1.setCellRenderer(cellRenderer);

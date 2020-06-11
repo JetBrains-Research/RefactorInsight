@@ -1,6 +1,5 @@
 package data;
 
-import com.google.gson.Gson;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import data.diffRequests.DiffRequestGenerator;
@@ -8,6 +7,7 @@ import data.diffRequests.ThreeSidedDiffRequestGenerator;
 import data.diffRequests.TwoSidedDiffRequestGenerator;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -15,23 +15,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.refactoringminer.api.RefactoringType;
 
 public class RefactoringInfo {
 
-  private DiffRequestGenerator requestGenerator = new TwoSidedDiffRequestGenerator();
   private transient RefactoringEntry entry;
+  private transient String groupId;
+  private transient RefactoringType type;
 
+  private DiffRequestGenerator requestGenerator = new TwoSidedDiffRequestGenerator();
   private String name;
 
   private String[][] uiStrings = new String[3][2];
   private String[] paths = new String[3];
 
-  private Set<String> includes = new HashSet<>();
-
-  private RefactoringType type;
   private Group group;
-  private String groupId;
+
+  private Set<String> includes = new HashSet<>();
 
   private boolean hidden = false;
   private boolean threeSided = false;
@@ -39,6 +41,48 @@ public class RefactoringInfo {
 
   public SimpleDiffRequest generate(DiffContent[] contents) {
     return requestGenerator.generate(contents, this);
+  }
+
+  public String toString() {
+    return name + Stream.concat(
+        Arrays.stream(uiStrings).flatMap(Arrays::stream),
+        Arrays.stream(paths)).map(s -> s == null ? "null" : s)
+        .collect(Collectors.joining(";", ";", ";"))
+        + group.toString() + ";" + (threeSided ? "t" : "f") + ";"
+        + (hidden ? "t" : "f") + ";" + requestGenerator.toString() + ";"
+        + String.join(";", includes);
+  }
+
+  public static RefactoringInfo fromString(String value) {
+    String[] tokens = value.split(";", 15);
+    return new RefactoringInfo()
+        .setName(tokens[0])
+        .setNameBefore(tokens[1])
+        .setElementBefore(tokens[2])
+        .setDetailsBefore(tokens[3])
+        .setNameAfter(tokens[4])
+        .setElementAfter(tokens[5])
+        .setDetailsAfter(tokens[6])
+        .setLeftPath(tokens[7])
+        .setMidPath(tokens[8])
+        .setRightPath(tokens[9])
+        .setGroup(Group.valueOf(tokens[10]))
+        .setThreeSided(tokens[11].equals("t"))
+        .setHidden(tokens[12].equals("t"))
+        .setRequestGenerator(tokens[11].equals("t")
+            ? TwoSidedDiffRequestGenerator.fromString(tokens[13])
+            : ThreeSidedDiffRequestGenerator.fromString(tokens[13]))
+        .setIncludes(new HashSet<>(Arrays.asList(tokens[14].split(";"))));
+  }
+
+  public RefactoringInfo setRequestGenerator(DiffRequestGenerator requestGenerator) {
+    this.requestGenerator = requestGenerator;
+    return this;
+  }
+
+  public RefactoringInfo setIncludes(Set<String> includes) {
+    this.includes = includes;
+    return this;
   }
 
   /**
@@ -101,10 +145,6 @@ public class RefactoringInfo {
     return this;
   }
 
-  @Override
-  public String toString() {
-    return new Gson().toJson(this);
-  }
 
   public void addAllMarkings(RefactoringInfo info) {
     requestGenerator.getMarkings().addAll(info.getLineMarkings());
@@ -186,8 +226,9 @@ public class RefactoringInfo {
     return hidden;
   }
 
-  public void setHidden(boolean hidden) {
+  public RefactoringInfo setHidden(boolean hidden) {
     this.hidden = hidden;
+    return this;
   }
 
   public String getGroupId() {

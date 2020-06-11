@@ -2,7 +2,6 @@ package data.diffRequests;
 
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.fragments.LineFragment;
-import com.intellij.diff.fragments.LineFragmentImpl;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.util.DiffUserDataKeysEx;
 import data.RefactoringInfo;
@@ -34,5 +33,9 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
     fragments = lineMarkings.stream()
         .map(RefactoringLine::getTwoSidedRange)
         .collect(Collectors.toList());
+  }
+
+  public String toString(){
+
   }
 }
