@@ -22,10 +22,8 @@ import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.Times;
-<<<<<<< HEAD
+import ui.tree.renderer.CellRenderer;
 import ui.windows.GitWindow;
-=======
->>>>>>> master
 
 /**
  * Extend GitSingleRepoTest
