@@ -2,6 +2,7 @@ package utils;
 
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameterList;
+import data.RefactoringInfo;
 import gr.uom.java.xmi.UMLOperation;
 
 public class StringUtils {
@@ -74,5 +75,27 @@ public class StringUtils {
 
     builder.append(")");
     return builder.toString();
+  }
+
+  /**
+   * Method for create a presentable String out of the
+   * name refactoring.
+   *
+   * @return presentable String that shows the changes if existent, else shows a presentable name.
+   */
+  public static String getDisplayableName(RefactoringInfo info) {
+    String before = info.getNameBefore();
+    if (before.contains(".")) {
+      before = info.getNameBefore().substring(info.getNameBefore().lastIndexOf(".") + 1);
+    }
+    String after = info.getNameAfter();
+    if (after.contains(".")) {
+      after = info.getNameAfter().substring(info.getNameAfter().lastIndexOf(".") + 1);
+    }
+    if (before.equals(after)) {
+      return before;
+    } else {
+      return before + " -> " + after;
+    }
   }
 }

@@ -1,5 +1,6 @@
 package data.diff;
 
+import static ui.windows.DiffWindow.REFACTORING;
 import static ui.windows.DiffWindow.REFACTORING_RANGES;
 
 import com.intellij.diff.contents.DiffContent;
@@ -22,6 +23,7 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
         contents[0], contents[1], contents[2],
         info.getLeftPath(), info.getMidPath(), info.getRightPath());
     request.putUserData(REFACTORING_RANGES, ranges);
+    request.putUserData(REFACTORING, true);
     return request;
   }
 

@@ -6,7 +6,6 @@ import static org.refactoringminer.api.RefactoringType.CHANGE_VARIABLE_TYPE;
 import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
 import static org.refactoringminer.api.RefactoringType.RENAME_PARAMETER;
 
-
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vcs.FilePath;

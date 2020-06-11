@@ -16,9 +16,16 @@ public class ThreeSidedRange {
   List<TextRange> right;
 
   RefactoringLine.VisualisationType type;
-
   MergeLineFragment fragment;
 
+  /**
+   * Constructor for ThreeSidedRange.
+   * @param left TextRanges
+   * @param mid TextRanges
+   * @param right TextRanges
+   * @param type VisualisationType
+   * @param fragment MergeLineFragment
+   */
   public ThreeSidedRange(List<TextRange> left, List<TextRange> mid, List<TextRange> right,
                          RefactoringLine.VisualisationType type,
                          MergeLineFragment fragment) {

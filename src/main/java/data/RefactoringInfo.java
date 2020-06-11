@@ -19,8 +19,8 @@ import org.refactoringminer.api.RefactoringType;
 
 public class RefactoringInfo {
 
-  private DiffRequestGenerator requestGenerator = new TwoSidedDiffRequestGenerator();
   private transient RefactoringEntry entry;
+  private DiffRequestGenerator requestGenerator = new TwoSidedDiffRequestGenerator();
 
   private String name;
 
@@ -35,11 +35,6 @@ public class RefactoringInfo {
 
   private boolean hidden = false;
   private boolean threeSided = false;
-
-
-  public SimpleDiffRequest generate(DiffContent[] contents) {
-    return requestGenerator.generate(contents, this);
-  }
 
   /**
    * Adds this refactoring to the method history map.
@@ -99,6 +94,10 @@ public class RefactoringInfo {
     }
     setRightPath(right.getFilePath());
     return this;
+  }
+
+  public SimpleDiffRequest generate(DiffContent[] contents) {
+    return requestGenerator.generate(contents, this);
   }
 
   @Override
@@ -248,28 +247,6 @@ public class RefactoringInfo {
   public RefactoringInfo setNameAfter(String nameAfter) {
     uiStrings[0][1] = nameAfter;
     return this;
-  }
-
-  /**
-   * Method for create a presentable String out of the
-   * name refactoring.
-   *
-   * @return presentable String that shows the changes if existent, else shows a presentable name.
-   */
-  public String getDisplayableName() {
-    String before = getNameBefore();
-    if (before.contains(".")) {
-      before = getNameBefore().substring(getNameBefore().lastIndexOf(".") + 1);
-    }
-    String after = getNameAfter();
-    if (after.contains(".")) {
-      after = getNameAfter().substring(getNameAfter().lastIndexOf(".") + 1);
-    }
-    if (before.equals(after)) {
-      return before;
-    } else {
-      return before + " -> " + after;
-    }
   }
 
   public String getElementBefore() {

@@ -43,6 +43,12 @@ public class RefactoringLine {
     this.type = type;
   }
 
+  /**
+   * Corrects lines and offsets returned by RefactoringMiner.
+   * @param leftText String containing whole left file contents
+   * @param midText String containing whole middle file contents
+   * @param rightText String containing whole righr file contents
+   */
   public void correctLines(String leftText, String midText, String rightText) {
     int maxLineLeft = Utils.getMaxLine(leftText);
     int maxLineRight = Utils.getMaxLine(rightText);
@@ -53,47 +59,53 @@ public class RefactoringLine {
       lines[MID_END] = lines[MID_END] < 0 ? maxLineMid : lines[MID_END];
     }
     computeLazyHighlighting(leftText, midText, rightText);
-
-
     if (midText == null) {
-      List<DiffFragment> fragments = offsets.stream().map(RefactoringOffset::toDiffFragment)
-          .collect(Collectors.toList());
-      if (hasColumns) {
-        fragments.add(new DiffFragmentImpl(
-            Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]),
-            Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]),
-            Utils.getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]),
-            Utils.getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END])));
-      }
-      fragment = new LineFragmentImpl(lines[LEFT_START], lines[LEFT_END], lines[RIGHT_START],
-          lines[RIGHT_END], 0, 0, 0, 0, fragments);
+      computeTwoSidedRanges(leftText, rightText);
     } else {
-      left = offsets.stream().map(RefactoringOffset::getLeftRange)
-          .collect(Collectors.toList());
-      mid = new ArrayList<>();
-      right = offsets.stream().map(RefactoringOffset::getRightRange)
-          .collect(Collectors.toList());
-
-      if (hasColumns) {
-        int leftStartOffset = Utils.getOffset(leftText, lines[LEFT_START] + 1, 1);
-        left.add(new TextRange(
-            Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]) - leftStartOffset,
-            Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]) - leftStartOffset
-        ));
-        int midStartOffset = Utils.getOffset(midText, lines[MID_START] + 1, 1);
-        mid.add(new TextRange(
-            Utils.getOffset(midText, lines[MID_START] + 1, columns[MID_START]) - midStartOffset,
-            Utils.getOffset(midText, lines[MID_END], columns[MID_END]) - midStartOffset
-        ));
-        int rightStartOffset = Utils.getOffset(rightText, lines[RIGHT_START] + 1, 1);
-        right.add(new TextRange(
-            Utils.getOffset(rightText, lines[RIGHT_START] + 1,
-                columns[RIGHT_START]) - rightStartOffset,
-            Utils.getOffset(rightText, lines[RIGHT_END],
-                columns[RIGHT_END]) - rightStartOffset
-        ));
-      }
+      computeThreeSidedRanges(leftText, midText, rightText);
     }
+  }
+
+  private void computeThreeSidedRanges(String leftText, String midText, String rightText) {
+    left = offsets.stream().map(RefactoringOffset::getLeftRange)
+        .collect(Collectors.toList());
+    mid = new ArrayList<>();
+    right = offsets.stream().map(RefactoringOffset::getRightRange)
+        .collect(Collectors.toList());
+
+    if (hasColumns) {
+      int leftStartOffset = Utils.getOffset(leftText, lines[LEFT_START] + 1, 1);
+      left.add(new TextRange(
+          Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]) - leftStartOffset,
+          Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]) - leftStartOffset
+      ));
+      int midStartOffset = Utils.getOffset(midText, lines[MID_START] + 1, 1);
+      mid.add(new TextRange(
+          Utils.getOffset(midText, lines[MID_START] + 1, columns[MID_START]) - midStartOffset,
+          Utils.getOffset(midText, lines[MID_END], columns[MID_END]) - midStartOffset
+      ));
+      int rightStartOffset = Utils.getOffset(rightText, lines[RIGHT_START] + 1, 1);
+      right.add(new TextRange(
+          Utils.getOffset(rightText, lines[RIGHT_START] + 1,
+              columns[RIGHT_START]) - rightStartOffset,
+          Utils.getOffset(rightText, lines[RIGHT_END],
+              columns[RIGHT_END]) - rightStartOffset
+      ));
+    }
+  }
+
+  private void computeTwoSidedRanges(String leftText, String rightText) {
+    List<DiffFragment> fragments = offsets.stream().map(RefactoringOffset::toDiffFragment)
+        .collect(Collectors.toList());
+    if (hasColumns) {
+      fragments.add(new DiffFragmentImpl(
+          Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]),
+          Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]),
+          Utils.getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]),
+          Utils.getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END])));
+    }
+    fragment = new LineFragmentImpl(lines[LEFT_START], lines[LEFT_END], lines[RIGHT_START],
+        lines[RIGHT_END], 0, 0, 0, 0, fragments);
   }
 
   private void computeLazyHighlighting(String leftText, String midText, String rightText) {
@@ -167,6 +179,10 @@ public class RefactoringLine {
     return fragment;
   }
 
+  /**
+   * Computes the ThreeSidedRange representing this.
+   * @return ThreeSidedRange
+   */
   public ThreeSidedRange getThreeSidedRange() {
     return new ThreeSidedRange(left, mid, right, type,
         new MergeLineFragmentImpl(

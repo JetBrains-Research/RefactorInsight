@@ -36,7 +36,7 @@ import utils.Utils;
 
 public class RefactoringEntry implements Serializable {
 
-  private static final InfoFactory factory = new InfoFactory();
+  private static final transient InfoFactory factory = new InfoFactory();
   private final String parent;
   private final String commitId;
   private final long time;
@@ -163,10 +163,6 @@ public class RefactoringEntry implements Serializable {
             r.setHidden(true);
           });
     }
-  }
-
-  private Predicate<RefactoringInfo> ofType(RefactoringType type) {
-    return (r) -> r.getType() == type;
   }
 
   /**

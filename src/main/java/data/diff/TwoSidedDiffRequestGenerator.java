@@ -1,5 +1,7 @@
 package data.diff;
 
+import static ui.windows.DiffWindow.REFACTORING;
+
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.fragments.LineFragment;
 import com.intellij.diff.requests.SimpleDiffRequest;
@@ -24,6 +26,7 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
     request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
         (text1, text2, policy, innerChanges, indicator)
             -> fragments);
+    request.putUserData(REFACTORING, true);
     return request;
   }
 

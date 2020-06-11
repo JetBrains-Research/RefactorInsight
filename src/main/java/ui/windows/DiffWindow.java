@@ -21,7 +21,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
   public static Key<List<ThreeSidedRange>> REFACTORING_RANGES =
       Key.create("refactoringMiner.List<ThreeSidedRange>");
-  public static Key<Boolean> REFACTORING = //todo
+  public static Key<Boolean> REFACTORING =
       Key.create("refactoringMiner.isRefactoringDiff");
 
 
@@ -54,7 +54,6 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
     myViewer.addListener(new MyDiffViewerListener(myViewer, ranges));
 
     Boolean isRefactoring = request.getUserData(REFACTORING);
-
     if (isRefactoring != null) {
       myViewer.getTextSettings().setExpandByDefault(false);
     }
