@@ -7,6 +7,7 @@ import com.intellij.diff.FrameDiffTool;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.DiffRequest;
 import com.intellij.diff.requests.SimpleDiffRequest;
+import com.intellij.diff.tools.simple.SimpleDiffViewer;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
 import com.intellij.diff.tools.simple.ThreesideDiffChangeBase;
@@ -25,6 +26,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       Key.create("refactoringMiner.RefactoringInfo");
   public static Key<String[]> FILE_CONTENTS =
       Key.create("refactoringMiner.fileContentsArray");
+  public static Key<Boolean> REFACTORING =
+      Key.create("refactoringMiner.isRefactoringDiff");
 
   /**
    * Requests diff window to show specific refactoring with two editors.
@@ -47,6 +50,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
     request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
         (text1, text2, policy, innerChanges, indicator) ->
             info.getTwoSidedLineMarkings(left, right));
+    request.putUserData(REFACTORING, true);
 
     DiffManager.getInstance().showDiff(project, request);
   }
@@ -76,6 +80,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
     String[] texts = {left, mid, right};
 
+    request.putUserData(REFACTORING, true);
     request.putUserData(REFACTORING_INFO, info);
     request.putUserData(FILE_CONTENTS, texts);
 
@@ -93,14 +98,20 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
   @Override
   public void onViewerCreated(@NotNull FrameDiffTool.DiffViewer viewer,
                               @NotNull DiffContext context, @NotNull DiffRequest request) {
+    Boolean isRefactoring = request.getUserData(REFACTORING);
     RefactoringInfo info = request.getUserData(REFACTORING_INFO);
-    if (info == null) {
+    if (isRefactoring != null && info == null) {
+      SimpleDiffViewer myViewer = (SimpleDiffViewer) viewer;
+      myViewer.getTextSettings().setExpandByDefault(false);
       return;
     }
 
-    String[] texts = request.getUserData(FILE_CONTENTS);
-    SimpleThreesideDiffViewer myViewer = (SimpleThreesideDiffViewer) viewer;
-    myViewer.addListener(new MyDiffViewerListener(myViewer, info, texts));
+    if (isRefactoring != null) {
+      String[] texts = request.getUserData(FILE_CONTENTS);
+      SimpleThreesideDiffViewer myViewer = (SimpleThreesideDiffViewer) viewer;
+      myViewer.getTextSettings().setExpandByDefault(false);
+      myViewer.addListener(new MyDiffViewerListener(myViewer, info, texts));
+    }
   }
 
   public static class MyDiffViewerListener extends DiffViewerListener {
