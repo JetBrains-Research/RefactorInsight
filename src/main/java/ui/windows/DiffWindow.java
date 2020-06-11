@@ -1,6 +1,10 @@
 package ui.windows;
 
-import com.intellij.diff.*;
+import com.intellij.diff.DiffContentFactoryEx;
+import com.intellij.diff.DiffContext;
+import com.intellij.diff.DiffDialogHints;
+import com.intellij.diff.DiffManager;
+import com.intellij.diff.FrameDiffTool;
 import com.intellij.diff.chains.DiffRequestChain;
 import com.intellij.diff.chains.SimpleDiffRequestChain;
 import com.intellij.diff.contents.DiffContent;
@@ -20,7 +24,6 @@ import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +44,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
    * @param info    RefactoringInfo
    * @param project Current project
    */
-  public static DiffRequest createDiff(String left, String right, RefactoringInfo info, Project project) {
+  public static DiffRequest createDiff(String left, String right,
+                                       RefactoringInfo info, Project project) {
     DiffContentFactoryEx myDiffContentFactory = DiffContentFactoryEx.getInstanceEx();
     DiffContent diffContentBefore = myDiffContentFactory.create(project, left,
         JavaClassFileType.INSTANCE);
@@ -92,9 +96,18 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
   }
 
-  public static DiffRequestChain buildDiffChain(RefactoringEntry entry, Collection<Change> changes, Project project) {
+  /**
+   * Method that builds the chain of diff windows.
+   *
+   * @param entry set of refactorings
+   * @param changes all changes made in a commit
+   * @param project current open project
+   * @return the chain of diff windows
+   */
+  public static DiffRequestChain buildDiffChain(
+          RefactoringEntry entry, Collection<Change> changes, Project project) {
     List<DiffRequest> requests = new ArrayList<>();
-    for(RefactoringInfo info : entry.getRefactorings()) {
+    for (RefactoringInfo info : entry.getRefactorings()) {
       try {
         String left = "";
         String right = "";
