@@ -6,23 +6,19 @@ import static org.refactoringminer.api.RefactoringType.CHANGE_VARIABLE_TYPE;
 import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
 import static org.refactoringminer.api.RefactoringType.RENAME_PARAMETER;
 
+
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.vcs.LocalFilePath;
 import com.intellij.openapi.vcs.VcsException;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiParameterList;
-import com.intellij.util.text.JBDateFormat;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import data.RefactoringInfo;
 import git4idea.GitContentRevision;
 import git4idea.GitRevisionNumber;
-import gr.uom.java.xmi.UMLOperation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import org.jetbrains.annotations.NotNull;
 import org.refactoringminer.api.RefactoringType;
 
 public class Utils {
@@ -50,81 +46,6 @@ public class Utils {
    */
   public static void add(MainVcsLogUi log) {
     logs.add(log);
-  }
-
-
-  /**
-   * <<<<<<< HEAD
-   * Creates presentable text for a refactoring info.
-   * Displayed in Method History Toolbar.
-   *
-   * @param info to create presentable Text for.
-   * @return
-   */
-  @NotNull
-  public static String getTextMethodToolbar(RefactoringInfo info) {
-    final String second = JBDateFormat.getFormatter()
-        .formatPrettyDateTime(info.getTimestamp());
-    final String first = info.getName();
-    return createHtml(second, first);
-  }
-
-  @NotNull
-  private static String createHtml(String second, String first) {
-    final String str = getStringForRefactoringNode(first, second);
-    return createHtml(str);
-  }
-
-  /**
-   * Creates presentable text.
-   *
-   * @param str html
-   * @return html representation of the text
-   */
-  @NotNull
-  public static String createHtml(String str) {
-    StringBuffer html = new StringBuffer(str);
-    return html.toString();
-  }
-
-  @NotNull
-  private static String getStringForRefactoringNode(String first, String second) {
-    return "<html> <b>" + first + "</b> <font color=\"#696969\"> "
-        + second + "</font></html>";
-  }
-
-  /**
-   * Creates presentable text for leaf nodes.
-   *
-   * @param first  line number (after refactoring)
-   * @param second element
-   * @param third  filename
-   * @return text
-   */
-  public static String getStringLeaf(String first, String second, String third) {
-    second = second.replace("<", "&lt;");
-    second = second.replace(">", "&gt;");
-    return "<html> <font color=\"#696969\"> " + first + " </font> "
-        + second + (third.equals("") ? "</html>"
-        : ("<font color=\"#696969\"> in file " + third + " </font></html>"));
-  }
-
-
-  /**
-   * Creates presentable text for the VcsLogUI refactoring nodes.
-   *
-   * @param info to create text for.
-   * @return presentable text.
-   */
-  @NotNull
-  public static String getTextLogUI(RefactoringInfo info) {
-    String second =
-        info.getIncludingRefactorings().size() > 0
-            ? info.getIncludingRefactorings().toString() : "  ";
-    second = second.substring(1, second.length() - 1);
-    second = second.equals("") ? "" : (" implied " + second);
-    final String first = info.getName();
-    return createHtml(second, first);
   }
 
   /**
@@ -176,7 +97,7 @@ public class Utils {
    * Gets the main refactoring in the list for combining purposes.
    *
    * @param infos list of refactorings
-   * @return
+   * @return RefactoringInfo
    */
   public static RefactoringInfo getMainRefactoringInfo(List<RefactoringInfo> infos) {
     RefactoringInfo info = null;
@@ -208,8 +129,8 @@ public class Utils {
   /**
    * Checks and corrects the ranges returned by RefactoringMiner.
    *
-   * @param info
-   * @param project
+   * @param info refactoring info
+   * @param project the open project
    * @return the corrected RefactoringInfo
    */
   public static RefactoringInfo check(RefactoringInfo info, Project project) {

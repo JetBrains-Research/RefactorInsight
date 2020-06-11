@@ -21,23 +21,17 @@ public class RefactoringLine {
   private static final int MID_END = 3;
   private static final int RIGHT_START = 4;
   private static final int RIGHT_END = 5;
-
+  VisualisationType type;
   private int[] lines = new int[6];
   private int[] columns = new int[6];
   private List<RefactoringOffset> offsets = new ArrayList<>();
-
   private boolean hasColumns = false;
-
   private String[] lazilyHighlightableWords;
   private boolean lazy = false;
-
-
   private List<TextRange> left;
   private List<TextRange> mid;
   private List<TextRange> right;
-
   private LineFragmentImpl fragment;
-  VisualisationType type;
 
   /**
    * Data holder for three sided refactoring diff.

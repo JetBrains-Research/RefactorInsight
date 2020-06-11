@@ -23,11 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.Times;
 <<<<<<< HEAD
-import ui.renderer.CellRenderer;
 import ui.windows.GitWindow;
 =======
-import ui.windows.GitWindow;
-import ui.tree.renderer.CellRenderer;
 >>>>>>> master
 
 /**

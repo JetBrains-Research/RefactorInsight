@@ -24,7 +24,7 @@ import java.util.Collection;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import services.MiningService;
-import ui.renderer.CellRenderer;
+import ui.tree.renderer.CellRenderer;
 
 public class GitWindow {
   private Project project;
