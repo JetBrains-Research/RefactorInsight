@@ -33,29 +33,34 @@ public class RenameMethodHandler extends Handler {
     String classNameBefore = ref.getOriginalOperation().getClassName();
     String classNameAfter = ref.getRenamedOperation().getClassName();
 
-
-    return info.setGroup(RefactoringInfo.Group.METHOD)
+    info.setGroup(RefactoringInfo.Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
         .setElementBefore(null)
         .setElementAfter(null)
+        .setNameBefore(StringUtils.calculateSignature(ref.getOriginalOperation()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getRenamedOperation()))
         .addMarking(ref.getOriginalOperation().getBody().getCompositeStatement().codeRange(),
             ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
             refactoringLine -> refactoringLine.setHasColumns(false),
-            RefactoringLine.MarkingOption.NONE, false)
-        .addMarking(
-            ref.getOriginalOperation().getBody().getCompositeStatement().codeRange(),
-            ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
-            refactoringLine -> {
-              refactoringLine.setLazilyHighlightableWords(new String[] {
-                  ref.getOriginalOperation().getName(),
-                  null,
-                  ref.getRenamedOperation().getName()
-              });
-            },
-            RefactoringLine.MarkingOption.COLLAPSE,
-            true)
-        .setNameBefore(StringUtils.calculateSignature(ref.getOriginalOperation()))
-        .setNameAfter(StringUtils.calculateSignature(ref.getRenamedOperation()));
+            RefactoringLine.MarkingOption.NONE, false);
+
+
+    if (ref.getOriginalOperation().getBody() == null) {
+      return info.addMarking(ref.getOriginalOperation().codeRange(),
+          ref.getRenamedOperation().codeRange(), false);
+    }
+    return info.addMarking(
+        ref.getOriginalOperation().getBody().getCompositeStatement().codeRange(),
+        ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
+        refactoringLine -> {
+          refactoringLine.setLazilyHighlightableWords(new String[] {
+              ref.getOriginalOperation().getName(),
+              null,
+              ref.getRenamedOperation().getName()
+          });
+        },
+        RefactoringLine.MarkingOption.COLLAPSE,
+        true);
   }
 }

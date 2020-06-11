@@ -124,7 +124,6 @@ public class RefactoringEntry implements Serializable {
     groups.forEach((k, v) -> {
       if (v.size() > 1) {
         RefactoringInfo info = Utils.getMainRefactoringInfo(v);
-
         if (info == null) {
           System.out.println("Grouping failed");
           return;
