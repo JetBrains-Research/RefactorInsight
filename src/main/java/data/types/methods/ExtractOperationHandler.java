@@ -43,7 +43,7 @@ public class ExtractOperationHandler extends Handler {
               invocation,
               RefactoringLine.VisualisationType.RIGHT,
               refactoringLine -> {
-                refactoringLine.setLazilyHighlightableWords(new String[] {
+                refactoringLine.setWord(new String[] {
                     null,
                     ref.getExtractedOperation().getName(),
                     null

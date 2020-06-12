@@ -61,7 +61,7 @@ public class ExtractClassHandler extends Handler {
 
           RefactoringLine.VisualisationType.RIGHT,
           refactoringLine -> {
-            refactoringLine.setLazilyHighlightableWords(new String[] {
+            refactoringLine.setWord(new String[] {
                 null,
                 className,
                 null

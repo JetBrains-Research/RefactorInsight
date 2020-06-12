@@ -1,12 +1,7 @@
 package ui.windows;
 
-import com.intellij.diff.DiffContentFactoryEx;
-import com.intellij.diff.contents.DiffContent;
-import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.VcsException;
-import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBViewport;
@@ -20,7 +15,6 @@ import data.RefactoringEntry;
 import data.RefactoringInfo;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Collection;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import services.MiningService;
@@ -123,7 +117,9 @@ public class GitWindow {
           if (node.isLeaf()) {
             RefactoringInfo info = (RefactoringInfo)
                 node.getUserObjectPath()[1];
-            showDiff(index, info, project);
+
+            DiffWindow.showDiff(table.getModel().getFullDetails(index)
+                .getChanges(0), info, project, entry);
           }
         }
       }
@@ -131,42 +127,4 @@ public class GitWindow {
     viewport.setView(tree);
   }
 
-  private void showDiff(int index, RefactoringInfo info, Project project) {
-    if (info.getLeftPath() == null) {
-      return;
-    }
-    Collection<Change> changes =
-        table.getModel().getFullDetails(index).getChanges(0);
-    try {
-      DiffContentFactoryEx myDiffContentFactory = DiffContentFactoryEx.getInstanceEx();
-      DiffContent[] contents = {null, null, null};
-      for (Change change : changes) {
-        if (change.getBeforeRevision() != null) {
-          change.getBeforeRevision().getFile().getPath();
-          if (change.getBeforeRevision().getFile().getPath().contains(info.getLeftPath())) {
-            contents[0] = myDiffContentFactory.create(project,
-                change.getBeforeRevision().getContent(),
-                JavaClassFileType.INSTANCE);
-          }
-        }
-        if (info.isThreeSided()
-            && change.getAfterRevision() != null
-            && change.getAfterRevision().getFile().getPath().contains(info.getMidPath())) {
-          contents[1] = myDiffContentFactory.create(project,
-              change.getAfterRevision().getContent(),
-              JavaClassFileType.INSTANCE);
-        }
-        if (change.getAfterRevision() != null
-            && change.getAfterRevision().getFile().getPath().contains(info.getRightPath())) {
-          contents[2] = myDiffContentFactory.create(project,
-              change.getAfterRevision().getContent(),
-              JavaClassFileType.INSTANCE);
-        }
-      }
-      DiffWindow.showDiff(contents, info, project);
-
-    } catch (VcsException ex) {
-      ex.printStackTrace();
-    }
-  }
 }

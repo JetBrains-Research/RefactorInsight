@@ -3,7 +3,6 @@ package data.types.methods;
 import data.RefactoringInfo;
 import data.RefactoringLine;
 import data.types.Handler;
-import gr.uom.java.xmi.UMLOperation;
 import gr.uom.java.xmi.diff.RenameOperationRefactoring;
 import java.util.List;
 import org.refactoringminer.api.Refactoring;
@@ -54,7 +53,7 @@ public class RenameMethodHandler extends Handler {
         ref.getOriginalOperation().getBody().getCompositeStatement().codeRange(),
         ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
         refactoringLine -> {
-          refactoringLine.setLazilyHighlightableWords(new String[] {
+          refactoringLine.setWord(new String[] {
               ref.getOriginalOperation().getName(),
               null,
               ref.getRenamedOperation().getName()
