@@ -153,7 +153,9 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
           RefactoringEntry entry, Collection<Change> changes, Project project) {
     List<DiffRequest> requests = new ArrayList<>();
     for (RefactoringInfo info : entry.getRefactorings()) {
-      requests.add(createDiffFromChanges(info, changes, project));
+      if (!info.isHidden()) {
+        requests.add(createDiffFromChanges(info, changes, project));
+      }
     }
     return new SimpleDiffRequestChain(requests);
   }
