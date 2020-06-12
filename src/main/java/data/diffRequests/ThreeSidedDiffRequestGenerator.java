@@ -6,6 +6,7 @@ import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import data.RefactoringInfo;
 import data.RefactoringLine;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,5 +31,18 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
     super.correct(before, mid, after);
     ranges = lineMarkings.stream().map(RefactoringLine::getThreeSidedRange)
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public String toString() {
+    return ranges.stream().map(ThreeSidedRange::toString)
+        .collect(Collectors.joining(listDelimiter));
+  }
+
+  public static ThreeSidedDiffRequestGenerator fromString(String value){
+    ThreeSidedDiffRequestGenerator generator = new ThreeSidedDiffRequestGenerator();
+    generator.ranges = Arrays.stream(value.split(listDelimiter))
+        .map(ThreeSidedRange::fromString).collect(Collectors.toList());
+    return generator;
   }
 }

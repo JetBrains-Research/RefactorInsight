@@ -36,6 +36,7 @@ import utils.Utils;
 public class RefactoringEntry implements Serializable {
 
   private static transient final InfoFactory factory = new InfoFactory();
+  private static transient final String delimiter = "danutz";
   private final String commitId;
   private final String parent;
   private final long time;
@@ -85,8 +86,9 @@ public class RefactoringEntry implements Serializable {
 //  }
 
   public static RefactoringEntry fromString(String value) {
-    String[] tokens = value.split(",", 4);
-    String[] refs = tokens[3].split(",");
+    String[] tokens = value.split(delimiter, 4);
+//    if(tokens)
+    String[] refs = tokens[3].split(delimiter);
     RefactoringEntry entry = new RefactoringEntry(
         tokens[0], tokens[1], Long.parseLong(tokens[2]))
         .setRefactorings(Arrays.stream(refs)
@@ -97,8 +99,8 @@ public class RefactoringEntry implements Serializable {
 
   @Override
   public String toString() {
-    return commitId + "," + parent + "," + time + "," + refactorings.stream()
-        .map(RefactoringInfo::toString).collect(Collectors.joining(","));
+    return commitId + delimiter + parent + delimiter + time + delimiter + refactorings.stream()
+        .map(RefactoringInfo::toString).collect(Collectors.joining(delimiter));
   }
 
   /**

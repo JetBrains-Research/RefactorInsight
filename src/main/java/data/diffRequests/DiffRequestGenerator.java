@@ -11,6 +11,10 @@ import java.util.function.Consumer;
 
 public abstract class DiffRequestGenerator {
 
+
+  public static final transient String listDelimiter = "#";
+  public static final transient String fragDelimiter = "@";
+
   transient List<RefactoringLine> lineMarkings = new ArrayList<>();
 
   public DiffRequestGenerator() {

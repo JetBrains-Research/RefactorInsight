@@ -70,8 +70,8 @@ public class RefactoringInfo {
         .setThreeSided(tokens[11].equals("t"))
         .setHidden(tokens[12].equals("t"))
         .setRequestGenerator(tokens[11].equals("t")
-            ? TwoSidedDiffRequestGenerator.fromString(tokens[13])
-            : ThreeSidedDiffRequestGenerator.fromString(tokens[13]))
+            ? ThreeSidedDiffRequestGenerator.fromString(tokens[13])
+            : TwoSidedDiffRequestGenerator.fromString(tokens[13]))
         .setIncludes(new HashSet<>(Arrays.asList(tokens[14].split(";"))));
   }
 
