@@ -83,8 +83,9 @@ public class RefactoringInfo {
           String newKey;
           //change constructor name in case of a class rename
           if (methodName.equals(getNameBefore().substring(getNameBefore().lastIndexOf(".") + 1))) {
-            newKey = getNameAfter() + getNameAfter().substring(getNameAfter().lastIndexOf("."))
-                + signature.substring(signature.indexOf("("));
+            newKey =
+                getNameAfter() + "." + getNameAfter().substring(getNameAfter().lastIndexOf(".") + 1)
+                    + signature.substring(signature.indexOf("("));
           } else {
             newKey = getNameAfter() + signature.substring(signature.lastIndexOf("."));
           }
