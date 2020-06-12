@@ -1,6 +1,10 @@
 package ui.windows;
 
-import com.intellij.diff.*;
+import com.intellij.diff.DiffContentFactoryEx;
+import com.intellij.diff.DiffContext;
+import com.intellij.diff.DiffDialogHints;
+import com.intellij.diff.DiffManager;
+import com.intellij.diff.FrameDiffTool;
 import com.intellij.diff.chains.DiffRequestChain;
 import com.intellij.diff.chains.SimpleDiffRequestChain;
 import com.intellij.diff.contents.DiffContent;
@@ -20,7 +24,6 @@ import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +44,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
    * @param info    RefactoringInfo
    * @param project Current project
    */
-  public static DiffRequest createDiff(String left, String right, RefactoringInfo info, Project project) {
+  public static DiffRequest createDiff(String left, String right,
+                                       RefactoringInfo info, Project project) {
     DiffContentFactoryEx myDiffContentFactory = DiffContentFactoryEx.getInstanceEx();
     DiffContent diffContentBefore = myDiffContentFactory.create(project, left,
         JavaClassFileType.INSTANCE);
@@ -92,41 +96,64 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
   }
 
-  public static DiffRequestChain buildDiffChain(RefactoringEntry entry, Collection<Change> changes, Project project) {
-    List<DiffRequest> requests = new ArrayList<>();
-    for(RefactoringInfo info : entry.getRefactorings()) {
-      try {
-        String left = "";
-        String right = "";
-        for (Change change : changes) {
-          if (change.getBeforeRevision() != null
-                  && (project.getBasePath() + "/" + info.getLeftPath())
-                  .equals(change.getBeforeRevision().getFile().getPath())) {
-            left = change.getBeforeRevision().getContent();
-          }
-          if (change.getAfterRevision() != null
-                  && (project.getBasePath() + "/" + info.getRightPath())
-                  .equals(change.getAfterRevision().getFile().getPath())) {
-            right = change.getAfterRevision().getContent();
-          }
+  /**
+   * Method that returns a diff request from a refactoring and given file changes from a commit.
+   *
+   * @param info the info about a refactoring
+   * @param changes given changes from a commit
+   * @param project current active project
+   * @return a diff request
+   */
+  public static DiffRequest createDiffFromChanges(
+          RefactoringInfo info, Collection<Change> changes, Project project) {
+    try {
+      String left = "";
+      String right = "";
+      for (Change change : changes) {
+        if (change.getBeforeRevision() != null
+                && (project.getBasePath() + "/" + info.getLeftPath())
+                .equals(change.getBeforeRevision().getFile().getPath())) {
+          left = change.getBeforeRevision().getContent();
         }
-        String mid = "";
-        if (info.isThreeSided()) {
-          for (Change change : changes) {
-            if (change.getAfterRevision() != null
-                    && (project.getBasePath() + "/" + info.getMidPath())
-                    .equals(change.getAfterRevision().getFile().getPath())) {
-              mid = change.getAfterRevision().getContent();
-            }
-          }
-          requests.add(createDiff(left, mid, right, info, project));
-        } else {
-          requests.add(createDiff(left, right, info, project));
+        if (change.getAfterRevision() != null
+                && (project.getBasePath() + "/" + info.getRightPath())
+                .equals(change.getAfterRevision().getFile().getPath())) {
+          right = change.getAfterRevision().getContent();
         }
-
-      } catch (VcsException ex) {
-        ex.printStackTrace();
       }
+      String mid = "";
+      if (info.isThreeSided()) {
+        for (Change change : changes) {
+          if (change.getAfterRevision() != null
+                  && (project.getBasePath() + "/" + info.getMidPath())
+                  .equals(change.getAfterRevision().getFile().getPath())) {
+            mid = change.getAfterRevision().getContent();
+          }
+        }
+        return createDiff(left, mid, right, info, project);
+      } else {
+        return createDiff(left, right, info, project);
+      }
+
+    } catch (VcsException ex) {
+      ex.printStackTrace();
+    }
+    return null;
+  }
+
+  /**
+   * Method that builds the chain of diff requests.
+   *
+   * @param entry set of refactorings
+   * @param changes all changes made in a commit
+   * @param project current open project
+   * @return the chain of diff requests
+   */
+  public static DiffRequestChain buildDiffChain(
+          RefactoringEntry entry, Collection<Change> changes, Project project) {
+    List<DiffRequest> requests = new ArrayList<>();
+    for (RefactoringInfo info : entry.getRefactorings()) {
+      requests.add(createDiffFromChanges(info, changes, project));
     }
     return new SimpleDiffRequestChain(requests);
   }

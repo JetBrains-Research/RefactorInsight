@@ -125,7 +125,7 @@ public class GitWindow {
                 node.getUserObjectPath()[1];
             SimpleDiffRequestChain chain = (SimpleDiffRequestChain) DiffWindow.buildDiffChain(entry,
                 table.getModel().getFullDetails(index).getChanges(0), project);
-            chain.setIndex(0);
+            chain.setIndex(entry.getRefactorings().indexOf(info));
             DiffWindow.showChain(chain, project);
           }
         }
