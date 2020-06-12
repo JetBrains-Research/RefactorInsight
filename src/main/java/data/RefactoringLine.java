@@ -32,6 +32,7 @@ public class RefactoringLine {
   private List<TextRange> mid;
   private List<TextRange> right;
   private LineFragmentImpl fragment;
+  private MarkingOption markingOption;
 
   /**
    * Data holder for three sided refactoring diff.
@@ -39,14 +40,15 @@ public class RefactoringLine {
   public RefactoringLine(CodeRange left, CodeRange mid, CodeRange right,
                          VisualisationType type, MarkingOption option, boolean hasColumns) {
     processLinesAndCols(left, mid, right, hasColumns);
-    processOption(mid, option);
+    this.markingOption = option;
     this.type = type;
   }
 
   /**
    * Corrects lines and offsets returned by RefactoringMiner.
-   * @param leftText String containing whole left file contents
-   * @param midText String containing whole middle file contents
+   *
+   * @param leftText  String containing whole left file contents
+   * @param midText   String containing whole middle file contents
    * @param rightText String containing whole righr file contents
    */
   public void correctLines(String leftText, String midText, String rightText) {
@@ -54,10 +56,19 @@ public class RefactoringLine {
     int maxLineRight = Utils.getMaxLine(rightText);
     lines[RIGHT_END] = lines[RIGHT_END] < 0 ? maxLineRight : lines[RIGHT_END];
     lines[LEFT_END] = lines[LEFT_END] < 0 ? maxLineLeft : lines[LEFT_END];
+
+    lines[RIGHT_START] = Utils.skipJavadoc(rightText, lines[RIGHT_START]);
+    lines[LEFT_START] = Utils.skipJavadoc(leftText, lines[LEFT_START]);
+
     if (midText != null) {
       int maxLineMid = Utils.getMaxLine(midText);
       lines[MID_END] = lines[MID_END] < 0 ? maxLineMid : lines[MID_END];
+      lines[MID_START] = Utils.skipJavadoc(midText, lines[MID_START]);
     }
+    if (markingOption == MarkingOption.PACKAGE) {
+      highlightPackage(leftText, rightText);
+    }
+    processOption(midText != null, markingOption);
     computeLazyHighlighting(leftText, midText, rightText);
     if (midText == null) {
       computeTwoSidedRanges(leftText, rightText);
@@ -116,19 +127,19 @@ public class RefactoringLine {
     columns = new int[] {1, 1, 0, 0, columns[RIGHT_START], columns[RIGHT_END]};
     if (lazilyHighlightableWords[0] != null) {
       int[] beforeColumns =
-          Utils.findColumns(leftText, lazilyHighlightableWords[0], lines[LEFT_START] + 1);
+          Utils.findColumns(leftText, lazilyHighlightableWords[0], lines[LEFT_START]);
       columns[LEFT_START] = beforeColumns[0];
       columns[LEFT_END] = beforeColumns[1];
     }
     if (lazilyHighlightableWords[1] != null && midText != null) {
       int[] midColumns =
-          Utils.findColumns(midText, lazilyHighlightableWords[1], lines[MID_START] + 1);
+          Utils.findColumns(midText, lazilyHighlightableWords[1], lines[MID_START]);
       columns[MID_START] = midColumns[0];
       columns[MID_END] = midColumns[1];
     }
     if (lazilyHighlightableWords[2] != null) {
       int[] afterColumns =
-          Utils.findColumns(rightText, lazilyHighlightableWords[2], lines[RIGHT_START] + 1);
+          Utils.findColumns(rightText, lazilyHighlightableWords[2], lines[RIGHT_START]);
       columns[RIGHT_START] = afterColumns[0];
       columns[RIGHT_END] = afterColumns[1];
     }
@@ -181,6 +192,7 @@ public class RefactoringLine {
 
   /**
    * Computes the ThreeSidedRange representing this.
+   *
    * @return ThreeSidedRange
    */
   public ThreeSidedRange getThreeSidedRange() {
@@ -207,7 +219,7 @@ public class RefactoringLine {
   }
 
 
-  private void processOption(CodeRange mid, MarkingOption option) {
+  private void processOption(boolean hasMid, MarkingOption option) {
     switch (option) {
       case ADD:
         lines[LEFT_END] = lines[LEFT_START];
@@ -222,12 +234,22 @@ public class RefactoringLine {
       case EXTRACT:
         lines[LEFT_START] = 0;
         lines[LEFT_END] = 1;
-        if (mid != null) {
+        if (hasMid) {
           lines[MID_END] = lines[MID_START] + 1;
         }
         break;
       default:
     }
+  }
+
+  private void highlightPackage(String leftText, String rightText) {
+    final int packageLine1 = Utils.findPackageLine(leftText);
+    final int packageLine2 = Utils.findPackageLine(rightText);
+
+    lines[LEFT_START] = packageLine1 == -1 ? 0 : packageLine1;
+    lines[RIGHT_START] = packageLine2 == -1 ? 0 : packageLine2;
+    lines[LEFT_END] = packageLine1 == -1 ? 0 : lines[LEFT_START] + 1;
+    lines[RIGHT_END] = packageLine2 == -1 ? 0 : lines[RIGHT_START] + 1;
   }
 
   private void processLinesAndCols(CodeRange left, CodeRange mid, CodeRange right,
@@ -267,7 +289,8 @@ public class RefactoringLine {
     REMOVE,
     COLLAPSE,
     NONE,
-    EXTRACT
+    EXTRACT,
+    PACKAGE
   }
 
   public static class RefactoringOffset {

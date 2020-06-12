@@ -2,6 +2,7 @@ package data.types.classes;
 
 import data.RefactoringInfo;
 import data.RefactoringInfo.Group;
+import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MoveClassRefactoring;
 import org.refactoringminer.api.Refactoring;
@@ -18,8 +19,17 @@ public class MoveClassHandler extends Handler {
     } else {
       info.setGroup(Group.CLASS);
     }
+    String packageBefore = ref.getOriginalClass().getPackageName();
+    String packageAfter = ref.getMovedClass().getPackageName();
+
     return info
-        .addMarking(ref.getOriginalClass().codeRange(), ref.getMovedClass().codeRange(), true)
+        .addMarking(ref.getOriginalClass().codeRange(), ref.getMovedClass().codeRange(),
+            (line) -> {
+              line.setLazilyHighlightableWords(
+                  new String[] {packageBefore, null, packageAfter});
+            },
+            RefactoringLine.MarkingOption.PACKAGE,
+            true)
         .setNameBefore(ref.getOriginalClassName())
         .setNameAfter(ref.getMovedClassName())
         .setDetailsBefore(ref.getOriginalClass().getPackageName())
