@@ -89,7 +89,6 @@ public class RefactoringHistoryAction extends AnAction {
                                     PsiElementUsageTarget target) {
     PsiField field = (PsiField) target.getElement();
     String signature = StringUtils.getFieldSignature(field);
-    System.out.println(signature);
     getToolbarWindow(project)
         .showToolbar(map.getOrDefault(signature, new ArrayList<RefactoringInfo>()),
             field.getName(), dataContext, HistoryType.ATTRIBUTE, null, null);

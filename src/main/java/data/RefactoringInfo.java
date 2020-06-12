@@ -59,15 +59,15 @@ public class RefactoringInfo {
 
     if (group != Group.VARIABLE) {
       ArrayList<RefactoringInfo> data = map.getOrDefault(before, new ArrayList<RefactoringInfo>());
+      map.remove(before);
       ArrayList<RefactoringInfo> data2 = map.getOrDefault(after, new ArrayList<RefactoringInfo>());
+      data.add(this);
       for (RefactoringInfo info : data) {
         if (!data2.contains(info)) {
           data2.add(info);
         }
       }
-      data2.add(this);
       map.put(after, data2);
-      map.remove(before);
     }
   }
 
@@ -85,7 +85,16 @@ public class RefactoringInfo {
         .filter(x -> x.contains(".")).filter(x -> x.substring(0, x.lastIndexOf("."))
         .equals(nameBefore))
         .forEach(signature -> {
-          String newKey = nameAfter + signature.substring(signature.lastIndexOf("."));
+          String methodName = signature.substring(signature.lastIndexOf(".") + 1);
+          methodName = methodName.substring(0, methodName.indexOf("("));
+          String newKey;
+          //change constructor name in case of a class rename
+          if (methodName.equals(nameBefore.substring(nameBefore.lastIndexOf(".") + 1))) {
+            newKey = nameAfter + nameAfter.substring(nameAfter.lastIndexOf("."))
+                + signature.substring(signature.indexOf("("));
+          } else {
+            newKey = nameAfter + signature.substring(signature.lastIndexOf("."));
+          }
           map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
           map.remove(signature);
         });
@@ -443,8 +452,8 @@ public class RefactoringInfo {
         && getName().equals(that.getName())
         && getNameBefore().equals(that.getNameBefore())
         && getNameAfter().equals(that.getNameAfter())
-        && getDetailsBefore().equals(that.getDetailsBefore())
-        && getDetailsAfter().equals(that.getDetailsAfter())
+        && Objects.equals(getDetailsBefore(), that.getDetailsBefore())
+        && Objects.equals(getDetailsAfter(), that.getDetailsAfter())
         && getType() == that.getType()
         && getGroup() == that.getGroup();
   }
