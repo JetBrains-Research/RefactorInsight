@@ -6,7 +6,6 @@ import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +60,6 @@ public class RefactoringInfo {
     if (group != Group.VARIABLE) {
       ArrayList<RefactoringInfo> data = map.getOrDefault(before, new ArrayList<RefactoringInfo>());
       ArrayList<RefactoringInfo> data2 = map.getOrDefault(after, new ArrayList<RefactoringInfo>());
-      map.remove(before);
       for (RefactoringInfo info : data) {
         if (!data2.contains(info)) {
           data2.add(info);
@@ -69,33 +67,39 @@ public class RefactoringInfo {
       }
       data2.add(this);
       map.put(after, data2);
+      map.remove(before);
     }
   }
 
   private void changeKeys(Map<String, ArrayList<RefactoringInfo>> map) {
     if ((group == Group.CLASS || group == Group.ABSTRACT || group == Group.INTERFACE)
         && !nameBefore.equals(nameAfter)) {
-      Map<String, String> renames = new HashMap<>();
-      renames.put(nameBefore, nameAfter);
-      renames.forEach((before, after) -> map.keySet().stream()
-          .filter(x -> x.contains("|")).filter(x -> x.substring(0, x.lastIndexOf("|"))
-              .equals(before))
-          .forEach(signature -> {
-            String newKey = after + signature.substring(signature.lastIndexOf("|"));
-            map.remove(signature);
-            map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
-          }));
-
-      renames.forEach((before, after) -> map.keySet().stream()
-          .filter(x -> !x.contains("|"))
-          .filter(x -> x.contains(".")).filter(x -> x.substring(0, x.lastIndexOf("."))
-              .equals(before))
-          .forEach(signature -> {
-            String newKey = after + signature.substring(signature.lastIndexOf("."));
-            map.remove(signature);
-            map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
-          }));
+      changeAttributesSignature(map);
+      changeMethodsSignature(map);
     }
+  }
+
+  private void changeMethodsSignature(Map<String, ArrayList<RefactoringInfo>> map) {
+    map.keySet().stream()
+        .filter(x -> !x.contains("|"))
+        .filter(x -> x.contains(".")).filter(x -> x.substring(0, x.lastIndexOf("."))
+        .equals(nameBefore))
+        .forEach(signature -> {
+          String newKey = nameAfter + signature.substring(signature.lastIndexOf("."));
+          map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
+          map.remove(signature);
+        });
+  }
+
+  private void changeAttributesSignature(Map<String, ArrayList<RefactoringInfo>> map) {
+    map.keySet().stream()
+        .filter(x -> x.contains("|")).filter(x -> x.substring(0, x.lastIndexOf("|"))
+        .equals(nameBefore))
+        .forEach(signature -> {
+          String newKey = nameAfter + signature.substring(signature.lastIndexOf("|"));
+          map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
+          map.remove(signature);
+        });
   }
 
   public String getName() {
