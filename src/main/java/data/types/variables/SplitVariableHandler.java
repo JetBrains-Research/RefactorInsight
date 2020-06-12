@@ -1,7 +1,5 @@
 package data.types.variables;
 
-import com.intellij.openapi.project.Project;
-import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.SplitVariableRefactoring;
@@ -12,18 +10,18 @@ import utils.StringUtils;
 public class SplitVariableHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     SplitVariableRefactoring ref = (SplitVariableRefactoring) refactoring;
 
     ref.getSplitVariables().forEach(var ->
-        info.addMarking(ref.getOldVariable().codeRange(), var.codeRange()));
+        info.addMarking(ref.getOldVariable().codeRange(), var.codeRange(), true));
 
     if (ref.getOldVariable().isParameter()) {
-      info.setGroup(Group.METHOD)
+      info.setGroup(RefactoringInfo.Group.METHOD)
           .setDetailsBefore(ref.getOperationBefore().getClassName())
           .setDetailsAfter(ref.getOperationAfter().getClassName());
     } else {
-      info.setGroup(Group.VARIABLE);
+      info.setGroup(RefactoringInfo.Group.VARIABLE);
     }
 
     return info

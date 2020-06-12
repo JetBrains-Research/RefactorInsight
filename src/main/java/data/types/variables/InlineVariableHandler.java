@@ -1,7 +1,5 @@
 package data.types.variables;
 
-import com.intellij.openapi.project.Project;
-import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.InlineVariableRefactoring;
@@ -11,15 +9,16 @@ import utils.StringUtils;
 public class InlineVariableHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     InlineVariableRefactoring ref = (InlineVariableRefactoring) refactoring;
-    return info.setGroup(Group.VARIABLE)
-        .setNameBefore(StringUtils.calculateSignature(ref.getOperationAfter()))
-        .setNameAfter(StringUtils.calculateSignature(ref.getOperationBefore()))
+
+    return info.setGroup(RefactoringInfo.Group.VARIABLE)
+        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
         .setElementBefore(ref.getVariableDeclaration().getVariableDeclaration().toQualifiedString())
         .setElementAfter(null)
         .addMarking(ref.getVariableDeclaration().codeRange(),
-            ref.getInlinedVariableDeclarationCodeRange());
+            ref.getInlinedVariableDeclarationCodeRange(), true);
 
 
   }

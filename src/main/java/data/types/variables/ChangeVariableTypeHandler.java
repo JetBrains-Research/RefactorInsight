@@ -1,7 +1,5 @@
 package data.types.variables;
 
-import com.intellij.openapi.project.Project;
-import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.UMLOperation;
@@ -12,7 +10,7 @@ import utils.StringUtils;
 public class ChangeVariableTypeHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ChangeVariableTypeRefactoring ref = (ChangeVariableTypeRefactoring) refactoring;
     final UMLOperation operationAfter = ref.getOperationAfter();
     String id = operationAfter.getClassName() + ".";
@@ -25,11 +23,11 @@ public class ChangeVariableTypeHandler extends Handler {
     }
     info.setGroupId(id);
     if (ref.getChangedTypeVariable().isParameter()) {
-      info.setGroup(Group.METHOD)
+      info.setGroup(RefactoringInfo.Group.METHOD)
           .setDetailsBefore(ref.getOperationBefore().getClassName())
           .setDetailsAfter(ref.getOperationAfter().getClassName());
     } else {
-      info.setGroup(Group.VARIABLE);
+      info.setGroup(RefactoringInfo.Group.VARIABLE);
     }
     return info
         .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
@@ -37,7 +35,7 @@ public class ChangeVariableTypeHandler extends Handler {
         .setElementBefore(ref.getOriginalVariable().getVariableDeclaration().toQualifiedString())
         .setElementAfter(ref.getChangedTypeVariable().getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOriginalVariable().getType().codeRange(),
-            ref.getChangedTypeVariable().getType().codeRange());
+            ref.getChangedTypeVariable().getType().codeRange(), true);
 
   }
 }

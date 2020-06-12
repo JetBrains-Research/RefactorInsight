@@ -1,16 +1,9 @@
 package ui.windows;
 
-import com.intellij.diff.DiffDialogHints;
-import com.intellij.diff.DiffManager;
-import com.intellij.diff.chains.SimpleDiffRequestChain;
-import com.intellij.diff.requests.DiffRequest;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.WindowWrapper;
-import com.intellij.openapi.vcs.VcsException;
-import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
-import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.VcsCommitMetadata;
@@ -22,11 +15,9 @@ import data.RefactoringEntry;
 import data.RefactoringInfo;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Collection;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import services.MiningService;
-import services.RefactoringsBundle;
 import ui.tree.renderer.CellRenderer;
 
 public class GitWindow {
@@ -93,12 +84,15 @@ public class GitWindow {
 
   private void buildComponent() {
     int index = table.getSelectionModel().getAnchorSelectionIndex();
-    if (index < 0) {
-      viewport.setView(new JBLabel(RefactoringsBundle.message("not.selected")));
+
+    if (index < 0 || index >= table.getRowCount() - 1) {
+      viewport.setView(new JBList<String>());
       return;
     }
+
     String commitId = table.getModel().getCommitId(index).getHash().asString();
     VcsCommitMetadata metadata = table.getModel().getCommitMetadata(index);
+
 
     String refactorings = miner.getRefactorings(commitId);
     RefactoringEntry entry = RefactoringEntry.fromString(refactorings);
@@ -123,10 +117,9 @@ public class GitWindow {
           if (node.isLeaf()) {
             RefactoringInfo info = (RefactoringInfo)
                 node.getUserObjectPath()[1];
-            SimpleDiffRequestChain chain = (SimpleDiffRequestChain) DiffWindow.buildDiffChain(entry,
-                table.getModel().getFullDetails(index).getChanges(0), project);
-            chain.setIndex(entry.getRefactorings().indexOf(info));
-            DiffWindow.showChain(chain, project);
+
+            DiffWindow.showDiff(table.getModel().getFullDetails(index)
+                .getChanges(0), info, project, entry);
           }
         }
       }
@@ -134,41 +127,4 @@ public class GitWindow {
     viewport.setView(tree);
   }
 
-  private DiffRequest createDiff(int index, RefactoringInfo info) {
-    try {
-      Collection<Change> changes =
-          table.getModel().getFullDetails(index).getChanges(0);
-      String left = "";
-      String right = "";
-      for (Change change : changes) {
-        if (change.getBeforeRevision() != null
-            && (project.getBasePath() + "/" + info.getLeftPath())
-            .equals(change.getBeforeRevision().getFile().getPath())) {
-          left = change.getBeforeRevision().getContent();
-        }
-        if (change.getAfterRevision() != null
-            && (project.getBasePath() + "/" + info.getRightPath())
-            .equals(change.getAfterRevision().getFile().getPath())) {
-          right = change.getAfterRevision().getContent();
-        }
-      }
-      String mid = "";
-      if (info.isThreeSided()) {
-        for (Change change : changes) {
-          if (change.getAfterRevision() != null
-              && (project.getBasePath() + "/" + info.getMidPath())
-              .equals(change.getAfterRevision().getFile().getPath())) {
-            mid = change.getAfterRevision().getContent();
-          }
-        }
-        return DiffWindow.createDiff(left, mid, right, info, project);
-      } else {
-        return DiffWindow.createDiff(left, right, info, project);
-      }
-
-    } catch (VcsException ex) {
-      ex.printStackTrace();
-    }
-    return null;
-  }
 }

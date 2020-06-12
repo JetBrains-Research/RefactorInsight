@@ -143,17 +143,20 @@ public class MethodRefactoringToolbar {
           .getDisplayableDetails(refactoringInfo.getDetailsBefore(),
               refactoringInfo.getDetailsAfter());
       if (displayableDetails != null && displayableDetails.contains("->")) {
+
         DefaultMutableTreeNode node = TreeUtils.makeNode(refactoringInfo);
         root.add(node);
       } else if (TreeUtils
           .getDisplayableDetails(refactoringInfo.getNameBefore(), refactoringInfo.getNameAfter())
           .contains("->")) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(refactoringInfo);
+
         TreeUtils.makeNameNode(node, refactoringInfo);
         root.add(node);
       } else {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(refactoringInfo);
         TreeUtils.addLeaves(node, refactoringInfo);
+
         root.add(node);
       }
     }

@@ -1,8 +1,8 @@
 package ui.tree;
 
 import com.intellij.ui.treeStructure.Tree;
-import data.Group;
 import data.RefactoringInfo;
+import data.RefactoringInfo.Group;
 import javax.swing.tree.DefaultMutableTreeNode;
 import utils.StringUtils;
 
@@ -69,7 +69,7 @@ public class TreeUtils {
     DefaultMutableTreeNode child = new DefaultMutableTreeNode(
         (group == Group.METHOD || group == Group.CLASS || group == Group.ABSTRACT
             || group == Group.INTERFACE)
-            ? refactoringInfo.getDisplayableName()
+            ? StringUtils.getDisplayableName(refactoringInfo)
             : getDisplayableDetails(refactoringInfo.getNameBefore(),
             refactoringInfo.getNameAfter()));
     root.add(child);
