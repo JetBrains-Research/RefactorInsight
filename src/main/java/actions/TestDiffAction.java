@@ -11,28 +11,41 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
+import com.intellij.openapi.editor.colors.EditorColorsManager;
+import com.intellij.openapi.editor.colors.EditorColorsScheme;
+import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.impl.DocumentImpl;
 import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.editor.impl.ScrollingModelImpl;
+import com.intellij.openapi.editor.markup.EffectType;
+import com.intellij.openapi.editor.markup.HighlighterTargetArea;
+import com.intellij.openapi.editor.markup.MarkupModel;
+import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.JavaCodeFragmentFactory;
 import com.intellij.testFramework.fixtures.EditorHintFixture;
+import com.intellij.ui.CaptionPanel;
 import com.intellij.ui.EditorTextField;
+import com.intellij.ui.TitlePanel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBViewport;
 import gr.uom.java.xmi.LocationInfoProvider;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.border.Border;
+import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 public class TestDiffAction extends AnAction {
@@ -79,19 +92,13 @@ public class TestDiffAction extends AnAction {
   public void actionPerformed(@NotNull AnActionEvent e) {
     //TODO check if scrolling works if editor in a viewport
     Editor editor1 = EditorFactory.getInstance().createEditor(new DocumentImpl(text), e.getProject(), JavaFileType.INSTANCE, true);
-    editor1.getComponent().setPreferredSize(new Dimension(400, 200));
-
+    EditorInfo e1 = new EditorInfo(editor1, 10);
 
     Editor editor2 = EditorFactory.getInstance().createEditor(new DocumentImpl(text), e.getProject(), JavaFileType.INSTANCE, true);
-    editor2.getComponent().setPreferredSize(new Dimension(400, 200));
-    ScrollingModelImpl scrollingModel = (ScrollingModelImpl) editor2.getScrollingModel();
-    scrollingModel.getVerticalScrollBar().setOpaque(false);
+    EditorInfo e2 = new EditorInfo(editor2, 15);
 
-    editor2.getScrollingModel().scrollTo(new LogicalPosition(20, 0), ScrollType.CENTER);
-    scrollingModel.flushViewportChanges();
-//    editor2.getComponent().repaint();
 
-    JBList<Editor> list = new JBList<>(JBList.createDefaultListModel(editor1, editor2));
+    JBList<EditorInfo> list = new JBList<>(JBList.createDefaultListModel(e1, e2));
     list.setCellRenderer(new MyRenderer());
     JBScrollPane pane = new JBScrollPane(list);
 
@@ -100,14 +107,34 @@ public class TestDiffAction extends AnAction {
     builder.createPopup().showCenteredInCurrentWindow(e.getProject());
   }
 
-  public class MyRenderer implements ListCellRenderer<Editor> {
-
+  public class MyRenderer implements ListCellRenderer<EditorInfo> {
 
     @Override
-    public Component getListCellRendererComponent(JList<? extends Editor> jList, Editor editor,
-                                                  int i, boolean b, boolean b1) {
+    public Component getListCellRendererComponent(JList<? extends EditorInfo> jList,
+                                                  EditorInfo editorInfo, int i, boolean b,
+                                                  boolean b1) {
 
-      return editor.getComponent();
+      EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
+      TextAttributes textColors = scheme.getAttributes(TextAttributesKey.find("DIFF_MODIFIED"));
+      TitlePanel titlePanel = new TitlePanel();
+      titlePanel.setText("TEST TITLE");
+      editorInfo.editor.setHeaderComponent(titlePanel);
+      editorInfo.editor.getMarkupModel().addLineHighlighter(12, 2, textColors);
+      editorInfo.editor.getComponent().setPreferredSize(new Dimension(400, 200));
+      editorInfo.editor.getScrollingModel().scrollTo(
+          new LogicalPosition(editorInfo.line, 0), ScrollType.CENTER);
+      return editorInfo.editor.getComponent();
+    }
+  }
+
+  public class EditorInfo {
+
+    public Editor editor;
+    public int line;
+
+    public EditorInfo(Editor editor, int line) {
+      this.editor = editor;
+      this.line = line;
     }
   }
 
