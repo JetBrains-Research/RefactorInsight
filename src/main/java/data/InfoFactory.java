@@ -55,7 +55,7 @@ public class InfoFactory {
   private final Map<RefactoringType, Handler> refactoringHandlers = new HashMap<>();
 
   /**
-   * Constructor for the infoFactory.
+   * Constructor for the info factory.
    */
   public InfoFactory() {
 
@@ -175,8 +175,9 @@ public class InfoFactory {
    * @param refactoring to be analyzed
    * @return resulting RefactoringInfo
    */
-  public RefactoringInfo create(Refactoring refactoring, RefactoringEntry entry, Project project) {
+  public RefactoringInfo create(Refactoring refactoring, RefactoringEntry entry) {
     return refactoringHandlers.get(refactoring.getRefactoringType())
-        .handle(refactoring, entry, project);
+        .handle(refactoring, entry);
   }
+
 }

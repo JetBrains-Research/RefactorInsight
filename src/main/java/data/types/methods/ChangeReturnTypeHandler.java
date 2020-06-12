@@ -1,6 +1,5 @@
 package data.types.methods;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
@@ -11,9 +10,10 @@ import utils.StringUtils;
 public class ChangeReturnTypeHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ChangeReturnTypeRefactoring ref = (ChangeReturnTypeRefactoring) refactoring;
-    if (ref.getOperationAfter().isGetter()) {
+    if (ref.getOperationAfter().isGetter()
+        && !ref.getOperationAfter().getBody().getAllVariables().isEmpty()) {
       String id = ref.getOperationAfter().getClassName() + "."
           + ref.getOperationAfter().getBody().getAllVariables().get(0);
       info.setGroupId(id);
@@ -29,7 +29,8 @@ public class ChangeReturnTypeHandler extends Handler {
         .setElementAfter(ref.getChangedType().toString())
         .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
-        .addMarking(ref.getOriginalType().codeRange(), ref.getChangedType().codeRange());
+        .addMarking(ref.getOriginalType().codeRange(), ref.getChangedType().codeRange(),
+            true);
 
   }
 

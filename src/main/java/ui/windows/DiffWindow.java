@@ -2,87 +2,96 @@ package ui.windows;
 
 import com.intellij.diff.DiffContentFactoryEx;
 import com.intellij.diff.DiffContext;
+import com.intellij.diff.DiffDialogHints;
 import com.intellij.diff.DiffManager;
 import com.intellij.diff.FrameDiffTool;
+import com.intellij.diff.chains.DiffRequestChain;
+import com.intellij.diff.chains.SimpleDiffRequestChain;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.DiffRequest;
-import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
 import com.intellij.diff.tools.simple.ThreesideDiffChangeBase;
 import com.intellij.diff.tools.util.base.DiffViewerListener;
-import com.intellij.diff.util.DiffUserDataKeysEx;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.WindowWrapper;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.vcs.VcsException;
+import com.intellij.openapi.vcs.changes.Change;
+import data.RefactoringEntry;
 import data.RefactoringInfo;
+import data.diff.ThreeSidedRange;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
 public class DiffWindow extends com.intellij.diff.DiffExtension {
 
-  public static Key<RefactoringInfo> REFACTORING_INFO =
-      Key.create("refactoringMiner.RefactoringInfo");
-  public static Key<String[]> FILE_CONTENTS =
-      Key.create("refactoringMiner.fileContentsArray");
+  public static Key<List<ThreeSidedRange>> REFACTORING_RANGES =
+      Key.create("refactoringMiner.List<ThreeSidedRange>");
+  public static Key<Boolean> REFACTORING =
+      Key.create("refactoringMiner.isRefactoringDiff");
+
 
   /**
    * Requests diff window to show specific refactoring with two editors.
    *
-   * @param left    Left text as String
-   * @param right   Right text as String
-   * @param info    RefactoringInfo
-   * @param project Current project
+   * @param info     RefactoringInfo
+   * @param project  Current project
    */
-  public static void showDiff(String left, String right, RefactoringInfo info, Project project) {
-    DiffContentFactoryEx myDiffContentFactory = DiffContentFactoryEx.getInstanceEx();
-    DiffContent diffContentBefore = myDiffContentFactory.create(project, left,
-        JavaClassFileType.INSTANCE);
-    DiffContent diffContentAfter = myDiffContentFactory.create(project, right,
-        JavaClassFileType.INSTANCE);
-
-    SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
-        diffContentBefore, diffContentAfter, info.getLeftPath(), info.getRightPath());
-
-    request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
-        (text1, text2, policy, innerChanges, indicator) ->
-            info.getTwoSidedLineMarkings(left, right));
-
-    DiffManager.getInstance().showDiff(project, request);
+  public static void showDiff(Collection<Change> changes, RefactoringInfo info,
+                              Project project, RefactoringEntry entry) {
+    List<DiffRequest> requests = entry.getRefactorings().stream()
+        .filter(i -> !i.isHidden()).map(i -> i.generate(getDiffContents(changes, i, project)))
+        .collect(Collectors.toList());
+    DiffRequestChain chain = new SimpleDiffRequestChain(requests);
+    chain.setIndex(entry.getRefactorings().stream()
+        .filter(i -> !i.isHidden()).collect(Collectors.toList()).indexOf(info));
+    DiffManager.getInstance().showDiff(project, chain,
+        new DiffDialogHints(WindowWrapper.Mode.FRAME));
   }
 
-  /**
-   * Requests diff window to show specific refactoring with three editors.
-   *
-   * @param left    Left text as String
-   * @param mid     Mid test as String
-   * @param right   Right text as String
-   * @param info    RefactoringInfo
-   * @param project Current project
-   */
-  public static void showDiff(String left, String mid, String right, RefactoringInfo info,
-                              Project project) {
-    DiffContentFactoryEx myDiffContentFactory = DiffContentFactoryEx.getInstanceEx();
-    DiffContent diffContentLeft = myDiffContentFactory.create(project, left,
-        JavaClassFileType.INSTANCE);
-    DiffContent diffContentMid = myDiffContentFactory.create(project, mid,
-        JavaClassFileType.INSTANCE);
-    DiffContent diffContentRight = myDiffContentFactory.create(project, right,
-        JavaClassFileType.INSTANCE);
 
-    SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
-        diffContentLeft, diffContentMid, diffContentRight, info.getLeftPath(), info.getMidPath(),
-        info.getRightPath());
+  private static DiffContent[] getDiffContents(Collection<Change> changes,
+                                               RefactoringInfo info, Project project) {
+    if (info.getLeftPath() == null) {
+      return null;
+    }
+    try {
+      DiffContentFactoryEx myDiffContentFactory = DiffContentFactoryEx.getInstanceEx();
+      DiffContent[] contents = {null, null, null};
+      for (Change change : changes) {
+        if (change.getBeforeRevision() != null) {
+          change.getBeforeRevision().getFile().getPath();
+          if (change.getBeforeRevision().getFile().getPath().contains(info.getLeftPath())) {
+            contents[0] = myDiffContentFactory.create(project,
+                change.getBeforeRevision().getContent(),
+                JavaClassFileType.INSTANCE);
+          }
+        }
+        if (info.isThreeSided()
+            && change.getAfterRevision() != null
+            && change.getAfterRevision().getFile().getPath().contains(info.getMidPath())) {
+          contents[1] = myDiffContentFactory.create(project,
+              change.getAfterRevision().getContent(),
+              JavaClassFileType.INSTANCE);
+        }
+        if (change.getAfterRevision() != null
+            && change.getAfterRevision().getFile().getPath().contains(info.getRightPath())) {
+          contents[2] = myDiffContentFactory.create(project,
+              change.getAfterRevision().getContent(),
+              JavaClassFileType.INSTANCE);
+        }
+      }
+      return contents;
 
-    String[] texts = {left, mid, right};
-
-    request.putUserData(REFACTORING_INFO, info);
-    request.putUserData(FILE_CONTENTS, texts);
-
-    DiffManager.getInstance().showDiff(project, request);
-
+    } catch (VcsException ex) {
+      ex.printStackTrace();
+      return null;
+    }
   }
-
 
   /**
    * IntelliJ Diff Extension.
@@ -93,34 +102,34 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
   @Override
   public void onViewerCreated(@NotNull FrameDiffTool.DiffViewer viewer,
                               @NotNull DiffContext context, @NotNull DiffRequest request) {
-    RefactoringInfo info = request.getUserData(REFACTORING_INFO);
-    if (info == null) {
+    List<ThreeSidedRange> ranges = request.getUserData(REFACTORING_RANGES);
+    if (ranges == null) {
       return;
     }
-
-    String[] texts = request.getUserData(FILE_CONTENTS);
     SimpleThreesideDiffViewer myViewer = (SimpleThreesideDiffViewer) viewer;
-    myViewer.addListener(new MyDiffViewerListener(myViewer, info, texts));
+    myViewer.addListener(new MyDiffViewerListener(myViewer, ranges));
+
+    Boolean isRefactoring = request.getUserData(REFACTORING);
+    if (isRefactoring != null) {
+      myViewer.getTextSettings().setExpandByDefault(false);
+    }
   }
 
   public static class MyDiffViewerListener extends DiffViewerListener {
 
     private final SimpleThreesideDiffViewer viewer;
-    private final RefactoringInfo info;
-    private final String[] texts;
+    private final List<ThreeSidedRange> ranges;
 
     /**
      * EventListener for DiffWindow finishing diff calculation.
      *
      * @param viewer DiffViewer
-     * @param info   RefactoringInfo
-     * @param texts  File contents in String
+     * @param ranges List of ThreeSidedRanges
      */
     public MyDiffViewerListener(SimpleThreesideDiffViewer viewer,
-                                RefactoringInfo info, String[] texts) {
-      this.info = info;
+                                List<ThreeSidedRange> ranges) {
+      this.ranges = ranges;
       this.viewer = viewer;
-      this.texts = texts;
     }
 
     @Override
@@ -128,11 +137,10 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       List<SimpleThreesideDiffChange> oldMarkings = viewer.getChanges();
       oldMarkings.forEach(ThreesideDiffChangeBase::destroy);
       oldMarkings.clear();
-      List<SimpleThreesideDiffChange> newMarkings =
-          info.getThreeSidedLineMarkings(texts[0], texts[1], texts[2], viewer);
-
-      oldMarkings.addAll(newMarkings);
-
+      oldMarkings.addAll(ranges.stream()
+          .map(r -> r.getDiffChange(viewer))
+          .collect(Collectors.toList())
+      );
     }
   }
 }

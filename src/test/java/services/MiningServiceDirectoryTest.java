@@ -5,7 +5,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.Hash;
 import com.intellij.vcs.log.VcsUser;
@@ -16,7 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
@@ -85,16 +84,42 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
   }
 
   public void testTreeIsBuilt() {
-    RefactoringEntry entry = miner.getEntry(head);
-    Tree tree = entry.buildTree();
-    tree.setCellRenderer(new MainCellRenderer());
-    TreeCellRenderer cellRenderer = tree.getCellRenderer();
-    Object root = tree.getModel().getRoot();
-    assertNotNull(cellRenderer
-        .getTreeCellRendererComponent(tree, root, false,
-            false, false, 0, false));
+    MainCellRenderer cellRenderer = new MainCellRenderer();
 
-    assertNotNull(entry.buildTree());
+    miner.getState().map.values().stream().map(RefactoringEntry::fromString)
+        .forEach(x -> {
+          Tree tree1 = x.buildTree();
+          tree1.setCellRenderer(cellRenderer);
+          assertNotNull(tree1);
+          Object root1 = tree1.getModel().getRoot();
+
+          //for each refactoring check that the renderer works properly
+          int children = tree1.getModel().getChildCount(root1);
+          for (int i = 0; i < children; i++) {
+            DefaultMutableTreeNode refactoringNode =
+                (DefaultMutableTreeNode) tree1.getModel().getChild(root1, i);
+            cellRenderer.customizeCellRenderer(tree1, refactoringNode, false,
+                false, refactoringNode.isLeaf(), 1, false);
+            for (int j = 0; j < refactoringNode.getChildCount(); j++) {
+              DefaultMutableTreeNode child1 =
+                  (DefaultMutableTreeNode) tree1.getModel().getChild(refactoringNode, j);
+              cellRenderer.customizeCellRenderer(tree1, child1, false,
+                  false, child1.isLeaf(), 1, false);
+              for (int z = 0; z < child1.getChildCount(); z++) {
+                DefaultMutableTreeNode child2 =
+                    (DefaultMutableTreeNode) tree1.getModel().getChild(child1, z);
+                cellRenderer.customizeCellRenderer(tree1, child2, false,
+                    false, child2.isLeaf(), 1, false);
+                for (int k = 0; k < child2.getChildCount(); k++) {
+                  DefaultMutableTreeNode child3 =
+                      (DefaultMutableTreeNode) tree1.getModel().getChild(child2, k);
+                  cellRenderer.customizeCellRenderer(tree1, child3, false,
+                      false, child3.isLeaf(), 1, false);
+                }
+              }
+            }
+          }
+        });
   }
 
   public void testMineAtCommit() {

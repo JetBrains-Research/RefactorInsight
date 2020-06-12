@@ -1,6 +1,5 @@
 package data.types.methods;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import data.Group;
 import data.RefactoringInfo;
@@ -15,11 +14,11 @@ import utils.StringUtils;
 public class ReorderParameterHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ReorderParameterRefactoring ref = (ReorderParameterRefactoring) refactoring;
+
     String classNameBefore = ref.getOperationBefore().getClassName();
     String classNameAfter = ref.getOperationAfter().getClassName();
-
     List<VariableDeclaration> as = ref.getParametersBefore();
     List<VariableDeclaration> bs = ref.getParametersAfter();
     IntStream.range(0, Math.min(as.size(), bs.size()))
@@ -28,7 +27,7 @@ public class ReorderParameterHandler extends Handler {
           if (!x.first.getVariableDeclaration().getType()
               .equals(x.second.getVariableDeclaration().getType())
               || !x.first.getVariableName().equals(x.second.getVariableName())) {
-            info.addMarking(x.first.codeRange(), x.second.codeRange());
+            info.addMarking(x.first.codeRange(), x.second.codeRange(), true);
           }
         });
     return info.setGroup(Group.METHOD)

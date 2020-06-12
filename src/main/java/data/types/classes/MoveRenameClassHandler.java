@@ -1,6 +1,5 @@
 package data.types.classes;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
@@ -10,18 +9,18 @@ import org.refactoringminer.api.Refactoring;
 public class MoveRenameClassHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     MoveAndRenameClassRefactoring ref = (MoveAndRenameClassRefactoring) refactoring;
-    if (ref.getRenamedClass().isInterface()) {
-      info.setGroup(Group.INTERFACE);
-    } else if (ref.getRenamedClass().isAbstract()) {
+
+    if (ref.getRenamedClass().isAbstract()) {
       info.setGroup(Group.ABSTRACT);
+    } else if (ref.getRenamedClass().isInterface()) {
+      info.setGroup(Group.INTERFACE);
     } else {
       info.setGroup(Group.CLASS);
     }
-
     return info
-        .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange())
+        .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(), true)
         .setNameBefore(ref.getOriginalClassName())
         .setNameAfter(ref.getRenamedClassName())
         .setDetailsBefore(ref.getOriginalClass().getPackageName())

@@ -1,17 +1,15 @@
 package data.types.attributes;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MoveAttributeRefactoring;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
 
 public class MoveAttributeHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     MoveAttributeRefactoring ref = (MoveAttributeRefactoring) refactoring;
 
     String classNameBefore = ref.getSourceClassName();
@@ -23,6 +21,6 @@ public class MoveAttributeHandler extends Handler {
         .setNameBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())
         .setNameAfter(ref.getMovedAttribute().getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOriginalAttribute().codeRange(),
-            ref.getMovedAttribute().codeRange());
+            ref.getMovedAttribute().codeRange(), true);
   }
 }

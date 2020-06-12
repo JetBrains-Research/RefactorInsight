@@ -1,8 +1,8 @@
 package data.types.classes;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
+import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ModifyClassAnnotationRefactoring;
 import org.refactoringminer.api.Refactoring;
@@ -10,8 +10,9 @@ import org.refactoringminer.api.Refactoring;
 public class ModifyClassAnnotationHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ModifyClassAnnotationRefactoring ref = (ModifyClassAnnotationRefactoring) refactoring;
+
     if (ref.getClassAfter().isInterface()) {
       info.setGroup(Group.INTERFACE);
     } else if (ref.getClassAfter().isAbstract()) {
@@ -29,6 +30,7 @@ public class ModifyClassAnnotationHandler extends Handler {
         .setElementAfter(ref.getAnnotationAfter().toString())
         .addMarking(ref.getAnnotationBefore().codeRange(), ref.getAnnotationAfter().codeRange(),
             line -> line.addOffset(ref.getAnnotationBefore().getLocationInfo(),
-                ref.getAnnotationAfter().getLocationInfo()));
+                ref.getAnnotationAfter().getLocationInfo()),
+            RefactoringLine.MarkingOption.NONE, true);
   }
 }

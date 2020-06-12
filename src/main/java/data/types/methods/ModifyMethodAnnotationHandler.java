@@ -1,6 +1,5 @@
 package data.types.methods;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
@@ -11,7 +10,7 @@ import utils.StringUtils;
 public class ModifyMethodAnnotationHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ModifyMethodAnnotationRefactoring ref = (ModifyMethodAnnotationRefactoring) refactoring;
 
     String classNameBefore = ref.getOperationBefore().getClassName();
@@ -22,7 +21,8 @@ public class ModifyMethodAnnotationHandler extends Handler {
         .setDetailsAfter(classNameAfter)
         .setElementBefore(ref.getAnnotationBefore().toString())
         .setElementAfter(ref.getAnnotationAfter().toString())
-        .addMarking(ref.getAnnotationBefore().codeRange(), ref.getAnnotationAfter().codeRange())
+        .addMarking(ref.getAnnotationBefore().codeRange(), ref.getAnnotationAfter().codeRange(),
+            true)
         .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()));
   }

@@ -1,6 +1,5 @@
 package data.types.variables;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
@@ -11,7 +10,7 @@ import utils.StringUtils;
 public class RenameVariableHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RenameVariableRefactoring ref = (RenameVariableRefactoring) refactoring;
     String id = ref.getOperationAfter().getClassName() + ".";
     if ((ref.getOperationAfter().isConstructor() || ref.getOperationAfter().isSetter())
@@ -37,7 +36,6 @@ public class RenameVariableHandler extends Handler {
         .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
         .addMarking(ref.getOriginalVariable().getVariableDeclaration().codeRange(),
-            ref.getRenamedVariable().getVariableDeclaration().codeRange());
-
+            ref.getRenamedVariable().codeRange(), true);
   }
 }

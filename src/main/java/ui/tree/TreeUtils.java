@@ -73,7 +73,8 @@ public class TreeUtils {
    */
   public static DefaultMutableTreeNode makeNameNode(RefactoringInfo refactoringInfo) {
     return new DefaultMutableTreeNode(
-        new Node(NodeType.NAME, refactoringInfo.getDisplayableName()));
+        new Node(NodeType.NAME, StringUtils.getDisplayableName(refactoringInfo)));
+
   }
 
   /**

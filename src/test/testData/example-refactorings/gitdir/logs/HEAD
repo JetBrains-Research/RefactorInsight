@@ -113,3 +113,57 @@ c3e62d4801ac0de22ab13e36d750cbdc5bf02986 27d8475b4db44e9a4980e65155ff387b1a67ea7
 10f5c41e356b04b708b64ccd7139fdd07518af1b dda8dc2feb6f5c517a1f8f6c265eb5efe700cb9d ioana <savuandreeaioana@yahoo.com> 1591199380 +0200	commit: Change attribute type.
 dda8dc2feb6f5c517a1f8f6c265eb5efe700cb9d 567c4cc09f20d4db661bcdfa3ca8334a269731a2 ioana <savuandreeaioana@yahoo.com> 1591218573 +0200	commit: Extract Abstract Class.
 567c4cc09f20d4db661bcdfa3ca8334a269731a2 b008734cbc613e74d7a570a9b33fcdd71b37fcd6 ioana <savuandreeaioana@yahoo.com> 1591220766 +0200	commit: Extract Interface.
+b008734cbc613e74d7a570a9b33fcdd71b37fcd6 5782933215b6de058adf69483d60271d67c598b4 ioana <savuandreeaioana@yahoo.com> 1591349329 +0200	checkout: moving from setup-repository to master
+5782933215b6de058adf69483d60271d67c598b4 821e92b35fbb75eef2a133d2dcda4966f13e918b ioana <savuandreeaioana@yahoo.com> 1591349333 +0200	pull origin master: Fast-forward
+821e92b35fbb75eef2a133d2dcda4966f13e918b b008734cbc613e74d7a570a9b33fcdd71b37fcd6 ioana <savuandreeaioana@yahoo.com> 1591349337 +0200	checkout: moving from master to setup-repository
+b008734cbc613e74d7a570a9b33fcdd71b37fcd6 82b61233c28d625917ca14f01e682ee3481df82c ioana <savuandreeaioana@yahoo.com> 1591352580 +0200	commit: Prepare code for multiple Extract Class op.
+82b61233c28d625917ca14f01e682ee3481df82c 12021cd4cecbe3463faf970509d002f4d1bce535 ioana <savuandreeaioana@yahoo.com> 1591352920 +0200	commit: Extract Class x2
+12021cd4cecbe3463faf970509d002f4d1bce535 0939e7a8cf6eb4a996ec94f7dc40fbefb8dc4a74 ioana <savuandreeaioana@yahoo.com> 1591353148 +0200	commit: Revert "Extract Class x2"
+0939e7a8cf6eb4a996ec94f7dc40fbefb8dc4a74 cd63f155b8d6cffbe0ba62e08c6fed90dd611b8c ioana <savuandreeaioana@yahoo.com> 1591353200 +0200	commit: Extract Class
+cd63f155b8d6cffbe0ba62e08c6fed90dd611b8c 4033cda87451f2b7305f51b4245a0f41a4a18be1 ioana <savuandreeaioana@yahoo.com> 1591379999 +0200	checkout: moving from setup-repository to test
+4033cda87451f2b7305f51b4245a0f41a4a18be1 82b61233c28d625917ca14f01e682ee3481df82c ioana <savuandreeaioana@yahoo.com> 1591448371 +0200	checkout: moving from test to 82b61233c28d625917ca14f01e682ee3481df82c
+82b61233c28d625917ca14f01e682ee3481df82c 821e92b35fbb75eef2a133d2dcda4966f13e918b ioana <savuandreeaioana@yahoo.com> 1591448413 +0200	checkout: moving from 82b61233c28d625917ca14f01e682ee3481df82c to master
+821e92b35fbb75eef2a133d2dcda4966f13e918b cd63f155b8d6cffbe0ba62e08c6fed90dd611b8c ioana <savuandreeaioana@yahoo.com> 1591448418 +0200	checkout: moving from master to setup-repository
+cd63f155b8d6cffbe0ba62e08c6fed90dd611b8c 0e7653632270f6fa24ef83dc6439532b713261cf ioana <savuandreeaioana@yahoo.com> 1591453793 +0200	commit: Extract Attribute
+0e7653632270f6fa24ef83dc6439532b713261cf fb60924a90fe7e09863cb2e23a6546cde79a0fe3 ioana <savuandreeaioana@yahoo.com> 1591454044 +0200	commit: Revert "Extract Attribute"
+fb60924a90fe7e09863cb2e23a6546cde79a0fe3 ce9849935a00263cc59191cd4d3db93fcaee1b8c ioana <savuandreeaioana@yahoo.com> 1591454082 +0200	commit: Prepare code for Extract Attribute from 2 places.
+ce9849935a00263cc59191cd4d3db93fcaee1b8c 1a00e910180edef5a056ece60e9f0580d4b2022a ioana <savuandreeaioana@yahoo.com> 1591454110 +0200	commit: Extract Attribute - 2 places.
+1a00e910180edef5a056ece60e9f0580d4b2022a f47dfaf1be27a9f585347fe93de05607b6dc65b3 ioana <savuandreeaioana@yahoo.com> 1591454600 +0200	commit: Revert "Extract Attribute - 2 places."
+f47dfaf1be27a9f585347fe93de05607b6dc65b3 c0aeebb4dd77e75109c132ee4acf8d4bbc0d9613 ioana <savuandreeaioana@yahoo.com> 1591454638 +0200	commit: Prepare code for Extract Attribute from 3 places.
+c0aeebb4dd77e75109c132ee4acf8d4bbc0d9613 539a38d2f15a2af05aa88ecb4a6e8defc8915d9d ioana <savuandreeaioana@yahoo.com> 1591454668 +0200	commit: Extract Attribute from 3 places.
+539a38d2f15a2af05aa88ecb4a6e8defc8915d9d 7a9c744bb2b47b7bcd7bc443c58fcf1aaf81f8dd ioana <savuandreeaioana@yahoo.com> 1591470867 +0200	commit: Test remove attr annotation
+7a9c744bb2b47b7bcd7bc443c58fcf1aaf81f8dd 710f57867c5569b5958f01377632094579eccb81 ioana <savuandreeaioana@yahoo.com> 1591470886 +0200	commit: Add attribute annotation
+710f57867c5569b5958f01377632094579eccb81 02f8c07de4b1e74c69a3b165e123ebb109e46949 ioana <savuandreeaioana@yahoo.com> 1591470924 +0200	commit (amend): Remove attribute annotation
+02f8c07de4b1e74c69a3b165e123ebb109e46949 fa45f1f847d0937ed21ad0141ba7084010f32d0d ioana <savuandreeaioana@yahoo.com> 1591545192 +0200	commit: Set up for reorder parameters together with remove parameter
+fa45f1f847d0937ed21ad0141ba7084010f32d0d 8905386127eea396ac3983eb345ecaec2b346e32 ioana <savuandreeaioana@yahoo.com> 1591545218 +0200	commit: Reorder parameters together with Remove parameter
+8905386127eea396ac3983eb345ecaec2b346e32 ccbc10fdfaffa838c0d97733c1e614bc4f67241a ioana <savuandreeaioana@yahoo.com> 1591545245 +0200	commit: Revert "Reorder parameters together with Remove parameter"
+ccbc10fdfaffa838c0d97733c1e614bc4f67241a 0cb439f05e3786b89a948e86b31db3b1580e8821 ioana <savuandreeaioana@yahoo.com> 1591545271 +0200	commit: Reorder parameters together with Remove parameter
+0cb439f05e3786b89a948e86b31db3b1580e8821 d12a53514270648973937ad16906ccbcba7fb764 ioana <savuandreeaioana@yahoo.com> 1591545314 +0200	commit: Revert "Reorder parameters together with Remove parameter"
+d12a53514270648973937ad16906ccbcba7fb764 e778d0585d4731017a66bea10570bdf476a1ef36 ioana <savuandreeaioana@yahoo.com> 1591545339 +0200	commit: Reorder parameters together with Remove parameter
+e778d0585d4731017a66bea10570bdf476a1ef36 d05bb23fa3baaeadbc34ddb7dc72ae4152b43df3 ioana <savuandreeaioana@yahoo.com> 1591545541 +0200	commit: Reorder parameters with rename parameter
+d05bb23fa3baaeadbc34ddb7dc72ae4152b43df3 babf79246edb3240537b59a11389fb5e42a52064 ioana <savuandreeaioana@yahoo.com> 1591546748 +0200	commit: Change Attribute Type.
+babf79246edb3240537b59a11389fb5e42a52064 3cffbaa67220745a42ae37eeb1fe5e3cf36b0686 ioana <savuandreeaioana@yahoo.com> 1591550828 +0200	commit: Prepare code for parametrize variable.
+3cffbaa67220745a42ae37eeb1fe5e3cf36b0686 e3a1be00389ba8a71678b726c211c56268e7e5a2 ioana <savuandreeaioana@yahoo.com> 1591550850 +0200	commit: Parametrize variable
+e3a1be00389ba8a71678b726c211c56268e7e5a2 ed06a6fb9912e23d470c845be912af1777dd8045 ioana <savuandreeaioana@yahoo.com> 1591558808 +0200	commit: Move and Rename Abstract Class.
+ed06a6fb9912e23d470c845be912af1777dd8045 1655559aaad05b1d1eed4407fdd3979a39913b02 ioana <savuandreeaioana@yahoo.com> 1591559039 +0200	commit: Add Abstract Class Annotation.
+1655559aaad05b1d1eed4407fdd3979a39913b02 aa55261852cbb43b1b7878c455089c7d8d19b626 ioana <savuandreeaioana@yahoo.com> 1591559070 +0200	commit: Add Abstract Class Annotation.
+aa55261852cbb43b1b7878c455089c7d8d19b626 792561571f7886d152b7249f4ab6d8f2bc7eb179 ioana <savuandreeaioana@yahoo.com> 1591559119 +0200	commit: Modify abstract class annotation
+792561571f7886d152b7249f4ab6d8f2bc7eb179 40cb3ac59752b2851fa361a6406caa847048b3fb ioana <savuandreeaioana@yahoo.com> 1591559219 +0200	commit: Add abstract class annotation
+40cb3ac59752b2851fa361a6406caa847048b3fb aa55261852cbb43b1b7878c455089c7d8d19b626 ioana <savuandreeaioana@yahoo.com> 1591559258 +0200	rebase -i (start): checkout aa55261852cbb43b1b7878c455089c7d8d19b626
+aa55261852cbb43b1b7878c455089c7d8d19b626 792561571f7886d152b7249f4ab6d8f2bc7eb179 ioana <savuandreeaioana@yahoo.com> 1591559258 +0200	rebase -i: fast-forward
+792561571f7886d152b7249f4ab6d8f2bc7eb179 65ea848952a67536180f1374dacda96fe229b061 ioana <savuandreeaioana@yahoo.com> 1591559258 +0200	rebase -i (reword): Modify abstract class annotation - NOT RECOGNIZED
+65ea848952a67536180f1374dacda96fe229b061 784080e82213714e295540c9234c55e084c1f767 ioana <savuandreeaioana@yahoo.com> 1591559258 +0200	rebase -i (pick): Add abstract class annotation
+784080e82213714e295540c9234c55e084c1f767 784080e82213714e295540c9234c55e084c1f767 ioana <savuandreeaioana@yahoo.com> 1591559258 +0200	rebase -i (finish): returning to refs/heads/setup-repository
+784080e82213714e295540c9234c55e084c1f767 1655559aaad05b1d1eed4407fdd3979a39913b02 ioana <savuandreeaioana@yahoo.com> 1591559268 +0200	rebase -i (start): checkout 1655559aaad05b1d1eed4407fdd3979a39913b02
+1655559aaad05b1d1eed4407fdd3979a39913b02 aa55261852cbb43b1b7878c455089c7d8d19b626 ioana <savuandreeaioana@yahoo.com> 1591559268 +0200	rebase -i: fast-forward
+aa55261852cbb43b1b7878c455089c7d8d19b626 d84f8b7af92fe59f61f3d173b313814e9be29502 ioana <savuandreeaioana@yahoo.com> 1591559268 +0200	rebase -i (reword): Add Abstract Class Annotation. - NOT RECOGNIZED
+d84f8b7af92fe59f61f3d173b313814e9be29502 160f77cf84c7c26babc0a11480240099c74dd360 ioana <savuandreeaioana@yahoo.com> 1591559268 +0200	rebase -i (pick): Modify abstract class annotation - NOT RECOGNIZED
+160f77cf84c7c26babc0a11480240099c74dd360 93bb1f1914565c40275216ab9298e6f07fd0d0bb ioana <savuandreeaioana@yahoo.com> 1591559268 +0200	rebase -i (pick): Add abstract class annotation
+93bb1f1914565c40275216ab9298e6f07fd0d0bb 93bb1f1914565c40275216ab9298e6f07fd0d0bb ioana <savuandreeaioana@yahoo.com> 1591559268 +0200	rebase -i (finish): returning to refs/heads/setup-repository
+93bb1f1914565c40275216ab9298e6f07fd0d0bb ed06a6fb9912e23d470c845be912af1777dd8045 ioana <savuandreeaioana@yahoo.com> 1591559281 +0200	rebase -i (start): checkout ed06a6fb9912e23d470c845be912af1777dd8045
+ed06a6fb9912e23d470c845be912af1777dd8045 1655559aaad05b1d1eed4407fdd3979a39913b02 ioana <savuandreeaioana@yahoo.com> 1591559281 +0200	rebase -i: fast-forward
+1655559aaad05b1d1eed4407fdd3979a39913b02 808ae40dad986ca0ec492bb6f70d123160cf810e ioana <savuandreeaioana@yahoo.com> 1591559281 +0200	rebase -i (reword): Add Abstract Class Annotation. - NOT RECOGNIZED
+808ae40dad986ca0ec492bb6f70d123160cf810e 230b0e0a8ab7766806fa0ec15040347315d4ebd9 ioana <savuandreeaioana@yahoo.com> 1591559282 +0200	rebase -i (pick): Add Abstract Class Annotation. - NOT RECOGNIZED
+230b0e0a8ab7766806fa0ec15040347315d4ebd9 6a2899976dc0926b4d0c7f1adad69ca4d4b509c7 ioana <savuandreeaioana@yahoo.com> 1591559282 +0200	rebase -i (pick): Modify abstract class annotation - NOT RECOGNIZED
+6a2899976dc0926b4d0c7f1adad69ca4d4b509c7 b0fedaafc269f85b553a0212d80a31d37ff540a6 ioana <savuandreeaioana@yahoo.com> 1591559282 +0200	rebase -i (pick): Add abstract class annotation
+b0fedaafc269f85b553a0212d80a31d37ff540a6 b0fedaafc269f85b553a0212d80a31d37ff540a6 ioana <savuandreeaioana@yahoo.com> 1591559282 +0200	rebase -i (finish): returning to refs/heads/setup-repository

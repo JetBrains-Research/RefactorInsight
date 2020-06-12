@@ -244,7 +244,4 @@ public class RefactoringHistoryToolbar {
     popup.showInBestPositionFor(datacontext);
   }
 
-  public ContentManager getToolWindowManager() {
-    return toolWindow.getContentManager();
-  }
 }

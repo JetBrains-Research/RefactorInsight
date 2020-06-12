@@ -15,7 +15,6 @@ import com.intellij.vcs.log.VcsCommitMetadata;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.RefactoringLine;
-import data.RefactoringOffset;
 import git4idea.history.GitHistoryUtils;
 import git4idea.repo.GitRepository;
 import java.io.BufferedReader;
@@ -86,7 +85,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     int limit = 100;
     try {
       limit = getCommitCount(repository);
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     } finally {
       mineRepo(repository, limit);
@@ -179,9 +178,13 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
           public void onFinished() {
             super.onFinished();
-            System.out.println("Mining commit done");
-            ApplicationManager.getApplication()
-                .invokeLater(() -> info.refresh(commit.getId().asString()));
+            if (innerState.map.containsKey(commit.getId().asString())) {
+              System.out.println("Mining commit done");
+              ApplicationManager.getApplication()
+                  .invokeLater(() -> info.refresh(commit.getId().asString()));
+            } else {
+              System.out.println("Mining commit FAILED!");
+            }
           }
 
           public void run(@NotNull ProgressIndicator progressIndicator) {
@@ -219,7 +222,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
       RefactoringEntry refactoringEntry = RefactoringEntry.fromString(innerState.map.get(commitId));
       assert refactoringEntry != null;
       refs.addAll(refactoringEntry.getRefactorings());
-      commitId = refactoringEntry.getParents().get(0);
+      commitId = refactoringEntry.getParent();
     }
     Collections.reverse(refs);
     refs.forEach(r -> r.addToHistory(methodHistory));
@@ -230,12 +233,12 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   }
 
   private String version() {
-    return VERSION + String.valueOf(Stream.of(
+    return RefactoringsBundle.message("version") + String.valueOf(Stream.of(
         //all classes that can change
         RefactoringEntry.class,
         RefactoringInfo.class,
         RefactoringLine.class,
-        RefactoringOffset.class
+        RefactoringLine.RefactoringOffset.class
     ).flatMap(c -> Arrays.stream(c.getDeclaredFields())
         .map(Field::getGenericType)
         .map(Type::getTypeName)

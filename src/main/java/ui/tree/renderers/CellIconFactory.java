@@ -13,7 +13,6 @@ import ui.tree.renderers.handlers.MethodHandler;
 import ui.tree.renderers.handlers.PackageHandler;
 import ui.tree.renderers.handlers.VariableHandler;
 
-
 public class CellIconFactory {
   HashMap<Group, IconHandler> map = new HashMap<>();
 
@@ -32,5 +31,6 @@ public class CellIconFactory {
 
   public Icon create(RefactoringInfo info, Node node) {
     return map.get(info.getGroup()).getIcon(info, node);
+
   }
 }

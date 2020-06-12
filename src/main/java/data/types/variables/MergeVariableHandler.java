@@ -1,6 +1,5 @@
 package data.types.variables;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
@@ -12,11 +11,11 @@ import utils.StringUtils;
 public class MergeVariableHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     MergeVariableRefactoring ref = (MergeVariableRefactoring) refactoring;
 
     ref.getMergedVariables().forEach(var ->
-        info.addMarking(var.codeRange(), ref.getNewVariable().codeRange()));
+        info.addMarking(var.codeRange(), ref.getNewVariable().codeRange(), true));
 
     if (ref.getNewVariable().isParameter()) {
       info.setGroup(Group.METHOD)

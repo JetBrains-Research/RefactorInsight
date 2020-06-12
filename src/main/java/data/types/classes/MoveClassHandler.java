@@ -1,6 +1,5 @@
 package data.types.classes;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
@@ -10,7 +9,7 @@ import org.refactoringminer.api.Refactoring;
 public class MoveClassHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     MoveClassRefactoring ref = (MoveClassRefactoring) refactoring;
     if (ref.getMovedClass().isInterface()) {
       info.setGroup(Group.INTERFACE);
@@ -19,9 +18,8 @@ public class MoveClassHandler extends Handler {
     } else {
       info.setGroup(Group.CLASS);
     }
-
     return info
-        .addMarking(ref.getOriginalClass().codeRange(), ref.getMovedClass().codeRange())
+        .addMarking(ref.getOriginalClass().codeRange(), ref.getMovedClass().codeRange(), true)
         .setNameBefore(ref.getOriginalClassName())
         .setNameAfter(ref.getMovedClassName())
         .setDetailsBefore(ref.getOriginalClass().getPackageName())
