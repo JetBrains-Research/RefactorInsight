@@ -15,17 +15,18 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
+import com.intellij.ui.content.ContentManager;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.data.VcsLogData;
 import com.intellij.vcs.log.impl.VcsLogManager;
 import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.visible.filters.VcsLogFilterObject;
-import data.HistoryData;
 import data.RefactoringInfo;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -40,7 +41,6 @@ import services.RefactoringsBundle;
 import ui.tree.TreeUtils;
 import ui.tree.renderers.HistoryToolbarRenderer;
 import utils.Utils;
-
 
 public class RefactoringHistoryToolbar {
 
@@ -59,11 +59,12 @@ public class RefactoringHistoryToolbar {
   public RefactoringHistoryToolbar(Project project) {
     this.project = project;
     toolWindowManager = ToolWindowManager.getInstance(project);
-
+    Utils.manager = toolWindowManager;
     factory = VcsProjectLog.getInstance(project).getLogManager()
         .getMainLogUiFactory("method history", VcsLogFilterObject.collection());
     toolWindow =
         toolWindowManager.registerToolWindow("Refactoring History", true, ToolWindowAnchor.BOTTOM);
+
   }
 
   /**
@@ -74,8 +75,8 @@ public class RefactoringHistoryToolbar {
    */
   public void showToolbar(List<RefactoringInfo> refactorings,
                           String objectsName, DataContext datacontext, HistoryType type,
-                          @Nullable HashMap<String, HistoryData> methodsHistory,
-                          @Nullable HashMap<String, HistoryData> attributesHistory) {
+                          @Nullable HashMap<String, ArrayList<RefactoringInfo>> methodsHistory,
+                          @Nullable HashMap<String, ArrayList<RefactoringInfo>> attributesHistory) {
 
     this.type = type;
     if (refactorings == null || refactorings.isEmpty()) {
@@ -155,14 +156,16 @@ public class RefactoringHistoryToolbar {
 
   @NotNull
   private Tree createTree(List<RefactoringInfo> refactorings,
-                          HashMap<String, HistoryData> methods,
-                          HashMap<String, HistoryData> attributes) {
+                          HashMap<String, ArrayList<RefactoringInfo>> methods,
+                          HashMap<String, ArrayList<RefactoringInfo>> attributes) {
 
     DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
     createRefactoringsTree(refactorings, root);
+
     AtomicInteger expandable = new AtomicInteger();
     root.breadthFirstEnumeration().asIterator().forEachRemaining((c) -> expandable
         .getAndIncrement());
+
     if (methods != null && !methods.isEmpty()) {
       DefaultMutableTreeNode child = new DefaultMutableTreeNode("Check methods in this class");
       addObjectsToTree(methods, child, true);
@@ -195,17 +198,16 @@ public class RefactoringHistoryToolbar {
     return tree;
   }
 
-  private void addObjectsToTree(HashMap<String, HistoryData> objects,
+  private void addObjectsToTree(HashMap<String, ArrayList<RefactoringInfo>> objects,
                                 DefaultMutableTreeNode child, boolean forMethods) {
     objects.forEach((obj, refs) -> {
-      List<RefactoringInfo> reffs = refs.getRefactoringInfoList();
-      if (!reffs.isEmpty()) {
+      if (!refs.isEmpty()) {
         DefaultMutableTreeNode m =
             new DefaultMutableTreeNode(forMethods
                 ? obj.substring(obj.lastIndexOf(".") + 1)
                 : obj.substring(obj.lastIndexOf("|") + 1));
         List<RefactoringInfo> infoList =
-            reffs.stream().collect(Collectors.toSet()).stream().collect(Collectors.toList());
+            refs.stream().collect(Collectors.toSet()).stream().collect(Collectors.toList());
         Utils.chronologicalOrder(infoList);
         createRefactoringsTree(infoList, m);
         child.add(m);
@@ -226,8 +228,7 @@ public class RefactoringHistoryToolbar {
       content.setComponent(tree);
     } else {
       ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-      content = contentFactory
-          .createContent(tree, methodName, false);
+      content = contentFactory.createContent(tree, methodName, false);
       toolWindow.getContentManager().addContent(content);
     }
     toolWindow.getContentManager().setSelectedContent(content);
@@ -241,5 +242,9 @@ public class RefactoringHistoryToolbar {
     JBPopup popup = JBPopupFactory.getInstance()
         .createComponentPopupBuilder(panel, null).createPopup();
     popup.showInBestPositionFor(datacontext);
+  }
+
+  public ContentManager getToolWindowManager() {
+    return toolWindow.getContentManager();
   }
 }

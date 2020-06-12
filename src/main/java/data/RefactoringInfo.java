@@ -49,7 +49,7 @@ public class RefactoringInfo {
    *
    * @param map for method history
    */
-  public void addToHistory(Map<String, HistoryData> map) {
+  public void addToHistory(Map<String, ArrayList<RefactoringInfo>> map) {
     changeKeys(map);
     String before = nameBefore;
     String after = nameAfter;
@@ -59,18 +59,20 @@ public class RefactoringInfo {
     }
 
     if (group != Group.VARIABLE) {
-      HistoryData data = map.getOrDefault(before, new HistoryData());
-      HistoryData data2 = map.getOrDefault(after, new HistoryData());
+      ArrayList<RefactoringInfo> data = map.getOrDefault(before, new ArrayList<RefactoringInfo>());
+      ArrayList<RefactoringInfo> data2 = map.getOrDefault(after, new ArrayList<RefactoringInfo>());
       map.remove(before);
-      data2.addRefactorings(data.getRefactoringInfoList());
-      data2.addRefactoring(this);
-      data2.addOldName(before);
-      data.getNamesBefore().forEach(name -> data2.addOldName(name));
+      for (RefactoringInfo info : data) {
+        if (!data2.contains(info)) {
+          data2.add(info);
+        }
+      }
+      data2.add(this);
       map.put(after, data2);
     }
   }
 
-  private void changeKeys(Map<String, HistoryData> map) {
+  private void changeKeys(Map<String, ArrayList<RefactoringInfo>> map) {
     if ((group == Group.CLASS || group == Group.ABSTRACT || group == Group.INTERFACE)
         && !nameBefore.equals(nameAfter)) {
       Map<String, String> renames = new HashMap<>();
@@ -80,10 +82,8 @@ public class RefactoringInfo {
               .equals(before))
           .forEach(signature -> {
             String newKey = after + signature.substring(signature.lastIndexOf("|"));
-            HistoryData data = map.get(signature);
             map.remove(signature);
-            data.addOldName(signature);
-            map.put(newKey, data);
+            map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
           }));
 
       renames.forEach((before, after) -> map.keySet().stream()
@@ -92,12 +92,9 @@ public class RefactoringInfo {
               .equals(before))
           .forEach(signature -> {
             String newKey = after + signature.substring(signature.lastIndexOf("."));
-            HistoryData data = map.get(signature);
             map.remove(signature);
-            data.addOldName(signature);
-            map.put(newKey, data);
+            map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
           }));
-
     }
   }
 

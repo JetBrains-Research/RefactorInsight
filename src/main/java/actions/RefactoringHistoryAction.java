@@ -10,7 +10,8 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.usages.PsiElementUsageTarget;
 import com.intellij.usages.UsageTarget;
 import com.intellij.usages.UsageView;
-import data.HistoryData;
+import data.RefactoringInfo;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -21,10 +22,11 @@ import services.MiningService;
 import ui.windows.HistoryType;
 import ui.windows.RefactoringHistoryToolbar;
 import utils.StringUtils;
+import utils.Utils;
 
 public class RefactoringHistoryAction extends AnAction {
 
-  Map<String, HistoryData> map;
+  Map<String, ArrayList<RefactoringInfo>> map;
   RefactoringHistoryToolbar refactoringHistoryToolbar;
 
   /**
@@ -77,7 +79,7 @@ public class RefactoringHistoryAction extends AnAction {
    * @return a new method refactorings toolbar window.
    */
   public RefactoringHistoryToolbar getToolbarWindow(Project project) {
-    if (refactoringHistoryToolbar == null) {
+    if (refactoringHistoryToolbar == null || Utils.manager == null) {
       refactoringHistoryToolbar = new RefactoringHistoryToolbar(project);
     }
     return refactoringHistoryToolbar;
@@ -89,7 +91,7 @@ public class RefactoringHistoryAction extends AnAction {
     String signature = StringUtils.getFieldSignature(field);
     System.out.println(signature);
     getToolbarWindow(project)
-        .showToolbar(map.getOrDefault(signature, new HistoryData()).getRefactoringInfoList(),
+        .showToolbar(map.getOrDefault(signature, new ArrayList<RefactoringInfo>()),
             field.getName(), dataContext, HistoryType.ATTRIBUTE, null, null);
   }
 
@@ -97,27 +99,27 @@ public class RefactoringHistoryAction extends AnAction {
     String signature = psiClass.getQualifiedName();
     List<String> methods = Arrays.asList(psiClass.getMethods()).stream()
         .map(method -> StringUtils.calculateSignature(method)).collect(Collectors.toList());
-    HashMap<String, HistoryData> methodsHistory = new HashMap<>();
+    HashMap<String, ArrayList<RefactoringInfo>> methodsHistory = new HashMap<>();
     methods.forEach(method -> {
-      methodsHistory.put(method, map.getOrDefault(method, new HistoryData()));
+      methodsHistory.put(method, map.getOrDefault(method, new ArrayList<RefactoringInfo>()));
     });
 
     List<String> fields = Arrays.asList(psiClass.getFields()).stream()
         .map(field -> StringUtils.getFieldSignature(field)).collect(Collectors.toList());
-    HashMap<String, HistoryData> fieldsHistory = new HashMap<>();
+    HashMap<String, ArrayList<RefactoringInfo>> fieldsHistory = new HashMap<>();
     fields.forEach(field -> {
-      fieldsHistory.put(field, map.getOrDefault(field, new HistoryData()));
+      fieldsHistory.put(field, map.getOrDefault(field, new ArrayList<RefactoringInfo>()));
     });
 
     getToolbarWindow(project)
-        .showToolbar(map.getOrDefault(signature, new HistoryData()).getRefactoringInfoList(),
+        .showToolbar(map.getOrDefault(signature, new ArrayList<RefactoringInfo>()),
             psiClass.getName(), dataContext, HistoryType.CLASS, methodsHistory, fieldsHistory);
   }
 
   private void showHistoryMethod(Project project, DataContext dataContext, PsiMethod method) {
     String signature = StringUtils.calculateSignature(method);
     getToolbarWindow(project)
-        .showToolbar(map.getOrDefault(signature, new HistoryData()).getRefactoringInfoList(),
+        .showToolbar(map.getOrDefault(signature, new ArrayList<RefactoringInfo>()),
             method.getName(), dataContext, HistoryType.METHOD, null, null);
   }
 

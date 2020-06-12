@@ -51,9 +51,7 @@ public class HistoryToolbarRenderer extends ColoredTreeCellRenderer {
       icon = factory.create(info, object);
       append(object.getContent());
     } else if (node.getUserObject() instanceof RefactoringInfo) {
-      append(info.getName() + " ");
-      append(JBDateFormat.getFormatter()
-          .formatPrettyDateTime(info.getTimestamp()), SimpleTextAttributes.GRAY_ATTRIBUTES);
+      append(info.getName());
       icon = AllIcons.Actions.SuggestedRefactoringBulb;
     } else if (node.getParent().equals(node.getRoot())) {
       append(node.toString(), SimpleTextAttributes.GRAY_ATTRIBUTES);
@@ -65,6 +63,11 @@ public class HistoryToolbarRenderer extends ColoredTreeCellRenderer {
         icon = AllIcons.Nodes.Field;
       }
       append(node.toString());
+    }
+    if (leaf) {
+      append(" " + JBDateFormat.getFormatter()
+          .formatPrettyDateTime(info.getTimestamp()), SimpleTextAttributes.GRAY_ATTRIBUTES);
+
     }
     setIcon(icon);
   }

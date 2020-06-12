@@ -12,7 +12,6 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.annotations.MapAnnotation;
 import com.intellij.vcs.log.VcsCommitMetadata;
-import data.HistoryData;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.RefactoringLine;
@@ -47,8 +46,8 @@ import ui.windows.GitWindow;
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
   private static final String VERSION = "1.0.1";
-  public static ConcurrentHashMap<String, HistoryData> methodHistory
-      = new ConcurrentHashMap<String, HistoryData>();
+  public static ConcurrentHashMap<String, ArrayList<RefactoringInfo>> methodHistory
+      = new ConcurrentHashMap<String, ArrayList<RefactoringInfo>>();
   private boolean mining = false;
   private MyState innerState = new MyState();
 
@@ -211,7 +210,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     return Integer.parseInt(output);
   }
 
-  public Map<String, HistoryData> getMethodHistory() {
+  public Map<String, ArrayList<RefactoringInfo>> getMethodHistory() {
     return methodHistory;
   }
 

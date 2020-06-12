@@ -1,16 +1,10 @@
 package ui.windows;
 
-import com.intellij.ide.util.EditorHelper;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
-import com.intellij.psi.JavaPsiFacade;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiField;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.ui.treeStructure.Tree;
@@ -19,22 +13,16 @@ import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
-import data.Group;
-import data.HistoryData;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import services.MiningService;
 import services.RefactoringsBundle;
 import ui.tree.renderers.MainCellRenderer;
-import utils.StringUtils;
 
 public class GitWindow {
   private Project project;
@@ -126,103 +114,16 @@ public class GitWindow {
           if (path == null) {
             return;
           }
-          DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-              path.getLastPathComponent();
+          DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
           if (node.isLeaf()) {
-            RefactoringInfo info = (RefactoringInfo)
-                node.getUserObjectPath()[1];
+            RefactoringInfo info = (RefactoringInfo) node.getUserObjectPath()[1];
             showDiff(index, info);
           }
         }
-        /*if (SwingUtilities.isRightMouseButton(ev)) {
-          TreePath path = tree.getPathForLocation(ev.getX(), ev.getY());
-          if (path == null) {
-            return;
-          }
-          DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-              path.getLastPathComponent();
-          if (node.getUserObject().equals(node.getUserObjectPath()[1])) {
-            RefactoringInfo info = (RefactoringInfo)
-                node.getUserObjectPath()[1];
-            openInEditor(info);
-          }
-        }*/
       }
     });
     viewport.setView(tree);
   }
-
-  /*private void openInEditor(RefactoringInfo info) {
-    final Map<String, HistoryData> methodHistory =
-        MiningService.getInstance(project).getMethodHistory();
-
-    if (info.getGroup() == Group.METHOD) {
-      String mostRecent = info.getNameAfter();
-      mostRecent = getLastVersion(methodHistory, mostRecent, info) != null
-          ? getLastVersion(methodHistory, mostRecent, info) : mostRecent;
-
-      String className = mostRecent.substring(0, mostRecent.lastIndexOf("."));
-
-      PsiClass cls = JavaPsiFacade.getInstance(project).findClass(className, GlobalSearchScope
-          .allScope(project));
-      if (cls == null) {
-        return;
-      }
-      for (PsiMethod psiMethod : cls.getAllMethods()) {
-        final String s = StringUtils.calculateSignature(psiMethod);
-        if (mostRecent.substring(mostRecent.lastIndexOf(".") + 1).equals(
-            s.substring(s.lastIndexOf(".") + 1))) {
-          EditorHelper.openInEditor(psiMethod);
-          return;
-        }
-      }
-    } else if (info.getGroup() == Group.ATTRIBUTE) {
-      String mostRecent = info.getDetailsAfter() + "|" + info.getNameAfter();
-      mostRecent = getLastVersion(methodHistory, mostRecent, info) != null
-          ? getLastVersion(methodHistory, mostRecent, info) : mostRecent;
-      String className = mostRecent.substring(0, mostRecent.lastIndexOf("|"));
-      PsiClass cls = JavaPsiFacade.getInstance(project).findClass(className, GlobalSearchScope
-          .allScope(project));
-      if (cls == null) {
-        return;
-      }
-      for (PsiField field : cls.getAllFields()) {
-        if (mostRecent.substring(mostRecent.lastIndexOf("|") + 1).equals(
-            field.getName() + " : " + field.getType().getPresentableText())) {
-          EditorHelper.openInEditor(field);
-          return;
-        }
-      }
-    } else {
-      String mostRecent = info.getNameAfter();
-      mostRecent = getLastVersion(methodHistory, mostRecent, info) != null
-          ? getLastVersion(methodHistory, mostRecent, info) : mostRecent;
-      if (mostRecent == null) {
-        return;
-      }
-      PsiClass classToFind =
-          JavaPsiFacade.getInstance(project).findClass(mostRecent, GlobalSearchScope
-              .allScope(project));
-      if (classToFind == null) {
-        return;
-      }
-      EditorHelper.openInEditor(classToFind);
-      return;
-    }
-  }*/
-
-  /*private String getLastVersion(Map<String, HistoryData> methodHistory,
-                                String current, RefactoringInfo info) {
-    Set<String> keys = methodHistory.keySet();
-
-    for (String key : keys) {
-      HistoryData data = methodHistory.get(key);
-      if (data.getNamesBefore().contains(current) && data.getRefactoringInfoList().contains(info)) {
-        return key;
-      }
-    }
-    return null;
-  }*/
 
   private void showDiff(int index, RefactoringInfo info) {
     try {
