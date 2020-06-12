@@ -1,7 +1,12 @@
 package ui.windows;
 
+import com.intellij.diff.DiffDialogHints;
+import com.intellij.diff.DiffManager;
+import com.intellij.diff.chains.SimpleDiffRequestChain;
+import com.intellij.diff.requests.DiffRequest;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.WindowWrapper;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
@@ -118,7 +123,10 @@ public class GitWindow {
           if (node.isLeaf()) {
             RefactoringInfo info = (RefactoringInfo)
                 node.getUserObjectPath()[1];
-            showDiff(index, info);
+            SimpleDiffRequestChain chain = (SimpleDiffRequestChain) DiffWindow.buildDiffChain(entry,
+                table.getModel().getFullDetails(index).getChanges(0), project);
+            chain.setIndex(entry.getRefactorings().indexOf(info));
+            DiffWindow.showChain(chain, project);
           }
         }
       }
@@ -126,7 +134,7 @@ public class GitWindow {
     viewport.setView(tree);
   }
 
-  private void showDiff(int index, RefactoringInfo info) {
+  private DiffRequest createDiff(int index, RefactoringInfo info) {
     try {
       Collection<Change> changes =
           table.getModel().getFullDetails(index).getChanges(0);
@@ -153,13 +161,14 @@ public class GitWindow {
             mid = change.getAfterRevision().getContent();
           }
         }
-        DiffWindow.showDiff(left, mid, right, info, project);
+        return DiffWindow.createDiff(left, mid, right, info, project);
       } else {
-        DiffWindow.showDiff(left, right, info, project);
+        return DiffWindow.createDiff(left, right, info, project);
       }
 
     } catch (VcsException ex) {
       ex.printStackTrace();
     }
+    return null;
   }
 }
