@@ -3,11 +3,9 @@ package ui.windows;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
-import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.vcs.changes.ui.TreeActionsToolbarPanel;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -18,7 +16,6 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBLoadingPanel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.components.panels.Wrapper;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.treeStructure.Tree;
@@ -140,13 +137,16 @@ public class MethodRefactoringToolbar {
     JComponent mainComponent = openLogTab.getMainComponent();
     if (mainComponent != null) {
       mainComponent.setAutoscrolls(true);
+      mainComponent.setSize(splitter.getSecondComponent().getSize());
+      splitter.setSecondComponent(mainComponent);
+      openLogTab.jumpToHash(info.getCommitId());
 
       JBSplitter splitter1 = (JBSplitter) mainComponent.getComponent(0);
 
       BorderLayoutPanel splitter2 = (BorderLayoutPanel) splitter1.getFirstComponent();
 
       OnePixelSplitter panel = (OnePixelSplitter) splitter2.getComponent(1);
-      com.intellij.vcs.log.ui.frame.MainFrame mainFrame = (MainFrame) panel.getComponent(2);
+      MainFrame mainFrame = (MainFrame) panel.getComponent(2);
 
       OnePixelSplitter splitter3 = (OnePixelSplitter) mainFrame.getComponent(0);
       OnePixelSplitter splitter4 = (OnePixelSplitter) splitter3.getComponent(2);
@@ -155,9 +155,6 @@ public class MethodRefactoringToolbar {
       JPanel panel2 = (JPanel) loadingDecorator.getComponent(0);
       VcsLogChangesBrowser browser = (VcsLogChangesBrowser) panel2.getComponent(0);
       ((ActionButton) browser.getToolbar().getComponent().getComponent(1)).click();
-      mainComponent.setSize(splitter.getSecondComponent().getSize());
-      splitter.setSecondComponent(mainComponent);
-      openLogTab.jumpToHash(info.getCommitId());
     }
   }
 
