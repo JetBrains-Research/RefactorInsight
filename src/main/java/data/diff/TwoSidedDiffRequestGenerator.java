@@ -1,6 +1,8 @@
 package data.diff;
 
 import static ui.windows.DiffWindow.REFACTORING;
+import static utils.StringUtils.FRAG;
+import static utils.StringUtils.LIST;
 
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.fragments.DiffFragment;
@@ -54,6 +56,7 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
     if (fragments == null) {
       return "";
     }
+    String del = StringUtils.delimiter(FRAG);
     return fragments.stream().map(frag ->
         Stream.of(
             frag.getStartLine1(),
@@ -66,13 +69,13 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
             frag.getEndOffset2(),
             (frag.getInnerFragments() == null ? ""
                 : frag.getInnerFragments().stream().map(f ->
-                f.getStartOffset1() + StringUtils.FRAG_DELIMITER
-                    + f.getEndOffset1() + StringUtils.FRAG_DELIMITER
-                    + f.getStartOffset2() + StringUtils.FRAG_DELIMITER
+                f.getStartOffset1() + del
+                    + f.getEndOffset1() + del
+                    + f.getStartOffset2() + del
                     + f.getEndOffset2()
-            ).collect(Collectors.joining(StringUtils.FRAG_DELIMITER)))
-        ).map(String::valueOf).collect(Collectors.joining(StringUtils.FRAG_DELIMITER))
-    ).collect(Collectors.joining(StringUtils.LIST_DELIMITER));
+            ).collect(Collectors.joining(del)))
+        ).map(String::valueOf).collect(Collectors.joining(del))
+    ).collect(Collectors.joining(del));
   }
 
   /**
@@ -82,8 +85,8 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
    * @return the TwoSidedDiffRequestGenerator
    */
   public static TwoSidedDiffRequestGenerator fromString(String value) {
-    String regex1 = StringUtils.ESC + StringUtils.LIST_DELIMITER;
-    String regex2 = StringUtils.ESC + StringUtils.FRAG_DELIMITER;
+    String regex1 = StringUtils.delimiter(LIST, true);
+    String regex2 = StringUtils.delimiter(FRAG, true);
     String[] tokens = value.split(regex1);
     TwoSidedDiffRequestGenerator generator = new TwoSidedDiffRequestGenerator();
     if (value.isEmpty()) {

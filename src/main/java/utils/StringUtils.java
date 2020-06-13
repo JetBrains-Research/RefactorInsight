@@ -4,31 +4,28 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameterList;
 import data.RefactoringInfo;
 import gr.uom.java.xmi.UMLOperation;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 public class StringUtils {
 
-  public static final String ESC = "(?<!#)";
+  public static final String ESC = "#";
+  public static final String ESC_REGEX = "(?<!" + ESC + ")";
 
-  public static final String MAP_DELIMITER = "§";
-  public static final String MAP_ENTRY_DELIMITER = "=";
-  public static final String ENTRY_DELIMITER = "`";
-  public static final String INFO_DELIMITER = "±";
-  public static final String LIST_DELIMITER = "!";
-  public static final String FRAG_DELIMITER = ",";
-  public static final String RANGE_DELIMITER = ";";
-  public static final Set<String> delimiters =
-      new HashSet<>(Arrays.asList(
-          "§",
-          "=",
-          "`",
-          "±",
-          "!",
-          ",",
-          ";")
-      );
+  public static final int MAP = 0;
+  public static final int MAP_ENTRY = 1;
+  public static final int ENTRY = 2;
+  public static final int INFO = 3;
+  public static final int LIST = 4;
+  public static final int FRAG = 5;
+  public static final int RANGE = 6;
+  public static final String[] delimiters = {"§", "=", "`", "±", "!", ",", ";"};
+
+  public static String delimiter(int option, boolean escaped) {
+    return (escaped ? ESC_REGEX : "") + delimiters[option];
+  }
+
+  public static String delimiter(int option) {
+    return delimiter(option, false);
+  }
 
 
   /**
@@ -131,9 +128,9 @@ public class StringUtils {
    * @return escaped s
    */
   public static String sanitize(String s) {
-    s = s.replaceAll("#", "##");
+    s = s.replaceAll(ESC, ESC + ESC);
     for (String d : delimiters) {
-      s = s.replaceAll(d, "#" + d);
+      s = s.replaceAll(d, ESC + d);
     }
     return s;
   }
@@ -146,8 +143,8 @@ public class StringUtils {
    */
   public static String deSanitize(String s) {
     for (String d : delimiters) {
-      s = s.replaceAll("#" + d, d);
+      s = s.replaceAll(ESC + d, d);
     }
-    return s.replaceAll("##", "#");
+    return s.replaceAll(ESC + ESC, ESC);
   }
 }

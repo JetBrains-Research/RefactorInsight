@@ -2,6 +2,7 @@ package data.diff;
 
 import static ui.windows.DiffWindow.REFACTORING;
 import static ui.windows.DiffWindow.REFACTORING_RANGES;
+import static utils.StringUtils.LIST;
 
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
@@ -39,7 +40,7 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
   @Override
   public String toString() {
     return ranges.stream().map(ThreeSidedRange::toString)
-        .collect(Collectors.joining(StringUtils.LIST_DELIMITER));
+        .collect(Collectors.joining(StringUtils.delimiter(LIST)));
   }
 
   /**
@@ -48,7 +49,7 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
    * @return the string value
    */
   public static ThreeSidedDiffRequestGenerator fromString(String value) {
-    String regex = StringUtils.ESC + StringUtils.LIST_DELIMITER;
+    String regex = StringUtils.delimiter(LIST, true);
     ThreeSidedDiffRequestGenerator generator = new ThreeSidedDiffRequestGenerator();
     generator.ranges = Arrays.stream(value.split(regex))
         .map(ThreeSidedRange::fromString).collect(Collectors.toList());

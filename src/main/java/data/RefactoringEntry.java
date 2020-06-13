@@ -1,6 +1,7 @@
 package data;
 
 import static org.refactoringminer.api.RefactoringType.EXTRACT_CLASS;
+import static utils.StringUtils.ENTRY;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
@@ -45,7 +46,7 @@ public class RefactoringEntry implements Serializable {
    * @return the RefactoringEntry
    */
   public static RefactoringEntry fromString(String value) {
-    String regex = StringUtils.ESC + StringUtils.ENTRY_DELIMITER;
+    String regex = StringUtils.delimiter(ENTRY, true);
     String[] tokens = value.split(regex, 4);
     String[] refs = tokens[3].split(regex);
     if (refs[0].isEmpty()) {
@@ -61,9 +62,9 @@ public class RefactoringEntry implements Serializable {
 
   @Override
   public String toString() {
-    return commitId + StringUtils.ENTRY_DELIMITER + parent + StringUtils.ENTRY_DELIMITER
-        + time + StringUtils.ENTRY_DELIMITER + refactorings.stream()
-        .map(RefactoringInfo::toString).collect(Collectors.joining(StringUtils.ENTRY_DELIMITER));
+    String del = StringUtils.delimiter(ENTRY);
+    return commitId + del + parent + del + time + del + refactorings.stream()
+        .map(RefactoringInfo::toString).collect(Collectors.joining(del));
   }
 
   /**

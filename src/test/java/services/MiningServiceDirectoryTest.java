@@ -70,8 +70,6 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
   //Example of using an existing repo
   //note that the project directory has to contain the .git folder but renamed
   public void testDirectory() {
-    assertNull(RefactoringEntry.fromString(""));
-    assertNull(RefactoringEntry.fromString(null));
 
     assertEquals(1, entry.getRefactorings().size());
     assertTrue(miner.get(head).getRefactorings().size() > 0);

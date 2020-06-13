@@ -1,5 +1,8 @@
 package data;
 
+import static utils.StringUtils.INFO;
+import static utils.StringUtils.delimiter;
+
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import data.diff.DiffRequestGenerator;
@@ -50,19 +53,19 @@ public class RefactoringInfo {
    * @return string value
    */
   public String toString() {
-    return String.join(StringUtils.INFO_DELIMITER,
+    return String.join(delimiter(INFO),
         name,
         Stream.concat(
             Arrays.stream(uiStrings).flatMap(Arrays::stream),
             Arrays.stream(paths))
             .map(s -> s == null ? "" : s)
             .map(StringUtils::sanitize)
-            .collect(Collectors.joining(StringUtils.INFO_DELIMITER)),
+            .collect(Collectors.joining(delimiter(INFO))),
         group.toString(),
         threeSided ? "t" : "f",
         hidden ? "t" : "f",
         requestGenerator.toString(),
-        String.join(StringUtils.INFO_DELIMITER, includes)
+        String.join(delimiter(INFO), includes)
     );
   }
 
@@ -73,7 +76,7 @@ public class RefactoringInfo {
    * @return the RefactoringInfo
    */
   public static RefactoringInfo fromString(String value) {
-    String regex = StringUtils.ESC + StringUtils.INFO_DELIMITER;
+    String regex = delimiter(INFO, true);
     String[] tokens = value.split(regex, 15);
     return new RefactoringInfo()
         .setName(tokens[0])
