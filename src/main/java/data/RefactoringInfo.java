@@ -113,17 +113,14 @@ public class RefactoringInfo {
     if (group == Group.CLASS) {
       Map<String, String> renames = new HashMap<>();
       renames.put(getNameBefore(), getNameAfter());
-      try {
-        renames.forEach((before, after) -> map.keySet().stream()
-            .filter(x -> x.substring(0, x.lastIndexOf("."))
-                .equals(before))
-            .forEach(signature -> {
-              String newKey = after + signature.substring(signature.lastIndexOf("."));
-              map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
-            }));
-      } catch (Exception e){
 
-      }
+      renames.forEach((before, after) -> map.keySet().stream()
+          .filter(x -> x.substring(0, x.lastIndexOf("."))
+              .equals(before))
+          .forEach(signature -> {
+            String newKey = after + signature.substring(signature.lastIndexOf("."));
+            map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
+          }));
       return;
     }
 
