@@ -13,11 +13,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.refactoringminer.api.Refactoring;
+import ui.tree.TreeUtils;
+import utils.StringUtils;
 import utils.Utils;
 
 public class RefactoringEntry implements Serializable {
 
   private static final transient InfoFactory factory = new InfoFactory();
+
   private final String commitId;
   private final String parent;
   private final long time;
@@ -35,9 +38,15 @@ public class RefactoringEntry implements Serializable {
     this.time = time;
   }
 
+  /**
+   * Deserializes a RefactoringEntry.
+   *
+   * @param value String
+   * @return the RefactoringEntry
+   */
   public static RefactoringEntry fromString(String value) {
-    String[] tokens = value.split(Utils.ENTRY_DELIMITER, 4);
-    String[] refs = tokens[3].split(Utils.ENTRY_DELIMITER);
+    String[] tokens = value.split(StringUtils.ENTRY_DELIMITER, 4);
+    String[] refs = tokens[3].split(StringUtils.ENTRY_DELIMITER);
     if (refs[0].isEmpty()) {
       refs = new String[0];
     }
@@ -51,9 +60,9 @@ public class RefactoringEntry implements Serializable {
 
   @Override
   public String toString() {
-    return commitId + Utils.ENTRY_DELIMITER + parent + Utils.ENTRY_DELIMITER
-        + time + Utils.ENTRY_DELIMITER + refactorings.stream()
-        .map(RefactoringInfo::toString).collect(Collectors.joining(Utils.ENTRY_DELIMITER));
+    return commitId + StringUtils.ENTRY_DELIMITER + parent + StringUtils.ENTRY_DELIMITER
+        + time + StringUtils.ENTRY_DELIMITER + refactorings.stream()
+        .map(RefactoringInfo::toString).collect(Collectors.joining(StringUtils.ENTRY_DELIMITER));
   }
 
   /**
@@ -116,14 +125,14 @@ public class RefactoringEntry implements Serializable {
     List<RefactoringInfo> extractClassRefactorings = refactorings
         .stream().filter(x -> x.getType() == EXTRACT_CLASS).collect(Collectors.toList());
     for (RefactoringInfo extractClass : extractClassRefactorings) {
-      String displayableElement = Utils
+      String displayableElement = TreeUtils
           .getDisplayableElement(extractClass.getElementBefore(), extractClass.getElementAfter());
       refactorings.stream().filter(x -> !x.equals(extractClass))
           .filter(x -> {
             String displayableDetails =
-                Utils.getDisplayableElement(x.getDetailsBefore(), x.getDetailsAfter());
+                TreeUtils.getDisplayableElement(x.getDetailsBefore(), x.getDetailsAfter());
             String displayableName =
-                Utils.getDisplayableElement(x.getNameBefore(), x.getNameAfter());
+                TreeUtils.getDisplayableElement(x.getNameBefore(), x.getNameAfter());
             if (displayableDetails == null) {
               return displayableName.equals(displayableElement);
             }
@@ -146,12 +155,12 @@ public class RefactoringEntry implements Serializable {
     DefaultMutableTreeNode root = new DefaultMutableTreeNode(commitId);
     refactorings.forEach(r -> {
       if (!r.isHidden()) {
-        root.add(Utils.makeNode(r));
+        root.add(TreeUtils.makeNode(r));
       }
     });
     Tree tree = new Tree(root);
     tree.setRootVisible(false);
-    Utils.expandAllNodes(tree, 0, tree.getRowCount());
+    TreeUtils.expandAllNodes(tree, 0, tree.getRowCount());
     return tree;
   }
 
@@ -175,6 +184,5 @@ public class RefactoringEntry implements Serializable {
   public String getCommitId() {
     return commitId;
   }
-
 }
 

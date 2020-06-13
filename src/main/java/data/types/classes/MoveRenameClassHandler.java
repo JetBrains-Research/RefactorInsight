@@ -1,6 +1,7 @@
 package data.types.classes;
 
 import data.RefactoringInfo;
+import data.RefactoringInfo.Group;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MoveAndRenameClassRefactoring;
 import org.refactoringminer.api.Refactoring;
@@ -12,11 +13,11 @@ public class MoveRenameClassHandler extends Handler {
     MoveAndRenameClassRefactoring ref = (MoveAndRenameClassRefactoring) refactoring;
 
     if (ref.getRenamedClass().isAbstract()) {
-      info.setGroup(RefactoringInfo.Group.ABSTRACT);
+      info.setGroup(Group.ABSTRACT);
     } else if (ref.getRenamedClass().isInterface()) {
-      info.setGroup(RefactoringInfo.Group.INTERFACE);
+      info.setGroup(Group.INTERFACE);
     } else {
-      info.setGroup(RefactoringInfo.Group.CLASS);
+      info.setGroup(Group.CLASS);
     }
     return info
         .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(), true)

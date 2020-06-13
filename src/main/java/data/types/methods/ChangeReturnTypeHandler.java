@@ -4,14 +4,15 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ChangeReturnTypeRefactoring;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
+import utils.StringUtils;
 
 public class ChangeReturnTypeHandler extends Handler {
 
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ChangeReturnTypeRefactoring ref = (ChangeReturnTypeRefactoring) refactoring;
-    if (ref.getOperationAfter().isGetter()) {
+    if (ref.getOperationAfter().isGetter()
+        && !ref.getOperationAfter().getBody().getAllVariables().isEmpty()) {
       String id = ref.getOperationAfter().getClassName() + "."
           + ref.getOperationAfter().getBody().getAllVariables().get(0);
       info.setGroupId(id);
@@ -25,8 +26,8 @@ public class ChangeReturnTypeHandler extends Handler {
         .setDetailsAfter(classNameAfter)
         .setElementBefore(ref.getOriginalType().toString())
         .setElementAfter(ref.getChangedType().toString())
-        .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()))
+        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
         .addMarking(ref.getOriginalType().codeRange(), ref.getChangedType().codeRange(),
             true);
 

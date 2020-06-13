@@ -1,5 +1,6 @@
 package data.types.classes;
 
+import static data.RefactoringInfo.Group;
 import static data.RefactoringLine.MarkingOption.REMOVE;
 
 import data.RefactoringInfo;
@@ -14,13 +15,15 @@ public class RemoveClassAnnotationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RemoveClassAnnotationRefactoring ref = (RemoveClassAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
+
     if (ref.getClassAfter().isAbstract()) {
-      info.setGroup(RefactoringInfo.Group.ABSTRACT);
+      info.setGroup(Group.ABSTRACT);
     } else if (ref.getClassAfter().isInterface()) {
-      info.setGroup(RefactoringInfo.Group.INTERFACE);
+      info.setGroup(Group.INTERFACE);
     } else {
-      info.setGroup(RefactoringInfo.Group.CLASS);
+      info.setGroup(Group.CLASS);
     }
+
     return info
         .setNameBefore(ref.getClassBefore().getName())
         .setNameAfter(ref.getClassAfter().getName())

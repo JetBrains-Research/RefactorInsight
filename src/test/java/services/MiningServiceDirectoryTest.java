@@ -23,7 +23,7 @@ import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.Times;
-import ui.renderer.CellRenderer;
+import ui.tree.renderer.CellRenderer;
 import ui.windows.GitWindow;
 
 /**

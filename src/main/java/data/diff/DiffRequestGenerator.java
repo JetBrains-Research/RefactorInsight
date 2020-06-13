@@ -1,4 +1,4 @@
-package data.diffRequests;
+package data.diff;
 
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;

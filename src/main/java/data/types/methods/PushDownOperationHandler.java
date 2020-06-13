@@ -4,7 +4,7 @@ import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.PushDownOperationRefactoring;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
+import utils.StringUtils;
 
 public class PushDownOperationHandler extends Handler {
 
@@ -19,7 +19,8 @@ public class PushDownOperationHandler extends Handler {
         .setDetailsAfter(classAfter)
         .addMarking(ref.getSourceOperationCodeRangeBeforeMove(),
             ref.getTargetOperationCodeRangeAfterMove(), true)
-        .setNameBefore(Utils.calculateSignature(ref.getOriginalOperation()))
-        .setNameAfter(Utils.calculateSignature(ref.getMovedOperation()));
+        .setNameBefore(StringUtils.calculateSignature(ref.getOriginalOperation()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getMovedOperation()));
+
   }
 }

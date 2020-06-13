@@ -10,7 +10,7 @@ public abstract class Handler {
    * Start generating RefactoringInfo from Refactoring.
    *
    * @param refactoring Refactoring from RefactoringMiner
-   * @param entry
+   * @param entry Refactoring entry to handle
    * @return RefactoringInfo
    */
   public RefactoringInfo handle(Refactoring refactoring, RefactoringEntry entry) {

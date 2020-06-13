@@ -2,9 +2,9 @@ package data;
 
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
-import data.diffRequests.DiffRequestGenerator;
-import data.diffRequests.ThreeSidedDiffRequestGenerator;
-import data.diffRequests.TwoSidedDiffRequestGenerator;
+import data.diff.DiffRequestGenerator;
+import data.diff.ThreeSidedDiffRequestGenerator;
+import data.diff.TwoSidedDiffRequestGenerator;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.refactoringminer.api.RefactoringType;
-import utils.Utils;
+import utils.StringUtils;
 
 public class RefactoringInfo {
 
@@ -44,32 +44,43 @@ public class RefactoringInfo {
     return requestGenerator.generate(contents, this);
   }
 
+  /**
+   * Serializes a RefactoringInfo.
+   *
+   * @return string value
+   */
   public String toString() {
-    return String.join(Utils.INFO_DELIMITER,
+    return String.join(StringUtils.INFO_DELIMITER,
         name,
         Stream.concat(
             Arrays.stream(uiStrings).flatMap(Arrays::stream),
             Arrays.stream(paths))
             .map(s -> s == null ? "null" : s)
-            .collect(Collectors.joining(Utils.INFO_DELIMITER)),
+            .collect(Collectors.joining(StringUtils.INFO_DELIMITER)),
         group.toString(),
         threeSided ? "t" : "f",
         hidden ? "t" : "f",
         requestGenerator.toString(),
-        String.join(Utils.INFO_DELIMITER, includes)
+        String.join(StringUtils.INFO_DELIMITER, includes)
     );
   }
 
+  /**
+   * Deserializes a RefactoringInfo.
+   *
+   * @param value string
+   * @return the RefactoringInfo
+   */
   public static RefactoringInfo fromString(String value) {
-    String[] tokens = value.split(Utils.INFO_DELIMITER, 15);
+    String[] tokens = value.split(StringUtils.INFO_DELIMITER, 15);
     return new RefactoringInfo()
         .setName(tokens[0])
         .setNameBefore(tokens[1])
-        .setElementBefore(tokens[2])
-        .setDetailsBefore(tokens[3])
-        .setNameAfter(tokens[4])
-        .setElementAfter(tokens[5])
-        .setDetailsAfter(tokens[6])
+        .setNameAfter(tokens[2])
+        .setElementAfter(tokens[3])
+        .setElementBefore(tokens[4])
+        .setDetailsAfter(tokens[5])
+        .setDetailsBefore(tokens[6])
         .setLeftPath(tokens[7])
         .setMidPath(tokens[8])
         .setRightPath(tokens[9])
@@ -79,7 +90,7 @@ public class RefactoringInfo {
         .setRequestGenerator(tokens[11].equals("t")
             ? ThreeSidedDiffRequestGenerator.fromString(tokens[13])
             : TwoSidedDiffRequestGenerator.fromString(tokens[13]))
-        .setIncludes(new HashSet<>(Arrays.asList(tokens[14].split(Utils.INFO_DELIMITER))));
+        .setIncludes(new HashSet<>(Arrays.asList(tokens[14].split(StringUtils.INFO_DELIMITER))));
   }
 
   public RefactoringInfo setRequestGenerator(DiffRequestGenerator requestGenerator) {
@@ -102,13 +113,17 @@ public class RefactoringInfo {
     if (group == Group.CLASS) {
       Map<String, String> renames = new HashMap<>();
       renames.put(getNameBefore(), getNameAfter());
-      renames.forEach((before, after) -> map.keySet().stream()
-          .filter(x -> x.substring(0, x.lastIndexOf("."))
-              .equals(before))
-          .forEach(signature -> {
-            String newKey = after + signature.substring(signature.lastIndexOf("."));
-            map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
-          }));
+      try {
+        renames.forEach((before, after) -> map.keySet().stream()
+            .filter(x -> x.substring(0, x.lastIndexOf("."))
+                .equals(before))
+            .forEach(signature -> {
+              String newKey = after + signature.substring(signature.lastIndexOf("."));
+              map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
+            }));
+      } catch (Exception e){
+
+      }
       return;
     }
 
@@ -152,7 +167,6 @@ public class RefactoringInfo {
     return this;
   }
 
-
   public void addAllMarkings(RefactoringInfo info) {
     requestGenerator.getMarkings().addAll(info.getLineMarkings());
   }
@@ -194,6 +208,12 @@ public class RefactoringInfo {
     return threeSided;
   }
 
+  /**
+   * Sets the refactoring info as three sided.
+   *
+   * @param threeSided boolean
+   * @return this
+   */
   public RefactoringInfo setThreeSided(boolean threeSided) {
     this.threeSided = threeSided;
     if (threeSided) {

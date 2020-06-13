@@ -4,10 +4,8 @@ import com.intellij.diff.fragments.DiffFragment;
 import com.intellij.diff.fragments.DiffFragmentImpl;
 import com.intellij.diff.fragments.LineFragmentImpl;
 import com.intellij.diff.fragments.MergeLineFragmentImpl;
-import com.intellij.diff.util.MergeConflictType;
-import com.intellij.diff.util.TextDiffType;
 import com.intellij.openapi.util.TextRange;
-import data.diffRequests.ThreeSidedRange;
+import data.diff.ThreeSidedRange;
 import gr.uom.java.xmi.LocationInfo;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
@@ -23,23 +21,17 @@ public class RefactoringLine {
   private static final int MID_END = 3;
   private static final int RIGHT_START = 4;
   private static final int RIGHT_END = 5;
-
+  VisualisationType type;
   private int[] lines = new int[6];
   private int[] columns = new int[6];
   private List<RefactoringOffset> offsets = new ArrayList<>();
-
   private boolean hasColumns = false;
-
-  private String[] lazilyHighlightableWords;
+  private String[] word;
   private boolean lazy = false;
-
-
   private List<TextRange> left;
   private List<TextRange> mid;
   private List<TextRange> right;
-
   private LineFragmentImpl fragment;
-  VisualisationType type;
 
   /**
    * Data holder for three sided refactoring diff.
@@ -51,6 +43,12 @@ public class RefactoringLine {
     this.type = type;
   }
 
+  /**
+   * Corrects lines and offsets returned by RefactoringMiner.
+   * @param leftText String containing whole left file contents
+   * @param midText String containing whole middle file contents
+   * @param rightText String containing whole righr file contents
+   */
   public void correctLines(String leftText, String midText, String rightText) {
     int maxLineLeft = Utils.getMaxLine(leftText);
     int maxLineRight = Utils.getMaxLine(rightText);
@@ -60,71 +58,77 @@ public class RefactoringLine {
       int maxLineMid = Utils.getMaxLine(midText);
       lines[MID_END] = lines[MID_END] < 0 ? maxLineMid : lines[MID_END];
     }
-    computeLazyHighlighting(leftText, midText, rightText);
-
-
+    computeHighlighting(leftText, midText, rightText);
     if (midText == null) {
-      List<DiffFragment> fragments = offsets.stream().map(RefactoringOffset::toDiffFragment)
-          .collect(Collectors.toList());
-      if (hasColumns) {
-        fragments.add(new DiffFragmentImpl(
-            Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]),
-            Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]),
-            Utils.getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]),
-            Utils.getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END])));
-      }
-      fragment = new LineFragmentImpl(lines[LEFT_START], lines[LEFT_END], lines[RIGHT_START],
-          lines[RIGHT_END], 0, 0, 0, 0, fragments);
+      computeTwoSidedRanges(leftText, rightText);
     } else {
-      left = offsets.stream().map(RefactoringOffset::getLeftRange)
-          .collect(Collectors.toList());
-      mid = new ArrayList<>();
-      right = offsets.stream().map(RefactoringOffset::getRightRange)
-          .collect(Collectors.toList());
-
-      if (hasColumns) {
-        int leftStartOffset = Utils.getOffset(leftText, lines[LEFT_START] + 1, 1);
-        left.add(new TextRange(
-            Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]) - leftStartOffset,
-            Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]) - leftStartOffset
-        ));
-        int midStartOffset = Utils.getOffset(midText, lines[MID_START] + 1, 1);
-        mid.add(new TextRange(
-            Utils.getOffset(midText, lines[MID_START] + 1, columns[MID_START]) - midStartOffset,
-            Utils.getOffset(midText, lines[MID_END], columns[MID_END]) - midStartOffset
-        ));
-        int rightStartOffset = Utils.getOffset(rightText, lines[RIGHT_START] + 1, 1);
-        right.add(new TextRange(
-            Utils.getOffset(rightText, lines[RIGHT_START] + 1,
-                columns[RIGHT_START]) - rightStartOffset,
-            Utils.getOffset(rightText, lines[RIGHT_END],
-                columns[RIGHT_END]) - rightStartOffset
-        ));
-      }
+      computeThreeSidedRanges(leftText, midText, rightText);
     }
   }
 
-  private void computeLazyHighlighting(String leftText, String midText, String rightText) {
+  private void computeThreeSidedRanges(String leftText, String midText, String rightText) {
+    left = offsets.stream().map(RefactoringOffset::getLeftRange)
+        .collect(Collectors.toList());
+    mid = new ArrayList<>();
+    right = offsets.stream().map(RefactoringOffset::getRightRange)
+        .collect(Collectors.toList());
+
+    if (hasColumns) {
+      int leftStartOffset = Utils.getOffset(leftText, lines[LEFT_START] + 1, 1);
+      left.add(new TextRange(
+          Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]) - leftStartOffset,
+          Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]) - leftStartOffset
+      ));
+      int midStartOffset = Utils.getOffset(midText, lines[MID_START] + 1, 1);
+      mid.add(new TextRange(
+          Utils.getOffset(midText, lines[MID_START] + 1, columns[MID_START]) - midStartOffset,
+          Utils.getOffset(midText, lines[MID_END], columns[MID_END]) - midStartOffset
+      ));
+      int rightStartOffset = Utils.getOffset(rightText, lines[RIGHT_START] + 1, 1);
+      right.add(new TextRange(
+          Utils.getOffset(rightText, lines[RIGHT_START] + 1,
+              columns[RIGHT_START]) - rightStartOffset,
+          Utils.getOffset(rightText, lines[RIGHT_END],
+              columns[RIGHT_END]) - rightStartOffset
+      ));
+    }
+  }
+
+  private void computeTwoSidedRanges(String leftText, String rightText) {
+    List<DiffFragment> fragments = offsets.stream().map(RefactoringOffset::toDiffFragment)
+        .collect(Collectors.toList());
+    if (hasColumns) {
+      fragments.add(new DiffFragmentImpl(
+          Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]),
+          Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]),
+          Utils.getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]),
+          Utils.getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END])));
+    }
+    fragment = new LineFragmentImpl(lines[LEFT_START], lines[LEFT_END], lines[RIGHT_START],
+        lines[RIGHT_END], 0, 0, 0, 0, fragments);
+  }
+
+  private void computeHighlighting(String leftText, String midText, String rightText) {
     if (!lazy) {
       return;
     }
     hasColumns = true;
     columns = new int[] {1, 1, 0, 0, columns[RIGHT_START], columns[RIGHT_END]};
-    if (lazilyHighlightableWords[0] != null) {
+    if (word[0] != null) {
       int[] beforeColumns =
-          Utils.findColumns(leftText, lazilyHighlightableWords[0], lines[LEFT_START] + 1);
+          Utils.findColumns(leftText, word[0], lines[LEFT_START] + 1);
       columns[LEFT_START] = beforeColumns[0];
       columns[LEFT_END] = beforeColumns[1];
     }
-    if (lazilyHighlightableWords[1] != null && midText != null) {
+    if (word[1] != null && midText != null) {
       int[] midColumns =
-          Utils.findColumns(midText, lazilyHighlightableWords[1], lines[MID_START] + 1);
+          Utils.findColumns(midText, word[1], lines[MID_START] + 1);
       columns[MID_START] = midColumns[0];
       columns[MID_END] = midColumns[1];
     }
-    if (lazilyHighlightableWords[2] != null) {
+    if (word[2] != null) {
       int[] afterColumns =
-          Utils.findColumns(rightText, lazilyHighlightableWords[2], lines[RIGHT_START] + 1);
+          Utils.findColumns(rightText, word[2], lines[RIGHT_START] + 1);
       columns[RIGHT_START] = afterColumns[0];
       columns[RIGHT_END] = afterColumns[1];
     }
@@ -175,6 +179,10 @@ public class RefactoringLine {
     return fragment;
   }
 
+  /**
+   * Computes the ThreeSidedRange representing this.
+   * @return ThreeSidedRange
+   */
   public ThreeSidedRange getThreeSidedRange() {
     return new ThreeSidedRange(left, mid, right, type,
         new MergeLineFragmentImpl(
@@ -193,8 +201,8 @@ public class RefactoringLine {
     this.hasColumns = hasColumns;
   }
 
-  public void setLazilyHighlightableWords(String[] lazilyHighlightableWords) {
-    this.lazilyHighlightableWords = lazilyHighlightableWords;
+  public void setWord(String[] word) {
+    this.word = word;
     lazy = true;
   }
 

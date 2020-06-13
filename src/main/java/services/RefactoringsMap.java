@@ -14,6 +14,7 @@ public class RefactoringsMap {
 
   public RefactoringsMap() {
   }
+
   public RefactoringsMap(Map<String, RefactoringEntry> map, String version) {
     this.map = map;
     this.version = version;

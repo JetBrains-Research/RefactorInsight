@@ -14,7 +14,7 @@ import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import services.MiningService;
 import ui.windows.MethodRefactoringToolbar;
-import utils.Utils;
+import utils.StringUtils;
 
 public class MethodAction extends AnAction {
 
@@ -45,7 +45,7 @@ public class MethodAction extends AnAction {
       if (target instanceof PsiElementUsageTarget) {
         if (((PsiElementUsageTarget) target).getElement() instanceof PsiMethod) {
           PsiMethod method = (PsiMethod) ((PsiElementUsageTarget) target).getElement();
-          String signature = Utils.calculateSignature(method);
+          String signature = StringUtils.calculateSignature(method);
           getToolbarWindow(project).showToolbar(map.get(signature),
               method.getName(), dataContext);
         }

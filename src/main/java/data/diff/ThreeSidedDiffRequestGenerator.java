@@ -1,5 +1,6 @@
-package data.diffRequests;
+package data.diff;
 
+import static ui.windows.DiffWindow.REFACTORING;
 import static ui.windows.DiffWindow.REFACTORING_RANGES;
 
 import com.intellij.diff.contents.DiffContent;
@@ -9,7 +10,7 @@ import data.RefactoringLine;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import utils.Utils;
+import utils.StringUtils;
 
 public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
 
@@ -24,6 +25,7 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
         contents[0], contents[1], contents[2],
         info.getLeftPath(), info.getMidPath(), info.getRightPath());
     request.putUserData(REFACTORING_RANGES, ranges);
+    request.putUserData(REFACTORING, true);
     return request;
   }
 
@@ -37,12 +39,17 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
   @Override
   public String toString() {
     return ranges.stream().map(ThreeSidedRange::toString)
-        .collect(Collectors.joining(Utils.LIST_DELIMITER));
+        .collect(Collectors.joining(StringUtils.LIST_DELIMITER));
   }
 
-  public static ThreeSidedDiffRequestGenerator fromString(String value){
+  /**
+   * Serializes a ThreeSidedDiffRequestGenerator.
+   *
+   * @return the string value
+   */
+  public static ThreeSidedDiffRequestGenerator fromString(String value) {
     ThreeSidedDiffRequestGenerator generator = new ThreeSidedDiffRequestGenerator();
-    generator.ranges = Arrays.stream(value.split(Utils.LIST_DELIMITER))
+    generator.ranges = Arrays.stream(value.split(StringUtils.LIST_DELIMITER))
         .map(ThreeSidedRange::fromString).collect(Collectors.toList());
     return generator;
   }

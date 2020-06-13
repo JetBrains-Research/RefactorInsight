@@ -1,4 +1,4 @@
-package data.diffRequests;
+package data.diff;
 
 import com.intellij.diff.fragments.MergeLineFragment;
 import com.intellij.diff.fragments.MergeLineFragmentImpl;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import utils.Utils;
+import utils.StringUtils;
 
 public class ThreeSidedRange {
 
@@ -26,6 +26,14 @@ public class ThreeSidedRange {
 
   MergeLineFragment fragment;
 
+  /**
+   * Constructor for ThreeSidedRange.
+   * @param left TextRanges
+   * @param mid TextRanges
+   * @param right TextRanges
+   * @param type VisualisationType
+   * @param fragment MergeLineFragment
+   */
   public ThreeSidedRange(List<TextRange> left, List<TextRange> mid, List<TextRange> right,
                          VisualisationType type,
                          MergeLineFragment fragment) {
@@ -53,24 +61,31 @@ public class ThreeSidedRange {
         stringify(left),
         stringify(mid),
         stringify(right)
-    ).map(String::valueOf).collect(Collectors.joining(Utils.FRAG_DELIMITER));
+    ).map(String::valueOf).collect(Collectors.joining(StringUtils.FRAG_DELIMITER));
   }
 
   private String stringify(List<TextRange> list) {
-    return list.stream().map(r -> r.getStartOffset() + Utils.RANGE_DELIMITER + r.getEndOffset())
-        .collect(Collectors.joining(Utils.RANGE_DELIMITER));
+    return list.stream()
+        .map(r -> r.getStartOffset() + StringUtils.RANGE_DELIMITER + r.getEndOffset())
+        .collect(Collectors.joining(StringUtils.RANGE_DELIMITER));
   }
 
   private static List<TextRange> deStringify(String value) {
-    String[] tokens = value.split(Utils.RANGE_DELIMITER);
+    String[] tokens = value.split(StringUtils.RANGE_DELIMITER);
     assert tokens.length % 2 == 0;
     return IntStream.range(0, tokens.length / 2).map(i -> i * 2).mapToObj(i ->
         new TextRange(Integer.parseInt(tokens[i]), Integer.parseInt(tokens[i + 1])))
         .collect(Collectors.toList());
   }
 
+  /**
+   * Deserializes a ThreeSidedRange.
+   *
+   * @param value string
+   * @return the ThreeSidedRange
+   */
   public static ThreeSidedRange fromString(String value) {
-    String[] tokens = value.split(Utils.FRAG_DELIMITER);
+    String[] tokens = value.split(StringUtils.FRAG_DELIMITER);
     return new ThreeSidedRange(
         deStringify(tokens[7]),
         deStringify(tokens[8]),

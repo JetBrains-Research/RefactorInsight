@@ -45,6 +45,7 @@ import ui.windows.GitWindow;
 @Service
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
+  private static final String VERSION = "1.0.1";
   public static ConcurrentHashMap<String, List<RefactoringInfo>> methodHistory
       = new ConcurrentHashMap<>();
   private boolean mining = false;
@@ -72,7 +73,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
       innerState = state;
     } else {
       innerState = new MyState();
-      innerState.refactoringsMap.version =  version();
+      innerState.refactoringsMap.version = version();
     }
   }
 
@@ -177,10 +178,11 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
           public void onFinished() {
             super.onFinished();
-            if(innerState.refactoringsMap.map.containsKey(commit.getId().asString())) {
+            if (innerState.refactoringsMap.map.containsKey(commit.getId().asString())) {
+
               System.out.println("Mining commit done");
               ApplicationManager.getApplication()
-                  .invokeLater(() -> info. refresh(commit.getId().asString()));
+                  .invokeLater(() -> info.refresh(commit.getId().asString()));
             } else {
               System.out.println("Mining commit FAILED!");
             }

@@ -5,7 +5,7 @@ import data.types.Handler;
 import gr.uom.java.xmi.diff.MergeVariableRefactoring;
 import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
-import utils.Utils;
+import utils.StringUtils;
 
 public class MergeVariableHandler extends Handler {
 
@@ -28,7 +28,7 @@ public class MergeVariableHandler extends Handler {
         .setElementBefore(ref.getMergedVariables().stream().map(x -> x.getVariableName()).collect(
             Collectors.joining()))
         .setElementAfter(ref.getNewVariable().getVariableDeclaration().toQualifiedString())
-        .setNameBefore(Utils.calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(Utils.calculateSignature(ref.getOperationAfter()));
+        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()));
   }
 }
