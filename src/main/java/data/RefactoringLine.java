@@ -26,7 +26,7 @@ public class RefactoringLine {
   private int[] columns = new int[6];
   private List<RefactoringOffset> offsets = new ArrayList<>();
   private boolean hasColumns = false;
-  private String[] lazilyHighlightableWords;
+  private String[] word;
   private boolean lazy = false;
   private List<TextRange> left;
   private List<TextRange> mid;
@@ -69,7 +69,7 @@ public class RefactoringLine {
       highlightPackage(leftText, rightText);
     }
     processOption(midText != null, markingOption);
-    computeLazyHighlighting(leftText, midText, rightText);
+    computeHighlighting(leftText, midText, rightText);
     if (midText == null) {
       computeTwoSidedRanges(leftText, rightText);
     } else {
@@ -119,27 +119,28 @@ public class RefactoringLine {
         lines[RIGHT_END], 0, 0, 0, 0, fragments);
   }
 
-  private void computeLazyHighlighting(String leftText, String midText, String rightText) {
+  private void computeHighlighting(String leftText, String midText, String rightText) {
     if (!lazy) {
       return;
     }
     hasColumns = true;
     columns = new int[] {1, 1, 0, 0, columns[RIGHT_START], columns[RIGHT_END]};
-    if (lazilyHighlightableWords[0] != null) {
+    if (word[0] != null) {
       int[] beforeColumns =
-          Utils.findColumns(leftText, lazilyHighlightableWords[0], lines[LEFT_START]);
+          Utils.findColumns(leftText, word[0], lines[LEFT_START]);
       columns[LEFT_START] = beforeColumns[0];
       columns[LEFT_END] = beforeColumns[1];
     }
-    if (lazilyHighlightableWords[1] != null && midText != null) {
+    if (word[1] != null && midText != null) {
       int[] midColumns =
-          Utils.findColumns(midText, lazilyHighlightableWords[1], lines[MID_START]);
+          Utils.findColumns(midText, word[1], lines[MID_START]);
+
       columns[MID_START] = midColumns[0];
       columns[MID_END] = midColumns[1];
     }
-    if (lazilyHighlightableWords[2] != null) {
+    if (word[2] != null) {
       int[] afterColumns =
-          Utils.findColumns(rightText, lazilyHighlightableWords[2], lines[RIGHT_START]);
+          Utils.findColumns(rightText, word[2], lines[RIGHT_START]);
       columns[RIGHT_START] = afterColumns[0];
       columns[RIGHT_END] = afterColumns[1];
     }
@@ -213,8 +214,8 @@ public class RefactoringLine {
     this.hasColumns = hasColumns;
   }
 
-  public void setLazilyHighlightableWords(String[] lazilyHighlightableWords) {
-    this.lazilyHighlightableWords = lazilyHighlightableWords;
+  public void setWord(String[] word) {
+    this.word = word;
     lazy = true;
   }
 

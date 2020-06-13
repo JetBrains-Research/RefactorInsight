@@ -25,7 +25,7 @@ public class MoveClassHandler extends Handler {
     return info
         .addMarking(ref.getOriginalClass().codeRange(), ref.getMovedClass().codeRange(),
             (line) -> {
-              line.setLazilyHighlightableWords(
+              line.setWord(
                   new String[] {packageBefore, null, packageAfter});
             },
             RefactoringLine.MarkingOption.PACKAGE,

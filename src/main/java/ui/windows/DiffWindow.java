@@ -1,18 +1,28 @@
 package ui.windows;
 
+import com.intellij.diff.DiffContentFactoryEx;
 import com.intellij.diff.DiffContext;
+import com.intellij.diff.DiffDialogHints;
 import com.intellij.diff.DiffManager;
 import com.intellij.diff.FrameDiffTool;
+import com.intellij.diff.chains.DiffRequestChain;
+import com.intellij.diff.chains.SimpleDiffRequestChain;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.DiffRequest;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
 import com.intellij.diff.tools.simple.ThreesideDiffChangeBase;
 import com.intellij.diff.tools.util.base.DiffViewerListener;
+import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.WindowWrapper;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.vcs.VcsException;
+import com.intellij.openapi.vcs.changes.Change;
+import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.diff.ThreeSidedRange;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
@@ -28,13 +38,59 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
   /**
    * Requests diff window to show specific refactoring with two editors.
    *
-   * @param contents array with the diffContents
    * @param info     RefactoringInfo
    * @param project  Current project
    */
-  public static void showDiff(DiffContent[] contents, RefactoringInfo info, Project project) {
-    DiffManager.getInstance().showDiff(project, info.generate(contents));
+  public static void showDiff(Collection<Change> changes, RefactoringInfo info,
+                              Project project, RefactoringEntry entry) {
+    List<DiffRequest> requests = entry.getRefactorings().stream()
+        .filter(i -> !i.isHidden()).map(i -> i.generate(getDiffContents(changes, i, project)))
+        .collect(Collectors.toList());
+    DiffRequestChain chain = new SimpleDiffRequestChain(requests);
+    chain.setIndex(entry.getRefactorings().stream()
+        .filter(i -> !i.isHidden()).collect(Collectors.toList()).indexOf(info));
+    DiffManager.getInstance().showDiff(project, chain,
+        new DiffDialogHints(WindowWrapper.Mode.FRAME));
+  }
 
+
+  private static DiffContent[] getDiffContents(Collection<Change> changes,
+                                               RefactoringInfo info, Project project) {
+    if (info.getLeftPath() == null) {
+      return null;
+    }
+    try {
+      DiffContentFactoryEx myDiffContentFactory = DiffContentFactoryEx.getInstanceEx();
+      DiffContent[] contents = {null, null, null};
+      for (Change change : changes) {
+        if (change.getBeforeRevision() != null) {
+          change.getBeforeRevision().getFile().getPath();
+          if (change.getBeforeRevision().getFile().getPath().contains(info.getLeftPath())) {
+            contents[0] = myDiffContentFactory.create(project,
+                change.getBeforeRevision().getContent(),
+                JavaClassFileType.INSTANCE);
+          }
+        }
+        if (info.isThreeSided()
+            && change.getAfterRevision() != null
+            && change.getAfterRevision().getFile().getPath().contains(info.getMidPath())) {
+          contents[1] = myDiffContentFactory.create(project,
+              change.getAfterRevision().getContent(),
+              JavaClassFileType.INSTANCE);
+        }
+        if (change.getAfterRevision() != null
+            && change.getAfterRevision().getFile().getPath().contains(info.getRightPath())) {
+          contents[2] = myDiffContentFactory.create(project,
+              change.getAfterRevision().getContent(),
+              JavaClassFileType.INSTANCE);
+        }
+      }
+      return contents;
+
+    } catch (VcsException ex) {
+      ex.printStackTrace();
+      return null;
+    }
   }
 
   /**

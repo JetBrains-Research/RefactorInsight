@@ -24,7 +24,7 @@ public class RenameClassHandler extends Handler {
     return info
         .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
             (line) -> {
-              line.setLazilyHighlightableWords(
+              line.setWord(
                   new String[] {null, null, className});
             },
             RefactoringLine.MarkingOption.COLLAPSE,

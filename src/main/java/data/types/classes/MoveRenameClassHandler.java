@@ -29,7 +29,7 @@ public class MoveRenameClassHandler extends Handler {
     return info
         .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
             (line) -> {
-              line.setLazilyHighlightableWords(
+              line.setWord(
                   new String[] {ref.getOriginalClass().getPackageName(), null,
                       ref.getRenamedClass().getPackageName()});
             },
@@ -37,7 +37,7 @@ public class MoveRenameClassHandler extends Handler {
             true)
         .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
             (line) -> {
-              line.setLazilyHighlightableWords(
+              line.setWord(
                   new String[] {className2, null, className});
             },
             RefactoringLine.MarkingOption.COLLAPSE,
