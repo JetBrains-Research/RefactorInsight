@@ -18,7 +18,7 @@ public class TreeUtils {
       return null;
     }
     String info = elementBefore;
-    if (elementAfter != null || elementAfter.isEmpty()) {
+    if (elementAfter != null && !elementAfter.isEmpty()) {
       info += " -> " + elementAfter;
     }
     return info;

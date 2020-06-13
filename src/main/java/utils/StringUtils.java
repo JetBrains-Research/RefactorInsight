@@ -7,13 +7,13 @@ import gr.uom.java.xmi.UMLOperation;
 
 public class StringUtils {
 
-  public static final String MAP_DELIMITER = ",,";
-  public static final String MAP_ENTRY_DELIMITER = "===";
-  public static final String ENTRY_DELIMITER = ";;";
-  public static final String INFO_DELIMITER = "==";
-  public static final String LIST_DELIMITER = ",";
-  public static final String FRAG_DELIMITER = ";";
-  public static final String RANGE_DELIMITER = "=";
+  public static final String MAP_DELIMITER = "§";
+  public static final String MAP_ENTRY_DELIMITER = "=";
+  public static final String ENTRY_DELIMITER = "#";
+  public static final String INFO_DELIMITER = "±";
+  public static final String LIST_DELIMITER = "!";
+  public static final String FRAG_DELIMITER = ",";
+  public static final String RANGE_DELIMITER = ";";
 
   /**
    * Method used for a presentable displaying of class change.
