@@ -55,7 +55,7 @@ public class RefactoringInfo {
         Stream.concat(
             Arrays.stream(uiStrings).flatMap(Arrays::stream),
             Arrays.stream(paths))
-            .map(s -> s == null ? "null" : s)
+            .map(s -> s == null ? "" : s)
             .collect(Collectors.joining(StringUtils.INFO_DELIMITER)),
         group.toString(),
         threeSided ? "t" : "f",

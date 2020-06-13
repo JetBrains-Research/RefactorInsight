@@ -52,7 +52,7 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
    */
   public String toString() {
     if (fragments == null) {
-      return "null";
+      return "";
     }
     return fragments.stream().map(frag ->
         Stream.of(
@@ -64,7 +64,7 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
             frag.getEndOffset1(),
             frag.getStartOffset2(),
             frag.getEndOffset2(),
-            (frag.getInnerFragments() == null ? "null"
+            (frag.getInnerFragments() == null ? ""
                 : frag.getInnerFragments().stream().map(f ->
                 f.getStartOffset1() + StringUtils.FRAG_DELIMITER
                     + f.getEndOffset1() + StringUtils.FRAG_DELIMITER
@@ -84,13 +84,13 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
   public static TwoSidedDiffRequestGenerator fromString(String value) {
     String[] tokens = value.split(StringUtils.LIST_DELIMITER);
     TwoSidedDiffRequestGenerator generator = new TwoSidedDiffRequestGenerator();
-    if (value.equals("null")) {
+    if (value.isEmpty()) {
       return generator;
     }
     generator.fragments = Arrays.stream(tokens).map(string -> {
       String[] toks = string.split(StringUtils.FRAG_DELIMITER, 9);
       String[] diffs = toks[8].split(StringUtils.FRAG_DELIMITER);
-      List<DiffFragment> frags = toks[8].equals("null") || diffs[0].isEmpty() ? null
+      List<DiffFragment> frags =  diffs[0].isEmpty() ? null
           : IntStream.range(0, diffs.length / 4).map(i -> i * 4).mapToObj(i -> new DiffFragmentImpl(
           Integer.parseInt(diffs[i]),
           Integer.parseInt(diffs[i + 1]),

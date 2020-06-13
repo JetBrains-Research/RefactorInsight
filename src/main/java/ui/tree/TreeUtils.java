@@ -14,11 +14,11 @@ public class TreeUtils {
    * @return presentable String that shows the changes.
    */
   public static String getDisplayableElement(String elementBefore, String elementAfter) {
-    if (elementBefore == null) {
+    if (elementBefore == null || elementBefore.isEmpty()) {
       return null;
     }
     String info = elementBefore;
-    if (elementAfter != null) {
+    if (elementAfter != null || elementAfter.isEmpty()) {
       info += " -> " + elementAfter;
     }
     return info;
@@ -31,7 +31,8 @@ public class TreeUtils {
    * @return presentable String that shows the changes.
    */
   public static String getDisplayableDetails(String before, String after) {
-    if (before == null || after == null) {
+    if (before == null || after == null
+        || before.isEmpty() || after.isEmpty()) {
       return null;
     }
 
