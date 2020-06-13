@@ -30,6 +30,7 @@ import static org.refactoringminer.api.RefactoringType.RENAME_PACKAGE;
 import static org.refactoringminer.api.RefactoringType.RENAME_PARAMETER;
 import static org.refactoringminer.api.RefactoringType.RENAME_VARIABLE;
 
+
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vcs.Executor;
 import com.intellij.ui.treeStructure.Tree;
@@ -47,7 +48,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
-import javax.swing.tree.TreeCellRenderer;
 import org.hamcrest.CustomMatcher;
 import org.hamcrest.Matcher;
 import org.junit.rules.ErrorCollector;

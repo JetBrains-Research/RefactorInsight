@@ -10,6 +10,7 @@ import com.intellij.vcs.log.Hash;
 import com.intellij.vcs.log.VcsUser;
 import com.intellij.vcs.log.impl.VcsCommitMetadataImpl;
 import data.RefactoringEntry;
+import data.RefactoringInfo;
 import git4idea.test.GitSingleRepoTest;
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +21,8 @@ import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.Times;
+import ui.tree.TreeUtils;
+import ui.tree.renderers.HistoryToolbarRenderer;
 import ui.tree.renderers.MainCellRenderer;
 import ui.windows.GitWindow;
 
@@ -71,7 +74,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
     assertNull(RefactoringEntry.fromString(""));
     assertNull(RefactoringEntry.fromString(null));
 
-    assertEquals(1, entry.getRefactorings().size());
+    assertEquals(3, entry.getRefactorings().size());
     assertTrue(miner.getRefactorings(head).length() > 0);
 
     assertThrows(IllegalArgumentException.class, () -> MiningService.getInstance(null));
@@ -91,34 +94,39 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
           Tree tree1 = x.buildTree();
           tree1.setCellRenderer(cellRenderer);
           assertNotNull(tree1);
-          Object root1 = tree1.getModel().getRoot();
+          DefaultMutableTreeNode root1 = (DefaultMutableTreeNode) tree1.getModel().getRoot();
 
           //for each refactoring check that the renderer works properly
-          int children = tree1.getModel().getChildCount(root1);
-          for (int i = 0; i < children; i++) {
-            DefaultMutableTreeNode refactoringNode =
-                (DefaultMutableTreeNode) tree1.getModel().getChild(root1, i);
-            cellRenderer.customizeCellRenderer(tree1, refactoringNode, false,
-                false, refactoringNode.isLeaf(), 1, false);
-            for (int j = 0; j < refactoringNode.getChildCount(); j++) {
-              DefaultMutableTreeNode child1 =
-                  (DefaultMutableTreeNode) tree1.getModel().getChild(refactoringNode, j);
-              cellRenderer.customizeCellRenderer(tree1, child1, false,
-                  false, child1.isLeaf(), 1, false);
-              for (int z = 0; z < child1.getChildCount(); z++) {
-                DefaultMutableTreeNode child2 =
-                    (DefaultMutableTreeNode) tree1.getModel().getChild(child1, z);
-                cellRenderer.customizeCellRenderer(tree1, child2, false,
-                    false, child2.isLeaf(), 1, false);
-                for (int k = 0; k < child2.getChildCount(); k++) {
-                  DefaultMutableTreeNode child3 =
-                      (DefaultMutableTreeNode) tree1.getModel().getChild(child2, k);
-                  cellRenderer.customizeCellRenderer(tree1, child3, false,
-                      false, child3.isLeaf(), 1, false);
-                }
-              }
-            }
+          root1.breadthFirstEnumeration().asIterator().forEachRemaining(node -> {
+            cellRenderer.customizeCellRenderer(tree1, node, false,
+                false, node.isLeaf(), 1, false);
+            assertNotNull(cellRenderer
+                .getTreeCellRendererComponent(tree1, node, false,
+                    false, node.isLeaf(), 1, false));
+          });
+        });
+  }
+
+  public void testHistoryTreeIsBuilt() {
+    HistoryToolbarRenderer cellRenderer = new HistoryToolbarRenderer();
+
+    miner.getMethodHistory()
+        .forEach((key, refactorings) -> {
+          DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+          for (RefactoringInfo ref : refactorings) {
+            TreeUtils.createHistoryTree(root, ref);
           }
+          Tree tree1 = new Tree(root);
+          tree1.setCellRenderer(cellRenderer);
+          assertNotNull(tree1);
+          DefaultMutableTreeNode root1 = (DefaultMutableTreeNode) tree1.getModel().getRoot();
+          root1.breadthFirstEnumeration().asIterator().forEachRemaining(node -> {
+            cellRenderer.customizeCellRenderer(tree1, node, false,
+                false, node.isLeaf(), 1, false);
+            assertNotNull(cellRenderer
+                .getTreeCellRendererComponent(tree1, node, false,
+                    false, node.isLeaf(), 1, false));
+          });
         });
   }
 
