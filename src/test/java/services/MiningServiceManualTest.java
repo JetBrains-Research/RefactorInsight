@@ -82,7 +82,7 @@ public class MiningServiceManualTest extends GitSingleRepoTest {
   };
   // and any number of RefactoringInfo predicates to check in specific commit
   // must have the same length as commitDirs
-  private final Matcher<Function<? super RefactoringEntry, ? extends RefactoringEntry>>[] matches = new Matcher[] {
+  private final Matcher<RefactoringEntry>[] matches = new Matcher[] {
       matcher(),
       matcher(
           ofType(PULL_UP_OPERATION),
@@ -165,7 +165,7 @@ public class MiningServiceManualTest extends GitSingleRepoTest {
 
   public void testAll() throws Throwable {
     for (int i = 1; i < hashes.length; i++) {
-      Function<? super RefactoringEntry, ? extends RefactoringEntry> entry = miner.getEntry(hashes[i]);
+      RefactoringEntry entry = miner.get(hashes[i]);
       collector.checkThat(entry.getCommitId(), equalTo(hashes[i]));
       collector.checkThat(entry.getParent(), equalTo(hashes[i - 1]));
       collector.checkThat("Issue in: " + commitDirs[i], entry, matches[i]);

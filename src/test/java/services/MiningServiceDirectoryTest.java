@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 import org.apache.commons.io.FileUtils;
@@ -65,7 +64,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
     repo.update();
     miner.mineAndWait(repo);
     head = repo.getCurrentRevision();
-    entry = miner.getEntry(head);
+    entry = miner.get(head);
   }
 
   //Example of using an existing repo
@@ -75,7 +74,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
     assertNull(RefactoringEntry.fromString(null));
 
     assertEquals(1, entry.getRefactorings().size());
-    assertTrue(miner.getRefactorings(head).getRefactorings().size() > 0);
+    assertTrue(miner.get(head).getRefactorings().size() > 0);
 
     assertThrows(IllegalArgumentException.class, () -> MiningService.getInstance(null));
     assertEquals(miner, MiningService.getInstance(myProject));

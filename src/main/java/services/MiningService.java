@@ -178,7 +178,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
           public void onFinished() {
             super.onFinished();
-            if (innerState.refactoringsMap.map.containsKey(commit.getId().asString())) {
+            if (contains(commit.getId().asString())) {
 
               System.out.println("Mining commit done");
               ApplicationManager.getApplication()
@@ -192,10 +192,6 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             CommitMiner.mineAtCommit(commit, innerState.refactoringsMap.map, project);
           }
         });
-  }
-
-  public RefactoringEntry getRefactorings(String commitHash) {
-    return innerState.refactoringsMap.map.get(commitHash);
   }
 
   /**
@@ -219,18 +215,14 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
   private void computeMethodHistory(@NotNull String commitId) {
     List<RefactoringInfo> refs = new ArrayList<>();
-    while (innerState.refactoringsMap.map.containsKey(commitId)) {
-      RefactoringEntry refactoringEntry = innerState.refactoringsMap.map.get(commitId);
+    while (contains(commitId)) {
+      RefactoringEntry refactoringEntry = get(commitId);
       assert refactoringEntry != null;
       refs.addAll(refactoringEntry.getRefactorings());
       commitId = refactoringEntry.getParent();
     }
     Collections.reverse(refs);
     refs.forEach(r -> r.addToHistory(methodHistory));
-  }
-
-  public RefactoringEntry getEntry(String hash) {
-    return innerState.refactoringsMap.map.get(hash);
   }
 
   private String version() {
@@ -245,6 +237,18 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
         .map(Type::getTypeName)
     ).collect(Collectors.toList()))
         .hashCode();
+  }
+
+  public RefactoringEntry get(String commitHash) {
+    return innerState.refactoringsMap.map.get(commitHash);
+  }
+
+  public boolean contains(String commitHash) {
+    return innerState.refactoringsMap.map.containsKey(commitHash);
+  }
+
+  public void clear() {
+    innerState.refactoringsMap.map.clear();
   }
 
   public static class MyState {
