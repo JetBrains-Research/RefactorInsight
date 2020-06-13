@@ -9,6 +9,7 @@ import data.RefactoringLine;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import utils.Utils;
 
 public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
 
@@ -36,12 +37,12 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
   @Override
   public String toString() {
     return ranges.stream().map(ThreeSidedRange::toString)
-        .collect(Collectors.joining(listDelimiter));
+        .collect(Collectors.joining(Utils.LIST_DELIMITER));
   }
 
   public static ThreeSidedDiffRequestGenerator fromString(String value){
     ThreeSidedDiffRequestGenerator generator = new ThreeSidedDiffRequestGenerator();
-    generator.ranges = Arrays.stream(value.split(listDelimiter))
+    generator.ranges = Arrays.stream(value.split(Utils.LIST_DELIMITER))
         .map(ThreeSidedRange::fromString).collect(Collectors.toList());
     return generator;
   }

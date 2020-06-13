@@ -1,7 +1,5 @@
 package data.diffRequests;
 
-import static data.diffRequests.DiffRequestGenerator.fragDelimiter;
-
 import com.intellij.diff.fragments.MergeLineFragment;
 import com.intellij.diff.fragments.MergeLineFragmentImpl;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
@@ -11,14 +9,14 @@ import com.intellij.diff.util.MergeConflictType;
 import com.intellij.diff.util.TextDiffType;
 import com.intellij.diff.util.ThreeSide;
 import com.intellij.openapi.util.TextRange;
-import data.RefactoringLine;
 import data.RefactoringLine.VisualisationType;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import utils.Utils;
 
 public class ThreeSidedRange {
-  private static final transient String rangeDelimiter = "!!";
 
   List<TextRange> left;
   List<TextRange> mid;
@@ -45,25 +43,26 @@ public class ThreeSidedRange {
 
   @Override
   public String toString() {
-    return type.toString() + fragDelimiter
-        + fragment.getStartLine(ThreeSide.LEFT) + fragDelimiter
-        + fragment.getEndLine(ThreeSide.LEFT) + fragDelimiter
-        + fragment.getStartLine(ThreeSide.BASE) + fragDelimiter
-        + fragment.getEndLine(ThreeSide.BASE) + fragDelimiter
-        + fragment.getStartLine(ThreeSide.RIGHT) + fragDelimiter
-        + fragment.getEndLine(ThreeSide.RIGHT) + fragDelimiter
-        + stringify(left) + fragDelimiter
-        + stringify(mid) + fragDelimiter
-        + stringify(right);
+    return Stream.of(type.toString(),
+        fragment.getStartLine(ThreeSide.LEFT),
+        fragment.getEndLine(ThreeSide.LEFT),
+        fragment.getStartLine(ThreeSide.BASE),
+        fragment.getEndLine(ThreeSide.BASE),
+        fragment.getStartLine(ThreeSide.RIGHT),
+        fragment.getEndLine(ThreeSide.RIGHT),
+        stringify(left),
+        stringify(mid),
+        stringify(right)
+    ).map(String::valueOf).collect(Collectors.joining(Utils.FRAG_DELIMITER));
   }
 
   private String stringify(List<TextRange> list) {
-    return list.stream().map(r -> r.getStartOffset() + rangeDelimiter + r.getEndOffset())
-        .collect(Collectors.joining(rangeDelimiter));
+    return list.stream().map(r -> r.getStartOffset() + Utils.RANGE_DELIMITER + r.getEndOffset())
+        .collect(Collectors.joining(Utils.RANGE_DELIMITER));
   }
 
   private static List<TextRange> deStringify(String value) {
-    String[] tokens = value.split(rangeDelimiter);
+    String[] tokens = value.split(Utils.RANGE_DELIMITER);
     assert tokens.length % 2 == 0;
     return IntStream.range(0, tokens.length / 2).map(i -> i * 2).mapToObj(i ->
         new TextRange(Integer.parseInt(tokens[i]), Integer.parseInt(tokens[i + 1])))
@@ -71,7 +70,7 @@ public class ThreeSidedRange {
   }
 
   public static ThreeSidedRange fromString(String value) {
-    String[] tokens = value.split(fragDelimiter);
+    String[] tokens = value.split(Utils.FRAG_DELIMITER);
     return new ThreeSidedRange(
         deStringify(tokens[7]),
         deStringify(tokens[8]),

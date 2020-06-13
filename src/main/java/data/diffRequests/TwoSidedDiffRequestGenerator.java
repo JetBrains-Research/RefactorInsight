@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import utils.Utils;
 
 public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
 
@@ -45,41 +47,42 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
       return "null";
     }
     return fragments.stream().map(frag ->
-        frag.getStartLine1() + fragDelimiter
-            + frag.getEndLine1() + fragDelimiter
-            + frag.getStartLine2() + fragDelimiter
-            + frag.getEndLine2() + fragDelimiter
-            + frag.getStartOffset1() + fragDelimiter
-            + frag.getEndOffset1() + fragDelimiter
-            + frag.getStartOffset2() + fragDelimiter
-            + frag.getEndOffset2() + fragDelimiter
-            + (frag.getInnerFragments() == null ? "null"
-            : frag.getInnerFragments().stream().map(f ->
-            f.getStartOffset1() + fragDelimiter
-                + f.getEndOffset1() + fragDelimiter
-                + f.getStartOffset2() + fragDelimiter
-                + f.getEndOffset2()
-        ).collect(Collectors.joining(fragDelimiter)))
-    ).collect(Collectors.joining(listDelimiter));
+        Stream.of(
+            frag.getStartLine1(),
+            frag.getEndLine1(),
+            frag.getStartLine2(),
+            frag.getEndLine2(),
+            frag.getStartOffset1(),
+            frag.getEndOffset1(),
+            frag.getStartOffset2(),
+            frag.getEndOffset2(),
+            (frag.getInnerFragments() == null ? "null"
+                : frag.getInnerFragments().stream().map(f ->
+                f.getStartOffset1() + Utils.FRAG_DELIMITER
+                    + f.getEndOffset1() + Utils.FRAG_DELIMITER
+                    + f.getStartOffset2() + Utils.FRAG_DELIMITER
+                    + f.getEndOffset2()
+            ).collect(Collectors.joining(Utils.FRAG_DELIMITER)))
+        ).map(String::valueOf).collect(Collectors.joining(Utils.FRAG_DELIMITER))
+    ).collect(Collectors.joining(Utils.LIST_DELIMITER));
   }
 
   public static TwoSidedDiffRequestGenerator fromString(String value) {
-    String[] tokens = value.split(listDelimiter);
+    String[] tokens = value.split(Utils.LIST_DELIMITER);
     TwoSidedDiffRequestGenerator generator = new TwoSidedDiffRequestGenerator();
     if (value.equals("null")) {
       return generator;
     }
     generator.fragments = Arrays.stream(tokens).map(string -> {
-      String[] toks = string.split(fragDelimiter, 9);
-      String[] diffs = toks[8].split(fragDelimiter);
-      List<DiffFragment> frags = toks[8].equals("null") ? null
+      String[] toks = string.split(Utils.FRAG_DELIMITER, 9);
+      String[] diffs = toks[8].split(Utils.FRAG_DELIMITER);
+      List<DiffFragment> frags = toks[8].equals("null") || diffs[0].isEmpty() ? null
           : IntStream.range(0, diffs.length / 4).map(i -> i * 4).mapToObj(i -> new DiffFragmentImpl(
           Integer.parseInt(diffs[i]),
           Integer.parseInt(diffs[i + 1]),
           Integer.parseInt(diffs[i + 2]),
           Integer.parseInt(diffs[i + 3])
       )).collect(Collectors.toList());
-      assert diffs.length % 4 == 0;
       return new LineFragmentImpl(
           Integer.parseInt(toks[0]), Integer.parseInt(toks[1]),
           Integer.parseInt(toks[2]), Integer.parseInt(toks[3]),

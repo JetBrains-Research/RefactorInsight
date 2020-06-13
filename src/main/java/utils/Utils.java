@@ -29,6 +29,14 @@ import org.refactoringminer.api.RefactoringType;
 
 public class Utils {
 
+  public static final String MAP_DELIMITER = ",,";
+  public static final String MAP_ENTRY_DELIMITER = "===";
+  public static final String ENTRY_DELIMITER = ";;";
+  public static final String INFO_DELIMITER = "==";
+  public static final String LIST_DELIMITER = ",";
+  public static final String FRAG_DELIMITER = ";";
+  public static final String RANGE_DELIMITER = "=";
+
   /**
    * Used for storing and disposing the MainVcsLogs used for method history action.
    */

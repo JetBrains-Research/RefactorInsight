@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.refactoringminer.api.RefactoringType;
+import utils.Utils;
 
 public class RefactoringInfo {
 
@@ -44,17 +45,23 @@ public class RefactoringInfo {
   }
 
   public String toString() {
-    return name + Stream.concat(
-        Arrays.stream(uiStrings).flatMap(Arrays::stream),
-        Arrays.stream(paths)).map(s -> s == null ? "null" : s)
-        .collect(Collectors.joining(";", ";", ";"))
-        + group.toString() + ";" + (threeSided ? "t" : "f") + ";"
-        + (hidden ? "t" : "f") + ";" + requestGenerator.toString() + ";"
-        + String.join(";", includes);
+    return String.join(Utils.INFO_DELIMITER,
+        name,
+        Stream.concat(
+            Arrays.stream(uiStrings).flatMap(Arrays::stream),
+            Arrays.stream(paths))
+            .map(s -> s == null ? "null" : s)
+            .collect(Collectors.joining(Utils.INFO_DELIMITER)),
+        group.toString(),
+        threeSided ? "t" : "f",
+        hidden ? "t" : "f",
+        requestGenerator.toString(),
+        String.join(Utils.INFO_DELIMITER, includes)
+    );
   }
 
   public static RefactoringInfo fromString(String value) {
-    String[] tokens = value.split(";", 15);
+    String[] tokens = value.split(Utils.INFO_DELIMITER, 15);
     return new RefactoringInfo()
         .setName(tokens[0])
         .setNameBefore(tokens[1])
@@ -72,7 +79,7 @@ public class RefactoringInfo {
         .setRequestGenerator(tokens[11].equals("t")
             ? ThreeSidedDiffRequestGenerator.fromString(tokens[13])
             : TwoSidedDiffRequestGenerator.fromString(tokens[13]))
-        .setIncludes(new HashSet<>(Arrays.asList(tokens[14].split(";"))));
+        .setIncludes(new HashSet<>(Arrays.asList(tokens[14].split(Utils.INFO_DELIMITER))));
   }
 
   public RefactoringInfo setRequestGenerator(DiffRequestGenerator requestGenerator) {
