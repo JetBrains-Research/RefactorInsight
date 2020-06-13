@@ -9,9 +9,11 @@ import utils.StringUtils;
 class RefactoringsMapConverter extends Converter<RefactoringsMap> {
 
   public RefactoringsMap fromString(String value) {
-    String[] bla = value.split(StringUtils.MAP_DELIMITER, 2);
-    return new RefactoringsMap(Arrays.stream(bla[1].split(StringUtils.MAP_DELIMITER))
-        .map(entry -> entry.split(StringUtils.MAP_ENTRY_DELIMITER))
+    String regex1 = StringUtils.ESC + StringUtils.MAP_DELIMITER;
+    String regex2 = StringUtils.ESC + StringUtils.MAP_ENTRY_DELIMITER;
+    String[] bla = value.split(regex1, 2);
+    return new RefactoringsMap(Arrays.stream(bla[1].split(regex1))
+        .map(entry -> entry.split(regex2))
         .collect(Collectors.toMap(entry -> entry[0],
             entry -> RefactoringEntry.fromString(entry[1]))), bla[0]);
   }

@@ -45,8 +45,9 @@ public class RefactoringEntry implements Serializable {
    * @return the RefactoringEntry
    */
   public static RefactoringEntry fromString(String value) {
-    String[] tokens = value.split(StringUtils.ENTRY_DELIMITER, 4);
-    String[] refs = tokens[3].split(StringUtils.ENTRY_DELIMITER);
+    String regex = StringUtils.ESC + StringUtils.ENTRY_DELIMITER;
+    String[] tokens = value.split(regex, 4);
+    String[] refs = tokens[3].split(regex);
     if (refs[0].isEmpty()) {
       refs = new String[0];
     }

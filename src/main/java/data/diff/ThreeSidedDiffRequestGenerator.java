@@ -48,8 +48,9 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
    * @return the string value
    */
   public static ThreeSidedDiffRequestGenerator fromString(String value) {
+    String regex = StringUtils.ESC + StringUtils.LIST_DELIMITER;
     ThreeSidedDiffRequestGenerator generator = new ThreeSidedDiffRequestGenerator();
-    generator.ranges = Arrays.stream(value.split(StringUtils.LIST_DELIMITER))
+    generator.ranges = Arrays.stream(value.split(regex))
         .map(ThreeSidedRange::fromString).collect(Collectors.toList());
     return generator;
   }

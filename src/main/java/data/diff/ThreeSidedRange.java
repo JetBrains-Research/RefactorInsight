@@ -71,7 +71,8 @@ public class ThreeSidedRange {
   }
 
   private static List<TextRange> deStringify(String value) {
-    String[] tokens = value.split(StringUtils.RANGE_DELIMITER);
+    String regex = StringUtils.ESC + StringUtils.RANGE_DELIMITER;
+    String[] tokens = value.split(regex);
     assert tokens.length % 2 == 0;
     return IntStream.range(0, tokens.length / 2).map(i -> i * 2).mapToObj(i ->
         new TextRange(Integer.parseInt(tokens[i]), Integer.parseInt(tokens[i + 1])))
@@ -85,7 +86,8 @@ public class ThreeSidedRange {
    * @return the ThreeSidedRange
    */
   public static ThreeSidedRange fromString(String value) {
-    String[] tokens = value.split(StringUtils.FRAG_DELIMITER);
+    String regex = StringUtils.ESC + StringUtils.FRAG_DELIMITER;
+    String[] tokens = value.split(regex);
     return new ThreeSidedRange(
         deStringify(tokens[7]),
         deStringify(tokens[8]),

@@ -56,6 +56,7 @@ public class RefactoringInfo {
             Arrays.stream(uiStrings).flatMap(Arrays::stream),
             Arrays.stream(paths))
             .map(s -> s == null ? "" : s)
+            .map(StringUtils::sanitize)
             .collect(Collectors.joining(StringUtils.INFO_DELIMITER)),
         group.toString(),
         threeSided ? "t" : "f",
@@ -72,15 +73,16 @@ public class RefactoringInfo {
    * @return the RefactoringInfo
    */
   public static RefactoringInfo fromString(String value) {
-    String[] tokens = value.split(StringUtils.INFO_DELIMITER, 15);
+    String regex = StringUtils.ESC + StringUtils.INFO_DELIMITER;
+    String[] tokens = value.split(regex, 15);
     return new RefactoringInfo()
         .setName(tokens[0])
-        .setNameBefore(tokens[1])
-        .setNameAfter(tokens[2])
-        .setElementAfter(tokens[3])
-        .setElementBefore(tokens[4])
-        .setDetailsAfter(tokens[5])
-        .setDetailsBefore(tokens[6])
+        .setNameBefore(StringUtils.deSanitize(tokens[1]))
+        .setNameAfter(StringUtils.deSanitize(tokens[2]))
+        .setElementBefore(StringUtils.deSanitize(tokens[3]))
+        .setElementAfter(StringUtils.deSanitize(tokens[4]))
+        .setDetailsBefore(StringUtils.deSanitize(tokens[5]))
+        .setDetailsAfter(StringUtils.deSanitize(tokens[6]))
         .setLeftPath(tokens[7])
         .setMidPath(tokens[8])
         .setRightPath(tokens[9])
@@ -90,7 +92,7 @@ public class RefactoringInfo {
         .setRequestGenerator(tokens[11].equals("t")
             ? ThreeSidedDiffRequestGenerator.fromString(tokens[13])
             : TwoSidedDiffRequestGenerator.fromString(tokens[13]))
-        .setIncludes(new HashSet<>(Arrays.asList(tokens[14].split(StringUtils.INFO_DELIMITER))));
+        .setIncludes(new HashSet<>(Arrays.asList(tokens[14].split(regex))));
   }
 
   public RefactoringInfo setRequestGenerator(DiffRequestGenerator requestGenerator) {

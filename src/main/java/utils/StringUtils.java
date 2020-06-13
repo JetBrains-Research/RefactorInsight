@@ -4,16 +4,32 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameterList;
 import data.RefactoringInfo;
 import gr.uom.java.xmi.UMLOperation;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class StringUtils {
 
+  public static final String ESC = "(?<!#)";
+
   public static final String MAP_DELIMITER = "§";
   public static final String MAP_ENTRY_DELIMITER = "=";
-  public static final String ENTRY_DELIMITER = "#";
+  public static final String ENTRY_DELIMITER = "`";
   public static final String INFO_DELIMITER = "±";
   public static final String LIST_DELIMITER = "!";
   public static final String FRAG_DELIMITER = ",";
   public static final String RANGE_DELIMITER = ";";
+  public static final Set<String> delimiters =
+      new HashSet<>(Arrays.asList(
+          "§",
+          "=",
+          "`",
+          "±",
+          "!",
+          ",",
+          ";")
+      );
+
 
   /**
    * Method used for a presentable displaying of class change.
@@ -106,5 +122,32 @@ public class StringUtils {
     } else {
       return before + " -> " + after;
     }
+  }
+
+  /**
+   * Escapes the delimiter chars with '#'.
+   *
+   * @param s string to sanitize
+   * @return escaped s
+   */
+  public static String sanitize(String s) {
+    s = s.replaceAll("#", "##");
+    for (String d : delimiters) {
+      s = s.replaceAll(d, "#" + d);
+    }
+    return s;
+  }
+
+  /**
+   * Remove escape chars.
+   *
+   * @param s string to desanitize.
+   * @return clean s
+   */
+  public static String deSanitize(String s) {
+    for (String d : delimiters) {
+      s = s.replaceAll("#" + d, d);
+    }
+    return s.replaceAll("##", "#");
   }
 }
