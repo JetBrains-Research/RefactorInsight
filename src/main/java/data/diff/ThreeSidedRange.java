@@ -65,7 +65,7 @@ public class ThreeSidedRange {
         stringify(left),
         stringify(mid),
         stringify(right)
-    ).map(String::valueOf).collect(Collectors.joining(delimiter(RANGE)));
+    ).map(String::valueOf).collect(Collectors.joining(delimiter(FRAG)));
   }
 
   private String stringify(List<TextRange> list) {

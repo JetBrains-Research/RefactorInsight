@@ -75,7 +75,7 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
                     + f.getEndOffset2()
             ).collect(Collectors.joining(del)))
         ).map(String::valueOf).collect(Collectors.joining(del))
-    ).collect(Collectors.joining(del));
+    ).collect(Collectors.joining(StringUtils.delimiter(LIST)));
   }
 
   /**

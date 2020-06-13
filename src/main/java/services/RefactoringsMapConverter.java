@@ -14,11 +14,11 @@ class RefactoringsMapConverter extends Converter<RefactoringsMap> {
   public RefactoringsMap fromString(String value) {
     String regex1 = delimiter(MAP, true);
     String regex2 = delimiter(MAP_ENTRY, true);
-    String[] bla = value.split(regex1, 2);
-    return new RefactoringsMap(Arrays.stream(bla[1].split(regex1))
+    String[] tokens = value.split(regex1, 2);
+    return new RefactoringsMap(Arrays.stream(tokens[1].split(regex1))
         .map(entry -> entry.split(regex2))
         .collect(Collectors.toMap(entry -> entry[0],
-            entry -> RefactoringEntry.fromString(entry[1]))), bla[0]);
+            entry -> RefactoringEntry.fromString(entry[1], entry[0]))), tokens[0]);
   }
 
   public String toString(RefactoringsMap value) {

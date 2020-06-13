@@ -22,7 +22,7 @@ public class RefactoringEntry implements Serializable {
 
   private static final transient InfoFactory factory = new InfoFactory();
 
-  private final String commitId;
+  private final transient String commitId;
   private final String parent;
   private final long time;
   private List<RefactoringInfo> refactorings;
@@ -45,15 +45,15 @@ public class RefactoringEntry implements Serializable {
    * @param value String
    * @return the RefactoringEntry
    */
-  public static RefactoringEntry fromString(String value) {
+  public static RefactoringEntry fromString(String value, String commitId) {
     String regex = StringUtils.delimiter(ENTRY, true);
-    String[] tokens = value.split(regex, 4);
-    String[] refs = tokens[3].split(regex);
+    String[] tokens = value.split(regex, 3);
+    String[] refs = tokens[2].split(regex);
     if (refs[0].isEmpty()) {
       refs = new String[0];
     }
     RefactoringEntry entry = new RefactoringEntry(
-        tokens[0], tokens[1], Long.parseLong(tokens[2]))
+        commitId, tokens[0], Long.parseLong(tokens[1]))
         .setRefactorings(Arrays.stream(refs)
             .map(RefactoringInfo::fromString).collect(Collectors.toList()));
     entry.getRefactorings().forEach(r -> r.setEntry(entry));
@@ -63,7 +63,7 @@ public class RefactoringEntry implements Serializable {
   @Override
   public String toString() {
     String del = StringUtils.delimiter(ENTRY);
-    return commitId + del + parent + del + time + del + refactorings.stream()
+    return parent + del + time + del + refactorings.stream()
         .map(RefactoringInfo::toString).collect(Collectors.joining(del));
   }
 
