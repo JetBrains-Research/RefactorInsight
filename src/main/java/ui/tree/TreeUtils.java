@@ -3,6 +3,7 @@ package ui.tree;
 import com.intellij.ui.treeStructure.Tree;
 import data.RefactoringInfo;
 import data.RefactoringInfo.Group;
+import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 import utils.StringUtils;
 
@@ -123,5 +124,24 @@ public class TreeUtils {
     if (tree.getRowCount() != rowCount) {
       expandAllNodes(tree, rowCount, tree.getRowCount());
     }
+  }
+
+  /**
+   * Builds a UI tree.
+   *
+   * @return Swing Tree visualisation of refactorings in this entry.
+   */
+  public static Tree buildTree(List<RefactoringInfo> refactorings) {
+    DefaultMutableTreeNode root =
+        new DefaultMutableTreeNode(refactorings.isEmpty() ? "" : refactorings.get(0).getCommitId());
+    refactorings.forEach(r -> {
+      if (!r.isHidden()) {
+        root.add(makeNode(r));
+      }
+    });
+    Tree tree = new Tree(root);
+    tree.setRootVisible(false);
+    expandAllNodes(tree, 0, tree.getRowCount());
+    return tree;
   }
 }
