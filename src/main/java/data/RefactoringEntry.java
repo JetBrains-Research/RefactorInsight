@@ -16,7 +16,6 @@ import com.intellij.diff.fragments.LineFragmentImpl;
 import com.intellij.diff.fragments.MergeLineFragment;
 import com.intellij.diff.fragments.MergeLineFragmentImpl;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import data.diff.DiffRequestGenerator;
 import data.diff.ThreeSidedDiffRequestGenerator;
@@ -26,11 +25,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.swing.tree.DefaultMutableTreeNode;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 import ui.tree.TreeUtils;
 import utils.Utils;
 
@@ -162,24 +158,6 @@ public class RefactoringEntry implements Serializable {
             r.setHidden(true);
           });
     }
-  }
-
-  /**
-   * Builds a UI tree.
-   *
-   * @return Swing Tree visualisation of refactorings in this entry.
-   */
-  public Tree buildTree() {
-    DefaultMutableTreeNode root = new DefaultMutableTreeNode(commitId);
-    refactorings.forEach(r -> {
-      if (!r.isHidden()) {
-        root.add(TreeUtils.makeNode(r));
-      }
-    });
-    Tree tree = new Tree(root);
-    tree.setRootVisible(false);
-    TreeUtils.expandAllNodes(tree, 0, tree.getRowCount());
-    return tree;
   }
 
   public List<RefactoringInfo> getRefactorings() {

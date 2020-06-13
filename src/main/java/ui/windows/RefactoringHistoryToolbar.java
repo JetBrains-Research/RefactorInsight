@@ -2,6 +2,7 @@ package ui.windows;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -10,17 +11,21 @@ import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBSplitter;
+import com.intellij.ui.OnePixelSplitter;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBLoadingPanel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import com.intellij.ui.content.ContentManager;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.ui.components.BorderLayoutPanel;
 import com.intellij.vcs.log.data.VcsLogData;
 import com.intellij.vcs.log.impl.VcsLogManager;
 import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
+import com.intellij.vcs.log.ui.frame.MainFrame;
+import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
 import com.intellij.vcs.log.visible.filters.VcsLogFilterObject;
 import data.RefactoringInfo;
 import java.awt.GridLayout;
@@ -32,6 +37,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -45,6 +51,7 @@ import utils.Utils;
 public class RefactoringHistoryToolbar {
 
   private final VcsLogManager.VcsLogUiFactory<? extends MainVcsLogUi> factory;
+
   private MainVcsLogUi openLogTab;
   private ToolWindowManager toolWindowManager;
   private ToolWindow toolWindow;
@@ -143,7 +150,9 @@ public class RefactoringHistoryToolbar {
 
   private void showLogTab(RefactoringInfo info, JBSplitter splitter) {
     VcsLogData data = VcsProjectLog.getInstance(project).getLogManager().getDataManager();
+
     openLogTab = factory.createLogUi(project, data);
+
     Utils.add(openLogTab);
     JComponent mainComponent = openLogTab.getMainComponent();
     if (mainComponent != null) {
@@ -151,6 +160,21 @@ public class RefactoringHistoryToolbar {
       mainComponent.setSize(splitter.getSecondComponent().getSize());
       splitter.setSecondComponent(mainComponent);
       openLogTab.jumpToHash(info.getCommitId());
+
+      JBSplitter splitter1 = (JBSplitter) mainComponent.getComponent(0);
+
+      BorderLayoutPanel splitter2 = (BorderLayoutPanel) splitter1.getFirstComponent();
+
+      OnePixelSplitter panel = (OnePixelSplitter) splitter2.getComponent(1);
+      MainFrame mainFrame = (MainFrame) panel.getComponent(2);
+
+      OnePixelSplitter splitter3 = (OnePixelSplitter) mainFrame.getComponent(0);
+      OnePixelSplitter splitter4 = (OnePixelSplitter) splitter3.getComponent(2);
+      JBLoadingPanel panel1 = (JBLoadingPanel) splitter4.getComponent(1);
+      JComponent loadingDecorator = (JComponent) panel1.getComponent(0);
+      JPanel panel2 = (JPanel) loadingDecorator.getComponent(0);
+      VcsLogChangesBrowser browser = (VcsLogChangesBrowser) panel2.getComponent(0);
+      ((ActionButton) browser.getToolbar().getComponent().getComponent(1)).click();
     }
   }
 

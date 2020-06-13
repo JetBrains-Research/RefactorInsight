@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.Hash;
 import com.intellij.vcs.log.VcsUser;
@@ -91,7 +92,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
 
     miner.getState().map.values().stream().map(RefactoringEntry::fromString)
         .forEach(x -> {
-          Tree tree1 = x.buildTree();
+          Tree tree1 = TreeUtils.buildTree(x.getRefactorings());
           tree1.setCellRenderer(cellRenderer);
           assertNotNull(tree1);
           DefaultMutableTreeNode root1 = (DefaultMutableTreeNode) tree1.getModel().getRoot();

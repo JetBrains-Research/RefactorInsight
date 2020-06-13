@@ -19,7 +19,7 @@ public class MoveOperationHandler extends Handler {
     return info.setGroup(Group.METHOD)
         .setDetailsBefore(classBefore)
         .setDetailsAfter(classAfter)
-        .addMarking(ref.getSourceOperationCodeRangeBeforeMove(),
+        .addMarking(ref.getOriginalOperation().codeRange(),
             ref.getTargetOperationCodeRangeAfterMove(), true)
         .setNameBefore(StringUtils.calculateSignature(ref.getOriginalOperation()))
         .setNameAfter(StringUtils.calculateSignature(ref.getMovedOperation()));

@@ -18,7 +18,9 @@ import java.awt.event.MouseEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import services.MiningService;
+import ui.tree.TreeUtils;
 import ui.tree.renderers.MainCellRenderer;
+
 
 public class GitWindow {
   private Project project;
@@ -102,7 +104,8 @@ public class GitWindow {
       return;
     }
 
-    Tree tree = entry.buildTree();
+
+    Tree tree = TreeUtils.buildTree(entry.getRefactorings());
     tree.setCellRenderer(new MainCellRenderer());
 
     tree.addMouseListener(new MouseAdapter() {

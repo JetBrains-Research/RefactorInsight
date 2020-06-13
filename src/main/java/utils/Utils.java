@@ -74,9 +74,27 @@ public class Utils {
    */
   public static int[] findColumns(String text, String word, int line) {
     String[] lines = text.split("\r\n|\r|\n");
-    int startColumn = lines[line - 1].indexOf(word) + 1;
+    int startColumn = lines[line].indexOf(word) + 1;
     int endColumn = startColumn + word.length();
     return new int[] {startColumn, endColumn};
+  }
+
+  /**
+   * Skips javadoc for a method or class.
+   * @param text to search in.
+   * @param line current line.
+   * @return the actual line.
+   */
+  public static int skipJavadoc(String text, int line) {
+    String[] lines = text.split("\r\n|\r|\n");
+    if (lines[line].contains("/**")) {
+      for (int i = line + 1; i < lines.length; i++) {
+        if (lines[i].contains("*/")) {
+          return i + 1;
+        }
+      }
+    }
+    return line;
   }
 
   /**
@@ -90,9 +108,6 @@ public class Utils {
   public static int getOffset(String text, int line, int column) {
     int offset = 0;
     String[] lines = text.split("\r\n|\r|\n");
-    if (lines.length <= line - 2) {
-      System.out.println(text);
-    }
     for (int i = 0; i < line - 1; i++) {
       offset += lines[i].length() + 1;
     }
@@ -178,5 +193,22 @@ public class Utils {
     }
 
     return info;
+  }
+
+  /**
+   * Calculates the line of the package.
+   * @param text to search in.
+   * @return line of the package.
+   */
+  public static int findPackageLine(String text) {
+    String[] lines = text.split("\r\n|\r|\n");
+    for (int i = 0; i < lines.length; i++) {
+      if (lines[i].contains("package ")) {
+        return i;
+      } else if (lines[i].matches("^[a-zA-Z0-9]*$")) {
+        return -1;
+      }
+    }
+    return 0;
   }
 }
