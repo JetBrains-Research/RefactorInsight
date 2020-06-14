@@ -393,13 +393,8 @@ public class RefactoringInfo {
       return false;
     }
     RefactoringInfo that = (RefactoringInfo) o;
-    return Objects.equals(getElementBefore(), that.getElementBefore())
-        && Objects.equals(getElementAfter(), that.getElementAfter())
+    return Arrays.equals(uiStrings, that.uiStrings)
         && getName().equals(that.getName())
-        && getNameBefore().equals(that.getNameBefore())
-        && getNameAfter().equals(that.getNameAfter())
-        && Objects.equals(getDetailsBefore(), that.getDetailsBefore())
-        && Objects.equals(getDetailsAfter(), that.getDetailsAfter())
         && getType() == that.getType()
         && getGroup() == that.getGroup();
   }
