@@ -106,6 +106,10 @@ public class RefactoringLine {
   }
 
   private void computeTwoSidedRanges(String leftText, String rightText) {
+    if (lines[LEFT_START] == lines[LEFT_END]
+        && lines[RIGHT_START] == lines[RIGHT_END]) {
+      return;
+    }
     List<DiffFragment> fragments = offsets.stream().map(RefactoringOffset::toDiffFragment)
         .collect(Collectors.toList());
     if (hasColumns) {
