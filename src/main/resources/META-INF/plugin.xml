@@ -4,9 +4,8 @@
     <vendor email="bobbrockbernd@gmail.com" url="http://www.tudelft.nl">TUDelft</vendor>
 
     <description><![CDATA[
-    Enter short description for your plugin her.<br>
-    <em>most HTML tag may be used</em>
-    ]]></description>
+    This plugin adds functionality to the git tab in order to allow the developer to visualize specific refactorings in commits.
+      ]]></description>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
@@ -22,7 +21,7 @@
     </extensions>
 
     <actions>
-        <action id="actions.ToggleRefactoringViewAction" class="actions.ToggleRefactoringViewAction" text="Show refactorings" description="actions.ToggleRefactoringViewAction">
+        <action id="actions.ToggleRefactoringViewAction" class="actions.ToggleRefactoringViewAction" text="Show Refactorings" description="actions.ToggleRefactoringViewAction">
             <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>
         </action>
         <!-- Add your actions here -->
