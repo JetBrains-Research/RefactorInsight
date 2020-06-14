@@ -9,6 +9,7 @@ import com.intellij.diff.util.DiffUserDataKeysEx;
 import data.RefactoringInfo;
 import data.RefactoringLine;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
@@ -35,6 +36,7 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
     super.correct(before, mid, after);
     fragments = lineMarkings.stream()
         .map(RefactoringLine::getTwoSidedRange)
+        .filter(Objects::nonNull)
         .collect(Collectors.toList());
   }
 }
