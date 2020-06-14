@@ -1,6 +1,7 @@
 package data.types.classes;
 
-import com.intellij.openapi.project.Project;
+import static data.RefactoringLine.MarkingOption.REMOVE;
+
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
@@ -11,22 +12,31 @@ import org.refactoringminer.api.Refactoring;
 public class RemoveClassAnnotationHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RemoveClassAnnotationRefactoring ref = (RemoveClassAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
-    return info.setGroup(Group.CLASS)
+
+    if (ref.getClassAfter().isAbstract()) {
+      info.setGroup(Group.ABSTRACT);
+    } else if (ref.getClassAfter().isInterface()) {
+      info.setGroup(Group.INTERFACE);
+    } else {
+      info.setGroup(Group.CLASS);
+    }
+
+    return info
         .setNameBefore(ref.getClassBefore().getName())
         .setNameAfter(ref.getClassAfter().getName())
         .setElementBefore(ref.getAnnotation().toString())
         .setElementAfter(null)
-        .addMarking(annotation.getLocationInfo().getStartLine(),
-            annotation.getLocationInfo().getEndLine(),
-            ref.getClassBefore().codeRange().getStartLine(),
-            ref.getClassBefore().codeRange().getStartLine() - 1,
-            ref.getClassBefore().codeRange().getFilePath(),
-            annotation.getLocationInfo().getFilePath(),
-            line -> line.addOffset(annotation.getLocationInfo().getStartOffset(),
-                annotation.getLocationInfo().getEndOffset(),
-                0, 0));
+        .setDetailsBefore(ref.getClassBefore().getPackageName())
+        .setDetailsAfter(ref.getClassAfter().getPackageName())
+        .addMarking(
+            annotation.codeRange(),
+            ref.getClassAfter().codeRange(),
+            line -> line.addOffset(annotation.getLocationInfo(),
+                REMOVE),
+            REMOVE,
+            false);
   }
 }

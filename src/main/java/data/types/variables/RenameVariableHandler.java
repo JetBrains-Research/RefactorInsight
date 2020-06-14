@@ -1,40 +1,41 @@
 package data.types.variables;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.RenameVariableRefactoring;
 import org.refactoringminer.api.Refactoring;
+import utils.StringUtils;
 
 public class RenameVariableHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RenameVariableRefactoring ref = (RenameVariableRefactoring) refactoring;
     String id = ref.getOperationAfter().getClassName() + ".";
     if ((ref.getOperationAfter().isConstructor() || ref.getOperationAfter().isSetter())
         && ref.getRenamedVariable().isParameter()) {
       id += ref.getRenamedVariable().getVariableName();
     } else {
-      id = calculateSignature(ref.getOperationAfter()) + "."
+      id = StringUtils.calculateSignature(ref.getOperationAfter()) + "."
           + ref.getRenamedVariable().getVariableName();
     }
     info.setGroupId(id);
 
     if (ref.getRenamedVariable().isParameter()) {
-      info.setGroup(Group.PARAMETER);
+      info.setGroup(Group.METHOD)
+          .setDetailsBefore(ref.getOperationBefore().getClassName())
+          .setDetailsAfter(ref.getOperationAfter().getClassName());
     } else {
       info.setGroup(Group.VARIABLE);
     }
 
     return info
-        .setElementBefore(ref.getOriginalVariable().toQualifiedString())
-        .setElementAfter(ref.getRenamedVariable().toQualifiedString())
-        .setNameBefore("in method " + ref.getOperationAfter().getName())
-        .setNameAfter("in method " + ref.getOperationAfter().getName())
+        .setElementBefore(ref.getOriginalVariable().getVariableDeclaration().toQualifiedString())
+        .setElementAfter(ref.getRenamedVariable().getVariableDeclaration().toQualifiedString())
+        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
         .addMarking(ref.getOriginalVariable().getVariableDeclaration().codeRange(),
-            ref.getRenamedVariable().codeRange());
-
+            ref.getRenamedVariable().codeRange(), true);
   }
 }

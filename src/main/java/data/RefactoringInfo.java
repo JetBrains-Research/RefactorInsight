@@ -1,46 +1,39 @@
 package data;
 
 import com.google.gson.Gson;
-import com.intellij.diff.fragments.LineFragment;
-import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
-import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
+import com.intellij.diff.contents.DiffContent;
+import com.intellij.diff.requests.SimpleDiffRequest;
+import data.diff.DiffRequestGenerator;
+import data.diff.ThreeSidedDiffRequestGenerator;
+import data.diff.TwoSidedDiffRequestGenerator;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import javax.swing.tree.DefaultMutableTreeNode;
-import org.jetbrains.annotations.Nullable;
 import org.refactoringminer.api.RefactoringType;
 
 public class RefactoringInfo {
 
-  @Nullable
-  private String elementBefore;
-  @Nullable
-  private String elementAfter;
+  private transient RefactoringEntry entry;
+  private DiffRequestGenerator requestGenerator = new TwoSidedDiffRequestGenerator();
 
   private String name;
-  private String nameBefore;
-  private String nameAfter;
+
+  private String[][] uiStrings = new String[3][2];
+  private String[] paths = new String[3];
+
   private Set<String> includes = new HashSet<>();
 
-  private transient RefactoringEntry entry;
-  private String leftPath;
-  private String midPath;
-  private String rightPath;
   private RefactoringType type;
-  private final List<RefactoringLine> lineMarkings = new ArrayList<>();
   private Group group;
-  private boolean threeSided = false;
   private String groupId;
-  private boolean hidden = false;
 
+  private boolean hidden = false;
+  private boolean threeSided = false;
 
   /**
    * Adds this refactoring to the method history map.
@@ -48,26 +41,174 @@ public class RefactoringInfo {
    *
    * @param map for method history
    */
-  public void addToHistory(Map<String, List<RefactoringInfo>> map) {
-    if (group == Group.CLASS) {
-      Map<String, String> renames = new HashMap<>();
-      renames.put(nameBefore, nameAfter);
-      renames.forEach((before, after) -> map.keySet().stream()
-          .filter(x -> x.substring(0, x.lastIndexOf("."))
-              .equals(before))
-          .forEach(signature -> {
-            String newKey = after + signature.substring(signature.lastIndexOf("."));
-            map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
-          }));
-      return;
+  public void addToHistory(Map<String, ArrayList<RefactoringInfo>> map) {
+    changeKeys(map);
+    String before = getNameBefore();
+    String after = getNameAfter();
+    if (group == Group.ATTRIBUTE) {
+      before = getDetailsBefore() + "|" + getNameBefore();
+      after = getDetailsAfter() + "|" + getNameAfter();
     }
 
-    if (group == Group.METHOD) {
-      List<RefactoringInfo> refs = map.getOrDefault(nameBefore, new LinkedList<>());
-      map.remove(nameBefore);
-      refs.add(0, this);
-      map.put(nameAfter, refs);
+    if (group != Group.VARIABLE) {
+      ArrayList<RefactoringInfo> data = map.getOrDefault(before, new ArrayList<RefactoringInfo>());
+      map.remove(before);
+      ArrayList<RefactoringInfo> data2 = map.getOrDefault(after, new ArrayList<RefactoringInfo>());
+      data.add(this);
+      for (RefactoringInfo info : data) {
+        if (!data2.contains(info)) {
+          data2.add(info);
+        }
+      }
+      map.put(after, data2);
     }
+  }
+
+  private void changeKeys(Map<String, ArrayList<RefactoringInfo>> map) {
+    if ((group == Group.CLASS || group == Group.ABSTRACT || group == Group.INTERFACE)
+        && !getNameBefore().equals(getNameAfter())) {
+      changeAttributesSignature(map);
+      changeMethodsSignature(map);
+    }
+  }
+
+  private void changeMethodsSignature(Map<String, ArrayList<RefactoringInfo>> map) {
+    map.keySet().stream()
+        .filter(x -> !x.contains("|"))
+        .filter(x -> x.contains(".")).filter(x -> x.substring(0, x.lastIndexOf("."))
+        .equals(getNameBefore()))
+        .forEach(signature -> {
+          String methodName = signature.substring(signature.lastIndexOf(".") + 1);
+          methodName = methodName.substring(0, methodName.indexOf("("));
+          String newKey;
+          //change constructor name in case of a class rename
+          if (methodName.equals(getNameBefore().substring(getNameBefore().lastIndexOf(".") + 1))) {
+            newKey =
+                getNameAfter() + "." + getNameAfter().substring(getNameAfter().lastIndexOf(".") + 1)
+                    + signature.substring(signature.indexOf("("));
+          } else {
+            newKey = getNameAfter() + signature.substring(signature.lastIndexOf("."));
+          }
+          map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
+          map.remove(signature);
+        });
+  }
+
+  private void changeAttributesSignature(Map<String, ArrayList<RefactoringInfo>> map) {
+    map.keySet().stream()
+        .filter(x -> x.contains("|")).filter(x -> x.substring(0, x.lastIndexOf("|"))
+        .equals(getNameBefore()))
+        .forEach(signature -> {
+          String newKey = getNameAfter() + signature.substring(signature.lastIndexOf("|"));
+          map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
+          map.remove(signature);
+        });
+  }
+
+  public RefactoringInfo addMarking(CodeRange left, CodeRange right, boolean hasColumns) {
+    return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, null,
+        RefactoringLine.MarkingOption.NONE, hasColumns);
+  }
+
+  public RefactoringInfo addMarking(CodeRange left, CodeRange right,
+                                    Consumer<RefactoringLine> offsetFunction,
+                                    RefactoringLine.MarkingOption option,
+                                    boolean hasColumns) {
+    return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, offsetFunction,
+        option, hasColumns);
+  }
+
+  /**
+   * Add line marking for diffwindow used to display refactorings.
+   * Includes possibility for sub-highlighting
+   */
+  public RefactoringInfo addMarking(CodeRange left, CodeRange mid, CodeRange right,
+                                    RefactoringLine.VisualisationType type,
+                                    Consumer<RefactoringLine> offsetFunction,
+                                    RefactoringLine.MarkingOption option,
+                                    boolean hasColumns) {
+
+    requestGenerator.addMarking(left, mid, right, type, offsetFunction, option, hasColumns);
+    setLeftPath(left.getFilePath());
+    if (mid != null) {
+      setMidPath(mid.getFilePath());
+    }
+    setRightPath(right.getFilePath());
+    return this;
+  }
+
+
+  public SimpleDiffRequest generate(DiffContent[] contents) {
+    return requestGenerator.generate(contents, this);
+  }
+
+  @Override
+  public String toString() {
+    return new Gson().toJson(this);
+  }
+
+  public void addAllMarkings(RefactoringInfo info) {
+    requestGenerator.getMarkings().addAll(info.getLineMarkings());
+  }
+
+  public void addIncludedRefactoring(String refactoring) {
+    this.includes.add(refactoring);
+  }
+
+  public Set<String> getIncludingRefactorings() {
+    return includes;
+  }
+
+  public String getParent() {
+    return entry.getParent();
+  }
+
+  public List<RefactoringLine> getLineMarkings() {
+    return requestGenerator.getMarkings();
+  }
+
+  public long getTimestamp() {
+    return entry.getTimeStamp();
+  }
+
+  public String getCommitId() {
+    return entry.getCommitId();
+  }
+
+  public boolean isThreeSided() {
+    return threeSided;
+  }
+
+  /**
+   * Sets the refactoring info as three sided.
+   *
+   * @param threeSided boolean
+   * @return this
+   */
+  public RefactoringInfo setThreeSided(boolean threeSided) {
+    this.threeSided = threeSided;
+    if (threeSided) {
+      requestGenerator = new ThreeSidedDiffRequestGenerator();
+    }
+    return this;
+  }
+
+  public RefactoringEntry getEntry() {
+    return entry;
+  }
+
+  public RefactoringInfo setEntry(RefactoringEntry entry) {
+    this.entry = entry;
+    return this;
+  }
+
+  public RefactoringType getType() {
+    return type;
+  }
+
+  public RefactoringInfo setType(RefactoringType type) {
+    this.type = type;
+    return this;
   }
 
   public String getName() {
@@ -96,195 +237,106 @@ public class RefactoringInfo {
     return this;
   }
 
-  public List<RefactoringLine> getLineMarkings() {
-    return lineMarkings;
+  public String getLeftPath() {
+    return paths[0];
   }
 
-  public void addAllMarkings(RefactoringInfo info) {
-    this.lineMarkings.addAll(info.getLineMarkings());
-  }
-
-  public RefactoringEntry getEntry() {
-    return entry;
-  }
-
-  public RefactoringInfo setEntry(RefactoringEntry entry) {
-    this.entry = entry;
+  public RefactoringInfo setLeftPath(String leftPath) {
+    paths[0] = leftPath;
     return this;
   }
 
-  public RefactoringType getType() {
-    return type;
+  public String getMidPath() {
+    return paths[1];
   }
 
-  public RefactoringInfo setType(RefactoringType type) {
-    this.type = type;
+  public RefactoringInfo setMidPath(String midPath) {
+    paths[1] = midPath;
     return this;
   }
 
-  public void includesRefactoring(String refactoring) {
-    this.includes.add(refactoring);
+  public String getRightPath() {
+    return paths[2];
   }
 
-  public Set<String> getIncludingRefactorings() {
-    return includes;
-  }
-
-  public RefactoringInfo addMarking(CodeRange left, CodeRange right) {
-    return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, null);
-  }
-
-  /**
-   * Add line marking for diffwindow used to display refactorings.
-   *
-   * @param startBefore int
-   * @param endBefore   int
-   * @param startAfter  int
-   * @param endAfter    int
-   * @param beforePath  String
-   * @param afterPath   String
-   * @return this
-   */
-  public RefactoringInfo addMarking(int startBefore, int endBefore,
-                                    int startAfter, int endAfter,
-                                    String beforePath, String afterPath) {
-    return addMarking(startBefore, endBefore, 0, 0, startAfter, endAfter, beforePath, "", afterPath,
-        RefactoringLine.VisualisationType.TWO, null);
-  }
-
-  public RefactoringInfo addMarking(CodeRange left, CodeRange right,
-                                    Consumer<RefactoringLine> offsetFunction) {
-    return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, offsetFunction);
-  }
-
-  /**
-   * Add line marking for diffwindow used to display refactorings.
-   * Includes possibility for sub-highlighting
-   *
-   * @param startBefore    int
-   * @param endBefore      int
-   * @param startAfter     int
-   * @param endAfter       int
-   * @param beforePath     String
-   * @param afterPath      String
-   * @param offsetFunction Consumer for adding subhighlightings
-   * @return
-   */
-  public RefactoringInfo addMarking(int startBefore, int endBefore,
-                                    int startAfter, int endAfter,
-                                    String beforePath, String afterPath,
-                                    Consumer<RefactoringLine> offsetFunction) {
-    return addMarking(startBefore, endBefore, 0, 0, startAfter, endAfter, beforePath, "", afterPath,
-        RefactoringLine.VisualisationType.TWO, offsetFunction);
-  }
-
-  /**
-   * Add line marking for diffwindow used to display refactorings.
-   */
-  public RefactoringInfo addMarking(CodeRange left, CodeRange mid, CodeRange right,
-                                    RefactoringLine.VisualisationType type) {
-
-    return addMarking(left, mid, right, type, null);
-  }
-
-  /**
-   * Add line marking for diffwindow used to display refactorings.
-   * Includes possibility for sub-highlighting
-   */
-  public RefactoringInfo addMarking(int startLeft, int endLeft,
-                                    int startMid, int endMid,
-                                    int startRight, int endRight,
-                                    String leftPath, String midPath, String rightPath,
-                                    RefactoringLine.VisualisationType type) {
-    return addMarking(startLeft, endLeft, startMid, endMid, startRight, endRight, leftPath, midPath,
-        rightPath, type, null);
-  }
-
-  /**
-   * Add line marking for diffwindow used to display refactorings.
-   * Includes possibility for sub-highlighting
-   */
-  public RefactoringInfo addMarking(CodeRange left, CodeRange mid, CodeRange right,
-                                    RefactoringLine.VisualisationType type,
-                                    Consumer<RefactoringLine> offsetFunction) {
-
-    RefactoringLine line = new RefactoringLine(left, mid, right, type);
-    if (offsetFunction != null) {
-      offsetFunction.accept(line);
-    }
-    lineMarkings.add(line);
-    this.leftPath = left.getFilePath();
-    if (mid != null) {
-      this.midPath = mid.getFilePath();
-    }
-    this.rightPath = right.getFilePath();
+  public RefactoringInfo setRightPath(String rightPath) {
+    paths[2] = rightPath;
     return this;
-  }
-
-  /**
-   * Add line marking for diffwindow used to display refactorings.
-   */
-  public RefactoringInfo addMarking(int startLeft, int endLeft,
-                                    int startMid, int endMid,
-                                    int startRight, int endRight,
-                                    String leftPath, String midPath, String rightPath,
-                                    RefactoringLine.VisualisationType type,
-                                    Consumer<RefactoringLine> offsetFunction) {
-
-    RefactoringLine line =
-        new RefactoringLine(startLeft - 1, endLeft, startMid - 1, endMid, startRight - 1, endRight,
-            type);
-    if (offsetFunction != null) {
-      offsetFunction.accept(line);
-    }
-    lineMarkings.add(line);
-    this.leftPath = leftPath;
-    this.midPath = midPath;
-    this.rightPath = rightPath;
-    return this;
-  }
-
-  /**
-   * Get line markings for two sided window.
-   * Should only be called if isThreeSided() evaluates to false.
-   */
-  public List<LineFragment> getTwoSidedLineMarkings(String leftText, String rightText) {
-    assert !threeSided;
-    return lineMarkings.stream().map(l ->
-        l.getTwoSidedRange(leftText, rightText)).collect(Collectors.toList());
-  }
-
-  /**
-   * Get line markings for two sided window.
-   * Should only be called if isThreeSided() evaluates to true.
-   */
-  public List<SimpleThreesideDiffChange> getThreeSidedLineMarkings(String textLeft,
-                                                                   String textMid,
-                                                                   String textRight,
-                                                                   SimpleThreesideDiffViewer
-                                                                       viewer) {
-    assert threeSided;
-    return lineMarkings.stream()
-        .map(line -> line.getThreeSidedRange(textLeft, textMid, textRight, viewer))
-        .collect(Collectors.toList());
-  }
-
-  @Override
-  public String toString() {
-    return new Gson().toJson(this);
   }
 
   public String getNameBefore() {
-    return nameBefore;
+    return uiStrings[0][0];
   }
 
   public RefactoringInfo setNameBefore(String nameBefore) {
-    this.nameBefore = nameBefore;
+    uiStrings[0][0] = nameBefore;
     return this;
   }
 
-  public List<String> getParents() {
-    return entry.getParents();
+  public String getNameAfter() {
+    return uiStrings[0][1];
+  }
+
+  public RefactoringInfo setNameAfter(String nameAfter) {
+    uiStrings[0][1] = nameAfter;
+    return this;
+  }
+
+  public String getElementBefore() {
+    return uiStrings[1][0];
+  }
+
+  public RefactoringInfo setElementBefore(String elementBefore) {
+    uiStrings[1][0] = elementBefore;
+    return this;
+  }
+
+  public String getElementAfter() {
+    return uiStrings[1][1];
+  }
+
+  public RefactoringInfo setElementAfter(String elementAfter) {
+    uiStrings[1][1] = elementAfter;
+    return this;
+  }
+
+  public String getDetailsBefore() {
+    return uiStrings[2][0];
+  }
+
+  public RefactoringInfo setDetailsBefore(String detailsBefore) {
+    uiStrings[2][0] = detailsBefore;
+    return this;
+  }
+
+  public String getDetailsAfter() {
+    return uiStrings[2][1];
+  }
+
+  public RefactoringInfo setDetailsAfter(String detailsAfter) {
+    uiStrings[2][1] = detailsAfter;
+    return this;
+  }
+
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof RefactoringInfo)) {
+      return false;
+    }
+    RefactoringInfo that = (RefactoringInfo) o;
+    return Objects.equals(getElementBefore(), that.getElementBefore())
+        && Objects.equals(getElementAfter(), that.getElementAfter())
+        && getName().equals(that.getName())
+        && getNameBefore().equals(that.getNameBefore())
+        && getNameAfter().equals(that.getNameAfter())
+        && Objects.equals(getDetailsBefore(), that.getDetailsBefore())
+        && Objects.equals(getDetailsAfter(), that.getDetailsAfter())
+        && getType() == that.getType()
+        && getGroup() == that.getGroup();
   }
 
   public Group getGroup() {
@@ -296,119 +348,9 @@ public class RefactoringInfo {
     return this;
   }
 
-  public String getLeftPath() {
-    return leftPath;
-  }
-
-  public String getMidPath() {
-    return midPath;
-  }
-
-  public String getRightPath() {
-    return rightPath;
-  }
-
-  public String getNameAfter() {
-    return nameAfter;
-  }
-
-  public RefactoringInfo setNameAfter(String nameAfter) {
-    this.nameAfter = nameAfter;
-    return this;
-  }
-
-  public long getTimestamp() {
-    return entry.getTimeStamp();
-  }
-
-  public String getCommitId() {
-    return entry.getCommitId();
-  }
-
-  public boolean isThreeSided() {
-    return threeSided;
-  }
-
-  public RefactoringInfo setThreeSided(boolean threeSided) {
-    this.threeSided = threeSided;
-    return this;
-  }
-
-  public RefactoringInfo setElementBefore(@Nullable String elementBefore) {
-    this.elementBefore = elementBefore;
-    return this;
-  }
-
-  public RefactoringInfo setElementAfter(@Nullable String elementAfter) {
-    this.elementAfter = elementAfter;
-    return this;
-  }
-
-  /**
-   * Creates a DefaultMutableTreeNode for the UI.
-   *
-   * @return the node.
-   */
-  public DefaultMutableTreeNode makeNode() {
-    DefaultMutableTreeNode node = new DefaultMutableTreeNode(this);
-    DefaultMutableTreeNode child = new DefaultMutableTreeNode(getDisplayableName());
-    node.add(child);
-    addLeaves(child);
-    return node;
-  }
-
-  /**
-   * Adds leaves for refactorings where the element
-   * is not null.
-   *
-   * @param node to add leaves to.
-   */
-  public void addLeaves(DefaultMutableTreeNode node) {
-    String displayableElement = getDisplayableElement();
-    if (displayableElement == null) {
-      return;
-    }
-    node.add(new DefaultMutableTreeNode(displayableElement));
-  }
-
-  /**
-   * Method for create a presentable String out of the
-   * element changes for a refactoring.
-   *
-   * @return presentable String that shows the changes.
-   */
-  public String getDisplayableElement() {
-    if (elementBefore == null) {
-      return null;
-    }
-    String info = elementBefore;
-    if (elementAfter != null) {
-      info += " -> " + elementAfter;
-    }
-    return info;
-  }
-
-
-  /**
-   * Method for create a presentable String out of the
-   * name refactoring.
-   *
-   * @return presentable String that shows the changes if existent, else shows a presentable name.
-   */
-  public String getDisplayableName() {
-    String before = nameBefore;
-    if (before.contains(".")) {
-      before = nameBefore.substring(nameBefore.lastIndexOf(".") + 1);
-    }
-    String after = nameAfter;
-    if (after.contains(".")) {
-      after = nameAfter.substring(nameAfter.lastIndexOf(".") + 1);
-    }
-    if (before.equals(after)) {
-      return before;
-    } else {
-      return before + "-> " + after;
-    }
+  public void correctLines(String before, String mid, String after) {
+    requestGenerator.correct(before, mid, after);
   }
 
 }
+

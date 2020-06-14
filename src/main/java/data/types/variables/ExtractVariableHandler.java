@@ -1,23 +1,24 @@
 package data.types.variables;
 
-import com.intellij.openapi.project.Project;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ExtractVariableRefactoring;
 import org.refactoringminer.api.Refactoring;
+import utils.StringUtils;
 
 public class ExtractVariableHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ExtractVariableRefactoring ref = (ExtractVariableRefactoring) refactoring;
+
     return info.setGroup(Group.VARIABLE)
-        .setElementBefore("in method " + ref.getOperationBefore().getName())
+        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
+        .setElementBefore(ref.getVariableDeclaration().getVariableDeclaration().toQualifiedString())
         .setElementAfter(null)
-        .setNameBefore(ref.getVariableDeclaration().toQualifiedString())
-        .setNameAfter(ref.getVariableDeclaration().toQualifiedString())
         .addMarking(ref.getOperationBefore().codeRange(),
-            ref.getExtractedVariableDeclarationCodeRange());
+            ref.getExtractedVariableDeclarationCodeRange(), true);
   }
 }

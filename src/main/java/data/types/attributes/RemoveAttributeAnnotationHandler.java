@@ -1,6 +1,7 @@
 package data.types.attributes;
 
-import com.intellij.openapi.project.Project;
+import static data.RefactoringLine.MarkingOption.REMOVE;
+
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
@@ -11,21 +12,25 @@ import org.refactoringminer.api.Refactoring;
 public class RemoveAttributeAnnotationHandler extends Handler {
 
   @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info, Project project) {
+  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RemoveAttributeAnnotationRefactoring ref = (RemoveAttributeAnnotationRefactoring) refactoring;
     UMLAnnotation annotation = ref.getAnnotation();
+
+    String classNameBefore = ref.getAttributeBefore().getClassName();
+    String classNameAfter = ref.getAttributeAfter().getClassName();
+
     return info.setGroup(Group.ATTRIBUTE)
-        .setNameBefore(ref.getAttributeBefore().toQualifiedString())
-        .setNameAfter(ref.getAttributeAfter().toQualifiedString())
+        .setDetailsBefore(classNameBefore)
+        .setDetailsAfter(classNameAfter)
+        .setNameBefore(ref.getAttributeBefore().getVariableDeclaration().toQualifiedString())
+        .setNameAfter(ref.getAttributeAfter().getVariableDeclaration().toQualifiedString())
         .setElementBefore(ref.getAnnotation().toString())
-        .setElementAfter(null).addMarking(annotation.getLocationInfo().getStartLine(),
-            annotation.getLocationInfo().getEndLine(),
-            ref.getAttributeBefore().codeRange().getStartLine(),
-            ref.getAttributeBefore().codeRange().getStartLine() - 1,
-            ref.getAttributeBefore().codeRange().getFilePath(),
-            annotation.getLocationInfo().getFilePath(),
-            line -> line.addOffset(annotation.getLocationInfo().getStartOffset(),
-                annotation.getLocationInfo().getEndOffset(),
-                0, 0));
+        .setElementAfter(null)
+        .addMarking(
+            annotation.codeRange(),
+            ref.getAttributeAfter().codeRange(),
+            line -> line.addOffset(annotation.getLocationInfo(), REMOVE),
+            REMOVE,
+            false);
   }
 }

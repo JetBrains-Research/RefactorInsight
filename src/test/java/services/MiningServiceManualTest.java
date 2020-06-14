@@ -30,6 +30,7 @@ import static org.refactoringminer.api.RefactoringType.RENAME_PACKAGE;
 import static org.refactoringminer.api.RefactoringType.RENAME_PARAMETER;
 import static org.refactoringminer.api.RefactoringType.RENAME_VARIABLE;
 
+
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vcs.Executor;
 import com.intellij.ui.treeStructure.Tree;
@@ -47,13 +48,12 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
-import javax.swing.tree.TreeCellRenderer;
 import org.hamcrest.CustomMatcher;
 import org.hamcrest.Matcher;
 import org.junit.rules.ErrorCollector;
 import org.refactoringminer.api.RefactoringType;
-import ui.renderer.CellRenderer;
-
+import ui.tree.renderers.MainCellRenderer;
+import ui.tree.TreeUtils;
 /**
  * Extend GitSingleRepoTest
  * variables as myProject, repo, projectPath and much more are available from super classes
@@ -166,7 +166,7 @@ public class MiningServiceManualTest extends GitSingleRepoTest {
     for (int i = 1; i < hashes.length; i++) {
       RefactoringEntry entry = miner.getEntry(hashes[i]);
       collector.checkThat(entry.getCommitId(), equalTo(hashes[i]));
-      collector.checkThat(entry.getParents().get(0), equalTo(hashes[i - 1]));
+      collector.checkThat(entry.getParent(), equalTo(hashes[i - 1]));
       collector.checkThat("Issue in: " + commitDirs[i], entry, matches[i]);
     }
     collector.verify();
@@ -185,18 +185,20 @@ public class MiningServiceManualTest extends GitSingleRepoTest {
             return true;
           }
           List<RefactoringInfo> refactorings = ((RefactoringEntry) o).getRefactorings();
-          Tree tree = ((RefactoringEntry) o).buildTree();
-          tree.setCellRenderer(new CellRenderer());
-          final TreeCellRenderer cellRenderer = tree.getCellRenderer();
+
+          Tree tree = TreeUtils.buildTree(refactorings);
+          final MainCellRenderer renderer = new MainCellRenderer();
+          tree.setCellRenderer(renderer);
+
           Object root = tree.getModel().getRoot();
 
           //for each refactoring check that the renderer works properly
           int children = tree.getModel().getChildCount(root);
           for (int i = 0; i < children; i++) {
             Object refactoringNode = tree.getModel().getChild(root, i);
-            assertNotNull(cellRenderer
-                .getTreeCellRendererComponent(tree, refactoringNode, false,
-                    false, false, 1, false));
+            renderer
+                .customizeCellRenderer(tree, refactoringNode, false,
+                    false, false, 1, false);
           }
 
           boolean res = true;

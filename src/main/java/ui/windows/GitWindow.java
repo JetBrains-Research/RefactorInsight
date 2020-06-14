@@ -2,10 +2,8 @@ package ui.windows;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.VcsException;
-import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
-import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.VcsCommitMetadata;
@@ -17,12 +15,12 @@ import data.RefactoringEntry;
 import data.RefactoringInfo;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Collection;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import services.MiningService;
-import services.RefactoringsBundle;
-import ui.renderer.CellRenderer;
+import ui.tree.TreeUtils;
+import ui.tree.renderers.MainCellRenderer;
+
 
 public class GitWindow {
   private Project project;
@@ -88,12 +86,15 @@ public class GitWindow {
 
   private void buildComponent() {
     int index = table.getSelectionModel().getAnchorSelectionIndex();
-    if (index < 0) {
-      viewport.setView(new JBLabel(RefactoringsBundle.message("not.selected")));
+
+    if (index < 0 || index >= table.getRowCount() - 1) {
+      viewport.setView(new JBList<String>());
       return;
     }
+
     String commitId = table.getModel().getCommitId(index).getHash().asString();
     VcsCommitMetadata metadata = table.getModel().getCommitMetadata(index);
+
 
     String refactorings = miner.getRefactorings(commitId);
     RefactoringEntry entry = RefactoringEntry.fromString(refactorings);
@@ -103,8 +104,10 @@ public class GitWindow {
       return;
     }
 
-    Tree tree = entry.buildTree();
-    tree.setCellRenderer(new CellRenderer());
+
+    Tree tree = TreeUtils.buildTree(entry.getRefactorings());
+    tree.setCellRenderer(new MainCellRenderer());
+
     tree.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent ev) {
@@ -113,12 +116,13 @@ public class GitWindow {
           if (path == null) {
             return;
           }
-          DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-              path.getLastPathComponent();
+          DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
           if (node.isLeaf()) {
             RefactoringInfo info = (RefactoringInfo)
                 node.getUserObjectPath()[1];
-            showDiff(index, info);
+
+            DiffWindow.showDiff(table.getModel().getFullDetails(index)
+                .getChanges(0), info, project, entry);
           }
         }
       }
@@ -126,40 +130,4 @@ public class GitWindow {
     viewport.setView(tree);
   }
 
-  private void showDiff(int index, RefactoringInfo info) {
-    try {
-      Collection<Change> changes =
-          table.getModel().getFullDetails(index).getChanges(0);
-      String left = "";
-      String right = "";
-      for (Change change : changes) {
-        if (change.getBeforeRevision() != null
-            && (project.getBasePath() + "/" + info.getLeftPath())
-            .equals(change.getBeforeRevision().getFile().getPath())) {
-          left = change.getBeforeRevision().getContent();
-        }
-        if (change.getAfterRevision() != null
-            && (project.getBasePath() + "/" + info.getRightPath())
-            .equals(change.getAfterRevision().getFile().getPath())) {
-          right = change.getAfterRevision().getContent();
-        }
-      }
-      String mid = "";
-      if (info.isThreeSided()) {
-        for (Change change : changes) {
-          if (change.getAfterRevision() != null
-              && (project.getBasePath() + "/" + info.getMidPath())
-              .equals(change.getAfterRevision().getFile().getPath())) {
-            mid = change.getAfterRevision().getContent();
-          }
-        }
-        DiffWindow.showDiff(left, mid, right, info, project);
-      } else {
-        DiffWindow.showDiff(left, right, info, project);
-      }
-
-    } catch (VcsException ex) {
-      ex.printStackTrace();
-    }
-  }
 }

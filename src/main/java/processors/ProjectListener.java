@@ -10,5 +10,8 @@ public class ProjectListener implements ProjectManagerListener {
   @Override
   public void projectClosing(@NotNull Project project) {
     Utils.dispose();
+    if (Utils.manager != null) {
+      Utils.manager = null;
+    }
   }
 }

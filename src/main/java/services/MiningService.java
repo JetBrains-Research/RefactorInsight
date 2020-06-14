@@ -15,7 +15,6 @@ import com.intellij.vcs.log.VcsCommitMetadata;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.RefactoringLine;
-import data.RefactoringOffset;
 import git4idea.history.GitHistoryUtils;
 import git4idea.repo.GitRepository;
 import java.io.BufferedReader;
@@ -45,11 +44,11 @@ import ui.windows.GitWindow;
 @Service
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
-  public static ConcurrentHashMap<String, List<RefactoringInfo>> methodHistory
-      = new ConcurrentHashMap<>();
+  private static final String VERSION = "1.0.1";
+  public static ConcurrentHashMap<String, ArrayList<RefactoringInfo>> methodHistory
+      = new ConcurrentHashMap<String, ArrayList<RefactoringInfo>>();
   private boolean mining = false;
   private MyState innerState = new MyState();
-  private static final String VERSION = "1.0.1";
 
   public MiningService() {
   }
@@ -86,7 +85,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     int limit = 100;
     try {
       limit = getCommitCount(repository);
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     } finally {
       mineRepo(repository, limit);
@@ -109,6 +108,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             int cores = 8; //Runtime.getRuntime().availableProcessors();
             ExecutorService pool = Executors.newFixedThreadPool(cores);
             System.out.println("Mining started on " + cores + " cores");
+            long timeStart = System.currentTimeMillis();
             AtomicInteger commitsDone = new AtomicInteger(0);
             CommitMiner miner =
                 new CommitMiner(pool, innerState.map, repository, commitsDone,
@@ -130,11 +130,14 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             } catch (InterruptedException e) {
               e.printStackTrace();
             }
-            System.out.println("Mining done");
+            long timeEnd = System.currentTimeMillis();
+            double time = ((double) (timeEnd - timeStart)) / 1000.0;
+            System.out.println("Mining done in " + time + " sec");
 
             computeMethodHistory(repository.getCurrentRevision());
-            System.out.println("Method history computed");
-
+            long timeEnd2 = System.currentTimeMillis();
+            double time2 = ((double) (timeEnd2 - timeEnd)) / 1000.0;
+            System.out.println("Method history computed in " + time2);
             progressIndicator.setText("Finished");
           }
         });
@@ -175,9 +178,13 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
           public void onFinished() {
             super.onFinished();
-            System.out.println("Mining commit done");
-            ApplicationManager.getApplication()
-                .invokeLater(() -> info.refresh(commit.getId().asString()));
+            if (innerState.map.containsKey(commit.getId().asString())) {
+              System.out.println("Mining commit done");
+              ApplicationManager.getApplication()
+                  .invokeLater(() -> info.refresh(commit.getId().asString()));
+            } else {
+              System.out.println("Mining commit FAILED!");
+            }
           }
 
           public void run(@NotNull ProgressIndicator progressIndicator) {
@@ -205,7 +212,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     return Integer.parseInt(output);
   }
 
-  public Map<String, List<RefactoringInfo>> getMethodHistory() {
+  public Map<String, ArrayList<RefactoringInfo>> getMethodHistory() {
     return methodHistory;
   }
 
@@ -215,7 +222,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
       RefactoringEntry refactoringEntry = RefactoringEntry.fromString(innerState.map.get(commitId));
       assert refactoringEntry != null;
       refs.addAll(refactoringEntry.getRefactorings());
-      commitId = refactoringEntry.getParents().get(0);
+      commitId = refactoringEntry.getParent();
     }
     Collections.reverse(refs);
     refs.forEach(r -> r.addToHistory(methodHistory));
@@ -226,12 +233,12 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   }
 
   private String version() {
-    return VERSION + String.valueOf(Stream.of(
+    return RefactoringsBundle.message("version") + String.valueOf(Stream.of(
         //all classes that can change
         RefactoringEntry.class,
         RefactoringInfo.class,
         RefactoringLine.class,
-        RefactoringOffset.class
+        RefactoringLine.RefactoringOffset.class
     ).flatMap(c -> Arrays.stream(c.getDeclaredFields())
         .map(Field::getGenericType)
         .map(Type::getTypeName)
