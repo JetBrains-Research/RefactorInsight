@@ -39,11 +39,7 @@ public class RenameMethodHandler extends Handler {
         .setElementBefore(null)
         .setElementAfter(null)
         .setNameBefore(StringUtils.calculateSignature(ref.getOriginalOperation()))
-        .setNameAfter(StringUtils.calculateSignature(ref.getRenamedOperation()))
-        .addMarking(ref.getOriginalOperation().getBody().getCompositeStatement().codeRange(),
-            ref.getRenamedOperation().getBody().getCompositeStatement().codeRange(),
-            refactoringLine -> refactoringLine.setHasColumns(false),
-            RefactoringLine.MarkingOption.NONE, false);
+        .setNameAfter(StringUtils.calculateSignature(ref.getRenamedOperation()));
 
 
     if (ref.getOriginalOperation().getBody() == null) {
