@@ -18,7 +18,9 @@ import java.awt.event.MouseEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import services.MiningService;
-import ui.tree.renderer.CellRenderer;
+import ui.tree.TreeUtils;
+import ui.tree.renderers.MainCellRenderer;
+
 
 public class GitWindow {
   private Project project;
@@ -101,8 +103,10 @@ public class GitWindow {
       return;
     }
 
-    Tree tree = entry.buildTree();
-    tree.setCellRenderer(new CellRenderer());
+
+    Tree tree = TreeUtils.buildTree(entry.getRefactorings());
+    tree.setCellRenderer(new MainCellRenderer());
+
     tree.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent ev) {
@@ -111,8 +115,7 @@ public class GitWindow {
           if (path == null) {
             return;
           }
-          DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-              path.getLastPathComponent();
+          DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
           if (node.isLeaf()) {
             RefactoringInfo info = (RefactoringInfo)
                 node.getUserObjectPath()[1];

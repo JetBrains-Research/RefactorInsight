@@ -1,5 +1,6 @@
 package data.types.methods;
 
+import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MoveOperationRefactoring;
@@ -15,10 +16,10 @@ public class MoveOperationHandler extends Handler {
     String classBefore = ref.getOriginalOperation().getClassName();
     String classAfter = ref.getMovedOperation().getClassName();
 
-    return info.setGroup(RefactoringInfo.Group.METHOD)
+    return info.setGroup(Group.METHOD)
         .setDetailsBefore(classBefore)
         .setDetailsAfter(classAfter)
-        .addMarking(ref.getSourceOperationCodeRangeBeforeMove(),
+        .addMarking(ref.getOriginalOperation().codeRange(),
             ref.getTargetOperationCodeRangeAfterMove(), true)
         .setNameBefore(StringUtils.calculateSignature(ref.getOriginalOperation()))
         .setNameAfter(StringUtils.calculateSignature(ref.getMovedOperation()));

@@ -11,18 +11,20 @@ import com.intellij.vcs.log.Hash;
 import com.intellij.vcs.log.VcsUser;
 import com.intellij.vcs.log.impl.VcsCommitMetadataImpl;
 import data.RefactoringEntry;
+import data.RefactoringInfo;
 import git4idea.test.GitSingleRepoTest;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeCellRenderer;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.Times;
-import ui.tree.renderer.CellRenderer;
+import ui.tree.TreeUtils;
+import ui.tree.renderers.HistoryToolbarRenderer;
+import ui.tree.renderers.MainCellRenderer;
 import ui.windows.GitWindow;
 
 /**
@@ -71,8 +73,9 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
   //note that the project directory has to contain the .git folder but renamed
   public void testDirectory() {
 
-    assertEquals(1, entry.getRefactorings().size());
+    assertEquals(3, entry.getRefactorings().size());
     assertTrue(miner.get(head).getRefactorings().size() > 0);
+
 
     assertThrows(IllegalArgumentException.class, () -> MiningService.getInstance(null));
     assertEquals(miner, MiningService.getInstance(myProject));
@@ -84,48 +87,47 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
   }
 
   public void testTreeIsBuilt() {
-
-    TreeCellRenderer cellRenderer = new CellRenderer();
+    MainCellRenderer cellRenderer = new MainCellRenderer();
 
     miner.getState().refactoringsMap.map.values()
         .forEach(x -> {
-          Tree tree1 = x.buildTree();
+          Tree tree1 = TreeUtils.buildTree(x.getRefactorings());
           tree1.setCellRenderer(cellRenderer);
           assertNotNull(tree1);
-          Object root1 = tree1.getModel().getRoot();
+          DefaultMutableTreeNode root1 = (DefaultMutableTreeNode) tree1.getModel().getRoot();
 
           //for each refactoring check that the renderer works properly
-          int children = tree1.getModel().getChildCount(root1);
-          for (int i = 0; i < children; i++) {
-            DefaultMutableTreeNode refactoringNode =
-                (DefaultMutableTreeNode) tree1.getModel().getChild(root1, i);
+          root1.breadthFirstEnumeration().asIterator().forEachRemaining(node -> {
+            cellRenderer.customizeCellRenderer(tree1, node, false,
+                false, node.isLeaf(), 1, false);
             assertNotNull(cellRenderer
-                .getTreeCellRendererComponent(tree1, refactoringNode, false,
-                    false, refactoringNode.isLeaf(), 1, false));
-            for (int j = 0; j < refactoringNode.getChildCount(); j++) {
-              DefaultMutableTreeNode child1 =
-                  (DefaultMutableTreeNode) tree1.getModel().getChild(refactoringNode, j);
-              assertNotNull(cellRenderer
-                  .getTreeCellRendererComponent(tree1, child1, false,
-                      false, child1.isLeaf(), 2, false));
-              for (int z = 0; z < child1.getChildCount(); z++) {
-                DefaultMutableTreeNode child2 =
-                    (DefaultMutableTreeNode) tree1.getModel().getChild(child1, z);
-                assertNotNull(cellRenderer
-                    .getTreeCellRendererComponent(tree1, child2, false,
-                        false, child2.isLeaf(), 3, false));
-                for (int k = 0; k < child2.getChildCount(); k++) {
-                  DefaultMutableTreeNode child3 =
-                      (DefaultMutableTreeNode) tree1.getModel().getChild(child2, k);
-                  assertNotNull(cellRenderer
-                      .getTreeCellRendererComponent(tree1, child3, false,
-                          false, child3.isLeaf(), 3, false));
-                }
-              }
-            }
-          }
+                .getTreeCellRendererComponent(tree1, node, false,
+                    false, node.isLeaf(), 1, false));
+          });
         });
+  }
 
+  public void testHistoryTreeIsBuilt() {
+    HistoryToolbarRenderer cellRenderer = new HistoryToolbarRenderer();
+
+    miner.getMethodHistory()
+        .forEach((key, refactorings) -> {
+          DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+          for (RefactoringInfo ref : refactorings) {
+            TreeUtils.createHistoryTree(root, ref);
+          }
+          Tree tree1 = new Tree(root);
+          tree1.setCellRenderer(cellRenderer);
+          assertNotNull(tree1);
+          DefaultMutableTreeNode root1 = (DefaultMutableTreeNode) tree1.getModel().getRoot();
+          root1.breadthFirstEnumeration().asIterator().forEachRemaining(node -> {
+            cellRenderer.customizeCellRenderer(tree1, node, false,
+                false, node.isLeaf(), 1, false);
+            assertNotNull(cellRenderer
+                .getTreeCellRendererComponent(tree1, node, false,
+                    false, node.isLeaf(), 1, false));
+          });
+        });
   }
 
   public void testMineAtCommit() {

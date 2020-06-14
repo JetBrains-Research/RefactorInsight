@@ -1,19 +1,23 @@
-package ui.tree.renderer.handlers;
+package ui.tree.renderers.handlers;
 
 import com.intellij.icons.AllIcons;
 import data.RefactoringInfo;
 import javax.swing.Icon;
-import ui.tree.renderer.IconHandler;
+import ui.tree.Node;
+import ui.tree.NodeType;
+import ui.tree.renderers.IconHandler;
 
 public class AttributeHandler implements IconHandler {
+
   @Override
-  public Icon getIcon(RefactoringInfo info, boolean leaf, boolean path) {
-    if (!leaf && path) {
+  public Icon getIcon(RefactoringInfo info, Node node) {
+    if (node.getType() == NodeType.DETAILS) {
       return AllIcons.Nodes.Class;
     }
-    if (leaf && info.getName().contains("Annotation")) {
+    if (node.getType() == NodeType.ELEMENTS) {
       return AllIcons.Nodes.Annotationtype;
     }
+
     return AllIcons.Nodes.Field;
   }
 }

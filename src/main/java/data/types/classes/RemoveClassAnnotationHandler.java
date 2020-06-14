@@ -1,8 +1,8 @@
 package data.types.classes;
 
-import static data.RefactoringInfo.Group;
 import static data.RefactoringLine.MarkingOption.REMOVE;
 
+import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;

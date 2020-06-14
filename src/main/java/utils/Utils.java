@@ -6,26 +6,29 @@ import static org.refactoringminer.api.RefactoringType.CHANGE_VARIABLE_TYPE;
 import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
 import static org.refactoringminer.api.RefactoringType.RENAME_PARAMETER;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.vcs.LocalFilePath;
 import com.intellij.openapi.vcs.VcsException;
-import com.intellij.vcs.log.ui.MainVcsLogUi;
+import com.intellij.openapi.wm.ToolWindowManager;
 import data.RefactoringInfo;
 import git4idea.GitContentRevision;
 import git4idea.GitRevisionNumber;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 import org.refactoringminer.api.RefactoringType;
 
 public class Utils {
 
+  public static ToolWindowManager manager;
   /**
    * Used for storing and disposing the MainVcsLogs used for method history action.
    */
-  private static ArrayList<MainVcsLogUi> logs = new ArrayList<>();
+  private static ArrayList<Disposable> logs = new ArrayList<>();
 
   /**
    * Method used for disposing the logs that were created and shown for the method history action.
@@ -33,18 +36,32 @@ public class Utils {
    * Avoids memory leaks.
    */
   public static void dispose() {
-    for (MainVcsLogUi log : logs) {
+    for (Disposable log : logs) {
       Disposer.dispose(log);
     }
   }
 
   /**
-   * Adds a MainVcsLogUI to the list.
+   * Adds a Disposable object to the list.
    *
    * @param log to add.
    */
-  public static void add(MainVcsLogUi log) {
+  public static void add(Disposable log) {
     logs.add(log);
+  }
+
+  /**
+   * Sorts the info list for a better displaying.
+   *
+   * @param infos to be sorted.
+   */
+  public static void chronologicalOrder(List<RefactoringInfo> infos) {
+    infos.sort(new Comparator<RefactoringInfo>() {
+      @Override
+      public int compare(RefactoringInfo o1, RefactoringInfo o2) {
+        return Long.compare(o1.getEntry().getTimeStamp(), o2.getEntry().getTimeStamp());
+      }
+    });
   }
 
   /**
@@ -57,9 +74,27 @@ public class Utils {
    */
   public static int[] findColumns(String text, String word, int line) {
     String[] lines = text.split("\r\n|\r|\n");
-    int startColumn = lines[line - 1].indexOf(word) + 1;
+    int startColumn = lines[line].indexOf(word) + 1;
     int endColumn = startColumn + word.length();
     return new int[] {startColumn, endColumn};
+  }
+
+  /**
+   * Skips javadoc for a method or class.
+   * @param text to search in.
+   * @param line current line.
+   * @return the actual line.
+   */
+  public static int skipJavadoc(String text, int line) {
+    String[] lines = text.split("\r\n|\r|\n");
+    if (lines[line].contains("/**")) {
+      for (int i = line + 1; i < lines.length; i++) {
+        if (lines[i].contains("*/")) {
+          return i + 1;
+        }
+      }
+    }
+    return line;
   }
 
   /**
@@ -128,7 +163,7 @@ public class Utils {
   /**
    * Checks and corrects the ranges returned by RefactoringMiner.
    *
-   * @param info refactoring info
+   * @param info    refactoring info
    * @param project the open project
    * @return the corrected RefactoringInfo
    */
@@ -161,5 +196,22 @@ public class Utils {
     }
 
     return info;
+  }
+
+  /**
+   * Calculates the line of the package.
+   * @param text to search in.
+   * @return line of the package.
+   */
+  public static int findPackageLine(String text) {
+    String[] lines = text.split("\r\n|\r|\n");
+    for (int i = 0; i < lines.length; i++) {
+      if (lines[i].contains("package ")) {
+        return i;
+      } else if (lines[i].matches("^[a-zA-Z0-9]*$")) {
+        return -1;
+      }
+    }
+    return 0;
   }
 }

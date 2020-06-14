@@ -167,3 +167,9 @@ ed06a6fb9912e23d470c845be912af1777dd8045 1655559aaad05b1d1eed4407fdd3979a39913b0
 230b0e0a8ab7766806fa0ec15040347315d4ebd9 6a2899976dc0926b4d0c7f1adad69ca4d4b509c7 ioana <savuandreeaioana@yahoo.com> 1591559282 +0200	rebase -i (pick): Modify abstract class annotation - NOT RECOGNIZED
 6a2899976dc0926b4d0c7f1adad69ca4d4b509c7 b0fedaafc269f85b553a0212d80a31d37ff540a6 ioana <savuandreeaioana@yahoo.com> 1591559282 +0200	rebase -i (pick): Add abstract class annotation
 b0fedaafc269f85b553a0212d80a31d37ff540a6 b0fedaafc269f85b553a0212d80a31d37ff540a6 ioana <savuandreeaioana@yahoo.com> 1591559282 +0200	rebase -i (finish): returning to refs/heads/setup-repository
+b0fedaafc269f85b553a0212d80a31d37ff540a6 b4f98e6045a5352c28dc44c179e85baf37ad38c7 ioana <savuandreeaioana@yahoo.com> 1591725252 +0200	commit: add method annotation
+b4f98e6045a5352c28dc44c179e85baf37ad38c7 821e92b35fbb75eef2a133d2dcda4966f13e918b ioana <savuandreeaioana@yahoo.com> 1591779538 +0200	checkout: moving from setup-repository to master
+821e92b35fbb75eef2a133d2dcda4966f13e918b b4f98e6045a5352c28dc44c179e85baf37ad38c7 ioana <savuandreeaioana@yahoo.com> 1591780837 +0200	checkout: moving from master to setup-repository
+b4f98e6045a5352c28dc44c179e85baf37ad38c7 a5de1b6761817fb5565b7c9fe07235eadc02472a ioana <savuandreeaioana@yahoo.com> 1591896285 +0200	commit: add java doc to test class rename
+a5de1b6761817fb5565b7c9fe07235eadc02472a 3bd2f014deedd9206bf320a8b50d324632ac80f5 ioana <savuandreeaioana@yahoo.com> 1591896301 +0200	commit: Rename class
+3bd2f014deedd9206bf320a8b50d324632ac80f5 3749aaee8a6278d386b2c7e2df9dfdfd4da63235 ioana <savuandreeaioana@yahoo.com> 1591978963 +0200	commit: Extract Class with Javadoc

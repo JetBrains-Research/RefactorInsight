@@ -1,5 +1,6 @@
 package data.types.classes;
 
+import data.Group;
 import data.RefactoringInfo;
 import data.RefactoringLine;
 import data.types.Handler;
@@ -13,11 +14,11 @@ public class ExtractClassHandler extends Handler {
     ExtractClassRefactoring ref = (ExtractClassRefactoring) refactoring;
 
     if (ref.getExtractedClass().isInterface()) {
-      info.setGroup(RefactoringInfo.Group.INTERFACE);
+      info.setGroup(Group.INTERFACE);
     } else if (ref.getExtractedClass().isAbstract()) {
-      info.setGroup(RefactoringInfo.Group.ABSTRACT);
+      info.setGroup(Group.ABSTRACT);
     } else {
-      info.setGroup(RefactoringInfo.Group.CLASS);
+      info.setGroup(Group.CLASS);
     }
     info.setDetailsBefore(ref.getOriginalClass().getPackageName())
         .setDetailsAfter(ref.getExtractedClass().getPackageName())

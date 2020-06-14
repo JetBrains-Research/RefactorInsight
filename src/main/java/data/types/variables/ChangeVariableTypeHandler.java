@@ -1,5 +1,6 @@
 package data.types.variables;
 
+import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.UMLOperation;
@@ -23,12 +24,13 @@ public class ChangeVariableTypeHandler extends Handler {
     }
     info.setGroupId(id);
     if (ref.getChangedTypeVariable().isParameter()) {
-      info.setGroup(RefactoringInfo.Group.METHOD)
+      info.setGroup(Group.METHOD)
           .setDetailsBefore(ref.getOperationBefore().getClassName())
           .setDetailsAfter(ref.getOperationAfter().getClassName());
     } else {
-      info.setGroup(RefactoringInfo.Group.VARIABLE);
+      info.setGroup(Group.VARIABLE);
     }
+
     return info
         .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))

@@ -1,5 +1,6 @@
 package utils;
 
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameterList;
 import data.RefactoringInfo;
@@ -100,6 +101,17 @@ public class StringUtils {
   }
 
   /**
+   * Computes the signature of a PsiField in order to match a RefactoringMiner attribute.
+   *
+   * @param field to compute signature for.
+   * @return signature of a field.
+   */
+  public static String getFieldSignature(PsiField field) {
+    return field.getContainingClass().getQualifiedName()
+        + "|" + field.getName() + " : " + field.getType().getPresentableText();
+  }
+
+  /**
    * Method for create a presentable String out of the
    * name refactoring.
    *
@@ -119,6 +131,7 @@ public class StringUtils {
     } else {
       return before + " -> " + after;
     }
+
   }
 
   /**

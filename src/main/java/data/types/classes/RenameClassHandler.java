@@ -1,6 +1,8 @@
 package data.types.classes;
 
+import data.Group;
 import data.RefactoringInfo;
+import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.RenameClassRefactoring;
 import org.refactoringminer.api.Refactoring;
@@ -12,16 +14,22 @@ public class RenameClassHandler extends Handler {
     RenameClassRefactoring ref = (RenameClassRefactoring) refactoring;
 
     if (ref.getRenamedClass().isAbstract()) {
-      info.setGroup(RefactoringInfo.Group.ABSTRACT);
+      info.setGroup(Group.ABSTRACT);
     } else if (ref.getRenamedClass().isInterface()) {
-      info.setGroup(RefactoringInfo.Group.INTERFACE);
+      info.setGroup(Group.INTERFACE);
     } else {
-      info.setGroup(RefactoringInfo.Group.CLASS);
+      info.setGroup(Group.CLASS);
     }
-
+    String[] nameSpace = ref.getRenamedClass().getName().split("\\.");
+    String className = nameSpace[nameSpace.length - 1];
     return info
-        .addMarking(ref.getOriginalClass().codeRange(),
-            ref.getRenamedClass().codeRange(), true)
+        .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
+            (line) -> {
+              line.setWord(
+                  new String[] {null, null, className});
+            },
+            RefactoringLine.MarkingOption.COLLAPSE,
+            true)
         .setNameBefore(ref.getOriginalClassName())
         .setNameAfter(ref.getRenamedClassName())
         .setDetailsBefore(ref.getOriginalClass().getPackageName())

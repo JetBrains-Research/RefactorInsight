@@ -2,6 +2,7 @@ package data.types.methods;
 
 import static data.RefactoringLine.MarkingOption.ADD;
 
+import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.UMLAnnotation;
@@ -19,7 +20,7 @@ public class AddMethodAnnotationHandler extends Handler {
     String classNameBefore = ref.getOperationBefore().getClassName();
     String classNameAfter = ref.getOperationAfter().getClassName();
 
-    return info.setGroup(RefactoringInfo.Group.METHOD)
+    return info.setGroup(Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
         .setElementBefore(annotation.toString())

@@ -14,26 +14,27 @@ repositories {
 
 
 test {
-//    useJUnitPlatform()
+    //useJUnitPlatform()
+    jacoco
     finalizedBy jacocoTestReport
 }
 
-//jacoco {
-//    toolVersion = "0.8.5"
-//    reportsDir = file("$buildDir/JaCoCo")
-//}
+jacoco {
+    toolVersion = "0.8.5"
+}
 
 jacocoTestReport {
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: '**/ui/windows**')
+        }))
+    }
+
     reports {
         xml.enabled true
         csv.enabled true
         html.destination file("${buildDir}/jacocoHtml")
-    }
-
-    afterEvaluate {
-        classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: '**/ui/windows/**')
-        }))
     }
 
 }

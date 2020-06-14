@@ -2,7 +2,7 @@ package ui.tree;
 
 import com.intellij.ui.treeStructure.Tree;
 import data.RefactoringInfo;
-import data.RefactoringInfo.Group;
+import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 import utils.StringUtils;
 
@@ -37,7 +37,6 @@ public class TreeUtils {
     }
 
     int index = StringUtils.indexOfDifference(before, after);
-
     String afterNew = after.substring(index);
     String beforeNew = before.substring(index);
 
@@ -55,63 +54,61 @@ public class TreeUtils {
    */
   public static DefaultMutableTreeNode makeNode(RefactoringInfo info) {
     DefaultMutableTreeNode node = new DefaultMutableTreeNode(info);
-    DefaultMutableTreeNode root = makeDetailsNode(node, info);
-    makeNameNode(root, info);
+
+    DefaultMutableTreeNode detailsNode = makeDetailsNode(info);
+    DefaultMutableTreeNode nameNode = makeNameNode(info);
+    DefaultMutableTreeNode leaf = makeLeafNode(info);
+    if (leaf != null) {
+      nameNode.add(leaf);
+    }
+    if (detailsNode != null) {
+      detailsNode.add(nameNode);
+      node.add(detailsNode);
+    } else {
+      node.add(nameNode);
+    }
     return node;
   }
 
   /**
    * Creates a node based on the nameBefore & nameAfter attributes.
-   *
-   * @param root to add node to.
    */
-  public static void makeNameNode(DefaultMutableTreeNode root, RefactoringInfo refactoringInfo) {
-    Group group = refactoringInfo.getGroup();
-    DefaultMutableTreeNode child = new DefaultMutableTreeNode(
-        (group == Group.METHOD || group == Group.CLASS || group == Group.ABSTRACT
-            || group == Group.INTERFACE)
-            ? StringUtils.getDisplayableName(refactoringInfo)
-            : getDisplayableDetails(refactoringInfo.getNameBefore(),
-            refactoringInfo.getNameAfter()));
-    root.add(child);
-    addLeaves(child, refactoringInfo);
+  public static DefaultMutableTreeNode makeNameNode(RefactoringInfo refactoringInfo) {
+    return new DefaultMutableTreeNode(
+        new Node(NodeType.NAME, StringUtils.getDisplayableName(refactoringInfo)));
+
   }
 
   /**
    * Creates a node iff the detailsBefore & detailsAfter attributes are not null.
    *
-   * @param root current root of the tree.
    * @return the same root if no node was created.
    */
-  private static DefaultMutableTreeNode makeDetailsNode(DefaultMutableTreeNode root,
-                                                        RefactoringInfo info) {
-    if (getDisplayableDetails(info.getDetailsBefore(), info.getDetailsAfter()) != null) {
-      DefaultMutableTreeNode details =
-          new DefaultMutableTreeNode(
-              getDisplayableDetails(info.getDetailsBefore(), info.getDetailsAfter()));
-      root.add(details);
-      return details;
+  public static DefaultMutableTreeNode makeDetailsNode(RefactoringInfo info) {
+    final String displayableDetails =
+        getDisplayableDetails(info.getDetailsBefore(), info.getDetailsAfter());
+    if (displayableDetails != null && displayableDetails.length() > 0) {
+      return new DefaultMutableTreeNode(new Node(NodeType.DETAILS, displayableDetails));
+    } else {
+      return null;
     }
-    return root;
   }
 
   /**
    * Adds leaves for refactorings where the element
    * is not null.
-   *
-   * @param node to add leaves to.
    */
-  public static void addLeaves(DefaultMutableTreeNode node, RefactoringInfo ref) {
+  public static DefaultMutableTreeNode makeLeafNode(RefactoringInfo ref) {
     String displayableElement =
         getDisplayableElement(ref.getElementBefore(), ref.getElementAfter());
-    if (displayableElement == null) {
-      return;
+    if (displayableElement != null) {
+      return new DefaultMutableTreeNode(new Node(NodeType.ELEMENTS, displayableElement));
     }
-    node.add(new DefaultMutableTreeNode(displayableElement));
+    return null;
   }
 
   /**
-   * Expands all the nodes of the tree.
+   * Expands all nodes of the tree.
    *
    * @param tree          to be expanded.
    * @param startingIndex the starting index for expansion.
@@ -124,5 +121,63 @@ public class TreeUtils {
     if (tree.getRowCount() != rowCount) {
       expandAllNodes(tree, rowCount, tree.getRowCount());
     }
+  }
+
+  /**
+   * Creates a presentable tree for the object's refactoring history.
+   * It creates a node iff the information is relevant (if anything has changed).
+   *
+   * @param root to add the tree to.
+   * @param ref  refactoring info.
+   */
+  public static void createHistoryTree(DefaultMutableTreeNode root, RefactoringInfo ref) {
+    DefaultMutableTreeNode details = makeDetailsNode(ref);
+    DefaultMutableTreeNode names = makeNameNode(ref);
+    DefaultMutableTreeNode elements = makeLeafNode(ref);
+    Node d = details != null ? (Node) details.getUserObject() : null;
+    Node n = (Node) names.getUserObject();
+
+    DefaultMutableTreeNode node = new DefaultMutableTreeNode(ref);
+
+    if (details != null && d.getContent().contains(" -> ")) {
+      node.add(details);
+      if (n.getContent().contains(" -> ")) {
+        details.add(names);
+        if (elements != null) {
+          names.add(elements);
+        }
+      } else {
+        if (elements != null) {
+          details.add(elements);
+        }
+      }
+    } else if (n.getContent().contains(" -> ")) {
+      node.add(names);
+      if (elements != null) {
+        names.add(elements);
+      }
+    } else if (elements != null) {
+      node.add(elements);
+    }
+    root.add(node);
+  }
+
+  /**
+   * Builds a UI tree.
+   *
+   * @return Swing Tree visualisation of refactorings in this entry.
+   */
+  public static Tree buildTree(List<RefactoringInfo> refactorings) {
+    DefaultMutableTreeNode root =
+        new DefaultMutableTreeNode(refactorings.isEmpty() ? "" : refactorings.get(0).getCommitId());
+    refactorings.forEach(r -> {
+      if (!r.isHidden()) {
+        root.add(makeNode(r));
+      }
+    });
+    Tree tree = new Tree(root);
+    tree.setRootVisible(false);
+    expandAllNodes(tree, 0, tree.getRowCount());
+    return tree;
   }
 }

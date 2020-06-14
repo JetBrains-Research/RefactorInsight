@@ -1,6 +1,7 @@
 package data.types.methods;
 
 import com.intellij.openapi.util.Pair;
+import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.decomposition.VariableDeclaration;
@@ -29,7 +30,7 @@ public class ReorderParameterHandler extends Handler {
             info.addMarking(x.first.codeRange(), x.second.codeRange(), true);
           }
         });
-    return info.setGroup(RefactoringInfo.Group.METHOD)
+    return info.setGroup(Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
         .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))

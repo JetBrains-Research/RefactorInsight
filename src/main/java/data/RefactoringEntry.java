@@ -4,7 +4,6 @@ import static org.refactoringminer.api.RefactoringType.EXTRACT_CLASS;
 import static utils.StringUtils.ENTRY;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.swing.tree.DefaultMutableTreeNode;
 import org.refactoringminer.api.Refactoring;
 import ui.tree.TreeUtils;
 import utils.StringUtils;
@@ -146,24 +144,6 @@ public class RefactoringEntry implements Serializable {
             r.setHidden(true);
           });
     }
-  }
-
-  /**
-   * Builds a UI tree.
-   *
-   * @return Swing Tree visualisation of refactorings in this entry.
-   */
-  public Tree buildTree() {
-    DefaultMutableTreeNode root = new DefaultMutableTreeNode(commitId);
-    refactorings.forEach(r -> {
-      if (!r.isHidden()) {
-        root.add(TreeUtils.makeNode(r));
-      }
-    });
-    Tree tree = new Tree(root);
-    tree.setRootVisible(false);
-    TreeUtils.expandAllNodes(tree, 0, tree.getRowCount());
-    return tree;
   }
 
   public List<RefactoringInfo> getRefactorings() {
