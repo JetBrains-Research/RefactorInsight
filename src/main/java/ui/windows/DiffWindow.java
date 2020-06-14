@@ -24,6 +24,7 @@ import data.RefactoringInfo;
 import data.diff.ThreeSidedRange;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,19 +39,25 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
   /**
    * Requests diff window to show specific refactoring with two editors.
    *
-   * @param info     RefactoringInfo
-   * @param project  Current project
+   * @param info    RefactoringInfo
+   * @param project Current project
    */
   public static void showDiff(Collection<Change> changes, RefactoringInfo info,
                               Project project, RefactoringEntry entry) {
+    final Predicate<RefactoringInfo> showable =
+        i -> !i.isHidden() && i.getLeftPath() != null;
     List<DiffRequest> requests = entry.getRefactorings().stream()
-        .filter(i -> !i.isHidden()).map(i -> i.generate(getDiffContents(changes, i, project)))
+        .filter(showable)
+        .map(i -> i.generate(getDiffContents(changes, i, project)))
         .collect(Collectors.toList());
     DiffRequestChain chain = new SimpleDiffRequestChain(requests);
-    chain.setIndex(entry.getRefactorings().stream()
-        .filter(i -> !i.isHidden()).collect(Collectors.toList()).indexOf(info));
-    DiffManager.getInstance().showDiff(project, chain,
-        new DiffDialogHints(WindowWrapper.Mode.FRAME));
+    final int index = entry.getRefactorings().stream()
+        .filter(showable).collect(Collectors.toList()).indexOf(info);
+    if (index != -1) {
+      chain.setIndex(index);
+      DiffManager.getInstance().showDiff(project, chain,
+          new DiffDialogHints(WindowWrapper.Mode.FRAME));
+    }
   }
 
 

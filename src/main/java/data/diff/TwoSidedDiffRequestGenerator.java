@@ -15,6 +15,7 @@ import data.RefactoringInfo;
 import data.RefactoringLine;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -44,6 +45,7 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
     super.correct(before, mid, after);
     fragments = lineMarkings.stream()
         .map(RefactoringLine::getTwoSidedRange)
+        .filter(Objects::nonNull)
         .collect(Collectors.toList());
   }
 

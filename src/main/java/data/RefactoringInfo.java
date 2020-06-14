@@ -151,7 +151,9 @@ public class RefactoringInfo {
         .equals(getNameBefore()))
         .forEach(signature -> {
           String methodName = signature.substring(signature.lastIndexOf(".") + 1);
-          methodName = methodName.substring(0, methodName.indexOf("("));
+          if (methodName.contains("(")) {
+            methodName = methodName.substring(0, methodName.indexOf("("));
+          }
           String newKey;
           //change constructor name in case of a class rename
           if (methodName.equals(getNameBefore().substring(getNameBefore().lastIndexOf(".") + 1))) {
