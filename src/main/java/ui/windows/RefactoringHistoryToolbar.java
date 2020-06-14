@@ -31,20 +31,24 @@ import data.RefactoringInfo;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import services.RefactoringsBundle;
 import ui.tree.TreeUtils;
-import ui.tree.renderer.CellRenderer;
+import ui.tree.renderers.HistoryToolbarRenderer;
 import utils.Utils;
 
-
-public class MethodRefactoringToolbar {
+public class RefactoringHistoryToolbar {
 
   private final VcsLogManager.VcsLogUiFactory<? extends MainVcsLogUi> factory;
 
@@ -52,42 +56,54 @@ public class MethodRefactoringToolbar {
   private ToolWindowManager toolWindowManager;
   private ToolWindow toolWindow;
   private Project project;
+  private HistoryType type;
 
   /**
    * Constructor for the toolbar.
    *
    * @param project current project
    */
-  public MethodRefactoringToolbar(Project project) {
+  public RefactoringHistoryToolbar(Project project) {
     this.project = project;
     toolWindowManager = ToolWindowManager.getInstance(project);
+    Utils.manager = toolWindowManager;
     factory = VcsProjectLog.getInstance(project).getLogManager()
         .getMainLogUiFactory("method history", VcsLogFilterObject.collection());
     toolWindow =
         toolWindowManager.registerToolWindow("Refactoring History", true, ToolWindowAnchor.BOTTOM);
+
   }
 
   /**
    * Display the toolbar.
    *
    * @param refactorings detected refactorings
-   * @param methodName   name of the method
+   * @param objectsName  name of the method
    */
   public void showToolbar(List<RefactoringInfo> refactorings,
-                          String methodName, DataContext datacontext) {
+                          String objectsName, DataContext datacontext, HistoryType type,
+                          @Nullable HashMap<String, ArrayList<RefactoringInfo>> methodsHistory,
+                          @Nullable HashMap<String, ArrayList<RefactoringInfo>> attributesHistory) {
 
+    this.type = type;
     if (refactorings == null || refactorings.isEmpty()) {
       showPopup(datacontext);
     } else {
-      JBSplitter splitter = new JBSplitter(false, (float) 0.3);
-      Tree tree = createTree(refactorings);
+      JBSplitter splitter = new JBSplitter(false, (float) 0.35);
+      List<RefactoringInfo> infos =
+          refactorings.stream().collect(Collectors.toSet()).stream().collect(Collectors.toList());
+
+      Utils.chronologicalOrder(infos);
+
+      Tree tree =
+          createTree(infos, methodsHistory, attributesHistory);
       tree.setRootVisible(false);
-      TreeUtils.expandAllNodes(tree, 0, tree.getRowCount());
-      tree.setCellRenderer(new CellRenderer(true));
+      //TreeUtils.expandAllNodes(tree, 0, tree.getRowCount());
+      tree.setCellRenderer(new HistoryToolbarRenderer());
       addMouseListener(splitter, tree);
-      setFirstComponent(refactorings.size(), splitter, tree);
+      setFirstComponent(infos.size(), splitter, tree);
       setSecondComponent(splitter);
-      showContent(methodName, splitter);
+      showContent(objectsName, splitter);
     }
   }
 
@@ -102,7 +118,8 @@ public class MethodRefactoringToolbar {
     JBScrollPane pane = new JBScrollPane(tree);
     JBLabel label =
         new JBLabel(
-            size + (size > 1 ? " refactorings" : " refactoring") + " detected for this method");
+            size + (size > 1 ? " refactorings" : " refactoring") + " detected for this "
+                + type.toString().toLowerCase());
     label.setForeground(Gray._105);
     pane.setColumnHeaderView(label);
     splitter.setFirstComponent(pane);
@@ -120,7 +137,10 @@ public class MethodRefactoringToolbar {
           DefaultMutableTreeNode node = (DefaultMutableTreeNode)
               path.getLastPathComponent();
           if (node.isLeaf()) {
-            RefactoringInfo info = (RefactoringInfo) node.getUserObjectPath()[1];
+            RefactoringInfo info = HistoryToolbarRenderer.getRefactoringInfo(node);
+            if (info == null) {
+              return;
+            }
             showLogTab(info, splitter);
           }
         }
@@ -159,43 +179,80 @@ public class MethodRefactoringToolbar {
   }
 
   @NotNull
-  private Tree createTree(List<RefactoringInfo> refactorings) {
+  private Tree createTree(List<RefactoringInfo> refactorings,
+                          HashMap<String, ArrayList<RefactoringInfo>> methods,
+                          HashMap<String, ArrayList<RefactoringInfo>> attributes) {
+
     DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+    createRefactoringsTree(refactorings, root);
 
-    for (RefactoringInfo refactoringInfo : refactorings) {
-      final String displayableDetails = TreeUtils
-          .getDisplayableDetails(refactoringInfo.getDetailsBefore(),
-              refactoringInfo.getDetailsAfter());
-      if (displayableDetails != null && displayableDetails.contains("->")) {
+    AtomicInteger expandable = new AtomicInteger();
+    root.breadthFirstEnumeration().asIterator().forEachRemaining((c) -> expandable
+        .getAndIncrement());
 
-        DefaultMutableTreeNode node = TreeUtils.makeNode(refactoringInfo);
-        root.add(node);
-      } else if (TreeUtils
-          .getDisplayableDetails(refactoringInfo.getNameBefore(), refactoringInfo.getNameAfter())
-          .contains("->")) {
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(refactoringInfo);
-
-        TreeUtils.makeNameNode(node, refactoringInfo);
-        root.add(node);
-      } else {
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(refactoringInfo);
-        TreeUtils.addLeaves(node, refactoringInfo);
-
-        root.add(node);
+    if (methods != null && !methods.isEmpty()) {
+      DefaultMutableTreeNode child = new DefaultMutableTreeNode("Check methods in this class");
+      addObjectsToTree(methods, child, true);
+      if (child.getChildCount() > 0) {
+        root.add(child);
       }
     }
-    return new Tree(root);
+
+    if (attributes != null && !attributes.isEmpty()) {
+      DefaultMutableTreeNode child = new DefaultMutableTreeNode("Check fields in this class");
+      addObjectsToTree(attributes, child, false);
+      if (child.getChildCount() > 0) {
+        root.add(child);
+      }
+    }
+
+    Tree tree = new Tree(root);
+    for (int i = 0; i < expandable.get(); i++) {
+      tree.expandRow(i);
+    }
+    if (tree.getRowCount() > expandable.get()) {
+      int history1 = expandable.get();
+      tree.expandRow(history1);
+      DefaultMutableTreeNode n =
+          (DefaultMutableTreeNode) tree.getPathForRow(history1).getLastPathComponent();
+      if (tree.getRowCount() > history1 + n.getChildCount() + 1) {
+        tree.expandRow(history1 + n.getChildCount() + 1);
+      }
+    }
+    return tree;
+  }
+
+  private void addObjectsToTree(HashMap<String, ArrayList<RefactoringInfo>> objects,
+                                DefaultMutableTreeNode child, boolean forMethods) {
+    objects.forEach((obj, refs) -> {
+      if (!refs.isEmpty()) {
+        DefaultMutableTreeNode m =
+            new DefaultMutableTreeNode(forMethods
+                ? obj.substring(obj.lastIndexOf(".") + 1)
+                : obj.substring(obj.lastIndexOf("|") + 1));
+        List<RefactoringInfo> infoList =
+            refs.stream().collect(Collectors.toSet()).stream().collect(Collectors.toList());
+        Utils.chronologicalOrder(infoList);
+        createRefactoringsTree(infoList, m);
+        child.add(m);
+      }
+    });
+  }
+
+  private void createRefactoringsTree(List<RefactoringInfo> refactorings,
+                                      DefaultMutableTreeNode root) {
+    for (RefactoringInfo ref : refactorings) {
+      TreeUtils.createHistoryTree(root, ref);
+    }
   }
 
   private void showContent(String methodName, JComponent tree) {
     Content content;
-    if ((content = toolWindow.getContentManager()
-        .findContent(methodName.substring(methodName.lastIndexOf(".") + 1))) != null) {
+    if ((content = toolWindow.getContentManager().findContent(methodName)) != null) {
       content.setComponent(tree);
     } else {
       ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-      content = contentFactory
-          .createContent(tree, methodName.substring(methodName.lastIndexOf(".") + 1), false);
+      content = contentFactory.createContent(tree, methodName, false);
       toolWindow.getContentManager().addContent(content);
     }
     toolWindow.getContentManager().setSelectedContent(content);
@@ -205,9 +262,10 @@ public class MethodRefactoringToolbar {
 
   private void showPopup(DataContext datacontext) {
     JBPanel panel = new JBPanel(new GridLayout(0, 1));
-    panel.add(new JBLabel(RefactoringsBundle.message("no.ref.method")));
+    panel.add(new JBLabel(RefactoringsBundle.message("no.ref.history")));
     JBPopup popup = JBPopupFactory.getInstance()
         .createComponentPopupBuilder(panel, null).createPopup();
     popup.showInBestPositionFor(datacontext);
   }
+
 }

@@ -1,7 +1,6 @@
 package data.types.classes;
 
-import static data.RefactoringInfo.Group;
-
+import data.Group;
 import data.RefactoringInfo;
 import data.RefactoringLine;
 import data.types.Handler;

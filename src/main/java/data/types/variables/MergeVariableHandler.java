@@ -1,5 +1,6 @@
 package data.types.variables;
 
+import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MergeVariableRefactoring;
@@ -17,11 +18,11 @@ public class MergeVariableHandler extends Handler {
         info.addMarking(var.codeRange(), ref.getNewVariable().codeRange(), true));
 
     if (ref.getNewVariable().isParameter()) {
-      info.setGroup(RefactoringInfo.Group.METHOD)
+      info.setGroup(Group.METHOD)
           .setDetailsBefore(ref.getOperationBefore().getClassName())
           .setDetailsAfter(ref.getOperationAfter().getClassName());
     } else {
-      info.setGroup(RefactoringInfo.Group.VARIABLE);
+      info.setGroup(Group.VARIABLE);
     }
 
     return info

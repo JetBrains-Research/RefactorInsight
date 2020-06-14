@@ -1,5 +1,6 @@
 package data.types.methods;
 
+import data.Group;
 import data.RefactoringInfo;
 import data.RefactoringLine;
 import data.types.Handler;
@@ -32,7 +33,7 @@ public class RenameMethodHandler extends Handler {
     String classNameBefore = ref.getOriginalOperation().getClassName();
     String classNameAfter = ref.getRenamedOperation().getClassName();
 
-    info.setGroup(RefactoringInfo.Group.METHOD)
+    info.setGroup(Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
         .setElementBefore(null)

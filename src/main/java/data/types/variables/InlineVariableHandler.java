@@ -1,5 +1,6 @@
 package data.types.variables;
 
+import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.InlineVariableRefactoring;
@@ -12,7 +13,7 @@ public class InlineVariableHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     InlineVariableRefactoring ref = (InlineVariableRefactoring) refactoring;
 
-    return info.setGroup(RefactoringInfo.Group.VARIABLE)
+    return info.setGroup(Group.VARIABLE)
         .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
         .setElementBefore(ref.getVariableDeclaration().getVariableDeclaration().toQualifiedString())

@@ -1,7 +1,7 @@
 package data.types.classes;
 
+import data.Group;
 import data.RefactoringInfo;
-import data.RefactoringInfo.Group;
 import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.MoveClassRefactoring;

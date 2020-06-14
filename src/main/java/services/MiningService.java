@@ -45,8 +45,8 @@ import ui.windows.GitWindow;
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
   private static final String VERSION = "1.0.1";
-  public static ConcurrentHashMap<String, List<RefactoringInfo>> methodHistory
-      = new ConcurrentHashMap<>();
+  public static ConcurrentHashMap<String, ArrayList<RefactoringInfo>> methodHistory
+      = new ConcurrentHashMap<String, ArrayList<RefactoringInfo>>();
   private boolean mining = false;
   private MyState innerState = new MyState();
 
@@ -135,8 +135,9 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             System.out.println("Mining done in " + time + " sec");
 
             computeMethodHistory(repository.getCurrentRevision());
-            System.out.println("Method history computed");
-
+            long timeEnd2 = System.currentTimeMillis();
+            double time2 = ((double) (timeEnd2 - timeEnd)) / 1000.0;
+            System.out.println("Method history computed in " + time2);
             progressIndicator.setText("Finished");
           }
         });
@@ -211,7 +212,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     return Integer.parseInt(output);
   }
 
-  public Map<String, List<RefactoringInfo>> getMethodHistory() {
+  public Map<String, ArrayList<RefactoringInfo>> getMethodHistory() {
     return methodHistory;
   }
 

@@ -1,5 +1,6 @@
 package data.types.methods;
 
+import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ModifyMethodAnnotationRefactoring;
@@ -15,7 +16,7 @@ public class ModifyMethodAnnotationHandler extends Handler {
     String classNameBefore = ref.getOperationBefore().getClassName();
     String classNameAfter = ref.getOperationAfter().getClassName();
 
-    return info.setGroup(RefactoringInfo.Group.METHOD)
+    return info.setGroup(Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
         .setElementBefore(ref.getAnnotationBefore().toString())

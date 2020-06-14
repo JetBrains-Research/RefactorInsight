@@ -8,11 +8,10 @@ import data.diff.ThreeSidedDiffRequestGenerator;
 import data.diff.TwoSidedDiffRequestGenerator;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.refactoringminer.api.RefactoringType;
@@ -42,27 +41,68 @@ public class RefactoringInfo {
    *
    * @param map for method history
    */
-  public void addToHistory(Map<String, List<RefactoringInfo>> map) {
-    final String nameBefore = getNameBefore();
-    final String nameAfter = getNameAfter();
-
-    if (group == Group.CLASS || group == Group.ABSTRACT || group == Group.INTERFACE) {
-      map.keySet().stream()
-          .filter(x -> x.substring(0, x.lastIndexOf("."))
-              .equals(nameBefore))
-          .forEach(signature -> {
-            String newKey = nameAfter + signature.substring(signature.lastIndexOf("."));
-            map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
-          });
-      return;
+  public void addToHistory(Map<String, ArrayList<RefactoringInfo>> map) {
+    changeKeys(map);
+    String before = getNameBefore();
+    String after = getNameAfter();
+    if (group == Group.ATTRIBUTE) {
+      before = getDetailsBefore() + "|" + getNameBefore();
+      after = getDetailsAfter() + "|" + getNameAfter();
     }
 
-    if (group == Group.METHOD) {
-      List<RefactoringInfo> refs = map.getOrDefault(nameBefore, new LinkedList<>());
-      map.remove(nameBefore);
-      refs.add(0, this);
-      map.put(nameAfter, refs);
+    if (group != Group.VARIABLE) {
+      ArrayList<RefactoringInfo> data = map.getOrDefault(before, new ArrayList<RefactoringInfo>());
+      map.remove(before);
+      ArrayList<RefactoringInfo> data2 = map.getOrDefault(after, new ArrayList<RefactoringInfo>());
+      data.add(this);
+      for (RefactoringInfo info : data) {
+        if (!data2.contains(info)) {
+          data2.add(info);
+        }
+      }
+      map.put(after, data2);
     }
+  }
+
+  private void changeKeys(Map<String, ArrayList<RefactoringInfo>> map) {
+    if ((group == Group.CLASS || group == Group.ABSTRACT || group == Group.INTERFACE)
+        && !getNameBefore().equals(getNameAfter())) {
+      changeAttributesSignature(map);
+      changeMethodsSignature(map);
+    }
+  }
+
+  private void changeMethodsSignature(Map<String, ArrayList<RefactoringInfo>> map) {
+    map.keySet().stream()
+        .filter(x -> !x.contains("|"))
+        .filter(x -> x.contains(".")).filter(x -> x.substring(0, x.lastIndexOf("."))
+        .equals(getNameBefore()))
+        .forEach(signature -> {
+          String methodName = signature.substring(signature.lastIndexOf(".") + 1);
+          methodName = methodName.substring(0, methodName.indexOf("("));
+          String newKey;
+          //change constructor name in case of a class rename
+          if (methodName.equals(getNameBefore().substring(getNameBefore().lastIndexOf(".") + 1))) {
+            newKey =
+                getNameAfter() + "." + getNameAfter().substring(getNameAfter().lastIndexOf(".") + 1)
+                    + signature.substring(signature.indexOf("("));
+          } else {
+            newKey = getNameAfter() + signature.substring(signature.lastIndexOf("."));
+          }
+          map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
+          map.remove(signature);
+        });
+  }
+
+  private void changeAttributesSignature(Map<String, ArrayList<RefactoringInfo>> map) {
+    map.keySet().stream()
+        .filter(x -> x.contains("|")).filter(x -> x.substring(0, x.lastIndexOf("|"))
+        .equals(getNameBefore()))
+        .forEach(signature -> {
+          String newKey = getNameAfter() + signature.substring(signature.lastIndexOf("|"));
+          map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
+          map.remove(signature);
+        });
   }
 
   public RefactoringInfo addMarking(CodeRange left, CodeRange right, boolean hasColumns) {
@@ -96,6 +136,7 @@ public class RefactoringInfo {
     setRightPath(right.getFilePath());
     return this;
   }
+
 
   public SimpleDiffRequest generate(DiffContent[] contents) {
     return requestGenerator.generate(contents, this);
@@ -132,15 +173,6 @@ public class RefactoringInfo {
 
   public String getCommitId() {
     return entry.getCommitId();
-  }
-
-  public Group getGroup() {
-    return group;
-  }
-
-  public RefactoringInfo setGroup(Group group) {
-    this.group = group;
-    return this;
   }
 
   public boolean isThreeSided() {
@@ -286,17 +318,39 @@ public class RefactoringInfo {
     return this;
   }
 
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof RefactoringInfo)) {
+      return false;
+    }
+    RefactoringInfo that = (RefactoringInfo) o;
+    return Objects.equals(getElementBefore(), that.getElementBefore())
+        && Objects.equals(getElementAfter(), that.getElementAfter())
+        && getName().equals(that.getName())
+        && getNameBefore().equals(that.getNameBefore())
+        && getNameAfter().equals(that.getNameAfter())
+        && Objects.equals(getDetailsBefore(), that.getDetailsBefore())
+        && Objects.equals(getDetailsAfter(), that.getDetailsAfter())
+        && getType() == that.getType()
+        && getGroup() == that.getGroup();
+  }
+
+  public Group getGroup() {
+    return group;
+  }
+
+  public RefactoringInfo setGroup(Group group) {
+    this.group = group;
+    return this;
+  }
+
   public void correctLines(String before, String mid, String after) {
     requestGenerator.correct(before, mid, after);
   }
 
-  public enum Group {
-    METHOD,
-    CLASS,
-    ATTRIBUTE,
-    VARIABLE,
-    INTERFACE,
-    ABSTRACT,
-    PACKAGE
-  }
 }
+
