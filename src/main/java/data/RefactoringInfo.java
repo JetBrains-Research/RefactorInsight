@@ -3,6 +3,7 @@ package data;
 import static utils.StringUtils.INFO;
 import static utils.StringUtils.delimiter;
 
+
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import data.diff.DiffRequestGenerator;
@@ -42,33 +43,6 @@ public class RefactoringInfo {
   private boolean hidden = false;
   private boolean threeSided = false;
 
-
-  public SimpleDiffRequest generate(DiffContent[] contents) {
-    return requestGenerator.generate(contents, this);
-  }
-
-  /**
-   * Serializes a RefactoringInfo.
-   *
-   * @return string value
-   */
-  public String toString() {
-    return String.join(delimiter(INFO),
-        name,
-        Stream.concat(
-            Arrays.stream(uiStrings).flatMap(Arrays::stream),
-            Arrays.stream(paths))
-            .map(s -> s == null ? "" : s)
-            .map(StringUtils::sanitize)
-            .collect(Collectors.joining(delimiter(INFO))),
-        group.toString(),
-        threeSided ? "t" : "f",
-        hidden ? "t" : "f",
-        requestGenerator.toString(),
-        String.join(delimiter(INFO), includes)
-    );
-  }
-
   /**
    * Deserializes a RefactoringInfo.
    *
@@ -95,7 +69,34 @@ public class RefactoringInfo {
         .setRequestGenerator(tokens[11].equals("t")
             ? ThreeSidedDiffRequestGenerator.fromString(tokens[13])
             : TwoSidedDiffRequestGenerator.fromString(tokens[13]))
-        .setIncludes(new HashSet<>(Arrays.asList(tokens[14].split(regex))));
+        .setIncludes(new HashSet<>(
+            tokens[14].isEmpty() ? List.of() : Arrays.asList(tokens[14].split(regex))));
+  }
+
+  public SimpleDiffRequest generate(DiffContent[] contents) {
+    return requestGenerator.generate(contents, this);
+  }
+
+  /**
+   * Serializes a RefactoringInfo.
+   *
+   * @return string value
+   */
+  public String toString() {
+    return String.join(delimiter(INFO),
+        name,
+        Stream.concat(
+            Arrays.stream(uiStrings).flatMap(Arrays::stream),
+            Arrays.stream(paths))
+            .map(s -> s == null ? "" : s)
+            .map(StringUtils::sanitize)
+            .collect(Collectors.joining(delimiter(INFO))),
+        group.toString(),
+        threeSided ? "t" : "f",
+        hidden ? "t" : "f",
+        requestGenerator.toString(),
+        String.join(delimiter(INFO), includes)
+    );
   }
 
   public RefactoringInfo setRequestGenerator(DiffRequestGenerator requestGenerator) {
