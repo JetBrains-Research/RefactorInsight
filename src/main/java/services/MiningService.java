@@ -10,7 +10,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.xmlb.annotations.MapAnnotation;
+import com.intellij.util.xmlb.annotations.OptionTag;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
@@ -68,11 +69,11 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
   @Override
   public void loadState(MyState state) {
-    if (version().equals(state.map.get("version"))) {
+    if (version().equals(state.refactoringsMap.version)) {
       innerState = state;
     } else {
       innerState = new MyState();
-      innerState.map.put("version", version());
+      innerState.refactoringsMap.version = version();
     }
   }
 
@@ -111,7 +112,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             long timeStart = System.currentTimeMillis();
             AtomicInteger commitsDone = new AtomicInteger(0);
             CommitMiner miner =
-                new CommitMiner(pool, innerState.map, repository, commitsDone,
+                new CommitMiner(pool, innerState.refactoringsMap.map, repository, commitsDone,
                     progressIndicator,
                     limit);
             try {
@@ -178,7 +179,8 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
           public void onFinished() {
             super.onFinished();
-            if (innerState.map.containsKey(commit.getId().asString())) {
+            if (contains(commit.getId().asString())) {
+
               System.out.println("Mining commit done");
               ApplicationManager.getApplication()
                   .invokeLater(() -> info.refresh(commit.getId().asString()));
@@ -188,13 +190,9 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
           }
 
           public void run(@NotNull ProgressIndicator progressIndicator) {
-            CommitMiner.mineAtCommit(commit, innerState.map, project);
+            CommitMiner.mineAtCommit(commit, innerState.refactoringsMap.map, project);
           }
         });
-  }
-
-  public String getRefactorings(String commitHash) {
-    return innerState.map.getOrDefault(commitHash, "");
   }
 
   /**
@@ -218,18 +216,14 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
   private void computeMethodHistory(@NotNull String commitId) {
     List<RefactoringInfo> refs = new ArrayList<>();
-    while (innerState.map.containsKey(commitId)) {
-      RefactoringEntry refactoringEntry = RefactoringEntry.fromString(innerState.map.get(commitId));
+    while (contains(commitId)) {
+      RefactoringEntry refactoringEntry = get(commitId);
       assert refactoringEntry != null;
       refs.addAll(refactoringEntry.getRefactorings());
       commitId = refactoringEntry.getParent();
     }
     Collections.reverse(refs);
     refs.forEach(r -> r.addToHistory(methodHistory));
-  }
-
-  public RefactoringEntry getEntry(String hash) {
-    return RefactoringEntry.fromString(innerState.map.get(hash));
   }
 
   private String version() {
@@ -246,10 +240,21 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
         .hashCode();
   }
 
+  public RefactoringEntry get(String commitHash) {
+    return innerState.refactoringsMap.map.get(commitHash);
+  }
+
+  public boolean contains(String commitHash) {
+    return innerState.refactoringsMap.map.containsKey(commitHash);
+  }
+
+  public void clear() {
+    innerState.refactoringsMap.map.clear();
+  }
+
   public static class MyState {
-    @NotNull
-    @MapAnnotation
-    public Map<String, String> map = new ConcurrentHashMap<>();
+    @OptionTag(converter = RefactoringsMapConverter.class)
+    public RefactoringsMap refactoringsMap = new RefactoringsMap();
   }
 
 }

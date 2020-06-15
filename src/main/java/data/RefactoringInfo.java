@@ -1,6 +1,8 @@
 package data;
 
-import com.google.gson.Gson;
+import static utils.StringUtils.INFO;
+import static utils.StringUtils.delimiter;
+
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import data.diff.DiffRequestGenerator;
@@ -8,32 +10,102 @@ import data.diff.ThreeSidedDiffRequestGenerator;
 import data.diff.TwoSidedDiffRequestGenerator;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.refactoringminer.api.RefactoringType;
+import utils.StringUtils;
 
 public class RefactoringInfo {
 
   private transient RefactoringEntry entry;
-  private DiffRequestGenerator requestGenerator = new TwoSidedDiffRequestGenerator();
+  private transient String groupId;
+  private transient RefactoringType type;
 
+  private DiffRequestGenerator requestGenerator = new TwoSidedDiffRequestGenerator();
   private String name;
 
   private String[][] uiStrings = new String[3][2];
   private String[] paths = new String[3];
 
-  private Set<String> includes = new HashSet<>();
-
-  private RefactoringType type;
   private Group group;
-  private String groupId;
+
+  private Set<String> includes = new HashSet<>();
 
   private boolean hidden = false;
   private boolean threeSided = false;
+
+  /**
+   * Deserializes a RefactoringInfo.
+   *
+   * @param value string
+   * @return the RefactoringInfo
+   */
+  public static RefactoringInfo fromString(String value) {
+    String regex = delimiter(INFO, true);
+    String[] tokens = value.split(regex, 15);
+    return new RefactoringInfo()
+        .setName(tokens[0])
+        .setNameBefore(StringUtils.deSanitize(tokens[1]))
+        .setNameAfter(StringUtils.deSanitize(tokens[2]))
+        .setElementBefore(StringUtils.deSanitize(tokens[3]))
+        .setElementAfter(StringUtils.deSanitize(tokens[4]))
+        .setDetailsBefore(StringUtils.deSanitize(tokens[5]))
+        .setDetailsAfter(StringUtils.deSanitize(tokens[6]))
+        .setLeftPath(tokens[7])
+        .setMidPath(tokens[8])
+        .setRightPath(tokens[9])
+        .setGroup(Group.valueOf(tokens[10]))
+        .setThreeSided(tokens[11].equals("t"))
+        .setHidden(tokens[12].equals("t"))
+        .setRequestGenerator(tokens[11].equals("t")
+            ? ThreeSidedDiffRequestGenerator.fromString(tokens[13])
+            : TwoSidedDiffRequestGenerator.fromString(tokens[13]))
+        .setIncludes(new HashSet<>(
+            tokens[14].isEmpty() ? List.of() : Arrays.asList(tokens[14].split(regex))));
+  }
+
+  public SimpleDiffRequest generate(DiffContent[] contents) {
+    return requestGenerator.generate(contents, this);
+  }
+
+  /**
+   * Serializes a RefactoringInfo.
+   *
+   * @return string value
+   */
+  public String toString() {
+    return String.join(delimiter(INFO),
+        name,
+        Stream.concat(
+            Arrays.stream(uiStrings).flatMap(Arrays::stream),
+            Arrays.stream(paths))
+            .map(s -> s == null ? "" : s)
+            .map(StringUtils::sanitize)
+            .collect(Collectors.joining(delimiter(INFO))),
+        group.toString(),
+        threeSided ? "t" : "f",
+        hidden ? "t" : "f",
+        requestGenerator.toString(),
+        String.join(delimiter(INFO), includes)
+    );
+  }
+
+  public RefactoringInfo setRequestGenerator(DiffRequestGenerator requestGenerator) {
+    this.requestGenerator = requestGenerator;
+    return this;
+  }
+
+  public RefactoringInfo setIncludes(Set<String> includes) {
+    this.includes = includes;
+    return this;
+  }
 
   /**
    * Adds this refactoring to the method history map.
@@ -139,16 +211,6 @@ public class RefactoringInfo {
     return this;
   }
 
-
-  public SimpleDiffRequest generate(DiffContent[] contents) {
-    return requestGenerator.generate(contents, this);
-  }
-
-  @Override
-  public String toString() {
-    return new Gson().toJson(this);
-  }
-
   public void addAllMarkings(RefactoringInfo info) {
     requestGenerator.getMarkings().addAll(info.getLineMarkings());
   }
@@ -226,8 +288,9 @@ public class RefactoringInfo {
     return hidden;
   }
 
-  public void setHidden(boolean hidden) {
+  public RefactoringInfo setHidden(boolean hidden) {
     this.hidden = hidden;
+    return this;
   }
 
   public String getGroupId() {
@@ -330,13 +393,8 @@ public class RefactoringInfo {
       return false;
     }
     RefactoringInfo that = (RefactoringInfo) o;
-    return Objects.equals(getElementBefore(), that.getElementBefore())
-        && Objects.equals(getElementAfter(), that.getElementAfter())
+    return Arrays.equals(uiStrings, that.uiStrings)
         && getName().equals(that.getName())
-        && getNameBefore().equals(that.getNameBefore())
-        && getNameAfter().equals(that.getNameAfter())
-        && Objects.equals(getDetailsBefore(), that.getDetailsBefore())
-        && Objects.equals(getDetailsAfter(), that.getDetailsAfter())
         && getType() == that.getType()
         && getGroup() == that.getGroup();
   }

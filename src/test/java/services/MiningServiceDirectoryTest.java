@@ -66,22 +66,21 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
     repo.update();
     miner.mineAndWait(repo);
     head = repo.getCurrentRevision();
-    entry = miner.getEntry(head);
+    entry = miner.get(head);
   }
 
   //Example of using an existing repo
   //note that the project directory has to contain the .git folder but renamed
   public void testDirectory() {
-    assertNull(RefactoringEntry.fromString(""));
-    assertNull(RefactoringEntry.fromString(null));
 
     assertEquals(3, entry.getRefactorings().size());
-    assertTrue(miner.getRefactorings(head).length() > 0);
+    assertTrue(miner.get(head).getRefactorings().size() > 0);
+
 
     assertThrows(IllegalArgumentException.class, () -> MiningService.getInstance(null));
     assertEquals(miner, MiningService.getInstance(myProject));
     assertNotNull(miner.getState());
-    assertFalse(miner.getState().map.isEmpty());
+    assertFalse(miner.getState().refactoringsMap.map.isEmpty());
     assertTrue(!miner.isMining());
     assertFalse(miner.getMethodHistory().isEmpty());
     assertThrows(NullPointerException.class, () -> miner.mineAndWait(null));
@@ -90,7 +89,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
   public void testTreeIsBuilt() {
     MainCellRenderer cellRenderer = new MainCellRenderer();
 
-    miner.getState().map.values().stream().map(RefactoringEntry::fromString)
+    miner.getState().refactoringsMap.map.values()
         .forEach(x -> {
           Tree tree1 = TreeUtils.buildTree(x.getRefactorings());
           tree1.setCellRenderer(cellRenderer);

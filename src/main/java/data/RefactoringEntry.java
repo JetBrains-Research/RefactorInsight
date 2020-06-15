@@ -1,40 +1,27 @@
 package data;
 
 import static org.refactoringminer.api.RefactoringType.EXTRACT_CLASS;
+import static utils.StringUtils.ENTRY;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.intellij.diff.fragments.DiffFragment;
-import com.intellij.diff.fragments.DiffFragmentImpl;
-import com.intellij.diff.fragments.LineFragment;
-import com.intellij.diff.fragments.LineFragmentImpl;
-import com.intellij.diff.fragments.MergeLineFragment;
-import com.intellij.diff.fragments.MergeLineFragmentImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.vcs.log.VcsCommitMetadata;
-import data.diff.DiffRequestGenerator;
-import data.diff.ThreeSidedDiffRequestGenerator;
-import data.diff.TwoSidedDiffRequestGenerator;
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
 import ui.tree.TreeUtils;
+import utils.StringUtils;
 import utils.Utils;
 
 public class RefactoringEntry implements Serializable {
 
   private static final transient InfoFactory factory = new InfoFactory();
+
+  private final transient String commitId;
   private final String parent;
-  private final String commitId;
   private final long time;
   private List<RefactoringInfo> refactorings;
 
@@ -45,39 +32,37 @@ public class RefactoringEntry implements Serializable {
    * @param time   timestamp of the commit.
    */
   public RefactoringEntry(String commitId, String parent, long time) {
+    this.commitId = commitId;
     this.parent = parent;
     this.time = time;
-    this.commitId = commitId;
   }
 
   /**
-   * Deserialize a refactoring info json.
+   * Deserializes a RefactoringEntry.
    *
-   * @param value json string
-   * @return a new data.RefactoringInfo object
+   * @param value String
+   * @return the RefactoringEntry
    */
-  public static RefactoringEntry fromString(String value) {
-    if (value == null || value.equals("")) {
-      return null;
+  public static RefactoringEntry fromString(String value, String commitId) {
+    String regex = StringUtils.delimiter(ENTRY, true);
+    String[] tokens = value.split(regex, 3);
+    String[] refs = tokens[2].split(regex);
+    if (refs[0].isEmpty()) {
+      refs = new String[0];
     }
-    try {
-      Gson gson = new GsonBuilder()
-          .registerTypeAdapter(DiffFragment.class,
-              InterfaceSerializer.interfaceSerializer(DiffFragmentImpl.class))
-          .registerTypeAdapter(MergeLineFragment.class,
-              InterfaceSerializer.interfaceSerializer(MergeLineFragmentImpl.class))
-          .registerTypeAdapter(LineFragment.class,
-              InterfaceSerializer.interfaceSerializer(LineFragmentImpl.class))
-          .registerTypeAdapter(DiffRequestGenerator.class,
-              InterfaceSerializer.interfaceSerializer(TwoSidedDiffRequestGenerator.class))
-          .create();
-      RefactoringEntry entry = gson.fromJson(value, RefactoringEntry.class);
-      entry.getRefactorings().forEach(r -> r.setEntry(entry));
-      return entry;
-    } catch (Exception e) {
-      e.printStackTrace();
-      return null;
-    }
+    RefactoringEntry entry = new RefactoringEntry(
+        commitId, tokens[0], Long.parseLong(tokens[1]))
+        .setRefactorings(Arrays.stream(refs)
+            .map(RefactoringInfo::fromString).collect(Collectors.toList()));
+    entry.getRefactorings().forEach(r -> r.setEntry(entry));
+    return entry;
+  }
+
+  @Override
+  public String toString() {
+    String del = StringUtils.delimiter(ENTRY);
+    return parent + del + time + del + refactorings.stream()
+        .map(RefactoringInfo::toString).collect(Collectors.joining(del));
   }
 
   /**
@@ -87,8 +72,8 @@ public class RefactoringEntry implements Serializable {
    * @param commit       current commit.
    * @return Json string.
    */
-  public static String convert(List<Refactoring> refactorings, VcsCommitMetadata commit,
-                               Project project) {
+  public static RefactoringEntry convert(List<Refactoring> refactorings, VcsCommitMetadata commit,
+                                         Project project) {
 
     RefactoringEntry entry =
         new RefactoringEntry(commit.getId().asString(),
@@ -101,7 +86,7 @@ public class RefactoringEntry implements Serializable {
     entry.setRefactorings(infos).combineRelated();
 
     entry.refactorings.forEach(info -> Utils.check(info, project));
-    return entry.toString();
+    return entry;
   }
 
   private void combineRelated() {
@@ -120,6 +105,7 @@ public class RefactoringEntry implements Serializable {
     groups.forEach((k, v) -> {
       if (v.size() > 1) {
         RefactoringInfo info = Utils.getMainRefactoringInfo(v);
+
         if (info == null) {
           System.out.println("Grouping failed");
           return;
@@ -173,61 +159,12 @@ public class RefactoringEntry implements Serializable {
     return parent;
   }
 
-  @Override
-  public String toString() {
-    return new Gson().toJson(this);
-  }
-
   public long getTimeStamp() {
     return time;
   }
 
   public String getCommitId() {
     return commitId;
-  }
-
-  static final class InterfaceSerializer<T>
-      implements JsonSerializer<T>, JsonDeserializer<T> {
-
-    private final Class<T> implementationClass;
-
-    InterfaceSerializer(final Class<T> implementationClass) {
-      this.implementationClass = implementationClass;
-    }
-
-    static <T> InterfaceSerializer<T> interfaceSerializer(final Class<T> implementationClass) {
-      return new InterfaceSerializer<>(implementationClass);
-    }
-
-    @Override
-    public JsonElement serialize(final T value, final Type type,
-                                 final JsonSerializationContext context) {
-      if (value != null && value.getClass().equals(ThreeSidedDiffRequestGenerator.class)) {
-        return context.serialize(value, ThreeSidedDiffRequestGenerator.class);
-      }
-      final Type targetType = value != null
-          ? value.getClass()
-          : type;
-      return context.serialize(value, targetType);
-    }
-
-    @Override
-    public T deserialize(final JsonElement jsonElement, final Type typeOfT,
-                         final JsonDeserializationContext context) {
-      try {
-        T obj = context.deserialize(jsonElement, implementationClass);
-        if (obj.getClass().equals(TwoSidedDiffRequestGenerator.class)) {
-          var v = (TwoSidedDiffRequestGenerator) obj;
-          if (v.fragments == null) {
-            throw new Exception("wrong side number");
-          }
-        }
-        return obj;
-      } catch (Exception e) {
-        return context.deserialize(jsonElement, ThreeSidedDiffRequestGenerator.class);
-      }
-    }
-
   }
 }
 
