@@ -1,7 +1,7 @@
 package data.diff;
 
 import static ui.windows.DiffWindow.REFACTORING;
-import static ui.windows.DiffWindow.REFACTORING_RANGES;
+import static ui.windows.DiffWindow.THREESIDED_RANGES;
 
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
@@ -22,14 +22,13 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
     SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
         contents[0], contents[1], contents[2],
         info.getLeftPath(), info.getMidPath(), info.getRightPath());
-    request.putUserData(REFACTORING_RANGES, ranges);
+    request.putUserData(THREESIDED_RANGES, ranges);
     request.putUserData(REFACTORING, true);
     return request;
   }
 
   @Override
-  public void correct(String before, String mid, String after) {
-    super.correct(before, mid, after);
+  public void prepareJetBrainsRanges(List<RefactoringLine> lineMarkings) {
     ranges = lineMarkings.stream().map(RefactoringLine::getThreeSidedRange)
         .collect(Collectors.toList());
   }

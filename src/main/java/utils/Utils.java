@@ -6,6 +6,7 @@ import static org.refactoringminer.api.RefactoringType.CHANGE_VARIABLE_TYPE;
 import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
 import static org.refactoringminer.api.RefactoringType.RENAME_PARAMETER;
 
+
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
@@ -81,6 +82,7 @@ public class Utils {
 
   /**
    * Skips javadoc for a method or class.
+   *
    * @param text to search in.
    * @param line current line.
    * @return the actual line.
@@ -178,16 +180,27 @@ public class Utils {
     GitRevisionNumber afterNumber = new GitRevisionNumber(info.getCommitId());
     GitRevisionNumber beforeNumber = new GitRevisionNumber(info.getParent());
 
+
     try {
-      String before = GitContentRevision
-          .createRevision(beforePath, beforeNumber, project).getContent();
-      String mid = !info.isThreeSided() ? null : GitContentRevision
-          .createRevision(midPath, afterNumber, project).getContent();
       String after = GitContentRevision
           .createRevision(afterPath, afterNumber, project).getContent();
 
-      info.correctLines(before, mid, after);
+      if (!info.isMoreSided()) {
+        String before = GitContentRevision
+            .createRevision(beforePath, beforeNumber, project).getContent();
+        String mid = !info.isThreeSided() ? null : GitContentRevision
+            .createRevision(midPath, afterNumber, project).getContent();
 
+        info.correctLines(before, mid, after);
+      } else {
+        List<String> befores = new ArrayList<>();
+        for (String path : info.getMoreSidedLeftPaths()) {
+          FilePath filePath = new LocalFilePath(project.getBasePath() + "/" + path, false);
+          befores.add(
+              GitContentRevision.createRevision(filePath, beforeNumber, project).getContent());
+        }
+        info.correctMoreSidedLines(befores, after);
+      }
     } catch (VcsException e) {
       System.out.println(info.getName() + " refactoring not implemented yet");
     }
@@ -197,6 +210,7 @@ public class Utils {
 
   /**
    * Calculates the line of the package.
+   *
    * @param text to search in.
    * @return line of the package.
    */

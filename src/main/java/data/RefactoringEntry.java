@@ -18,6 +18,7 @@ import com.intellij.diff.fragments.MergeLineFragmentImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import data.diff.DiffRequestGenerator;
+import data.diff.MoreSidedDiffRequestGenerator;
 import data.diff.ThreeSidedDiffRequestGenerator;
 import data.diff.TwoSidedDiffRequestGenerator;
 import java.io.Serializable;

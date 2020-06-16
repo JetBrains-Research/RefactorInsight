@@ -31,8 +31,7 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
   }
 
   @Override
-  public void correct(String before, String mid, String after) {
-    super.correct(before, mid, after);
+  public void prepareJetBrainsRanges(List<RefactoringLine> lineMarkings) {
     fragments = lineMarkings.stream()
         .map(RefactoringLine::getTwoSidedRange)
         .collect(Collectors.toList());

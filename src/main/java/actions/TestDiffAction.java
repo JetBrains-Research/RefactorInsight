@@ -1,12 +1,8 @@
 package actions;
 
-import com.intellij.debugger.impl.JavaEditorTextProviderImpl;
-import com.intellij.ide.actions.RecentLocationItem;
-import com.intellij.ide.actions.RecentLocationsAction;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.LogicalPosition;
@@ -15,37 +11,16 @@ import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.impl.DocumentImpl;
-import com.intellij.openapi.editor.impl.EditorImpl;
-import com.intellij.openapi.editor.impl.ScrollingModelImpl;
-import com.intellij.openapi.editor.markup.EffectType;
-import com.intellij.openapi.editor.markup.HighlighterTargetArea;
-import com.intellij.openapi.editor.markup.MarkupModel;
 import com.intellij.openapi.editor.markup.TextAttributes;
-import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.util.Disposer;
-import com.intellij.psi.JavaCodeFragmentFactory;
-import com.intellij.testFramework.fixtures.EditorHintFixture;
-import com.intellij.ui.CaptionPanel;
-import com.intellij.ui.EditorTextField;
 import com.intellij.ui.TitlePanel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.components.JBViewport;
-import gr.uom.java.xmi.LocationInfoProvider;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
-import javax.swing.ListModel;
-import javax.swing.border.Border;
-import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 public class TestDiffAction extends AnAction {
@@ -90,11 +65,12 @@ public class TestDiffAction extends AnAction {
 
   @Override
   public void actionPerformed(@NotNull AnActionEvent e) {
-    //TODO check if scrolling works if editor in a viewport
-    Editor editor1 = EditorFactory.getInstance().createEditor(new DocumentImpl(text), e.getProject(), JavaFileType.INSTANCE, true);
+    Editor editor1 = EditorFactory.getInstance()
+        .createEditor(new DocumentImpl(text), e.getProject(), JavaFileType.INSTANCE, true);
     EditorInfo e1 = new EditorInfo(editor1, 10);
 
-    Editor editor2 = EditorFactory.getInstance().createEditor(new DocumentImpl(text), e.getProject(), JavaFileType.INSTANCE, true);
+    Editor editor2 = EditorFactory.getInstance()
+        .createEditor(new DocumentImpl(text), e.getProject(), JavaFileType.INSTANCE, true);
     EditorInfo e2 = new EditorInfo(editor2, 15);
 
 
@@ -102,7 +78,8 @@ public class TestDiffAction extends AnAction {
     list.setCellRenderer(new MyRenderer());
     JBScrollPane pane = new JBScrollPane(list);
 
-    ComponentPopupBuilder builder = JBPopupFactory.getInstance().createComponentPopupBuilder(pane, null);
+    ComponentPopupBuilder builder =
+        JBPopupFactory.getInstance().createComponentPopupBuilder(pane, null);
     builder.setResizable(true);
     builder.createPopup().showCenteredInCurrentWindow(e.getProject());
   }

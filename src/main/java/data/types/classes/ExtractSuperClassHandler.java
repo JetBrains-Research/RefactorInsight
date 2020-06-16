@@ -22,10 +22,17 @@ public class ExtractSuperClassHandler extends Handler {
       info.setGroup(Group.CLASS);
     }
 
-    return info
-        .setDetailsBefore(ref.getExtractedClass().getPackageName())
+
+    info.setDetailsBefore(ref.getExtractedClass().getPackageName())
         .setDetailsAfter(ref.getExtractedClass().getPackageName())
         .setNameBefore(ref.getExtractedClass().getName())
-        .setNameAfter(ref.getExtractedClass().getName());
+        .setNameAfter(ref.getExtractedClass().getName())
+        .setMoreSided(true)
+        .addMarking(null, ref.getExtractedClass().codeRange(), false);
+
+    ref.getUMLSubclassSet().forEach(
+        subClass -> info.addMarking(subClass.codeRange(), null, false));
+
+    return info;
   }
 }

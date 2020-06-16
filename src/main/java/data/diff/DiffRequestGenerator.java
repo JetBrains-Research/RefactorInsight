@@ -18,6 +18,8 @@ public abstract class DiffRequestGenerator {
 
   public abstract SimpleDiffRequest generate(DiffContent[] contents, RefactoringInfo info);
 
+  public abstract void prepareJetBrainsRanges(List<RefactoringLine> lineMarkings);
+
 
   /**
    * Add line marking for diffwindow used to display refactorings.
@@ -42,5 +44,6 @@ public abstract class DiffRequestGenerator {
 
   public void correct(String before, String mid, String after) {
     lineMarkings.forEach(l -> l.correctLines(before, mid, after));
+    prepareJetBrainsRanges(lineMarkings);
   }
 }

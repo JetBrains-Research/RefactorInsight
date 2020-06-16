@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import data.diff.DiffRequestGenerator;
+import data.diff.MoreSidedDiffRequestGenerator;
 import data.diff.ThreeSidedDiffRequestGenerator;
 import data.diff.TwoSidedDiffRequestGenerator;
 import gr.uom.java.xmi.diff.CodeRange;
@@ -25,6 +26,7 @@ public class RefactoringInfo {
 
   private String[][] uiStrings = new String[3][2];
   private String[] paths = new String[3];
+  private ArrayList<String> moreSidedLeftPaths = new ArrayList<>();
 
   private Set<String> includes = new HashSet<>();
 
@@ -34,6 +36,7 @@ public class RefactoringInfo {
 
   private boolean hidden = false;
   private boolean threeSided = false;
+  private boolean moreSided = false;
 
   /**
    * Adds this refactoring to the method history map.
@@ -129,11 +132,18 @@ public class RefactoringInfo {
                                     boolean hasColumns) {
 
     requestGenerator.addMarking(left, mid, right, type, offsetFunction, option, hasColumns);
-    setLeftPath(left.getFilePath());
+    if (left != null) {
+      setLeftPath(left.getFilePath());
+      if (moreSided) {
+        moreSidedLeftPaths.add(left.getFilePath());
+      }
+    }
     if (mid != null) {
       setMidPath(mid.getFilePath());
     }
-    setRightPath(right.getFilePath());
+    if (right != null) {
+      setRightPath(right.getFilePath());
+    }
     return this;
   }
 
@@ -193,6 +203,18 @@ public class RefactoringInfo {
     return this;
   }
 
+  public boolean isMoreSided() {
+    return moreSided;
+  }
+
+  public RefactoringInfo setMoreSided(boolean moreSided) {
+    this.moreSided = moreSided;
+    if (moreSided) {
+      requestGenerator = new MoreSidedDiffRequestGenerator();
+    }
+    return this;
+  }
+
   public RefactoringEntry getEntry() {
     return entry;
   }
@@ -200,6 +222,10 @@ public class RefactoringInfo {
   public RefactoringInfo setEntry(RefactoringEntry entry) {
     this.entry = entry;
     return this;
+  }
+
+  public ArrayList<String> getMoreSidedLeftPaths() {
+    return moreSidedLeftPaths;
   }
 
   public RefactoringType getType() {
@@ -350,6 +376,10 @@ public class RefactoringInfo {
 
   public void correctLines(String before, String mid, String after) {
     requestGenerator.correct(before, mid, after);
+  }
+
+  public void correctMoreSidedLines(List<String> befores, String after) {
+    ((MoreSidedDiffRequestGenerator) requestGenerator).correct(befores, after);
   }
 
 }
