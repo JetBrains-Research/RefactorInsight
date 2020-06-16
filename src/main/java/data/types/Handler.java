@@ -1,6 +1,5 @@
 package data.types;
 
-import com.intellij.openapi.project.Project;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
 import org.refactoringminer.api.Refactoring;
@@ -11,6 +10,7 @@ public abstract class Handler {
    * Start generating RefactoringInfo from Refactoring.
    *
    * @param refactoring Refactoring from RefactoringMiner
+   * @param entry Refactoring entry to handle
    * @return RefactoringInfo
    */
   public RefactoringInfo handle(Refactoring refactoring, RefactoringEntry entry) {

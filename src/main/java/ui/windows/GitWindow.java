@@ -96,8 +96,7 @@ public class GitWindow {
     VcsCommitMetadata metadata = table.getModel().getCommitMetadata(index);
 
 
-    String refactorings = miner.getRefactorings(commitId);
-    RefactoringEntry entry = RefactoringEntry.fromString(refactorings);
+    RefactoringEntry entry = miner.get(commitId);
 
     if (entry == null || miner.isMining()) {
       miner.mineAtCommit(metadata, project, this);

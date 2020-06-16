@@ -7,6 +7,28 @@ import data.RefactoringInfo;
 import gr.uom.java.xmi.UMLOperation;
 
 public class StringUtils {
+
+  public static final String ESC = "#";
+  public static final String ESC_REGEX = "(?<!" + ESC + ")";
+
+  public static final int MAP = 0;
+  public static final int MAP_ENTRY = 1;
+  public static final int ENTRY = 2;
+  public static final int INFO = 3;
+  public static final int LIST = 4;
+  public static final int FRAG = 5;
+  public static final int RANGE = 6;
+  public static final String[] delimiters = {"§", "=", "`", "±", "!", ",", ";"};
+
+  public static String delimiter(int option, boolean escaped) {
+    return (escaped ? ESC_REGEX : "") + delimiters[option];
+  }
+
+  public static String delimiter(int option) {
+    return delimiter(option, false);
+  }
+
+
   /**
    * Method used for a presentable displaying of class change.
    *
@@ -110,5 +132,32 @@ public class StringUtils {
       return before + " -> " + after;
     }
 
+  }
+
+  /**
+   * Escapes the delimiter chars with '#'.
+   *
+   * @param s string to sanitize
+   * @return escaped s
+   */
+  public static String sanitize(String s) {
+    s = s.replaceAll(ESC, ESC + ESC);
+    for (String d : delimiters) {
+      s = s.replaceAll(d, ESC + d);
+    }
+    return s;
+  }
+
+  /**
+   * Remove escape chars.
+   *
+   * @param s string to desanitize.
+   * @return clean s
+   */
+  public static String deSanitize(String s) {
+    for (String d : delimiters) {
+      s = s.replaceAll(ESC + d, d);
+    }
+    return s.replaceAll(ESC + ESC, ESC);
   }
 }

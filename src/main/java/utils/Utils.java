@@ -110,6 +110,9 @@ public class Utils {
   public static int getOffset(String text, int line, int column) {
     int offset = 0;
     String[] lines = text.split("\r\n|\r|\n");
+    if (lines.length <= line - 2) {
+      line = lines.length;
+    }
     for (int i = 0; i < line - 1; i++) {
       offset += lines[i].length() + 1;
     }

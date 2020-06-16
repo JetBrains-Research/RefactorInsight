@@ -112,20 +112,6 @@ public class RefactoringLine {
     }
   }
 
-  private void computeTwoSidedRanges(String leftText, String rightText) {
-    List<DiffFragment> fragments = offsets.stream().map(RefactoringOffset::toDiffFragment)
-        .collect(Collectors.toList());
-    if (hasColumns) {
-      fragments.add(new DiffFragmentImpl(
-          Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]),
-          Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]),
-          Utils.getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]),
-          Utils.getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END])));
-    }
-    fragment = new LineFragmentImpl(lines[LEFT_START], lines[LEFT_END], lines[RIGHT_START],
-        lines[RIGHT_END], 0, 0, 0, 0, fragments);
-  }
-
   private void computeThreeSidedRanges(String leftText, String midText, String rightText) {
     left = offsets.stream().map(RefactoringOffset::getLeftRange)
         .collect(Collectors.toList());
@@ -152,6 +138,24 @@ public class RefactoringLine {
               columns[RIGHT_END]) - rightStartOffset
       ));
     }
+  }
+
+  private void computeTwoSidedRanges(String leftText, String rightText) {
+    if (lines[LEFT_START] == lines[LEFT_END]
+        && lines[RIGHT_START] == lines[RIGHT_END]) {
+      return;
+    }
+    List<DiffFragment> fragments = offsets.stream().map(RefactoringOffset::toDiffFragment)
+        .collect(Collectors.toList());
+    if (hasColumns) {
+      fragments.add(new DiffFragmentImpl(
+          Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]),
+          Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]),
+          Utils.getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]),
+          Utils.getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END])));
+    }
+    fragment = new LineFragmentImpl(lines[LEFT_START], lines[LEFT_END], lines[RIGHT_START],
+        lines[RIGHT_END], 0, 0, 0, 0, fragments);
   }
 
   private void computeHighlighting(String leftText, String midText, String rightText) {

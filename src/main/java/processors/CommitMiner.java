@@ -24,7 +24,7 @@ public class CommitMiner implements Consumer<GitCommit> {
 
   private static final String progress = RefactoringsBundle.message("progress");
   private final Executor pool;
-  private final Map<String, String> map;
+  private final Map<String, RefactoringEntry> map;
   private final GitRepository repository;
   private final AtomicInteger commitsDone;
   private final ProgressIndicator progressIndicator;
@@ -37,7 +37,7 @@ public class CommitMiner implements Consumer<GitCommit> {
    * @param map        Map to add mined commit data to.
    * @param repository GitRepository.
    */
-  public CommitMiner(Executor pool, Map<String, String> map, GitRepository repository,
+  public CommitMiner(Executor pool, Map<String, RefactoringEntry> map, GitRepository repository,
                      AtomicInteger commitsDone, ProgressIndicator progressIndicator, int limit) {
 
     this.pool = pool;
@@ -56,7 +56,7 @@ public class CommitMiner implements Consumer<GitCommit> {
    * @param map     the inner map that should be updated
    * @param project the current project
    */
-  public static void mineAtCommit(VcsCommitMetadata commit, Map<String, String> map,
+  public static void mineAtCommit(VcsCommitMetadata commit, Map<String, RefactoringEntry> map,
                                   Project project) {
     GitService gitService = new GitServiceImpl();
     GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
