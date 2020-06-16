@@ -40,7 +40,7 @@ public abstract class DiffRequestGenerator {
     return lineMarkings;
   }
 
-  public void correct(String before, String mid, String after) {
-    lineMarkings.forEach(l -> l.correctLines(before, mid, after));
+  public void correct(String before, String mid, String after, boolean skipable) {
+    lineMarkings.forEach(l -> l.correctLines(before, mid, after, skipable));
   }
 }

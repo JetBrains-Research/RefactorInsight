@@ -81,6 +81,7 @@ public class Utils {
 
   /**
    * Skips javadoc for a method or class.
+   *
    * @param text to search in.
    * @param line current line.
    * @return the actual line.
@@ -90,8 +91,19 @@ public class Utils {
     if (lines[line].contains("/**")) {
       for (int i = line + 1; i < lines.length; i++) {
         if (lines[i].contains("*/")) {
-          return i + 1;
+          return skipAnnotations(lines, i + 1);
         }
+      }
+    }
+    return skipAnnotations(lines, line);
+  }
+
+  private static int skipAnnotations(String[] lines, int line) {
+    for (int i = line; i < lines.length; i++) {
+      if (lines[i].matches("((\\s|\\t)*@(\\w)*([(](.)*[)])*(\\s|\\t)*)+")) {
+        continue;
+      } else {
+        return i;
       }
     }
     return line;
@@ -200,6 +212,7 @@ public class Utils {
 
   /**
    * Calculates the line of the package.
+   *
    * @param text to search in.
    * @return line of the package.
    */

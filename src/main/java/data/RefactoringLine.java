@@ -51,23 +51,32 @@ public class RefactoringLine {
    * @param midText   String containing whole middle file contents
    * @param rightText String containing whole righr file contents
    */
-  public void correctLines(String leftText, String midText, String rightText) {
+  public void correctLines(String leftText, String midText, String rightText, boolean skipable) {
     int maxLineLeft = Utils.getMaxLine(leftText);
     int maxLineRight = Utils.getMaxLine(rightText);
-    lines[RIGHT_END] = lines[RIGHT_END] < 0 ? maxLineRight : lines[RIGHT_END];
-    lines[LEFT_END] = lines[LEFT_END] < 0 ? maxLineLeft : lines[LEFT_END];
-
-    lines[RIGHT_START] = Utils.skipJavadoc(rightText, lines[RIGHT_START]);
-    lines[LEFT_START] = Utils.skipJavadoc(leftText, lines[LEFT_START]);
-
+    lines[RIGHT_END] =
+        lines[RIGHT_END] < 0 || lines[RIGHT_END] > maxLineRight ? maxLineRight : lines[RIGHT_END];
+    lines[LEFT_END] =
+        lines[LEFT_END] < 0 || lines[LEFT_END] > maxLineLeft ? maxLineLeft : lines[LEFT_END];
+    lines[RIGHT_START] =
+        lines[RIGHT_START] < 0 || lines[RIGHT_START] > maxLineRight ? 0 : lines[RIGHT_START];
+    lines[LEFT_START] =
+        lines[LEFT_START] < 0 || lines[LEFT_START] > maxLineLeft ? 0 : lines[LEFT_START];
+    if (skipable) {
+      lines[RIGHT_START] = Utils.skipJavadoc(rightText, lines[RIGHT_START]);
+      lines[LEFT_START] = Utils.skipJavadoc(leftText, lines[LEFT_START]);
+    }
     if (midText != null) {
       int maxLineMid = Utils.getMaxLine(midText);
-      lines[MID_END] = lines[MID_END] < 0 ? maxLineMid : lines[MID_END];
-      lines[MID_START] = Utils.skipJavadoc(midText, lines[MID_START]);
+      lines[MID_END] =
+          lines[MID_END] < 0 || lines[MID_END] > maxLineMid ? maxLineMid : lines[MID_END];
+      lines[MID_START] =
+          lines[MID_START] < 0 || lines[MID_START] > maxLineMid ? 0 : lines[MID_START];
+      if (skipable) {
+        lines[MID_START] = Utils.skipJavadoc(midText, lines[MID_START]);
+      }
     }
-    if (markingOption == MarkingOption.PACKAGE) {
-      highlightPackage(leftText, rightText);
-    }
+    highlightPackage(leftText, rightText, markingOption);
     processOption(midText != null, markingOption);
     computeHighlighting(leftText, midText, rightText);
     if (midText == null) {
@@ -247,9 +256,21 @@ public class RefactoringLine {
     }
   }
 
-  private void highlightPackage(String leftText, String rightText) {
-    final int packageLine1 = Utils.findPackageLine(leftText);
-    final int packageLine2 = Utils.findPackageLine(rightText);
+  private void highlightPackage(String leftText, String rightText, MarkingOption option) {
+    int packageLine1;
+    int packageLine2;
+    switch (option) {
+      case PACKAGE:
+        packageLine1 = Utils.findPackageLine(leftText);
+        packageLine2 = Utils.findPackageLine(rightText);
+        break;
+      case CLASS:
+        packageLine1 = lines[LEFT_START];
+        packageLine2 = lines[RIGHT_START];
+        break;
+      default:
+        return;
+    }
 
     lines[LEFT_START] = packageLine1 == -1 ? 0 : packageLine1;
     lines[RIGHT_START] = packageLine2 == -1 ? 0 : packageLine2;
@@ -295,7 +316,8 @@ public class RefactoringLine {
     COLLAPSE,
     NONE,
     EXTRACT,
-    PACKAGE
+    PACKAGE,
+    CLASS
   }
 
   public static class RefactoringOffset {

@@ -3,6 +3,7 @@ package utils;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameterList;
+import data.Group;
 import data.RefactoringInfo;
 import gr.uom.java.xmi.UMLOperation;
 
@@ -118,6 +119,13 @@ public class StringUtils {
    * @return presentable String that shows the changes if existent, else shows a presentable name.
    */
   public static String getDisplayableName(RefactoringInfo info) {
+    if (info.getGroup() == Group.PACKAGE) {
+      if (info.getNameBefore().equals(info.getNameAfter())) {
+        return info.getNameBefore();
+      } else {
+        return info.getNameBefore() + " -> " + info.getNameAfter();
+      }
+    }
     String before = info.getNameBefore();
     if (before.contains(".")) {
       before = info.getNameBefore().substring(info.getNameBefore().lastIndexOf(".") + 1);

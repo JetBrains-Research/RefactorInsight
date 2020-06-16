@@ -409,7 +409,7 @@ public class RefactoringInfo {
   }
 
   public void correctLines(String before, String mid, String after) {
-    requestGenerator.correct(before, mid, after);
+    requestGenerator.correct(before, mid, after, !name.contains("Annotation"));
   }
 
 }

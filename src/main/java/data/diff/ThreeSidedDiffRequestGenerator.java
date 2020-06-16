@@ -31,8 +31,8 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
   }
 
   @Override
-  public void correct(String before, String mid, String after) {
-    super.correct(before, mid, after);
+  public void correct(String before, String mid, String after, boolean skipable) {
+    super.correct(before, mid, after, skipable);
     ranges = lineMarkings.stream().map(RefactoringLine::getThreeSidedRange)
         .collect(Collectors.toList());
   }

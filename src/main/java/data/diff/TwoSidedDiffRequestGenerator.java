@@ -41,8 +41,8 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
   }
 
   @Override
-  public void correct(String before, String mid, String after) {
-    super.correct(before, mid, after);
+  public void correct(String before, String mid, String after, boolean skipable) {
+    super.correct(before, mid, after, skipable);
     fragments = lineMarkings.stream()
         .map(RefactoringLine::getTwoSidedRange)
         .filter(Objects::nonNull)
