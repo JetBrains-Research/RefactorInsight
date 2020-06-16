@@ -1,20 +1,15 @@
 package services;
 
-    import com.intellij.openapi.options.Configurable;
-    import com.intellij.openapi.options.ConfigurationException;
-    import org.jetbrains.annotations.Nls;
-    import org.jetbrains.annotations.Nullable;
-
-    import javax.swing.*;
+import com.intellij.openapi.options.Configurable;
+import javax.swing.JComponent;
+import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Provides controller functionality for application settings.
  */
 public class SettingsConfigurable implements Configurable {
   private SettingsComponent mySettingsComponent;
-
-  // A default constructor with no arguments is required because this implementation
-  // is registered as an applicationConfigurable EP
 
   @Nls(capitalization = Nls.Capitalization.Title)
   @Override
@@ -37,23 +32,25 @@ public class SettingsConfigurable implements Configurable {
   @Override
   public boolean isModified() {
     SettingsState settings = SettingsState.getInstance();
-    boolean modified = !mySettingsComponent.getUserNameText().equals(settings.userId);
-    modified |= mySettingsComponent.getIdeaUserStatus() != settings.ideaStatus;
-    return modified;
+    return !(mySettingsComponent.getCommitLimit() == settings.commitLimit
+        && mySettingsComponent.getHistoryLimit() == settings.historyLimit
+        && mySettingsComponent.getThreads() == settings.threads);
   }
 
   @Override
-  public void apply() throws ConfigurationException {
+  public void apply() {
     SettingsState settings = SettingsState.getInstance();
-    settings.userId = mySettingsComponent.getUserNameText();
-    settings.ideaStatus = mySettingsComponent.getIdeaUserStatus();
+    settings.commitLimit = mySettingsComponent.getCommitLimit();
+    settings.historyLimit = mySettingsComponent.getHistoryLimit();
+    settings.threads = mySettingsComponent.getThreads();
   }
 
   @Override
   public void reset() {
     SettingsState settings = SettingsState.getInstance();
-    mySettingsComponent.setUserNameText(settings.userId);
-    mySettingsComponent.setIdeaUserStatus(settings.ideaStatus);
+    mySettingsComponent.setCommitLimit(settings.commitLimit);
+    mySettingsComponent.setHistoryLimit(settings.historyLimit);
+    mySettingsComponent.setThreads(settings.threads);
   }
 
   @Override

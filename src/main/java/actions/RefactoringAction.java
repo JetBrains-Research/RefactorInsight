@@ -15,7 +15,7 @@ public class RefactoringAction extends AnAction {
         .getInstance(e.getProject()).getRepositories().get(0);
 
     MiningService.getInstance(e.getProject()).clear();
-    MiningService.getInstance(e.getProject()).mineRepo(repository);
+    MiningService.getInstance(e.getProject()).mineAll(repository);
   }
 
 }

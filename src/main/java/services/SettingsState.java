@@ -19,8 +19,9 @@ import org.jetbrains.annotations.Nullable;
 )
 public class SettingsState implements PersistentStateComponent<SettingsState> {
 
-  public String userId = "John Q. Public";
-  public boolean ideaStatus = false;
+  public int commitLimit = 100;
+  public int historyLimit = 100;
+  public int threads = 8;
 
   public static SettingsState getInstance() {
     return ServiceManager.getService(SettingsState.class);

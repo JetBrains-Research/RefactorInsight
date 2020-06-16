@@ -33,7 +33,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +44,6 @@ import ui.windows.GitWindow;
 @Service
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
-  private static final String VERSION = "1.0.1";
   public static ConcurrentHashMap<String, ArrayList<RefactoringInfo>> methodHistory
       = new ConcurrentHashMap<String, ArrayList<RefactoringInfo>>();
   private boolean mining = false;
@@ -82,10 +80,26 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    *
    * @param repository GitRepository
    */
-  public void mineRepo(GitRepository repository) {
-    int limit = 100;
+  public void mineAll(GitRepository repository) {
+    int limit = Integer.MAX_VALUE;
     try {
       limit = getCommitCount(repository);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      mineRepo(repository, limit);
+    }
+  }
+
+  /**
+   * Mine git repo for refactorings.
+   *
+   * @param repository GitRepository
+   */
+  public void mineRepo(GitRepository repository) {
+    int limit = SettingsState.getInstance().commitLimit;
+    try {
+      limit = Math.min(getCommitCount(repository), limit);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
@@ -106,7 +120,8 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             mining = true;
             progressIndicator.setText("Mining refactorings");
             progressIndicator.setIndeterminate(false);
-            int cores = 8; //Runtime.getRuntime().availableProcessors();
+            int cores =
+                SettingsState.getInstance().threads; //Runtime.getRuntime().availableProcessors();
             ExecutorService pool = Executors.newFixedThreadPool(cores);
             System.out.println("Mining started on " + cores + " cores");
             long timeStart = System.currentTimeMillis();
@@ -216,7 +231,8 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
   private void computeMethodHistory(@NotNull String commitId) {
     List<RefactoringInfo> refs = new ArrayList<>();
-    while (contains(commitId)) {
+    int limit = SettingsState.getInstance().historyLimit;
+    while (contains(commitId) && limit-- > 0) {
       RefactoringEntry refactoringEntry = get(commitId);
       assert refactoringEntry != null;
       refs.addAll(refactoringEntry.getRefactorings());
