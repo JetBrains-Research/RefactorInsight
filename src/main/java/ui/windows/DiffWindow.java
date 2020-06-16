@@ -9,6 +9,7 @@ import com.intellij.diff.chains.DiffRequestChain;
 import com.intellij.diff.chains.SimpleDiffRequestChain;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.DiffRequest;
+import com.intellij.diff.tools.simple.SimpleDiffViewer;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
 import com.intellij.diff.tools.simple.ThreesideDiffChangeBase;
@@ -109,16 +110,18 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
   @Override
   public void onViewerCreated(@NotNull FrameDiffTool.DiffViewer viewer,
                               @NotNull DiffContext context, @NotNull DiffRequest request) {
-    List<ThreeSidedRange> ranges = request.getUserData(REFACTORING_RANGES);
-    if (ranges == null) {
+    Boolean isRefactoring = request.getUserData(REFACTORING);
+    if (isRefactoring == null || !isRefactoring) {
       return;
     }
-    SimpleThreesideDiffViewer myViewer = (SimpleThreesideDiffViewer) viewer;
-    myViewer.addListener(new MyDiffViewerListener(myViewer, ranges));
-
-    Boolean isRefactoring = request.getUserData(REFACTORING);
-    if (isRefactoring != null) {
+    List<ThreeSidedRange> ranges = request.getUserData(REFACTORING_RANGES);
+    if (ranges == null) {
+      SimpleDiffViewer myViewer = (SimpleDiffViewer) viewer;
       myViewer.getTextSettings().setExpandByDefault(false);
+    } else {
+      SimpleThreesideDiffViewer myViewer = (SimpleThreesideDiffViewer) viewer;
+      myViewer.getTextSettings().setExpandByDefault(false);
+      myViewer.addListener(new MyDiffViewerListener(myViewer, ranges));
     }
   }
 
