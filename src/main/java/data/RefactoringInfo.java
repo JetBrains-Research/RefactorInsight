@@ -1,6 +1,7 @@
 package data;
 
 import static utils.StringUtils.INFO;
+import static utils.StringUtils.LIST;
 import static utils.StringUtils.delimiter;
 
 import com.intellij.diff.contents.DiffContent;
@@ -15,7 +16,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -34,7 +34,7 @@ public class RefactoringInfo {
 
   private String[][] uiStrings = new String[3][2];
   private String[] paths = new String[3];
-  private ArrayList<String> moreSidedLeftPaths = new ArrayList<>();
+  private List<String> moreSidedLeftPaths = new ArrayList<>();
 
   private Group group;
 
@@ -67,11 +67,13 @@ public class RefactoringInfo {
         .setGroup(Group.valueOf(tokens[10]))
         .setThreeSided(tokens[11].equals("t"))
         .setHidden(tokens[12].equals("t"))
+        .setMoreSided(tokens[13].equals("t"))
+        .setMoreSidedLeftPaths(Arrays.asList(tokens[14].split(delimiter(LIST, true))))
         .setRequestGenerator(tokens[11].equals("t")
-            ? ThreeSidedDiffRequestGenerator.fromString(tokens[13])
-            : TwoSidedDiffRequestGenerator.fromString(tokens[13]))
+            ? ThreeSidedDiffRequestGenerator.fromString(tokens[15])
+            : TwoSidedDiffRequestGenerator.fromString(tokens[15]))
         .setIncludes(new HashSet<>(
-            tokens[14].isEmpty() ? List.of() : Arrays.asList(tokens[14].split(regex))));
+            tokens[16].isEmpty() ? List.of() : Arrays.asList(tokens[16].split(regex))));
   }
 
   public SimpleDiffRequest generate(DiffContent[] contents) {
@@ -95,6 +97,8 @@ public class RefactoringInfo {
         group.toString(),
         threeSided ? "t" : "f",
         hidden ? "t" : "f",
+        moreSided ? "t" : "f",
+        String.join(delimiter(LIST), moreSidedLeftPaths),
         requestGenerator.toString(),
         String.join(delimiter(INFO), includes)
     );
@@ -288,7 +292,7 @@ public class RefactoringInfo {
     return this;
   }
 
-  public ArrayList<String> getMoreSidedLeftPaths() {
+  public List<String> getMoreSidedLeftPaths() {
     return moreSidedLeftPaths;
   }
 
@@ -409,6 +413,10 @@ public class RefactoringInfo {
     return this;
   }
 
+  public RefactoringInfo setMoreSidedLeftPaths(List<String> moreSidedLeftPaths) {
+    this.moreSidedLeftPaths = moreSidedLeftPaths;
+    return this;
+  }
 
   @Override
   public boolean equals(Object o) {

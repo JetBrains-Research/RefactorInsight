@@ -7,14 +7,22 @@ import data.RefactoringInfo;
 import data.RefactoringLine;
 import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import ui.windows.DiffWindow;
+import utils.StringUtils;
 
 public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
 
   List<Data> lines;
+
+  public MoreSidedDiffRequestGenerator(List<Data> lines) {
+    this.lines = lines;
+  }
+
+  public MoreSidedDiffRequestGenerator() {}
 
   @Override
   public SimpleDiffRequest generate(DiffContent[] contents, RefactoringInfo info) {
@@ -63,6 +71,22 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
     prepareJetBrainsRanges(lineMarkings);
   }
 
+  @Override
+  public String toString() {
+    if (lines == null || lines.size() == 0) {
+      return "";
+    }
+    return lines.stream().map(Data::toString)
+        .collect(Collectors.joining(StringUtils.delimiter(StringUtils.LIST)));
+  }
+
+  public static MoreSidedDiffRequestGenerator fromString(String seq) {
+    List<Data> lines = Arrays.asList(seq.split(StringUtils.delimiter(StringUtils.LIST))).stream()
+    .map(dataSt -> Data.fromString(dataSt)).collect(Collectors.toList());
+
+    return new MoreSidedDiffRequestGenerator(lines);
+  }
+
   public static class Data {
     public int startLine;
     public int endLine;
@@ -76,6 +100,19 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
       this.startOffset = startOffset;
       this.endOffset = endOffset;
     }
+
+    public String toString() {
+      String del = StringUtils.delimiter(StringUtils.FRAG);
+      return startLine + del + endLine + del + startOffset + del + endOffset;
+    }
+
+    public static Data fromString(String seq) {
+      String[] tokens = seq.split(StringUtils.delimiter(StringUtils.FRAG));
+      return new Data(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]),
+          Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]));
+    }
+
+
   }
 
 }
