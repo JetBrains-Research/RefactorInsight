@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -408,8 +407,24 @@ public class RefactoringInfo {
     return this;
   }
 
+  /**
+   * Corrects lines if necessary.
+   *
+   * @param before text left window
+   * @param mid    text mid window
+   * @param after  text right window
+   */
   public void correctLines(String before, String mid, String after) {
-    requestGenerator.correct(before, mid, after, !name.contains("Annotation"));
+    boolean skipAnnotationsLeft = true;
+    boolean skipAnnotationsRight = true;
+    if (name.matches("Add\\s(\\w)*\\sAnnotation")) {
+      skipAnnotationsRight = false;
+    } else if (name.matches("Remove\\s(\\w)*\\sAnnotation")) {
+      skipAnnotationsLeft = false;
+    } else if (name.matches("Modify\\s(\\w)*\\sAnnotation")) {
+      skipAnnotationsLeft = skipAnnotationsRight = false;
+    }
+    requestGenerator.correct(before, mid, after, skipAnnotationsLeft, true, skipAnnotationsRight);
   }
 
 }

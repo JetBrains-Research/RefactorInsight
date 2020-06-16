@@ -86,6 +86,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     int limit = 100;
     try {
       limit = getCommitCount(repository);
+      limit = 1200;
     } catch (Exception e) {
       e.printStackTrace();
     } finally {

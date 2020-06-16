@@ -20,29 +20,6 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
   public ThreeSidedDiffRequestGenerator() {
   }
 
-  @Override
-  public SimpleDiffRequest generate(DiffContent[] contents, RefactoringInfo info) {
-    SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
-        contents[0], contents[1], contents[2],
-        info.getLeftPath(), info.getMidPath(), info.getRightPath());
-    request.putUserData(REFACTORING_RANGES, ranges);
-    request.putUserData(REFACTORING, true);
-    return request;
-  }
-
-  @Override
-  public void correct(String before, String mid, String after, boolean skipable) {
-    super.correct(before, mid, after, skipable);
-    ranges = lineMarkings.stream().map(RefactoringLine::getThreeSidedRange)
-        .collect(Collectors.toList());
-  }
-
-  @Override
-  public String toString() {
-    return ranges.stream().map(ThreeSidedRange::toString)
-        .collect(Collectors.joining(StringUtils.delimiter(LIST)));
-  }
-
   /**
    * Serializes a ThreeSidedDiffRequestGenerator.
    *
@@ -54,5 +31,30 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
     generator.ranges = Arrays.stream(value.split(regex))
         .map(ThreeSidedRange::fromString).collect(Collectors.toList());
     return generator;
+  }
+
+  @Override
+  public SimpleDiffRequest generate(DiffContent[] contents, RefactoringInfo info) {
+    SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
+        contents[0], contents[1], contents[2],
+        info.getLeftPath(), info.getMidPath(), info.getRightPath());
+    request.putUserData(REFACTORING_RANGES, ranges);
+    request.putUserData(REFACTORING, true);
+    return request;
+  }
+
+  @Override
+  public void correct(String before, String mid, String after, boolean skipAnnotationsLeft,
+                      boolean skipAnnotationsMid, boolean skipAnnotationsRight) {
+    super
+        .correct(before, mid, after, skipAnnotationsLeft, skipAnnotationsMid, skipAnnotationsRight);
+    ranges = lineMarkings.stream().map(RefactoringLine::getThreeSidedRange)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public String toString() {
+    return ranges.stream().map(ThreeSidedRange::toString)
+        .collect(Collectors.joining(StringUtils.delimiter(LIST)));
   }
 }

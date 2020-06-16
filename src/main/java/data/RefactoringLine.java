@@ -51,7 +51,9 @@ public class RefactoringLine {
    * @param midText   String containing whole middle file contents
    * @param rightText String containing whole righr file contents
    */
-  public void correctLines(String leftText, String midText, String rightText, boolean skipable) {
+  public void correctLines(String leftText, String midText, String rightText,
+                           boolean skipAnnotationsLeft, boolean skipAnnotationsMid,
+                           boolean skipAnnotationsRight) {
     int maxLineLeft = Utils.getMaxLine(leftText);
     int maxLineRight = Utils.getMaxLine(rightText);
     lines[RIGHT_END] =
@@ -62,19 +64,18 @@ public class RefactoringLine {
         lines[RIGHT_START] < 0 || lines[RIGHT_START] > maxLineRight ? 0 : lines[RIGHT_START];
     lines[LEFT_START] =
         lines[LEFT_START] < 0 || lines[LEFT_START] > maxLineLeft ? 0 : lines[LEFT_START];
-    if (skipable) {
-      lines[RIGHT_START] = Utils.skipJavadoc(rightText, lines[RIGHT_START]);
-      lines[LEFT_START] = Utils.skipJavadoc(leftText, lines[LEFT_START]);
-    }
+
+    lines[RIGHT_START] = Utils.skipJavadoc(rightText, lines[RIGHT_START], skipAnnotationsRight);
+    lines[LEFT_START] = Utils.skipJavadoc(leftText, lines[LEFT_START], skipAnnotationsLeft);
+
     if (midText != null) {
       int maxLineMid = Utils.getMaxLine(midText);
       lines[MID_END] =
           lines[MID_END] < 0 || lines[MID_END] > maxLineMid ? maxLineMid : lines[MID_END];
       lines[MID_START] =
           lines[MID_START] < 0 || lines[MID_START] > maxLineMid ? 0 : lines[MID_START];
-      if (skipable) {
-        lines[MID_START] = Utils.skipJavadoc(midText, lines[MID_START]);
-      }
+      lines[MID_START] = Utils.skipJavadoc(midText, lines[MID_START], skipAnnotationsMid);
+
     }
     highlightPackage(leftText, rightText, markingOption);
     processOption(midText != null, markingOption);

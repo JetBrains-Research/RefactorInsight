@@ -40,7 +40,20 @@ public abstract class DiffRequestGenerator {
     return lineMarkings;
   }
 
-  public void correct(String before, String mid, String after, boolean skipable) {
-    lineMarkings.forEach(l -> l.correctLines(before, mid, after, skipable));
+  /**
+   * Corrects each line if necessary.
+   *
+   * @param before               text left diff window
+   * @param mid                  text mid diff window
+   * @param after                text right diff window
+   * @param skipAnnotationsLeft  always true, except when remove or modify annotation happen
+   * @param skipAnnotationsMid   true
+   * @param skipAnnotationsRight always true, except when add or modify annotation happen
+   */
+  public void correct(String before, String mid, String after, boolean skipAnnotationsLeft,
+                      boolean skipAnnotationsMid, boolean skipAnnotationsRight) {
+    lineMarkings.forEach(l -> l
+        .correctLines(before, mid, after, skipAnnotationsLeft, skipAnnotationsMid,
+            skipAnnotationsRight));
   }
 }
