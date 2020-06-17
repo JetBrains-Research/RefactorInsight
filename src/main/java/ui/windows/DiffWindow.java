@@ -17,6 +17,7 @@ import com.intellij.diff.tools.simple.ThreesideDiffChangeBase;
 import com.intellij.diff.tools.util.base.DiffViewerListener;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.ide.highlighter.JavaFileType;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.LogicalPosition;
@@ -24,15 +25,22 @@ import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
+import com.intellij.openapi.editor.impl.EditorImpl;
+import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TitlePanel;
 import com.intellij.openapi.ui.WindowWrapper;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
+import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBScrollPane;
+import com.intellij.util.config.ToggleBooleanProperty;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.diff.MoreSidedDiffRequestGenerator;
@@ -41,10 +49,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.swing.JLabel;
+import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
@@ -111,12 +120,13 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
           break;
         }
       }
-      for (String path : info.getMoreSidedLeftPaths()) {
+      for (Pair<String, Boolean> pathPair : info.getMoreSidedLeftPaths()) {
         for (Change change : changes) {
-          if (change.getBeforeRevision() != null
-              && change.getBeforeRevision().getFile().getPath().contains(path)) {
+          ContentRevision revision = pathPair.second
+              ? change.getAfterRevision() : change.getBeforeRevision();
+          if (revision != null && revision.getFile().getPath().contains(pathPair.first)) {
             contentList.add(myDiffContentFactory
-                .create(project, change.getBeforeRevision().getContent(),
+                .create(project, revision.getContent(),
                     JavaClassFileType.INSTANCE));
             break;
           }
@@ -196,53 +206,139 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
         request.getUserData(MORESIDED_RANGES);
     SimpleDiffViewer myViewer = (SimpleDiffViewer) viewer;
     if (moreSidedRanges != null) {
-      //Highlight right part
+      myViewer.getTextSettings().setExpandByDefault(true);
+      //Sort on filename and code ranges.
+      List<MoreSidedDiffRequestGenerator.Data> sortedRanges = new ArrayList<>(moreSidedRanges);
+      Collections.sort(sortedRanges);
+
+      //Highlight right part of diff window
+      //  Get diff colors of current theme.
       EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
-      TextAttributes textColors = scheme.getAttributes(TextAttributesKey.find("DIFF_MODIFIED"));
-      MoreSidedDiffRequestGenerator.Data rightData = moreSidedRanges.get(0);
-      for (int i = rightData.startLine; i < rightData.endLine; i++) {
-        myViewer.getEditor2().getMarkupModel().addLineHighlighter(i, 2, textColors);
+      TextAttributes lineColors = scheme.getAttributes(TextAttributesKey.find("DIFF_MODIFIED"));
+      TextAttributes offsetColors = scheme.getAttributes(TextAttributesKey.find("DIFF_INSERTED"));
+      sortedRanges.forEach(data -> {
+        //  Highlight lines
+        if (data.startLineRight != -1 && data.endLineRight != -1) {
+          for (int i = data.startLineRight - 1; i < data.endLineRight; i++) {
+            myViewer.getEditor2().getMarkupModel().addLineHighlighter(i, 2, lineColors);
+          }
+          //  Highlight offsets
+          myViewer.getEditor2().getMarkupModel()
+              .addRangeHighlighter(data.startOffsetRight, data.endOffsetRight,
+                  3, offsetColors, HighlighterTargetArea.EXACT_RANGE);
+        }
+      });
+
+      //Generate list for left side of diff window
+      List<Pair<MoreSidedDiffRequestGenerator.Data, Project>> pairs = new ArrayList<>();
+      String current = "";
+      for (MoreSidedDiffRequestGenerator.Data data : sortedRanges) {
+        //If new file add title row first by setting project null (this is tested in renderer)
+        if (!data.leftPath.equals(current)) {
+          current = data.leftPath;
+          pairs.add(new Pair<>(data, null));
+        }
+        pairs.add(new Pair<>(data, myViewer.getProject()));
       }
-      List<Pair<MoreSidedDiffRequestGenerator.Data, Project>> pairs =
-          moreSidedRanges.subList(1, moreSidedRanges.size()).stream()
-          .map(data -> new Pair<>(data, myViewer.getProject()))
-          .collect(Collectors.toList());
-      //Generate Left UI
-      JBList<Pair<MoreSidedDiffRequestGenerator.Data, Project>> editorList = new JBList<>(JBList.createDefaultListModel(pairs));
+
+
+
+      //Generate Left Side UI
+      JBList<Pair<MoreSidedDiffRequestGenerator.Data, Project>> editorList =
+          new JBList<>(JBList.createDefaultListModel(pairs));
+      MoreSidedRenderer renderer = new MoreSidedRenderer(editorList.getItemsCount());
+      Disposer.register(myViewer, renderer);
+      editorList.setCellRenderer(renderer);
       JPanel leftPanel = (JPanel) myViewer.getEditor1().getComponent();
       leftPanel.remove(0);
-      leftPanel.add(editorList);
+      leftPanel.add(new JBScrollPane(editorList));
       return;
     }
 
     //Asume diff viewer is two sided
     myViewer.getTextSettings().setExpandByDefault(false);
-
   }
 
-  public class MoreSidedRenderer implements ListCellRenderer<Pair<MoreSidedDiffRequestGenerator.Data, Project>> {
+  /**
+   * Renders the editors and title rows in the left side of diff window.
+   */
+  public static class MoreSidedRenderer implements Disposable,
+      ListCellRenderer<Pair<MoreSidedDiffRequestGenerator.Data, Project>> {
+
+    JComponent[] components;
+    List<EditorImpl> editors = new ArrayList<>();
+
+    public MoreSidedRenderer(int size) {
+      components = new JComponent[size];
+    }
 
     @Override
     public Component getListCellRendererComponent(
-        JList<? extends Pair<MoreSidedDiffRequestGenerator.Data, Project>> jList,
+        JList<? extends Pair<MoreSidedDiffRequestGenerator.Data, Project>> jlist,
         Pair<MoreSidedDiffRequestGenerator.Data, Project> pair, int i, boolean b,
         boolean b1) {
-      DocumentContent content = (DocumentContent) pair.first.content;
+      //If component null generate ui.
+      if (components[i] == null) {
+        //If project null generate TitlePanel instead.
+        if (pair.second == null) {
+          components[i] = new TitlePanel(pair.first.leftPath, null);
+        } else {
+          generateEditor(i, pair);
+        }
+      }
+      return components[i];
+    }
 
+    /**
+     * Generate Editor UI for left side of diffwindow.
+     * @param i Index of row in left side
+     * @param pair RangeData and Project
+     */
+    public void generateEditor(int i, Pair<MoreSidedDiffRequestGenerator.Data, Project> pair) {
+
+      //Instantiate editor
+      DocumentContent content = (DocumentContent) pair.first.content;
       Editor editor = EditorFactory.getInstance().createEditor(content.getDocument(),
           pair.second, JavaFileType.INSTANCE, true);
+
+      //Get highlight colors corresponding with theme and revision
       EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
-      TextAttributes textColors = scheme.getAttributes(TextAttributesKey.find("DIFF_MODIFIED"));
-      TitlePanel titlePanel = new TitlePanel("path here", null);
-      editor.setHeaderComponent(titlePanel);
-      for (int ind = pair.first.startLine; ind < pair.first.endLine; ind++) {
-        editor.getMarkupModel().addLineHighlighter(ind, 2, textColors);
+      TextAttributes lineColor = scheme.getAttributes(TextAttributesKey.find("DIFF_MODIFIED"));
+      TextAttributes offsetColor
+          = pair.first.startLineRight == -1 && pair.first.endLineRight == -1
+          ? scheme.getAttributes(TextAttributesKey.find("DIFF_INSERTED"))
+          : scheme.getAttributes(TextAttributesKey.find("DIFF_DELETED"));
+
+      //Highlighting process
+      //  Hide caret line highlighting
+      editor.getSettings().setCaretRowShown(false);
+      //  Highlight lines
+      for (int ind = pair.first.startLineLeft - 1; ind < pair.first.endLineLeft; ind++) {
+        editor.getMarkupModel().addLineHighlighter(ind, 2, lineColor);
       }
-      int editorSize = editor.getLineHeight() * (pair.first.endLine - pair.first.startLine + 2);
+      //  Highlight offsets
+      editor.getMarkupModel().addRangeHighlighter(pair.first.startOffsetLeft,
+          pair.first.endOffsetLeft, 10, offsetColor, HighlighterTargetArea.EXACT_RANGE);
+
+      //Set editor size to fit coderange
+      int editorSize = editor.getLineHeight()
+          * (pair.first.endLineLeft - Math.max(pair.first.startLineLeft - 1, 1) + 2);
       editor.getComponent().setPreferredSize(new Dimension(400, editorSize));
+
+      //Scroll to coderange
       editor.getScrollingModel().scrollTo(
-          new LogicalPosition(pair.first.startLine, 0), ScrollType.CENTER);
-      return editor.getComponent();
+          new LogicalPosition(Math.max(pair.first.startLineLeft - 2, 0), 0), ScrollType.CENTER);
+      //Hide scrollbar
+      ((EditorImpl) editor).getScrollPane().getVerticalScrollBar()
+          .setPreferredSize(new Dimension(0, 0));
+      editors.add((EditorImpl) editor);
+      components[i] = editor.getComponent();
+    }
+
+
+    @Override
+    public void dispose() {
+      editors.forEach(editor -> EditorFactory.getInstance().releaseEditor(editor));
     }
   }
 

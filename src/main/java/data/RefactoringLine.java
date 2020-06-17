@@ -91,7 +91,8 @@ public class RefactoringLine {
     computeHighlighting(leftText, midText, rightText);
     if (moreSided) {
       computeMoreSidedRanges(leftText, rightText);
-    } else if (midText == null) {
+    }
+    if (midText == null) {
       computeTwoSidedRanges(leftText, rightText);
     } else {
       computeThreeSidedRanges(leftText, midText, rightText);
@@ -99,17 +100,18 @@ public class RefactoringLine {
   }
 
   private void computeMoreSidedRanges(String leftText, String rightText) {
-    if (leftText != null) {
-      moreSidedData = new MoreSidedDiffRequestGenerator.Data(
-          lines[LEFT_START] + 1, lines[LEFT_END],
-          Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]),
-          Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]));
-    } else if (rightText != null) {
-      moreSidedData = new MoreSidedDiffRequestGenerator.Data(
-          lines[RIGHT_START] + 1, lines[RIGHT_END],
-          Utils.getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]),
-          Utils.getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END]));
-    }
+    MoreSidedDiffRequestGenerator.Data data = new MoreSidedDiffRequestGenerator.Data();
+    data.startLineLeft = lines[LEFT_START] + 1;
+    data.endLineLeft = lines[LEFT_END];
+    data.startOffsetLeft = Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]);
+    data.endOffsetLeft = Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]);
+
+    data.startLineRight = lines[RIGHT_START] + 1;
+    data.endLineRight = lines[RIGHT_END];
+    data.startOffsetRight =
+        Utils.getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]);
+    data.endOffsetRight = Utils.getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END]);
+    moreSidedData = data;
   }
 
   private void computeThreeSidedRanges(String leftText, String midText, String rightText) {
@@ -258,12 +260,8 @@ public class RefactoringLine {
     lazy = true;
   }
 
-  public int[] getColumns() {
-    return columns;
-  }
-
-  public int[] getLines() {
-    return lines;
+  public void setMoreSided(boolean moreSided) {
+    this.moreSided = moreSided;
   }
 
   public MoreSidedDiffRequestGenerator.Data getMoreSidedData() {

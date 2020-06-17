@@ -6,10 +6,10 @@ import static org.refactoringminer.api.RefactoringType.CHANGE_VARIABLE_TYPE;
 import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
 import static org.refactoringminer.api.RefactoringType.RENAME_PARAMETER;
 
-
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.vcs.LocalFilePath;
 import com.intellij.openapi.vcs.VcsException;
@@ -197,10 +197,12 @@ public class Utils {
         info.correctLines(before, mid, after);
       } else {
         List<String> befores = new ArrayList<>();
-        for (String path : info.getMoreSidedLeftPaths()) {
-          FilePath filePath = new LocalFilePath(project.getBasePath() + "/" + path, false);
+        for (Pair<String, Boolean> pathPair : info.getMoreSidedLeftPaths()) {
+          GitRevisionNumber number = pathPair.second ? afterNumber : beforeNumber;
+          FilePath filePath =
+              new LocalFilePath(project.getBasePath() + "/" + pathPair.first, false);
           befores.add(
-              GitContentRevision.createRevision(filePath, beforeNumber, project).getContent());
+              GitContentRevision.createRevision(filePath, number, project).getContent());
         }
         info.correctMoreSidedLines(befores, after);
       }
