@@ -21,14 +21,14 @@ public class MoveRenameClassHandler extends Handler {
       info.setGroup(Group.CLASS);
     }
 
-    String[] nameSpace = ref.getRenamedClass().getName().split("\\.");
-    String className = nameSpace[nameSpace.length - 1];
-    String[] nameSpace2 = ref.getOriginalClass().getName().split("\\.");
-    String className2 = nameSpace2[nameSpace2.length - 1];
+    String[] nameSpaceBefore = ref.getOriginalClass().getName().split("\\.");
+    String classNameBefore = nameSpaceBefore[nameSpaceBefore.length - 1];
+    String[] nameSpaceAfter = ref.getRenamedClass().getName().split("\\.");
+    String classNameAfter = nameSpaceAfter[nameSpaceAfter.length - 1];
     info.addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
         (line) -> {
           line.setWord(
-              new String[] {className2, null, className});
+              new String[] {classNameBefore, null, classNameAfter});
         },
         RefactoringLine.MarkingOption.COLLAPSE,
         false)

@@ -20,13 +20,15 @@ public class RenameClassHandler extends Handler {
     } else {
       info.setGroup(Group.CLASS);
     }
-    String[] nameSpace = ref.getRenamedClass().getName().split("\\.");
-    String className = nameSpace[nameSpace.length - 1];
+    String[] nameSpaceBefore = ref.getOriginalClassName().split("\\.");
+    String classNameBefore = nameSpaceBefore[nameSpaceBefore.length - 1];
+    String[] nameSpaceAfter = ref.getRenamedClass().getName().split("\\.");
+    String classNameAfter = nameSpaceAfter[nameSpaceAfter.length - 1];
     return info
         .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
             (line) -> {
               line.setWord(
-                  new String[] {null, null, className});
+                  new String[] {classNameBefore, null, classNameAfter});
             },
             RefactoringLine.MarkingOption.COLLAPSE,
             true)
