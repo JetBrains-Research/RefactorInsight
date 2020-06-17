@@ -1,12 +1,9 @@
-# Detecting Refactorings in Code Changes
+# RefactorInsight
 
 [![pipeline status](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2019-2020-q4/cluster-0/detecting-refactorings-in-code-changes/detecting-refactorings-in-code-changes/badges/master/pipeline.svg)](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2019-2020-q4/cluster-0/detecting-refactorings-in-code-changes/detecting-refactorings-in-code-changes/badges/master)
 [![coverage report](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2019-2020-q4/cluster-0/detecting-refactorings-in-code-changes/detecting-refactorings-in-code-changes/badges/master/coverage.svg)](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2019-2020-q4/cluster-0/detecting-refactorings-in-code-changes/detecting-refactorings-in-code-changes/badges/master)
 
-[Download](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2019-2020-q4/cluster-0/detecting-refactorings-in-code-changes/detecting-refactorings-in-code-changes/-/jobs/artifacts/85-improve-documentation/raw/build/distributions/detecting-refactorings-in-code-changes-1.0-SNAPSHOT.zip?job=build)
-
-
-This project aims to introduce a plugin for IntelliJ IDEA that detects code refactorings in the version control history of Java repositories. 
+This project aims to introduce a RefactorInsight, a plugin for IntelliJ IDEA that detects code refactorings in the version control history of Java repositories. 
 The main framework that is used in order to retrieve the refactorings is the RefactoringMiner API.
 
 Every sprint planning and retrospective can be found in the [Milestones section](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2019-2020-q4/cluster-0/detecting-refactorings-in-code-changes/detecting-refactorings-in-code-changes/-/milestones?sort=due_date_desc&state=all). 
@@ -23,11 +20,15 @@ If any stage fails, the badge will turn red.
 How to build & run
 -------------
 
-Download or clone the project in IntelliJ IDEA 2020.1 or up and run `gradle build` in order to install all the required dependencies.
+Download or clone the project in IntelliJ IDEA 2020.1.2 or up and run `gradle build` in order to install all the required dependencies.
 Use `gradle runIde` task to run the project. 
 A new IDE will open up where you can follow the steps below.
-If you want to import the plugin from disk, run `gradle buildPlugin`. A zip will be generated in the 
-build/distribution file of the repository. Go to IntelliJ -> Preferences -> Plugin -> Install Plugin
+
+[Download RefactorInsight](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2019-2020-q4/cluster-0/detecting-refactorings-in-code-changes/detecting-refactorings-in-code-changes/-/jobs/artifacts/85-improve-documentation/raw/build/distributions/detecting-refactorings-in-code-changes-1.0-SNAPSHOT.zip?job=build)
+
+
+If you want to import the plugin from disk, click `Download RefactorInsight`.
+Go to IntelliJ -> Preferences -> Plugin -> Install Plugin
 from Disk and upload the zip file. After an IDE restart, you will be able to follow the steps below.
 
 In order to see the refactorings in a git repository, make sure you cloned the repository and 
