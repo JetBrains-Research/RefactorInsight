@@ -46,7 +46,8 @@ public class MoveClassHandler extends Handler {
         .setDetailsAfter(ref.getMovedClass().getPackageName());
 
     //check if it is inner class
-    if (!left.equals(originalClassName) || !right.equals(movedClassName)) {
+    if ((!left.equals(originalClassName) && packageBefore.contains(left))
+        || (!right.equals(movedClassName) && packageAfter.contains(right))) {
       return info
           .addMarking(ref.getOriginalClass().codeRange(), ref.getMovedClass().codeRange(),
               null,
