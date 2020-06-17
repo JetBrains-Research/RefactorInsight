@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.eclipse.core.resources.IProject;
 import org.jetbrains.annotations.NotNull;
 import processors.CommitMiner;
 import ui.windows.GitWindow;
@@ -97,7 +98,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    * @param repository GitRepository
    */
   public void mineRepo(GitRepository repository) {
-    int limit = SettingsState.getInstance().commitLimit;
+    int limit = SettingsState.getInstance(repository.getProject()).commitLimit;
     try {
       limit = Math.min(getCommitCount(repository), limit);
     } catch (Exception e) {
@@ -120,8 +121,8 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             mining = true;
             progressIndicator.setText("Mining refactorings");
             progressIndicator.setIndeterminate(false);
-            int cores =
-                SettingsState.getInstance().threads; //Runtime.getRuntime().availableProcessors();
+            int cores = SettingsState
+                .getInstance(repository.getProject()).threads;
             ExecutorService pool = Executors.newFixedThreadPool(cores);
             System.out.println("Mining started on " + cores + " cores");
             long timeStart = System.currentTimeMillis();
@@ -150,7 +151,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             double time = ((double) (timeEnd - timeStart)) / 1000.0;
             System.out.println("Mining done in " + time + " sec");
 
-            computeMethodHistory(repository.getCurrentRevision());
+            computeMethodHistory(repository.getCurrentRevision(), repository.getProject());
             long timeEnd2 = System.currentTimeMillis();
             double time2 = ((double) (timeEnd2 - timeEnd)) / 1000.0;
             System.out.println("Method history computed in " + time2);
@@ -229,9 +230,9 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     return methodHistory;
   }
 
-  private void computeMethodHistory(@NotNull String commitId) {
+  private void computeMethodHistory(@NotNull String commitId, Project project) {
     List<RefactoringInfo> refs = new ArrayList<>();
-    int limit = SettingsState.getInstance().historyLimit;
+    int limit = SettingsState.getInstance(project).historyLimit;
     while (contains(commitId) && limit-- > 0) {
       RefactoringEntry refactoringEntry = get(commitId);
       assert refactoringEntry != null;

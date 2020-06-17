@@ -36,43 +36,38 @@ public class SettingsComponent {
   /**
    * SettingsComponent constructor. Creates the setting panel.
    */
-  public SettingsComponent() {
+  public SettingsComponent(Project project) {
 
     JButton clear = new JButton("Clear Cache");
     clear.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
-        for (Project project : ProjectManager.getInstance().getOpenProjects()) {
-          MiningService.getInstance(project).clear();
-        }
+        MiningService.getInstance(project).clear();
       }
     });
     JButton all = new JButton("Mine All");
     all.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
-        for (Project project : ProjectManager.getInstance().getOpenProjects()) {
-          GitRepository repository = GitRepositoryManager
-              .getInstance(project).getRepositories().get(0);
-          MiningService.getInstance(project).mineAll(repository);
-        }
+        GitRepository repository = GitRepositoryManager
+            .getInstance(project).getRepositories().get(0);
+        MiningService.getInstance(project).mineAll(repository);
       }
     });
     JButton choose = new JButton("Import xml");
     choose.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
-        Project proj = ProjectManager.getInstance().getOpenProjects()[0];
         FileChooser.chooseFile(
             FileChooserDescriptorFactory.createSingleFileDescriptor("xml"),
-            proj,
+            project,
             null,
             file -> {
               try {
                 String content = VfsUtil.loadText(file);
                 content = content.split("value=\"", 2)[1];
                 content = content.substring(0, content.lastIndexOf('\"'));
-                MiningService.getInstance(proj).getState().refactoringsMap =
+                MiningService.getInstance(project).getState().refactoringsMap =
                     new RefactoringsMapConverter().fromString(content);
               } catch (Exception ex) {
                 ex.printStackTrace();

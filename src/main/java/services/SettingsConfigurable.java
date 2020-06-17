@@ -1,6 +1,7 @@
 package services;
 
 import com.intellij.openapi.options.Configurable;
+import com.intellij.openapi.project.Project;
 import javax.swing.JComponent;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -10,6 +11,11 @@ import org.jetbrains.annotations.Nullable;
  */
 public class SettingsConfigurable implements Configurable {
   private SettingsComponent mySettingsComponent;
+  private Project project;
+
+  public SettingsConfigurable(Project project) {
+    this.project = project;
+  }
 
   @Nls(capitalization = Nls.Capitalization.Title)
   @Override
@@ -25,13 +31,13 @@ public class SettingsConfigurable implements Configurable {
   @Nullable
   @Override
   public JComponent createComponent() {
-    mySettingsComponent = new SettingsComponent();
+    mySettingsComponent = new SettingsComponent(project);
     return mySettingsComponent.getPanel();
   }
 
   @Override
   public boolean isModified() {
-    SettingsState settings = SettingsState.getInstance();
+    SettingsState settings = SettingsState.getInstance(project);
     return !(mySettingsComponent.getCommitLimit() == settings.commitLimit
         && mySettingsComponent.getHistoryLimit() == settings.historyLimit
         && mySettingsComponent.getThreads() == settings.threads);
@@ -39,7 +45,7 @@ public class SettingsConfigurable implements Configurable {
 
   @Override
   public void apply() {
-    SettingsState settings = SettingsState.getInstance();
+    SettingsState settings = SettingsState.getInstance(project);
     settings.commitLimit = mySettingsComponent.getCommitLimit();
     settings.historyLimit = mySettingsComponent.getHistoryLimit();
     settings.threads = mySettingsComponent.getThreads();
@@ -47,7 +53,7 @@ public class SettingsConfigurable implements Configurable {
 
   @Override
   public void reset() {
-    SettingsState settings = SettingsState.getInstance();
+    SettingsState settings = SettingsState.getInstance(project);
     mySettingsComponent.setCommitLimit(settings.commitLimit);
     mySettingsComponent.setHistoryLimit(settings.historyLimit);
     mySettingsComponent.setThreads(settings.threads);
