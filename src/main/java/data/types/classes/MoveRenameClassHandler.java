@@ -58,7 +58,7 @@ public class MoveRenameClassHandler extends Handler {
 
     //check if it is inner class
     if ((!left.equals(originalClassName) && packageBefore.contains(left))
-        || (!right.equals(movedClassName) && packageAfter.contains(right))){
+        || (!right.equals(movedClassName) && packageAfter.contains(right))) {
       return info
           .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
               null,
