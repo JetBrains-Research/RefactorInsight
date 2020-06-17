@@ -56,56 +56,13 @@ public class MoveRenameClassHandler extends Handler {
     movedClassName = movedClassName.contains(".")
         ? movedClassName.substring(movedClassName.lastIndexOf(".") + 1) : movedClassName;
 
-    String package1 =
-        packageBefore.contains(".")
-            ? packageBefore.substring(0, packageBefore.lastIndexOf(".")) : packageBefore;
-
-    String package2 =
-        packageAfter.contains(".")
-            ? packageAfter.substring(0, packageAfter.lastIndexOf(".")) : packageAfter;
-
     //check if it is inner class
-    if (!left.equals(originalClassName) && !right.equals(movedClassName)
-        && packageBefore.contains(left) && packageAfter.contains(right)) {
-      if (!package1.equals(package2)) {
-        info.addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
-            (line) -> {
-              line.setWord(
-                  new String[] {package1, null, package2});
-            },
-            RefactoringLine.MarkingOption.PACKAGE,
-            true);
-      }
+    if (!left.equals(originalClassName) || !right.equals(movedClassName)) {
       return info
           .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
-              (line) -> {
-                line.setWord(
-                    new String[] {left, null, right});
-              },
-              RefactoringLine.MarkingOption.CLASS,
-              true);
-    } else if (!left.equals(originalClassName)
-        && packageBefore.contains(left) && !package1.equals(packageAfter)) {
-      return info
-          .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
-              (line) -> {
-                line.setWord(
-                    new String[] {package1, null, packageAfter});
-              },
-              RefactoringLine.MarkingOption.PACKAGE,
-              true);
-
-    } else if (!right.equals(movedClassName)
-        && packageAfter.contains(right) && !package2.equals(packageBefore)) {
-      return info
-          .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
-              (line) -> {
-                line.setWord(
-                    new String[] {packageBefore, null, package2});
-              },
-              RefactoringLine.MarkingOption.PACKAGE,
-              true);
-
+              null,
+              RefactoringLine.MarkingOption.COLLAPSE,
+              false);
     }
     return info
         .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),

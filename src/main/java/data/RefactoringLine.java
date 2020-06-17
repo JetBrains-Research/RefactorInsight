@@ -77,7 +77,9 @@ public class RefactoringLine {
       lines[MID_START] = Utils.skipJavadoc(midText, lines[MID_START], skipAnnotationsMid);
 
     }
-    highlightPackage(leftText, rightText, markingOption);
+    if (markingOption == MarkingOption.PACKAGE) {
+      highlightPackage(leftText, rightText);
+    }
     processOption(midText != null, markingOption);
     computeHighlighting(leftText, midText, rightText);
     if (midText == null) {
@@ -257,21 +259,9 @@ public class RefactoringLine {
     }
   }
 
-  private void highlightPackage(String leftText, String rightText, MarkingOption option) {
-    int packageLine1;
-    int packageLine2;
-    switch (option) {
-      case PACKAGE:
-        packageLine1 = Utils.findPackageLine(leftText);
-        packageLine2 = Utils.findPackageLine(rightText);
-        break;
-      case CLASS:
-        packageLine1 = lines[LEFT_START];
-        packageLine2 = lines[RIGHT_START];
-        break;
-      default:
-        return;
-    }
+  private void highlightPackage(String leftText, String rightText) {
+    int packageLine1 = Utils.findPackageLine(leftText);
+    int packageLine2 = Utils.findPackageLine(rightText);
 
     lines[LEFT_START] = packageLine1 == -1 ? 0 : packageLine1;
     lines[RIGHT_START] = packageLine2 == -1 ? 0 : packageLine2;
@@ -317,8 +307,7 @@ public class RefactoringLine {
     COLLAPSE,
     NONE,
     EXTRACT,
-    PACKAGE,
-    CLASS
+    PACKAGE
   }
 
   public static class RefactoringOffset {
