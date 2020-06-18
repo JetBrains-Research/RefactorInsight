@@ -81,6 +81,20 @@ public class Utils {
   }
 
   /**
+   * Similar to find columns but starts from the back of the line.
+   * @param text Java code
+   * @param word Word to look for
+   * @param line Line to look in
+   * @return Start and ending column in int[]
+   */
+  public static int[] findColumnsBackwards(String text, String word, int line) {
+    String[] lines = text.split("\r\n|\r|\n");
+    int startColumn = lines[line].lastIndexOf(word) + 1;
+    int endColumn = startColumn + word.length();
+    return new int[] {startColumn, endColumn};
+  }
+
+  /**
    * Skips javadoc for a method or class.
    *
    * @param text to search in.
