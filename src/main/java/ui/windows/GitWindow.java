@@ -87,7 +87,7 @@ public class GitWindow {
   private void buildComponent() {
     int index = table.getSelectionModel().getAnchorSelectionIndex();
 
-    if (index < 0 || index >= table.getRowCount() - 1) {
+    if (index < 0) {
       viewport.setView(new JBList<String>());
       return;
     }
