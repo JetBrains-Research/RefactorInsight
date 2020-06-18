@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -457,11 +458,16 @@ public class RefactoringInfo {
     if (!(o instanceof RefactoringInfo)) {
       return false;
     }
+
     RefactoringInfo that = (RefactoringInfo) o;
-    return Arrays.equals(uiStrings, that.uiStrings)
-        && getName().equals(that.getName())
-        && getType() == that.getType()
-        && getGroup() == that.getGroup();
+    return this.getNameAfter().equals(that.getNameAfter())
+        && this.getNameBefore().equals(that.getNameBefore())
+        && Objects.equals(this.getDetailsAfter(), that.getDetailsAfter())
+        && Objects.equals(this.getDetailsBefore(), that.getDetailsBefore())
+        && Objects.equals(this.getElementBefore(), that.getElementBefore())
+        && this.name.equals(that.getName())
+        && this.type == that.getType()
+        && this.group == that.getGroup();
   }
 
   public Group getGroup() {

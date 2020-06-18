@@ -113,6 +113,12 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   public void mineRepo(GitRepository repository, int limit) {
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(repository.getProject(), "Mining refactorings") {
+          @Override
+          public void onCancel() {
+            super.onCancel();
+            return;
+          }
+
           public void run(@NotNull ProgressIndicator progressIndicator) {
             mining = true;
             progressIndicator.setText("Mining refactorings");
@@ -188,6 +194,12 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     System.out.println("Mining commit " + commit.getId().asString());
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(project, "Mining at commit " + commit.getId().asString()) {
+
+          @Override
+          public void onCancel() {
+            super.onCancel();
+            return;
+          }
 
           public void onFinished() {
             super.onFinished();

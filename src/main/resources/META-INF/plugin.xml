@@ -1,10 +1,11 @@
 <idea-plugin>
-    <id>org.example.detecting-refactorings-in-code-changes</id>
+    <id>org.example.detecting-refactorings-in-code-change.refactorinsight</id>
     <name>RefactorInsight</name>
     <vendor email="bobbrockbernd@gmail.com" url="http://www.tudelft.nl">TUDelft</vendor>
 
     <description><![CDATA[
     This plugin adds functionality to the git tab in order to allow the developer to visualize specific refactorings in commits.
+    It also provides the refactoring history of a class, field or method.
       ]]></description>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
