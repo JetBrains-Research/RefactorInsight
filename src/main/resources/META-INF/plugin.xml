@@ -15,9 +15,13 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
+        <projectConfigurable parentId="tools" instance="services.SettingsConfigurable"
+                                 id="services.SettingsConfigurable"
+                                 displayName="Refactoring Detection Settings"/>
         <diff.DiffExtension implementation="ui.windows.DiffWindow"/>
         <projectService serviceImplementation="services.MiningService"/>
         <projectService serviceImplementation="services.WindowService"/>
+        <projectService serviceImplementation="services.SettingsState"/>
     </extensions>
 
     <actions>
