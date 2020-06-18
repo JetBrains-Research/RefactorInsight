@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>org.example.detecting-refactorings-in-code-changes</id>
-    <name>Refactoring detection</name>
+    <name>RefactorInsight</name>
     <vendor email="bobbrockbernd@gmail.com" url="http://www.tudelft.nl">TUDelft</vendor>
 
     <description><![CDATA[
