@@ -20,17 +20,22 @@ public class InlineOperationHandler extends Handler {
     String classNameBefore = ref.getTargetOperationBeforeInline().getClassName();
     String classNameAfter = ref.getTargetOperationAfterInline().getClassName();
 
-    return info.setGroup(Group.METHOD)
+    info.setGroup(Group.METHOD)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
         .setElementBefore(ref.getInlinedOperation().getName())
         .setElementAfter(null)
         .setNameBefore(StringUtils.calculateSignature(ref.getTargetOperationBeforeInline()))
-        .setNameAfter(StringUtils.calculateSignature(ref.getTargetOperationAfterInline()))
-        .addMarking(ref.getInlinedOperationCodeRange(),
-            ref.getInlinedCodeRangeInTargetOperation(),
-            null,
-            RefactoringLine.MarkingOption.REMOVE,
-            false);
+        .setNameAfter(StringUtils.calculateSignature(ref.getTargetOperationAfterInline()));
+
+    if (ref.getInlinedOperation().codeRange().getFilePath()
+        .equals(ref.getTargetOperationAfterInline().codeRange().getFilePath())) {
+      info.addMarking(ref.getInlinedOperationCodeRange(),
+          ref.getInlinedCodeRangeInTargetOperation(),
+          null,
+          RefactoringLine.MarkingOption.REMOVE,
+          false);
+    }
+    return info;
   }
 }

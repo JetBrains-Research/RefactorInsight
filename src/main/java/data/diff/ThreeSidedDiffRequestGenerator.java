@@ -20,6 +20,19 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
   public ThreeSidedDiffRequestGenerator() {
   }
 
+  /**
+   * Serializes a ThreeSidedDiffRequestGenerator.
+   *
+   * @return the string value
+   */
+  public static ThreeSidedDiffRequestGenerator fromString(String value) {
+    String regex = StringUtils.delimiter(LIST, true);
+    ThreeSidedDiffRequestGenerator generator = new ThreeSidedDiffRequestGenerator();
+    generator.ranges = Arrays.stream(value.split(regex))
+        .map(ThreeSidedRange::fromString).collect(Collectors.toList());
+    return generator;
+  }
+
   @Override
   public SimpleDiffRequest generate(DiffContent[] contents, RefactoringInfo info) {
     SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
@@ -40,18 +53,5 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
   public String toString() {
     return ranges.stream().map(ThreeSidedRange::toString)
         .collect(Collectors.joining(StringUtils.delimiter(LIST)));
-  }
-
-  /**
-   * Serializes a ThreeSidedDiffRequestGenerator.
-   *
-   * @return the string value
-   */
-  public static ThreeSidedDiffRequestGenerator fromString(String value) {
-    String regex = StringUtils.delimiter(LIST, true);
-    ThreeSidedDiffRequestGenerator generator = new ThreeSidedDiffRequestGenerator();
-    generator.ranges = Arrays.stream(value.split(regex))
-        .map(ThreeSidedRange::fromString).collect(Collectors.toList());
-    return generator;
   }
 }

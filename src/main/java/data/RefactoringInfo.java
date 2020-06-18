@@ -449,8 +449,24 @@ public class RefactoringInfo {
     return this;
   }
 
+  /**
+   * Corrects lines if necessary.
+   *
+   * @param before text left window
+   * @param mid    text mid window
+   * @param after  text right window
+   */
   public void correctLines(String before, String mid, String after) {
-    requestGenerator.correct(before, mid, after);
+    boolean skipAnnotationsLeft = true;
+    boolean skipAnnotationsRight = true;
+    if (name.matches("Add\\s(\\w)*\\sAnnotation")) {
+      skipAnnotationsRight = false;
+    } else if (name.matches("Remove\\s(\\w)*\\sAnnotation")) {
+      skipAnnotationsLeft = false;
+    } else if (name.matches("Modify\\s(\\w)*\\sAnnotation")) {
+      skipAnnotationsLeft = skipAnnotationsRight = false;
+    }
+    requestGenerator.correct(before, mid, after, skipAnnotationsLeft, true, skipAnnotationsRight);
   }
 
   public void correctMoreSidedLines(List<String> befores, String after) {

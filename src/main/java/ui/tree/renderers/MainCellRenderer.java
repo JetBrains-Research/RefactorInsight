@@ -49,8 +49,8 @@ public class MainCellRenderer extends ColoredTreeCellRenderer {
               ? ((info.getLineMarkings().get(0).getRightStart() + 1) + " ") : ""),
           SimpleTextAttributes.GRAY_ATTRIBUTES);
       append(object.getContent() + " ");
-      append((info.getRightPath() != null ? ("in file " + info.getRightPath()) : ""),
-          SimpleTextAttributes.GRAY_ATTRIBUTES);
+      append(((info.getRightPath() != null && !info.getRightPath().isEmpty())
+          ? ("in file " + info.getRightPath()) : ""), SimpleTextAttributes.GRAY_ATTRIBUTES);
     } else {
       append(object.getContent());
     }

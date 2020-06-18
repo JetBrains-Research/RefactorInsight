@@ -21,30 +21,58 @@ public class MoveRenameClassHandler extends Handler {
       info.setGroup(Group.CLASS);
     }
 
-    String[] nameSpace = ref.getRenamedClass().getName().split("\\.");
-    String className = nameSpace[nameSpace.length - 1];
-    String[] nameSpace2 = ref.getOriginalClass().getName().split("\\.");
-    String className2 = nameSpace2[nameSpace2.length - 1];
-
-    return info
-        .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
-            (line) -> {
-              line.setWord(
-                  new String[] {ref.getOriginalClass().getPackageName(), null,
-                      ref.getRenamedClass().getPackageName()});
-            },
-            RefactoringLine.MarkingOption.PACKAGE,
-            true)
-        .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
-            (line) -> {
-              line.setWord(
-                  new String[] {className2, null, className});
-            },
-            RefactoringLine.MarkingOption.COLLAPSE,
-            true)
+    String[] nameSpaceBefore = ref.getOriginalClass().getName().split("\\.");
+    String classNameBefore = nameSpaceBefore[nameSpaceBefore.length - 1];
+    String[] nameSpaceAfter = ref.getRenamedClass().getName().split("\\.");
+    String classNameAfter = nameSpaceAfter[nameSpaceAfter.length - 1];
+    info.addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
+        (line) -> {
+          line.setWord(
+              new String[] {classNameBefore, null, classNameAfter});
+        },
+        RefactoringLine.MarkingOption.COLLAPSE,
+        false)
         .setNameBefore(ref.getOriginalClassName())
         .setNameAfter(ref.getRenamedClassName())
         .setDetailsBefore(ref.getOriginalClass().getPackageName())
         .setDetailsAfter(ref.getRenamedClass().getPackageName());
+
+    String packageBefore = ref.getOriginalClass().getPackageName();
+    String packageAfter = ref.getRenamedClass().getPackageName();
+
+    String fileBefore = ref.getOriginalClass().getSourceFile();
+    String fileAfter = ref.getRenamedClass().getSourceFile();
+
+    fileBefore = fileBefore.substring(fileBefore.lastIndexOf("/") + 1);
+    final String left = fileBefore.substring(0, fileBefore.lastIndexOf("."));
+
+    fileAfter = fileAfter.substring(fileAfter.lastIndexOf("/") + 1);
+    final String right = fileAfter.substring(0, fileAfter.lastIndexOf("."));
+
+    String originalClassName = ref.getOriginalClassName();
+    String movedClassName = ref.getRenamedClassName();
+    originalClassName = originalClassName.contains(".")
+        ? originalClassName.substring(originalClassName.lastIndexOf(".") + 1) : originalClassName;
+    movedClassName = movedClassName.contains(".")
+        ? movedClassName.substring(movedClassName.lastIndexOf(".") + 1) : movedClassName;
+
+    //check if it is inner class
+    if ((!left.equals(originalClassName) && packageBefore.contains(left))
+        || (!right.equals(movedClassName) && packageAfter.contains(right))) {
+      return info
+          .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
+              null,
+              RefactoringLine.MarkingOption.COLLAPSE,
+              false);
+    }
+    return info
+        .addMarking(ref.getOriginalClass().codeRange(), ref.getRenamedClass().codeRange(),
+            (line) -> {
+              line.setWord(
+                  new String[] {packageBefore, null, packageAfter});
+            },
+            RefactoringLine.MarkingOption.PACKAGE,
+            false);
+
   }
 }
