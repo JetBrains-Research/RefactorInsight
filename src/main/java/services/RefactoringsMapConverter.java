@@ -7,18 +7,24 @@ import static utils.StringUtils.delimiter;
 import com.intellij.util.xmlb.Converter;
 import data.RefactoringEntry;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 class RefactoringsMapConverter extends Converter<RefactoringsMap> {
 
   public RefactoringsMap fromString(String value) {
-    String regex1 = delimiter(MAP, true);
-    String regex2 = delimiter(MAP_ENTRY, true);
-    String[] tokens = value.split(regex1, 2);
-    return new RefactoringsMap(Arrays.stream(tokens[1].split(regex1))
-        .map(entry -> entry.split(regex2))
-        .collect(Collectors.toMap(entry -> entry[0],
-            entry -> RefactoringEntry.fromString(entry[1], entry[0]))), tokens[0]);
+    try {
+      String regex1 = delimiter(MAP, true);
+      String regex2 = delimiter(MAP_ENTRY, true);
+      String[] tokens = value.split(regex1, 2);
+      return new RefactoringsMap(Arrays.stream(tokens[1].split(regex1))
+          .map(entry -> entry.split(regex2))
+          .collect(Collectors.toMap(entry -> entry[0],
+              entry -> RefactoringEntry.fromString(entry[1], entry[0]))), tokens[0]);
+    } catch (Exception e) {
+      System.out.println("Deprecated xml format");
+      return new RefactoringsMap(new HashMap<>(), "-1");
+    }
   }
 
   public String toString(RefactoringsMap value) {
