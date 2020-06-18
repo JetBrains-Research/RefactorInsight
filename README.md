@@ -62,12 +62,12 @@ An example for a class `LuxuryCar` is presented below.
 
 If you double-click on a leaf node in a tree, the VCS log opens at that specific commit.
 
-<img src="assets/img/history_example2.png" alt="RefactoringHistory3" width="400">
+<img src="assets/img/history_example2.png" alt="RefactoringHistory3" width="900">
 
 
 In the main Tools menu, you can select Mine All Refactorings if the commits have not been mined.
 
-<img src="assets/img/toolbar.png" alt="Tools" width="300">
+<img src="assets/img/toolbar.png" alt="Tools" width="200">
 
 
 
