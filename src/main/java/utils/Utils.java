@@ -9,6 +9,7 @@ import static org.refactoringminer.api.RefactoringType.RENAME_PARAMETER;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.vcs.LocalFilePath;
 import com.intellij.openapi.vcs.VcsException;
@@ -194,16 +195,29 @@ public class Utils {
     GitRevisionNumber afterNumber = new GitRevisionNumber(info.getCommitId());
     GitRevisionNumber beforeNumber = new GitRevisionNumber(info.getParent());
 
+
     try {
-      String before = GitContentRevision
-          .createRevision(beforePath, beforeNumber, project).getContent();
-      String mid = !info.isThreeSided() ? null : GitContentRevision
-          .createRevision(midPath, afterNumber, project).getContent();
       String after = GitContentRevision
           .createRevision(afterPath, afterNumber, project).getContent();
 
-      info.correctLines(before, mid, after);
+      if (!info.isMoreSided()) {
+        String before = GitContentRevision
+            .createRevision(beforePath, beforeNumber, project).getContent();
+        String mid = !info.isThreeSided() ? null : GitContentRevision
+            .createRevision(midPath, afterNumber, project).getContent();
 
+        info.correctLines(before, mid, after);
+      } else {
+        List<String> befores = new ArrayList<>();
+        for (Pair<String, Boolean> pathPair : info.getMoreSidedLeftPaths()) {
+          GitRevisionNumber number = pathPair.second ? afterNumber : beforeNumber;
+          FilePath filePath =
+              new LocalFilePath(project.getBasePath() + "/" + pathPair.first, false);
+          befores.add(
+              GitContentRevision.createRevision(filePath, number, project).getContent());
+        }
+        info.correctMoreSidedLines(befores, after);
+      }
     } catch (VcsException e) {
       System.out.println(info.getName() + " refactoring not implemented yet");
     }

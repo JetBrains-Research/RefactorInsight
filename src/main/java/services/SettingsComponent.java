@@ -1,0 +1,123 @@
+package services;
+
+import com.google.common.io.Files;
+import com.intellij.icons.AllIcons;
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.JBIntSpinner;
+import com.intellij.util.Consumer;
+import com.intellij.util.ui.FormBuilder;
+import git4idea.repo.GitRepository;
+import git4idea.repo.GitRepositoryManager;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+public class SettingsComponent {
+  private final JPanel myMainPanel;
+  private final JBIntSpinner commitLimit =
+      new JBIntSpinner(100, 0, Integer.MAX_VALUE, 10);
+  private final JBIntSpinner historyLimit =
+      new JBIntSpinner(100, 0, Integer.MAX_VALUE, 10);
+  private final JBIntSpinner threads =
+      new JBIntSpinner(8, 0, Integer.MAX_VALUE, 1);
+
+  /**
+   * SettingsComponent constructor. Creates the setting panel.
+   */
+  public SettingsComponent(Project project) {
+
+    JButton clear = new JButton("Clear Cache");
+    clear.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        MiningService.getInstance(project).clear();
+      }
+    });
+    JButton all = new JButton("Mine All");
+    all.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        GitRepository repository = GitRepositoryManager
+            .getInstance(project).getRepositories().get(0);
+        MiningService.getInstance(project).mineAll(repository);
+      }
+    });
+    JButton choose = new JButton("Import xml");
+    choose.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        FileChooser.chooseFile(
+            FileChooserDescriptorFactory.createSingleFileDescriptor("xml"),
+            project,
+            null,
+            file -> {
+              try {
+                String content = VfsUtil.loadText(file);
+                content = content.split("value=\"", 2)[1];
+                content = content.substring(0, content.lastIndexOf('\"'));
+                MiningService.getInstance(project).getState().refactoringsMap =
+                    new RefactoringsMapConverter().fromString(content);
+              } catch (Exception ex) {
+                ex.printStackTrace();
+              }
+            }
+        );
+      }
+    });
+
+    myMainPanel = FormBuilder.createFormBuilder()
+        .addLabeledComponent("Max commits to mine: ", commitLimit, 1, false)
+        .addLabeledComponent("Max commits to compute history for: ", historyLimit, 1, false)
+        .addLabeledComponent("Number of threads to use for mining: ", threads, 1, false)
+        .addComponent(clear)
+        .addComponent(all)
+        .addComponent(choose)
+        .addComponentFillVertically(new JPanel(), 0)
+        .getPanel();
+
+  }
+
+  public JPanel getPanel() {
+    return myMainPanel;
+  }
+
+  public JComponent getPreferredFocusedComponent() {
+    return commitLimit;
+  }
+
+  public int getCommitLimit() {
+    return commitLimit.getNumber();
+  }
+
+  public void setCommitLimit(int limit) {
+    this.commitLimit.setNumber(limit);
+  }
+
+  public int getHistoryLimit() {
+    return historyLimit.getNumber();
+  }
+
+  public void setHistoryLimit(int limit) {
+    this.historyLimit.setNumber(limit);
+  }
+
+  public int getThreads() {
+    return threads.getNumber();
+  }
+
+  public void setThreads(int n) {
+    this.threads.setNumber(n);
+  }
+}

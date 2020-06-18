@@ -5,7 +5,9 @@ import static utils.StringUtils.delimiter;
 
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
+import com.intellij.openapi.util.Pair;
 import data.diff.DiffRequestGenerator;
+import data.diff.MoreSidedDiffRequestGenerator;
 import data.diff.ThreeSidedDiffRequestGenerator;
 import data.diff.TwoSidedDiffRequestGenerator;
 import gr.uom.java.xmi.diff.CodeRange;
@@ -32,6 +34,7 @@ public class RefactoringInfo {
 
   private String[][] uiStrings = new String[3][2];
   private String[] paths = new String[3];
+  private transient List<Pair<String, Boolean>> moreSidedLeftPaths = new ArrayList<>();
 
   private Group group;
 
@@ -39,6 +42,7 @@ public class RefactoringInfo {
 
   private boolean hidden = false;
   private boolean threeSided = false;
+  private boolean moreSided = false;
 
   /**
    * Deserializes a RefactoringInfo.
@@ -48,8 +52,8 @@ public class RefactoringInfo {
    */
   public static RefactoringInfo fromString(String value) {
     String regex = delimiter(INFO, true);
-    String[] tokens = value.split(regex, 15);
-    return new RefactoringInfo()
+    String[] tokens = value.split(regex, 16);
+    RefactoringInfo info = new RefactoringInfo()
         .setName(tokens[0])
         .setNameBefore(StringUtils.deSanitize(tokens[1]))
         .setNameAfter(StringUtils.deSanitize(tokens[2]))
@@ -63,11 +67,20 @@ public class RefactoringInfo {
         .setGroup(Group.valueOf(tokens[10]))
         .setThreeSided(tokens[11].equals("t"))
         .setHidden(tokens[12].equals("t"))
-        .setRequestGenerator(tokens[11].equals("t")
-            ? ThreeSidedDiffRequestGenerator.fromString(tokens[13])
-            : TwoSidedDiffRequestGenerator.fromString(tokens[13]))
+        .setMoreSided(tokens[13].equals("t"))
         .setIncludes(new HashSet<>(
-            tokens[14].isEmpty() ? List.of() : Arrays.asList(tokens[14].split(regex))));
+            tokens[15].isEmpty() ? List.of() : Arrays.asList(tokens[15].split(regex))));
+
+    DiffRequestGenerator diffGenerator;
+    if (info.isMoreSided()) {
+      diffGenerator = MoreSidedDiffRequestGenerator.fromString(tokens[14]);
+    } else if (info.isThreeSided()) {
+      diffGenerator = ThreeSidedDiffRequestGenerator.fromString(tokens[14]);
+    } else {
+      diffGenerator = TwoSidedDiffRequestGenerator.fromString(tokens[14]);
+    }
+
+    return info.setRequestGenerator(diffGenerator);
   }
 
   public SimpleDiffRequest generate(DiffContent[] contents) {
@@ -91,6 +104,7 @@ public class RefactoringInfo {
         group.toString(),
         threeSided ? "t" : "f",
         hidden ? "t" : "f",
+        moreSided ? "t" : "f",
         requestGenerator.toString(),
         String.join(delimiter(INFO), includes)
     );
@@ -122,9 +136,9 @@ public class RefactoringInfo {
     }
 
     if (group != Group.VARIABLE) {
-      ArrayList<RefactoringInfo> data = map.getOrDefault(before, new ArrayList<RefactoringInfo>());
+      ArrayList<RefactoringInfo> data = map.getOrDefault(before, new ArrayList<>());
       map.remove(before);
-      ArrayList<RefactoringInfo> data2 = map.getOrDefault(after, new ArrayList<RefactoringInfo>());
+      ArrayList<RefactoringInfo> data2 = map.getOrDefault(after, new ArrayList<>());
       data.add(this);
       for (RefactoringInfo info : data) {
         if (!data2.contains(info)) {
@@ -202,11 +216,18 @@ public class RefactoringInfo {
                                     boolean hasColumns) {
 
     requestGenerator.addMarking(left, mid, right, type, offsetFunction, option, hasColumns);
-    setLeftPath(left.getFilePath());
+    if (left != null) {
+      setLeftPath(left.getFilePath());
+      if (moreSided) {
+        moreSidedLeftPaths.add(new Pair<>(left.getFilePath(), true));
+      }
+    }
     if (mid != null) {
       setMidPath(mid.getFilePath());
     }
-    setRightPath(right.getFilePath());
+    if (right != null) {
+      setRightPath(right.getFilePath());
+    }
     return this;
   }
 
@@ -256,6 +277,24 @@ public class RefactoringInfo {
     return this;
   }
 
+  public boolean isMoreSided() {
+    return moreSided;
+  }
+
+  /**
+   * Sets boolean for more sided refactoring types (Extract method).
+   *
+   * @param moreSided Boolean
+   * @return this
+   */
+  public RefactoringInfo setMoreSided(boolean moreSided) {
+    this.moreSided = moreSided;
+    if (moreSided) {
+      requestGenerator = new MoreSidedDiffRequestGenerator();
+    }
+    return this;
+  }
+
   public RefactoringEntry getEntry() {
     return entry;
   }
@@ -263,6 +302,23 @@ public class RefactoringInfo {
   public RefactoringInfo setEntry(RefactoringEntry entry) {
     this.entry = entry;
     return this;
+  }
+
+  /**
+   * Getter for left path list.
+   * If empty generates it from data in generator.
+   * @return
+   */
+  public List<Pair<String, Boolean>> getMoreSidedLeftPaths() {
+    if (moreSidedLeftPaths.isEmpty()) {
+      MoreSidedDiffRequestGenerator generator = (MoreSidedDiffRequestGenerator) requestGenerator;
+      moreSidedLeftPaths = generator.getLines().stream()
+          .map(line ->
+              new Pair<>(line.leftPath, line.startLineRight == -1 && line.endLineRight == -1))
+          .collect(Collectors.toList());
+
+    }
+    return moreSidedLeftPaths;
   }
 
   public RefactoringType getType() {
@@ -382,7 +438,6 @@ public class RefactoringInfo {
     return this;
   }
 
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -425,6 +480,11 @@ public class RefactoringInfo {
       skipAnnotationsLeft = skipAnnotationsRight = false;
     }
     requestGenerator.correct(before, mid, after, skipAnnotationsLeft, true, skipAnnotationsRight);
+  }
+
+  public void correctMoreSidedLines(List<String> befores, String after) {
+    ((MoreSidedDiffRequestGenerator) requestGenerator).correct(befores, after, moreSidedLeftPaths,
+        true, false, true);
   }
 
 }

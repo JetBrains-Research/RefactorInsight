@@ -23,7 +23,7 @@ public class RefactoringAction extends AnAction {
     GitRepository repository = repositories.get(0);
 
     MiningService.getInstance(e.getProject()).clear();
-    MiningService.getInstance(e.getProject()).mineRepo(repository);
+    MiningService.getInstance(e.getProject()).mineAll(repository);
   }
 
 }

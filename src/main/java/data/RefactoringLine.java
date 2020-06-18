@@ -5,6 +5,7 @@ import com.intellij.diff.fragments.DiffFragmentImpl;
 import com.intellij.diff.fragments.LineFragmentImpl;
 import com.intellij.diff.fragments.MergeLineFragmentImpl;
 import com.intellij.openapi.util.TextRange;
+import data.diff.MoreSidedDiffRequestGenerator;
 import data.diff.ThreeSidedRange;
 import gr.uom.java.xmi.LocationInfo;
 import gr.uom.java.xmi.diff.CodeRange;
@@ -32,16 +33,28 @@ public class RefactoringLine {
   private List<TextRange> mid;
   private List<TextRange> right;
   private LineFragmentImpl fragment;
+  private MoreSidedDiffRequestGenerator.Data moreSidedData;
   private MarkingOption markingOption;
+  private boolean moreSided;
 
   /**
    * Data holder for three sided refactoring diff.
    */
   public RefactoringLine(CodeRange left, CodeRange mid, CodeRange right,
                          VisualisationType type, MarkingOption option, boolean hasColumns) {
-    processLinesAndCols(left, mid, right, hasColumns);
+    this(left, mid, right, type, option, hasColumns, false);
+  }
+
+  /**
+   * Data holder for three sided refactoring diff.
+   */
+  public RefactoringLine(CodeRange left, CodeRange mid, CodeRange right,
+                         VisualisationType type, MarkingOption option,
+                         boolean hasColumns, boolean moreSided) {
     this.markingOption = option;
     this.type = type;
+    this.moreSided = moreSided;
+    processLinesAndCols(left, mid, right, hasColumns);
   }
 
   /**
@@ -49,24 +62,19 @@ public class RefactoringLine {
    *
    * @param leftText  String containing whole left file contents
    * @param midText   String containing whole middle file contents
-   * @param rightText String containing whole righr file contents
+   * @param rightText String containing whole right file contents
    */
   public void correctLines(String leftText, String midText, String rightText,
                            boolean skipAnnotationsLeft, boolean skipAnnotationsMid,
                            boolean skipAnnotationsRight) {
-    int maxLineLeft = Utils.getMaxLine(leftText);
-    int maxLineRight = Utils.getMaxLine(rightText);
-    lines[RIGHT_END] =
-        lines[RIGHT_END] < 0 || lines[RIGHT_END] > maxLineRight ? maxLineRight : lines[RIGHT_END];
-    lines[LEFT_END] =
-        lines[LEFT_END] < 0 || lines[LEFT_END] > maxLineLeft ? maxLineLeft : lines[LEFT_END];
-    lines[RIGHT_START] =
-        lines[RIGHT_START] < 0 || lines[RIGHT_START] > maxLineRight ? 0 : lines[RIGHT_START];
-    lines[LEFT_START] =
-        lines[LEFT_START] < 0 || lines[LEFT_START] > maxLineLeft ? 0 : lines[LEFT_START];
-
-    lines[RIGHT_START] = Utils.skipJavadoc(rightText, lines[RIGHT_START], skipAnnotationsRight);
-    lines[LEFT_START] = Utils.skipJavadoc(leftText, lines[LEFT_START], skipAnnotationsLeft);
+    if (leftText != null) {
+      int maxLineLeft = Utils.getMaxLine(leftText);
+      lines[LEFT_END] =
+          lines[LEFT_END] < 0 || lines[LEFT_END] > maxLineLeft ? maxLineLeft : lines[LEFT_END];
+      lines[LEFT_START] =
+          lines[LEFT_START] < 0 || lines[LEFT_START] > maxLineLeft ? 0 : lines[LEFT_START];
+      lines[LEFT_START] = Utils.skipJavadoc(leftText, lines[LEFT_START], skipAnnotationsLeft);
+    }
 
     if (midText != null) {
       int maxLineMid = Utils.getMaxLine(midText);
@@ -77,16 +85,45 @@ public class RefactoringLine {
       lines[MID_START] = Utils.skipJavadoc(midText, lines[MID_START], skipAnnotationsMid);
 
     }
+
+    if (rightText != null) {
+      int maxLineRight = Utils.getMaxLine(rightText);
+      lines[RIGHT_END] =
+          lines[RIGHT_END] < 0 || lines[RIGHT_END] > maxLineRight ? maxLineRight : lines[RIGHT_END];
+      lines[RIGHT_START] =
+          lines[RIGHT_START] < 0 || lines[RIGHT_START] > maxLineRight ? 0 : lines[RIGHT_START];
+      lines[RIGHT_START] = Utils.skipJavadoc(rightText, lines[RIGHT_START], skipAnnotationsRight);
+    }
+
+
     if (markingOption == MarkingOption.PACKAGE) {
       highlightPackage(leftText, rightText);
     }
     processOption(midText != null, markingOption);
     computeHighlighting(leftText, midText, rightText);
+    if (moreSided) {
+      computeMoreSidedRanges(leftText, rightText);
+    }
     if (midText == null) {
       computeTwoSidedRanges(leftText, rightText);
     } else {
       computeThreeSidedRanges(leftText, midText, rightText);
     }
+  }
+
+  private void computeMoreSidedRanges(String leftText, String rightText) {
+    MoreSidedDiffRequestGenerator.Data data = new MoreSidedDiffRequestGenerator.Data();
+    data.startLineLeft = lines[LEFT_START] + 1;
+    data.endLineLeft = lines[LEFT_END];
+    data.startOffsetLeft = Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]);
+    data.endOffsetLeft = Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]);
+
+    data.startLineRight = lines[RIGHT_START] + 1;
+    data.endLineRight = lines[RIGHT_END];
+    data.startOffsetRight =
+        Utils.getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]);
+    data.endOffsetRight = Utils.getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END]);
+    moreSidedData = data;
   }
 
   private void computeThreeSidedRanges(String leftText, String midText, String rightText) {
@@ -235,6 +272,13 @@ public class RefactoringLine {
     lazy = true;
   }
 
+  public void setMoreSided(boolean moreSided) {
+    this.moreSided = moreSided;
+  }
+
+  public MoreSidedDiffRequestGenerator.Data getMoreSidedData() {
+    return moreSidedData;
+  }
 
   private void processOption(boolean hasMid, MarkingOption option) {
     switch (option) {
@@ -271,24 +315,29 @@ public class RefactoringLine {
 
   private void processLinesAndCols(CodeRange left, CodeRange mid, CodeRange right,
                                    boolean hasColumns) {
-    lines[LEFT_START] = left.getStartLine() - 1;
-    lines[LEFT_END] = left.getEndLine();
-    lines[RIGHT_START] = right.getStartLine() - 1;
-    lines[RIGHT_END] = right.getEndLine();
     this.hasColumns = hasColumns;
-    if (hasColumns) {
-      columns[LEFT_START] = Math.max(left.getStartColumn(), 1);
-      columns[LEFT_END] = Math.max(left.getEndColumn(), 1);
-      columns[RIGHT_START] = Math.max(right.getStartColumn(), 1);
-      columns[RIGHT_END] = Math.max(right.getEndColumn(), 1);
+    if (left != null) {
+      lines[LEFT_START] = left.getStartLine() - 1;
+      lines[LEFT_END] = left.getEndLine();
+      if (hasColumns) {
+        columns[LEFT_START] = Math.max(left.getStartColumn(), 1);
+        columns[LEFT_END] = Math.max(left.getEndColumn(), 1);
+      }
     }
-
     if (mid != null) {
       lines[MID_START] = mid.getStartLine() - 1;
       lines[MID_END] = mid.getEndLine();
       if (hasColumns) {
         columns[MID_START] = Math.max(mid.getStartColumn(), 1);
         columns[MID_END] = Math.max(mid.getEndColumn(), 1);
+      }
+    }
+    if (right != null) {
+      lines[RIGHT_START] = right.getStartLine() - 1;
+      lines[RIGHT_END] = right.getEndLine();
+      if (hasColumns) {
+        columns[RIGHT_START] = Math.max(right.getStartColumn(), 1);
+        columns[RIGHT_END] = Math.max(right.getEndColumn(), 1);
       }
     }
   }
