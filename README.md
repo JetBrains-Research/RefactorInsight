@@ -70,6 +70,9 @@ In the main Tools menu, you can select Mine All Refactorings if the commits have
 <img src="assets/img/toolbar.png" alt="Tools" width="200">
 
 
+The detected code refactorings are stored and persisted in the `refactorings.xml` file that can be found in the
+`.idea` folder. If the file is deleted, the commits are mined with the next repository changed event.
+
 
 
 
