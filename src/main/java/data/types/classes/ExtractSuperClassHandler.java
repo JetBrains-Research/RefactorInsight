@@ -2,6 +2,7 @@ package data.types.classes;
 
 import data.Group;
 import data.RefactoringInfo;
+import data.RefactoringLine;
 import data.types.Handler;
 import gr.uom.java.xmi.diff.ExtractSuperclassRefactoring;
 import org.refactoringminer.api.Refactoring;
@@ -22,10 +23,23 @@ public class ExtractSuperClassHandler extends Handler {
       info.setGroup(Group.CLASS);
     }
 
-    return info
-        .setDetailsBefore(ref.getExtractedClass().getPackageName())
+    info.setDetailsBefore(ref.getExtractedClass().getPackageName())
         .setDetailsAfter(ref.getExtractedClass().getPackageName())
         .setNameBefore(ref.getExtractedClass().getName())
-        .setNameAfter(ref.getExtractedClass().getName());
+        .setNameAfter(ref.getExtractedClass().getName())
+        .setMoreSided(true)
+        .setRightPath(ref.getExtractedClass().codeRange().getFilePath());
+
+    String[] nameSpace = ref.getExtractedClass().getName().split("\\.");
+    String className = nameSpace[nameSpace.length - 1];
+
+    ref.getUMLSubclassSet().forEach(subClass -> {
+      info.addMarking(subClass.codeRange(), null, line ->
+          line.setWord(new String[] {className, null, null}),
+          RefactoringLine.MarkingOption.COLLAPSE, true);
+    });
+
+
+    return info;
   }
 }

@@ -19,7 +19,7 @@ public class StringUtils {
   public static final int LIST = 4;
   public static final int FRAG = 5;
   public static final int RANGE = 6;
-  public static final String[] delimiters = {"§", "=", "`", "±", "!", ",", ";"};
+  public static final String[] delimiters = {"_", "=", "`", "-", "!", ",", ";"};
 
   public static String delimiter(int option, boolean escaped) {
     return (escaped ? ESC_REGEX : "") + delimiters[option];

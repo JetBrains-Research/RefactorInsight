@@ -1,9 +1,13 @@
 package data;
 
 import static org.refactoringminer.api.RefactoringType.EXTRACT_CLASS;
+import static org.refactoringminer.api.RefactoringType.EXTRACT_SUPERCLASS;
+import static org.refactoringminer.api.RefactoringType.PULL_UP_ATTRIBUTE;
+import static org.refactoringminer.api.RefactoringType.PULL_UP_OPERATION;
 import static utils.StringUtils.ENTRY;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -58,13 +62,6 @@ public class RefactoringEntry implements Serializable {
     return entry;
   }
 
-  @Override
-  public String toString() {
-    String del = StringUtils.delimiter(ENTRY);
-    return parent + del + time + del + refactorings.stream()
-        .map(RefactoringInfo::toString).collect(Collectors.joining(del));
-  }
-
   /**
    * Converter to Json.
    *
@@ -89,7 +86,15 @@ public class RefactoringEntry implements Serializable {
     return entry;
   }
 
+  @Override
+  public String toString() {
+    String del = StringUtils.delimiter(ENTRY);
+    return parent + del + time + del + refactorings.stream()
+        .map(RefactoringInfo::toString).collect(Collectors.joining(del));
+  }
+
   private void combineRelated() {
+    combineRelatedExtractSuperClass();
     combineRelatedExtractClass();
 
     HashMap<String, List<RefactoringInfo>> groups = new HashMap<>();
@@ -119,6 +124,38 @@ public class RefactoringEntry implements Serializable {
         });
       }
     });
+  }
+
+  private void combineRelatedExtractSuperClass() {
+    //Find all extract Super Class Refactorings
+    List<RefactoringInfo> superClassRefs = refactorings.stream()
+        .filter(info -> info.getType() == EXTRACT_SUPERCLASS)
+        .collect(Collectors.toList());
+
+    //Find all pull up refactorings
+    List<RefactoringInfo> pullUpRefs = refactorings.stream()
+        .filter(info -> info.getType() == PULL_UP_ATTRIBUTE || info.getType() == PULL_UP_OPERATION)
+        .collect(Collectors.toList());
+
+
+    superClassRefs.forEach(info -> {
+      String superPath = info.getRightPath();
+      //Relate
+      List<RefactoringInfo> related = pullUpRefs.stream()
+          .filter(pullUp -> pullUp.getRightPath().equals(superPath))
+          .collect(Collectors.toList());
+
+      //Combine ranges
+      related.forEach(relInfo -> {
+        relInfo.setHidden(true);
+        relInfo.getLineMarkings().forEach(line -> {
+          line.setMoreSided(true);
+          info.getLineMarkings().add(0, line);
+          info.getMoreSidedLeftPaths().add(0, new Pair<>(relInfo.getLeftPath(), false));
+        });
+      });
+    });
+
   }
 
   private void combineRelatedExtractClass() {

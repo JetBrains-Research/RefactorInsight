@@ -76,10 +76,7 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
   }
 
   @Override
-  public void correct(String before, String mid, String after, boolean skipAnnotationsLeft,
-                      boolean skipAnnotationsMid, boolean skipAnnotationsRight) {
-    super
-        .correct(before, mid, after, skipAnnotationsLeft, skipAnnotationsMid, skipAnnotationsRight);
+  public void prepareJetBrainsRanges(List<RefactoringLine> lineMarkings) {
     fragments = lineMarkings.stream()
         .map(RefactoringLine::getTwoSidedRange)
         .filter(Objects::nonNull)
