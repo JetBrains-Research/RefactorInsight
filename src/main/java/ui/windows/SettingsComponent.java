@@ -1,4 +1,4 @@
-package services;
+package ui.windows;
 
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -13,6 +13,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import services.MiningService;
+import services.RefactoringsMapConverter;
 
 public class SettingsComponent {
   private final JPanel myMainPanel;

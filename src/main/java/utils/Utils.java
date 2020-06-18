@@ -14,14 +14,27 @@ import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.vcs.LocalFilePath;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.wm.ToolWindowManager;
+import data.RefactoringEntry;
 import data.RefactoringInfo;
+import data.RefactoringLine;
 import git4idea.GitContentRevision;
 import git4idea.GitRevisionNumber;
+import git4idea.repo.GitRepository;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.refactoringminer.api.RefactoringType;
+import services.RefactoringsBundle;
 
 public class Utils {
 
@@ -241,5 +254,39 @@ public class Utils {
       }
     }
     return 0;
+  }
+
+  /**
+   * Get the total amount of commits in a repository.
+   *
+   * @param repository GitRepository
+   * @return the amount of commits
+   * @throws IOException in case of a problem
+   */
+  public static int getCommitCount(GitRepository repository) throws IOException {
+    Process process = Runtime.getRuntime().exec("git rev-list --all --count", null,
+        new File(repository.getRoot().getCanonicalPath()));
+    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+    String output = reader.readLine();
+    return Integer.parseInt(output);
+  }
+
+  /**
+   * Calculates the version of the project by computing the hash code of the existing classes.
+   *
+   * @return the current version.
+   */
+  public static String version() {
+    return RefactoringsBundle.message("version") + String.valueOf(Stream.of(
+        //all classes that can change
+        RefactoringEntry.class,
+        RefactoringInfo.class,
+        RefactoringLine.class,
+        RefactoringLine.RefactoringOffset.class
+    ).flatMap(c -> Arrays.stream(c.getDeclaredFields())
+        .map(Field::getGenericType)
+        .map(Type::getTypeName)
+    ).collect(Collectors.toList()))
+        .hashCode();
   }
 }

@@ -4,7 +4,6 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
@@ -26,16 +25,20 @@ import ui.windows.RefactoringHistoryToolbar;
 import utils.StringUtils;
 import utils.Utils;
 
+/**
+ * This is the Check Refactorings History Action.
+ * If the currently opened project is a git repository, it retrieves
+ * the refactoring history map that should be in the MiningService instance
+ * of this project.
+ * It checks if the selected PsiElement is instances of Class, Method or Field.
+ * It computes the last object's signature and retrieves the data from the
+ * refactoring history map.
+ */
 public class RefactoringHistoryAction extends AnAction {
 
   Map<String, ArrayList<RefactoringInfo>> map;
   RefactoringHistoryToolbar refactoringHistoryToolbar;
 
-  /**
-   * Implement this method to provide your action handler.
-   *
-   * @param e Carries information on the invocation place
-   */
   @Override
   public void actionPerformed(@NotNull AnActionEvent e) {
     Project project = e.getProject();
@@ -51,6 +54,13 @@ public class RefactoringHistoryAction extends AnAction {
     showHistory(project, dataContext, usageTarget);
   }
 
+  /**
+   * Checks if the selected object is instance of Class, Field or Method.
+   *
+   * @param project     the currently opened project
+   * @param dataContext context in editor
+   * @param usageTarget the target of the action call
+   */
   private void showHistory(Project project, DataContext dataContext,
                            UsageTarget[] usageTarget) {
     if (usageTarget != null) {
@@ -69,25 +79,6 @@ public class RefactoringHistoryAction extends AnAction {
         }
       }
     }
-  }
-
-  @Override
-  public void update(@NotNull AnActionEvent e) {
-    e.getPresentation().setVisible(true);
-    super.update(e);
-  }
-
-  /**
-   * Create or get a method refactorings toolbar window.
-   *
-   * @param project the current project.
-   * @return a new method refactorings toolbar window.
-   */
-  public RefactoringHistoryToolbar getToolbarWindow(Project project) {
-    if (refactoringHistoryToolbar == null || Utils.manager == null) {
-      refactoringHistoryToolbar = new RefactoringHistoryToolbar(project);
-    }
-    return refactoringHistoryToolbar;
   }
 
   private void showHistoryAttribute(Project project, DataContext dataContext,
@@ -125,6 +116,25 @@ public class RefactoringHistoryAction extends AnAction {
     getToolbarWindow(project)
         .showToolbar(map.getOrDefault(signature, new ArrayList<RefactoringInfo>()),
             method.getName(), dataContext, HistoryType.METHOD, null, null);
+  }
+
+  @Override
+  public void update(@NotNull AnActionEvent e) {
+    e.getPresentation().setVisible(true);
+    super.update(e);
+  }
+
+  /**
+   * Create or get a method refactorings toolbar window.
+   *
+   * @param project the current project.
+   * @return a new method refactorings toolbar window.
+   */
+  public RefactoringHistoryToolbar getToolbarWindow(Project project) {
+    if (refactoringHistoryToolbar == null || Utils.manager == null) {
+      refactoringHistoryToolbar = new RefactoringHistoryToolbar(project);
+    }
+    return refactoringHistoryToolbar;
   }
 
 }

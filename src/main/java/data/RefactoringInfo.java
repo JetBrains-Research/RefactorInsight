@@ -23,6 +23,16 @@ import java.util.stream.Stream;
 import org.refactoringminer.api.RefactoringType;
 import utils.StringUtils;
 
+/**
+ * This is the RefactoringInfo object that stores the information needed
+ * for displaying one refactoring. It stores a diff request generator,
+ * a name, ui node strings, paths, the group where it belongs,
+ * if it is hidden, three-sided or a more-sided refactoring. RefactoringInfo
+ * contains also information about any refactoring that it implies
+ * (used when combining refactorings).
+ * Here, each refactoring is added to the refactoring history map used in
+ * Check Refactoring History Action.
+ */
 public class RefactoringInfo {
 
   private transient RefactoringEntry entry;
@@ -307,6 +317,7 @@ public class RefactoringInfo {
   /**
    * Getter for left path list.
    * If empty generates it from data in generator.
+   *
    * @return
    */
   public List<Pair<String, Boolean>> getMoreSidedLeftPaths() {

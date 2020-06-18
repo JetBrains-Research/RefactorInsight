@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import utils.StringUtils;
 
+/**
+ * Creates ThreeSidedRanges out of RefactoringLines in order to create three sided diff windows.
+ */
 public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
 
   private List<ThreeSidedRange> ranges;
