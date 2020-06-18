@@ -265,11 +265,12 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
   public static class MoreSidedRenderer implements Disposable,
       ListCellRenderer<Pair<MoreSidedDiffRequestGenerator.Data, Project>> {
 
-    JComponent[] components;
-    List<EditorImpl> editors = new ArrayList<>();
+    TitlePanel[] titles;
+    Editor[] editors;
 
     public MoreSidedRenderer(int size) {
-      components = new JComponent[size];
+      titles = new TitlePanel[size];
+      editors = new Editor[size];
     }
 
     @Override
@@ -277,16 +278,19 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
         JList<? extends Pair<MoreSidedDiffRequestGenerator.Data, Project>> jlist,
         Pair<MoreSidedDiffRequestGenerator.Data, Project> pair, int i, boolean b,
         boolean b1) {
-      //If component null generate ui.
-      if (components[i] == null) {
-        //If project null generate TitlePanel instead.
-        if (pair.second == null) {
-          components[i] = new TitlePanel(pair.first.leftPath, null);
-        } else {
-          generateEditor(i, pair);
+      //is title panel
+      if (pair.second == null) {
+        if (titles[i] == null) {
+          titles[i] = new TitlePanel(pair.first.leftPath, null);
         }
+        return titles[i];
+      } else if (editors[i] == null) {
+        generateEditor(i, pair);
       }
-      return components[i];
+      editors[i].getScrollingModel().scrollVertically(
+          Math.max(pair.first.startLineLeft - 2, 0) * editors[i].getLineHeight());
+      return editors[i].getComponent();
+
     }
 
     /**
@@ -325,20 +329,21 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
           * (pair.first.endLineLeft - Math.max(pair.first.startLineLeft - 1, 1) + 2);
       editor.getComponent().setPreferredSize(new Dimension(400, editorSize));
 
-      //Scroll to coderange
-      editor.getScrollingModel().scrollTo(
-          new LogicalPosition(Math.max(pair.first.startLineLeft - 2, 0), 0), ScrollType.CENTER);
+
       //Hide scrollbar
       ((EditorImpl) editor).getScrollPane().getVerticalScrollBar()
           .setPreferredSize(new Dimension(0, 0));
-      editors.add((EditorImpl) editor);
-      components[i] = editor.getComponent();
+      editors[i] = editor;
     }
 
 
     @Override
     public void dispose() {
-      editors.forEach(editor -> EditorFactory.getInstance().releaseEditor(editor));
+      for (Editor editor : editors) {
+        if (editor != null) {
+          EditorFactory.getInstance().releaseEditor(editor);
+        }
+      }
     }
   }
 
