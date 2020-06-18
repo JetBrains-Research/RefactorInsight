@@ -1,28 +1,18 @@
 package services;
 
-import com.google.common.io.Files;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileChooser.FileChooser;
-import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
-import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBIntSpinner;
-import com.intellij.util.Consumer;
 import com.intellij.util.ui.FormBuilder;
 import git4idea.repo.GitRepository;
 import git4idea.repo.GitRepositoryManager;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class SettingsComponent {
   private final JPanel myMainPanel;
@@ -37,6 +27,7 @@ public class SettingsComponent {
    * SettingsComponent constructor. Creates the setting panel.
    */
   public SettingsComponent(Project project) {
+
 
     JButton clear = new JButton("Clear Cache");
     clear.addMouseListener(new MouseAdapter() {
