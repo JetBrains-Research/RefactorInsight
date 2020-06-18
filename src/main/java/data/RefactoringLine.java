@@ -169,10 +169,14 @@ public class RefactoringLine {
     List<DiffFragment> fragments = offsets.stream().map(RefactoringOffset::toDiffFragment)
         .collect(Collectors.toList());
     if (hasColumns) {
+      int leftStart = lines[LEFT_START] == lines[LEFT_END]
+          ? lines[LEFT_START] : lines[LEFT_START] + 1;
+      int rightStart = lines[RIGHT_START] == lines[RIGHT_END]
+          ? lines[RIGHT_START] : lines[RIGHT_START] + 1;
       fragments.add(new DiffFragmentImpl(
-          Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]),
+          Utils.getOffset(leftText, leftStart, columns[LEFT_START]),
           Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]),
-          Utils.getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]),
+          Utils.getOffset(rightText, rightStart, columns[RIGHT_START]),
           Utils.getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END])));
     }
     fragment = new LineFragmentImpl(lines[LEFT_START], lines[LEFT_END], lines[RIGHT_START],
@@ -185,24 +189,31 @@ public class RefactoringLine {
     }
     hasColumns = true;
     columns = new int[] {1, 1, 0, 0, columns[RIGHT_START], columns[RIGHT_END]};
-    if (word[0] != null) {
+    if (word[0] != null && word[1] == null && word[2] == null) {
       int[] beforeColumns =
-          Utils.findColumns(leftText, word[0], lines[LEFT_START]);
+          Utils.findColumnsBackwards(leftText, word[0], lines[LEFT_START]);
       columns[LEFT_START] = beforeColumns[0];
       columns[LEFT_END] = beforeColumns[1];
-    }
-    if (word[1] != null && midText != null) {
-      int[] midColumns =
-          Utils.findColumns(midText, word[1], lines[MID_START]);
+    } else {
+      if (word[0] != null) {
+        int[] beforeColumns =
+            Utils.findColumns(leftText, word[0], lines[LEFT_START]);
+        columns[LEFT_START] = beforeColumns[0];
+        columns[LEFT_END] = beforeColumns[1];
+      }
+      if (word[1] != null && midText != null) {
+        int[] midColumns =
+            Utils.findColumns(midText, word[1], lines[MID_START]);
 
-      columns[MID_START] = midColumns[0];
-      columns[MID_END] = midColumns[1];
-    }
-    if (word[2] != null) {
-      int[] afterColumns =
-          Utils.findColumns(rightText, word[2], lines[RIGHT_START]);
-      columns[RIGHT_START] = afterColumns[0];
-      columns[RIGHT_END] = afterColumns[1];
+        columns[MID_START] = midColumns[0];
+        columns[MID_END] = midColumns[1];
+      }
+      if (word[2] != null) {
+        int[] afterColumns =
+            Utils.findColumns(rightText, word[2], lines[RIGHT_START]);
+        columns[RIGHT_START] = afterColumns[0];
+        columns[RIGHT_END] = afterColumns[1];
+      }
     }
     for (int i = 0; i < columns.length; i++) {
       columns[i] = Math.max(columns[i], 1);
@@ -291,6 +302,7 @@ public class RefactoringLine {
     switch (option) {
       case ADD:
         lines[LEFT_END] = lines[LEFT_START];
+        columns[LEFT_END] = columns[LEFT_START];
         break;
       case REMOVE:
         lines[RIGHT_END] = lines[RIGHT_START];
