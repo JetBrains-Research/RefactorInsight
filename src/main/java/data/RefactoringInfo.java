@@ -1,8 +1,8 @@
 package data;
 
 import static utils.StringUtils.INFO;
-import static utils.StringUtils.LIST;
 import static utils.StringUtils.delimiter;
+
 
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
@@ -284,6 +284,7 @@ public class RefactoringInfo {
 
   /**
    * Sets boolean for more sided refactoring types (Extract method).
+   *
    * @param moreSided Boolean
    * @return this
    */
@@ -305,6 +306,14 @@ public class RefactoringInfo {
   }
 
   public List<Pair<String, Boolean>> getMoreSidedLeftPaths() {
+    if (moreSidedLeftPaths.isEmpty()) {
+      MoreSidedDiffRequestGenerator generator = (MoreSidedDiffRequestGenerator) requestGenerator;
+      moreSidedLeftPaths = generator.getLines().stream()
+          .map(line ->
+              new Pair<>(line.leftPath, line.startLineRight == -1 && line.endLineRight == -1))
+          .collect(Collectors.toList());
+
+    }
     return moreSidedLeftPaths;
   }
 
@@ -470,7 +479,8 @@ public class RefactoringInfo {
   }
 
   public void correctMoreSidedLines(List<String> befores, String after) {
-    ((MoreSidedDiffRequestGenerator) requestGenerator).correct(befores, after, moreSidedLeftPaths);
+    ((MoreSidedDiffRequestGenerator) requestGenerator).correct(befores, after, moreSidedLeftPaths,
+        true, false, true);
   }
 
 }

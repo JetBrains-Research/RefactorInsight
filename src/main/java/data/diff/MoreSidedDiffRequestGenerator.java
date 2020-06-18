@@ -27,6 +27,10 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
   public MoreSidedDiffRequestGenerator() {
   }
 
+  public List<Data> getLines() {
+    return lines;
+  }
+
   /**
    * Serializer.
    * @return this
@@ -78,7 +82,8 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
    * Throws Exception if called.
    */
   @Override
-  public void correct(String before, String mid, String after) {
+  public void correct(String before, String mid, String after, boolean skipAnnotationsLeft,
+                      boolean skipAnnotationsMid, boolean skipAnnotationsRight) {
     throw new IllegalStateException("Incorrect correct method for more sided diff request");
   }
 
@@ -89,10 +94,13 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
    * @param after Text of right side
    * @param pathPair Path of file and boolean for revision
    */
-  public void correct(List<String> befores, String after, List<Pair<String, Boolean>> pathPair) {
+  public void correct(List<String> befores, String after, List<Pair<String, Boolean>> pathPair,
+                      boolean skipAnnotationsLeft,
+                      boolean skipAnnotationsMid, boolean skipAnnotationsRight) {
     assert pathPair.size() == lineMarkings.size();
     for (int i = 0; i < befores.size(); i++) {
-      lineMarkings.get(i).correctLines(befores.get(i), null, after);
+      lineMarkings.get(i).correctLines(befores.get(i), null, after, skipAnnotationsLeft,
+          skipAnnotationsMid, skipAnnotationsRight);
       lineMarkings.get(i).getMoreSidedData().leftPath = pathPair.get(i).first;
       if (pathPair.get(i).second) {
         lineMarkings.get(i).getMoreSidedData().startLineRight = -1;
