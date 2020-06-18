@@ -162,10 +162,14 @@ public class RefactoringLine {
     List<DiffFragment> fragments = offsets.stream().map(RefactoringOffset::toDiffFragment)
         .collect(Collectors.toList());
     if (hasColumns) {
+      int leftStart = lines[LEFT_START] == lines[LEFT_END]
+          ? lines[LEFT_START] : lines[LEFT_START] + 1;
+      int rightStart = lines[RIGHT_START] == lines[RIGHT_END]
+          ? lines[RIGHT_START] : lines[RIGHT_START] + 1;
       fragments.add(new DiffFragmentImpl(
-          Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]),
+          Utils.getOffset(leftText, leftStart, columns[LEFT_START]),
           Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]),
-          Utils.getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]),
+          Utils.getOffset(rightText, rightStart, columns[RIGHT_START]),
           Utils.getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END])));
     }
     fragment = new LineFragmentImpl(lines[LEFT_START], lines[LEFT_END], lines[RIGHT_START],
@@ -284,6 +288,7 @@ public class RefactoringLine {
     switch (option) {
       case ADD:
         lines[LEFT_END] = lines[LEFT_START];
+        columns[LEFT_END] = columns[LEFT_START];
         break;
       case REMOVE:
         lines[RIGHT_END] = lines[RIGHT_START];

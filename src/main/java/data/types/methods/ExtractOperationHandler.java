@@ -71,7 +71,7 @@ public class ExtractOperationHandler extends Handler {
               invocation,
               null,
               RefactoringLine.MarkingOption.ADD,
-              false)
+              true)
       );
       return info;
     }
