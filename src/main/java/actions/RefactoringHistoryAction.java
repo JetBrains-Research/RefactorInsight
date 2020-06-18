@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
@@ -11,6 +12,7 @@ import com.intellij.usages.PsiElementUsageTarget;
 import com.intellij.usages.UsageTarget;
 import com.intellij.usages.UsageView;
 import data.RefactoringInfo;
+import git4idea.repo.GitRepositoryManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,6 +40,9 @@ public class RefactoringHistoryAction extends AnAction {
   public void actionPerformed(@NotNull AnActionEvent e) {
     Project project = e.getProject();
     if (project == null) {
+      return;
+    }
+    if (GitRepositoryManager.getInstance(project).getRepositories().isEmpty()) {
       return;
     }
     map = e.getProject().getService(MiningService.class).getMethodHistory();
