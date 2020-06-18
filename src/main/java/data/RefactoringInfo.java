@@ -3,7 +3,6 @@ package data;
 import static utils.StringUtils.INFO;
 import static utils.StringUtils.delimiter;
 
-
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.openapi.util.Pair;
@@ -305,6 +304,11 @@ public class RefactoringInfo {
     return this;
   }
 
+  /**
+   * Getter for left path list.
+   * If empty generates it from data in generator.
+   * @return
+   */
   public List<Pair<String, Boolean>> getMoreSidedLeftPaths() {
     if (moreSidedLeftPaths.isEmpty()) {
       MoreSidedDiffRequestGenerator generator = (MoreSidedDiffRequestGenerator) requestGenerator;
