@@ -182,24 +182,31 @@ public class RefactoringLine {
     }
     hasColumns = true;
     columns = new int[] {1, 1, 0, 0, columns[RIGHT_START], columns[RIGHT_END]};
-    if (word[0] != null) {
+    if (word[0] != null && word[1] == null && word[2] == null) {
       int[] beforeColumns =
-          Utils.findColumns(leftText, word[0], lines[LEFT_START]);
+          Utils.findColumnsBackwards(leftText, word[0], lines[LEFT_START]);
       columns[LEFT_START] = beforeColumns[0];
       columns[LEFT_END] = beforeColumns[1];
-    }
-    if (word[1] != null && midText != null) {
-      int[] midColumns =
-          Utils.findColumns(midText, word[1], lines[MID_START]);
+    } else {
+      if (word[0] != null) {
+        int[] beforeColumns =
+            Utils.findColumns(leftText, word[0], lines[LEFT_START]);
+        columns[LEFT_START] = beforeColumns[0];
+        columns[LEFT_END] = beforeColumns[1];
+      }
+      if (word[1] != null && midText != null) {
+        int[] midColumns =
+            Utils.findColumns(midText, word[1], lines[MID_START]);
 
-      columns[MID_START] = midColumns[0];
-      columns[MID_END] = midColumns[1];
-    }
-    if (word[2] != null) {
-      int[] afterColumns =
-          Utils.findColumns(rightText, word[2], lines[RIGHT_START]);
-      columns[RIGHT_START] = afterColumns[0];
-      columns[RIGHT_END] = afterColumns[1];
+        columns[MID_START] = midColumns[0];
+        columns[MID_END] = midColumns[1];
+      }
+      if (word[2] != null) {
+        int[] afterColumns =
+            Utils.findColumns(rightText, word[2], lines[RIGHT_START]);
+        columns[RIGHT_START] = afterColumns[0];
+        columns[RIGHT_END] = afterColumns[1];
+      }
     }
     for (int i = 0; i < columns.length; i++) {
       columns[i] = Math.max(columns[i], 1);
