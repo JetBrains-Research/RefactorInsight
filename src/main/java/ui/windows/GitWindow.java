@@ -21,7 +21,6 @@ import services.MiningService;
 import ui.tree.TreeUtils;
 import ui.tree.renderers.MainCellRenderer;
 
-
 public class GitWindow {
   private Project project;
 

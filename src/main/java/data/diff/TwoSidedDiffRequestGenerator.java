@@ -21,6 +21,10 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import utils.StringUtils;
 
+/**
+ * In order to create a two sided diff window, the LineFragments are needed.
+ * This class converts RefactoringLines into LineFragments objects.
+ */
 public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
 
   public List<LineFragment> fragments;

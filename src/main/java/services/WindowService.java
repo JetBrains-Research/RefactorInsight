@@ -11,6 +11,10 @@ import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import ui.windows.GitWindow;
 
+/**
+ * Service that holds a git window map per opened project.
+ * Provides useful information for all the refactoring tree git windows that are active.
+ */
 @Service
 public class WindowService {
 

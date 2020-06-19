@@ -11,11 +11,14 @@ import com.intellij.usages.PsiElementUsageTarget;
 import com.intellij.usages.UsageTarget;
 import com.intellij.usages.UsageView;
 import data.RefactoringInfo;
+import git4idea.repo.GitRepositoryManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import services.MiningService;
@@ -24,28 +27,43 @@ import ui.windows.RefactoringHistoryToolbar;
 import utils.StringUtils;
 import utils.Utils;
 
+/**
+ * This is the Check Refactorings History Action.
+ * If the currently opened project is a git repository, it retrieves
+ * the refactoring history map that should be in the MiningService instance
+ * of this project.
+ * It checks if the selected PsiElement is instances of Class, Method or Field.
+ * It computes the last object's signature and retrieves the data from the
+ * refactoring history map.
+ */
 public class RefactoringHistoryAction extends AnAction {
 
-  Map<String, ArrayList<RefactoringInfo>> map;
+  Map<String, Set<RefactoringInfo>> map;
   RefactoringHistoryToolbar refactoringHistoryToolbar;
 
-  /**
-   * Implement this method to provide your action handler.
-   *
-   * @param e Carries information on the invocation place
-   */
   @Override
   public void actionPerformed(@NotNull AnActionEvent e) {
     Project project = e.getProject();
     if (project == null) {
       return;
     }
+    if (GitRepositoryManager.getInstance(project).getRepositories().isEmpty()) {
+      return;
+    }
     map = e.getProject().getService(MiningService.class).getRefactoringHistory();
+
     DataContext dataContext = e.getDataContext();
     UsageTarget[] usageTarget = dataContext.getData(UsageView.USAGE_TARGETS_KEY);
     showHistory(project, dataContext, usageTarget);
   }
 
+  /**
+   * Checks if the selected object is instance of Class, Field or Method.
+   *
+   * @param project     the currently opened project
+   * @param dataContext context in editor
+   * @param usageTarget the target of the action call
+   */
   private void showHistory(Project project, DataContext dataContext,
                            UsageTarget[] usageTarget) {
     if (usageTarget != null) {
@@ -66,6 +84,43 @@ public class RefactoringHistoryAction extends AnAction {
     }
   }
 
+  private void showHistoryAttribute(Project project, DataContext dataContext,
+                                    PsiElementUsageTarget target) {
+    PsiField field = (PsiField) target.getElement();
+    String signature = StringUtils.getFieldSignature(field);
+    getToolbarWindow(project)
+        .showToolbar(map.getOrDefault(signature, new HashSet<>()),
+            field.getName(), dataContext, HistoryType.ATTRIBUTE, null, null);
+  }
+
+  private void showHistoryClass(Project project, DataContext dataContext, PsiClass psiClass) {
+    String signature = psiClass.getQualifiedName();
+    List<String> methods = Arrays.asList(psiClass.getMethods()).stream()
+        .map(method -> StringUtils.calculateSignature(method)).collect(Collectors.toList());
+    HashMap<String, Set<RefactoringInfo>> methodsHistory = new HashMap<>();
+    methods.forEach(method -> {
+      methodsHistory.put(method, map.getOrDefault(method, new HashSet<>()));
+    });
+
+    List<String> fields = Arrays.asList(psiClass.getFields()).stream()
+        .map(field -> StringUtils.getFieldSignature(field)).collect(Collectors.toList());
+    HashMap<String, Set<RefactoringInfo>> fieldsHistory = new HashMap<>();
+    fields.forEach(field -> {
+      fieldsHistory.put(field, map.getOrDefault(field, new HashSet<>()));
+    });
+
+    getToolbarWindow(project)
+        .showToolbar(map.getOrDefault(signature, new HashSet<>()),
+            psiClass.getName(), dataContext, HistoryType.CLASS, methodsHistory, fieldsHistory);
+  }
+
+  private void showHistoryMethod(Project project, DataContext dataContext, PsiMethod method) {
+    String signature = StringUtils.calculateSignature(method);
+    getToolbarWindow(project)
+        .showToolbar(map.getOrDefault(signature, new HashSet<>()),
+            method.getName(), dataContext, HistoryType.METHOD, null, null);
+  }
+
   @Override
   public void update(@NotNull AnActionEvent e) {
     e.getPresentation().setVisible(true);
@@ -83,43 +138,6 @@ public class RefactoringHistoryAction extends AnAction {
       refactoringHistoryToolbar = new RefactoringHistoryToolbar(project);
     }
     return refactoringHistoryToolbar;
-  }
-
-  private void showHistoryAttribute(Project project, DataContext dataContext,
-                                    PsiElementUsageTarget target) {
-    PsiField field = (PsiField) target.getElement();
-    String signature = StringUtils.getFieldSignature(field);
-    getToolbarWindow(project)
-        .showToolbar(map.getOrDefault(signature, new ArrayList<RefactoringInfo>()),
-            field.getName(), dataContext, HistoryType.ATTRIBUTE, null, null);
-  }
-
-  private void showHistoryClass(Project project, DataContext dataContext, PsiClass psiClass) {
-    String signature = psiClass.getQualifiedName();
-    List<String> methods = Arrays.asList(psiClass.getMethods()).stream()
-        .map(method -> StringUtils.calculateSignature(method)).collect(Collectors.toList());
-    HashMap<String, ArrayList<RefactoringInfo>> methodsHistory = new HashMap<>();
-    methods.forEach(method -> {
-      methodsHistory.put(method, map.getOrDefault(method, new ArrayList<RefactoringInfo>()));
-    });
-
-    List<String> fields = Arrays.asList(psiClass.getFields()).stream()
-        .map(field -> StringUtils.getFieldSignature(field)).collect(Collectors.toList());
-    HashMap<String, ArrayList<RefactoringInfo>> fieldsHistory = new HashMap<>();
-    fields.forEach(field -> {
-      fieldsHistory.put(field, map.getOrDefault(field, new ArrayList<RefactoringInfo>()));
-    });
-
-    getToolbarWindow(project)
-        .showToolbar(map.getOrDefault(signature, new ArrayList<RefactoringInfo>()),
-            psiClass.getName(), dataContext, HistoryType.CLASS, methodsHistory, fieldsHistory);
-  }
-
-  private void showHistoryMethod(Project project, DataContext dataContext, PsiMethod method) {
-    String signature = StringUtils.calculateSignature(method);
-    getToolbarWindow(project)
-        .showToolbar(map.getOrDefault(signature, new ArrayList<RefactoringInfo>()),
-            method.getName(), dataContext, HistoryType.METHOD, null, null);
   }
 
 }

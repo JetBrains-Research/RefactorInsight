@@ -18,8 +18,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import utils.StringUtils;
 
+/**
+ * Used to hold information about a highlighting for a three sided diff window.
+ */
 public class ThreeSidedRange {
 
   List<TextRange> left;
@@ -32,10 +34,11 @@ public class ThreeSidedRange {
 
   /**
    * Constructor for ThreeSidedRange.
-   * @param left TextRanges
-   * @param mid TextRanges
-   * @param right TextRanges
-   * @param type VisualisationType
+   *
+   * @param left     TextRanges
+   * @param mid      TextRanges
+   * @param right    TextRanges
+   * @param type     VisualisationType
    * @param fragment MergeLineFragment
    */
   public ThreeSidedRange(List<TextRange> left, List<TextRange> mid, List<TextRange> right,
@@ -46,32 +49,6 @@ public class ThreeSidedRange {
     this.right = right;
     this.fragment = fragment;
     this.type = type;
-  }
-
-  public SimpleThreesideDiffChange getDiffChange(SimpleThreesideDiffViewer viewer) {
-    return new SimpleThreesideDiffChange(fragment, getMergeConflictType(type),
-        new MergeInnerDifferences(left, mid, right), viewer);
-  }
-
-  @Override
-  public String toString() {
-    return Stream.of(type.toString(),
-        fragment.getStartLine(ThreeSide.LEFT),
-        fragment.getEndLine(ThreeSide.LEFT),
-        fragment.getStartLine(ThreeSide.BASE),
-        fragment.getEndLine(ThreeSide.BASE),
-        fragment.getStartLine(ThreeSide.RIGHT),
-        fragment.getEndLine(ThreeSide.RIGHT),
-        stringify(left),
-        stringify(mid),
-        stringify(right)
-    ).map(String::valueOf).collect(Collectors.joining(delimiter(FRAG)));
-  }
-
-  private String stringify(List<TextRange> list) {
-    return list.stream()
-        .map(r -> r.getStartOffset() + delimiter(RANGE) + r.getEndOffset())
-        .collect(Collectors.joining(delimiter(RANGE)));
   }
 
   private static List<TextRange> deStringify(String value) {
@@ -105,6 +82,32 @@ public class ThreeSidedRange {
             Integer.parseInt(tokens[5]),
             Integer.parseInt(tokens[6])
         ));
+  }
+
+  public SimpleThreesideDiffChange getDiffChange(SimpleThreesideDiffViewer viewer) {
+    return new SimpleThreesideDiffChange(fragment, getMergeConflictType(type),
+        new MergeInnerDifferences(left, mid, right), viewer);
+  }
+
+  @Override
+  public String toString() {
+    return Stream.of(type.toString(),
+        fragment.getStartLine(ThreeSide.LEFT),
+        fragment.getEndLine(ThreeSide.LEFT),
+        fragment.getStartLine(ThreeSide.BASE),
+        fragment.getEndLine(ThreeSide.BASE),
+        fragment.getStartLine(ThreeSide.RIGHT),
+        fragment.getEndLine(ThreeSide.RIGHT),
+        stringify(left),
+        stringify(mid),
+        stringify(right)
+    ).map(String::valueOf).collect(Collectors.joining(delimiter(FRAG)));
+  }
+
+  private String stringify(List<TextRange> list) {
+    return list.stream()
+        .map(r -> r.getStartOffset() + delimiter(RANGE) + r.getEndOffset())
+        .collect(Collectors.joining(delimiter(RANGE)));
   }
 
   private MergeConflictType getMergeConflictType(VisualisationType type) {

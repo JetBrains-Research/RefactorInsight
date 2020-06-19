@@ -14,6 +14,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import utils.Utils;
 
+/**
+ * RefactoringLine holds the data needed in order to create a LineFragment,
+ * or a ThreeSidedRange that are used for the diff window.
+ * It is a processing class.
+ * It retrieves information about RefactoringMiner's code ranges and
+ * it corrects and modify the data such that it can be displayed in a diff window.
+ */
 public class RefactoringLine {
 
   private static final int LEFT_START = 0;

@@ -1,13 +1,14 @@
 package services;
 
-
 import data.RefactoringEntry;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * The Refactorings Map.
+ * Contains a version and the refactoring data map.
+ */
 public class RefactoringsMap {
 
   public Map<String, RefactoringEntry> map = new ConcurrentHashMap<>();
