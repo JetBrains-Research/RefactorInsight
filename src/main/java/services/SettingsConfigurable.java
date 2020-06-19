@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import javax.swing.JComponent;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
+import ui.windows.SettingsComponent;
 
 /**
  * Provides controller functionality for application settings.

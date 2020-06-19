@@ -9,6 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * This is a DiffRequestGenerator.
+ * Its implementations represent all types of diff requests that this plugin supports.
+ * The DiffRequestGenerator is used to collect data from the RefactoringLines, to correct them,
+ * and to create a diff request in order to display the data.
+ */
 public abstract class DiffRequestGenerator {
 
   transient List<RefactoringLine> lineMarkings = new ArrayList<>();

@@ -6,6 +6,7 @@ import com.intellij.psi.PsiParameterList;
 import data.Group;
 import data.RefactoringInfo;
 import gr.uom.java.xmi.UMLOperation;
+import org.jetbrains.annotations.NotNull;
 
 public class StringUtils {
 
@@ -167,5 +168,10 @@ public class StringUtils {
       s = s.replaceAll(ESC + d, d);
     }
     return s.replaceAll(ESC + ESC, ESC);
+  }
+
+  public static String pathToClassName(String name) {
+    return name.substring(name.indexOf('/') + 1, name.lastIndexOf('.'))
+        .replace('/', '.');
   }
 }
