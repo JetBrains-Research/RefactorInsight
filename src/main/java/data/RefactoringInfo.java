@@ -447,7 +447,7 @@ public class RefactoringInfo {
       return false;
     }
     RefactoringInfo that = (RefactoringInfo) o;
-    return Arrays.equals(uiStrings, that.uiStrings)
+    return Arrays.deepEquals(uiStrings, that.uiStrings)
         && getName().equals(that.getName())
         && getType() == that.getType()
         && getGroup() == that.getGroup();

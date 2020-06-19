@@ -1,6 +1,7 @@
 package services;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.refactoringminer.api.RefactoringType.ADD_METHOD_ANNOTATION;
 import static org.refactoringminer.api.RefactoringType.CHANGE_ATTRIBUTE_TYPE;
 import static org.refactoringminer.api.RefactoringType.CHANGE_PARAMETER_TYPE;
@@ -170,6 +171,13 @@ public class MiningServiceManualTest extends GitSingleRepoTest {
       collector.checkThat("Issue in: " + commitDirs[i], entry, matches[i]);
     }
     collector.verify();
+  }
+
+  public void testConverter() {
+    RefactoringsMapConverter converter = new RefactoringsMapConverter();
+    String serialized = converter.toString(miner.getState().refactoringsMap);
+    RefactoringsMap deserialised = converter.fromString(serialized);
+    assertThat(serialized, equalTo(converter.toString(deserialised)));
   }
 
   private Predicate<RefactoringInfo> ofType(RefactoringType type) {
