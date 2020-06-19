@@ -40,7 +40,7 @@ public class RefactoringHistoryAction extends AnAction {
     if (project == null) {
       return;
     }
-    map = e.getProject().getService(MiningService.class).getMethodHistory();
+    map = e.getProject().getService(MiningService.class).getRefactoringHistory();
     DataContext dataContext = e.getDataContext();
     UsageTarget[] usageTarget = dataContext.getData(UsageView.USAGE_TARGETS_KEY);
     showHistory(project, dataContext, usageTarget);

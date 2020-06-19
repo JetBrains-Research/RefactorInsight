@@ -35,7 +35,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.eclipse.core.resources.IProject;
 import org.jetbrains.annotations.NotNull;
 import processors.CommitMiner;
 import ui.windows.GitWindow;
@@ -151,7 +150,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             double time = ((double) (timeEnd - timeStart)) / 1000.0;
             System.out.println("Mining done in " + time + " sec");
 
-            computeMethodHistory(repository.getCurrentRevision(), repository.getProject());
+            computeRefactoringHistory(repository.getCurrentRevision(), repository.getProject());
             long timeEnd2 = System.currentTimeMillis();
             double time2 = ((double) (timeEnd2 - timeEnd)) / 1000.0;
             System.out.println("Method history computed in " + time2);
@@ -226,11 +225,11 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     return Integer.parseInt(output);
   }
 
-  public Map<String, ArrayList<RefactoringInfo>> getMethodHistory() {
+  public Map<String, ArrayList<RefactoringInfo>> getRefactoringHistory() {
     return methodHistory;
   }
 
-  private void computeMethodHistory(@NotNull String commitId, Project project) {
+  private void computeRefactoringHistory(@NotNull String commitId, Project project) {
     List<RefactoringInfo> refs = new ArrayList<>();
     int limit = SettingsState.getInstance(project).historyLimit;
     while (contains(commitId) && limit-- > 0) {
