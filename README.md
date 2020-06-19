@@ -28,7 +28,7 @@ A new IDE will open up where you can follow the steps presented below.
 
 #### Import from disk 
 
-[Download RefactorInsight](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2019-2020-q4/cluster-0/detecting-refactorings-in-code-changes/detecting-refactorings-in-code-changes/-/jobs/artifacts/85-improve-documentation/raw/build/distributions/detecting-refactorings-in-code-changes-1.0-SNAPSHOT.zip?job=build)
+[Download RefactorInsight](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2019-2020-q4/cluster-0/detecting-refactorings-in-code-changes/detecting-refactorings-in-code-changes/-/jobs/artifacts/master/raw/build/distributions/detecting-refactorings-in-code-changes-1.0-SNAPSHOT.zip?job=build)
 
 If you want to import the plugin from disk, click `Download RefactorInsight`.
 Go to IntelliJ -> Preferences -> Plugin -> Install Plugin
