@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -23,6 +24,16 @@ import java.util.stream.Stream;
 import org.refactoringminer.api.RefactoringType;
 import utils.StringUtils;
 
+/**
+ * This is the RefactoringInfo object that stores the information needed
+ * for displaying one refactoring. It stores a diff request generator,
+ * a name, ui node strings, paths, the group where it belongs,
+ * if it is hidden, three-sided or a more-sided refactoring. RefactoringInfo
+ * contains also information about any refactoring that it implies
+ * (used when combining refactorings).
+ * Here, each refactoring is added to the refactoring history map used in
+ * Check Refactoring History Action.
+ */
 public class RefactoringInfo implements Cloneable {
 
   private transient RefactoringEntry entry;
@@ -126,7 +137,7 @@ public class RefactoringInfo implements Cloneable {
    *
    * @param map for method history
    */
-  public void addToHistory(Map<String, ArrayList<RefactoringInfo>> map) {
+  public void addToHistory(Map<String, Set<RefactoringInfo>> map) {
     changeKeys(map);
     String before = getNameBefore();
     String after = getNameAfter();
@@ -136,23 +147,23 @@ public class RefactoringInfo implements Cloneable {
     }
 
     if (group != Group.VARIABLE) {
-      ArrayList<RefactoringInfo> data = map.getOrDefault(before, new ArrayList<>());
+      Set<RefactoringInfo> data = map.getOrDefault(before, new HashSet<>());
       map.remove(before);
-      ArrayList<RefactoringInfo> data2 = map.getOrDefault(after, new ArrayList<>());
+      Set<RefactoringInfo> data2 = map.getOrDefault(after, new HashSet<>());
       data.add(this);
-      for (RefactoringInfo info : data) {
-        if (!data2.contains(info)) {
-          data2.add(info);
-        }
-      }
+      data2.addAll(data);
       map.put(after, data2);
       if (moreSided) {
+        System.out.println(this.name);
+        ((MoreSidedDiffRequestGenerator) requestGenerator).getClassNames()
+            .forEach(System.out::println);
         ((MoreSidedDiffRequestGenerator) requestGenerator).getClassNames().forEach(name -> {
-          ArrayList<RefactoringInfo> infos = map.getOrDefault(name, new ArrayList<>());
+          Set<RefactoringInfo> infos = map.getOrDefault(name, new HashSet<>());
           try {
-            infos.add(((RefactoringInfo) this.clone())
+            RefactoringInfo info = ((RefactoringInfo) this.clone())
                 .setElementBefore(getNameAfter()
-                    .substring(getNameAfter().lastIndexOf('.') + 1)));
+                    .substring(getNameAfter().lastIndexOf('.') + 1));
+            infos.add(info);
           } catch (CloneNotSupportedException e) {
             e.printStackTrace();
           }
@@ -163,7 +174,7 @@ public class RefactoringInfo implements Cloneable {
 
   }
 
-  private void changeKeys(Map<String, ArrayList<RefactoringInfo>> map) {
+  private void changeKeys(Map<String, Set<RefactoringInfo>> map) {
     if ((group == Group.CLASS || group == Group.ABSTRACT || group == Group.INTERFACE)
         && !getNameBefore().equals(getNameAfter())) {
       changeAttributesSignature(map);
@@ -171,7 +182,7 @@ public class RefactoringInfo implements Cloneable {
     }
   }
 
-  private void changeMethodsSignature(Map<String, ArrayList<RefactoringInfo>> map) {
+  private void changeMethodsSignature(Map<String, Set<RefactoringInfo>> map) {
     map.keySet().stream()
         .filter(x -> !x.contains("|"))
         .filter(x -> x.contains(".")).filter(x -> x.substring(0, x.lastIndexOf("."))
@@ -190,18 +201,18 @@ public class RefactoringInfo implements Cloneable {
           } else {
             newKey = getNameAfter() + signature.substring(signature.lastIndexOf("."));
           }
-          map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
+          map.put(newKey, map.getOrDefault(signature, new HashSet<>()));
           map.remove(signature);
         });
   }
 
-  private void changeAttributesSignature(Map<String, ArrayList<RefactoringInfo>> map) {
+  private void changeAttributesSignature(Map<String, Set<RefactoringInfo>> map) {
     map.keySet().stream()
         .filter(x -> x.contains("|")).filter(x -> x.substring(0, x.lastIndexOf("|"))
         .equals(getNameBefore()))
         .forEach(signature -> {
           String newKey = getNameAfter() + signature.substring(signature.lastIndexOf("|"));
-          map.put(newKey, map.getOrDefault(signature, new ArrayList<>()));
+          map.put(newKey, map.getOrDefault(signature, new HashSet<>()));
           map.remove(signature);
         });
   }
@@ -461,11 +472,16 @@ public class RefactoringInfo implements Cloneable {
     if (!(o instanceof RefactoringInfo)) {
       return false;
     }
+
     RefactoringInfo that = (RefactoringInfo) o;
-    return Arrays.equals(uiStrings, that.uiStrings)
-        && getName().equals(that.getName())
-        && getType() == that.getType()
-        && getGroup() == that.getGroup();
+    return this.getNameAfter().equals(that.getNameAfter())
+        && this.getNameBefore().equals(that.getNameBefore())
+        && Objects.equals(this.getDetailsAfter(), that.getDetailsAfter())
+        && Objects.equals(this.getDetailsBefore(), that.getDetailsBefore())
+        && Objects.equals(this.getElementBefore(), that.getElementBefore())
+        && this.name.equals(that.getName())
+        && this.type == that.getType()
+        && this.group == that.getGroup();
   }
 
   public Group getGroup() {

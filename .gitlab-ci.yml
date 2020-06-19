@@ -22,6 +22,9 @@ build:
     paths:
       - build/
       - .gradle/
+  artifacts:
+    paths:
+      - build/distributions
 
 checkStyle:
   stage: validate

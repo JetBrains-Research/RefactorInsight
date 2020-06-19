@@ -35,6 +35,7 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
     return lines.stream()
         .map(Data::getLeftPath)
         .map(StringUtils::pathToClassName)
+        .distinct()
         .collect(Collectors.toList());
   }
 

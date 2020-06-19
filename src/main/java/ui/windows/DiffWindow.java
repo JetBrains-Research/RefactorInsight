@@ -20,12 +20,9 @@ import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.LogicalPosition;
-import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.TextAttributes;
@@ -40,7 +37,6 @@ import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.util.config.ToggleBooleanProperty;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.diff.MoreSidedDiffRequestGenerator;
@@ -53,7 +49,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
@@ -242,7 +237,6 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       }
 
 
-
       //Generate Left Side UI
       JBList<Pair<MoreSidedDiffRequestGenerator.Data, Project>> editorList =
           new JBList<>(JBList.createDefaultListModel(pairs));
@@ -295,7 +289,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
     /**
      * Generate Editor UI for left side of diffwindow.
-     * @param i Index of row in left side
+     *
+     * @param i    Index of row in left side
      * @param pair RangeData and Project
      */
     public void generateEditor(int i, Pair<MoreSidedDiffRequestGenerator.Data, Project> pair) {

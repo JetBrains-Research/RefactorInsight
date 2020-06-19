@@ -1,6 +1,5 @@
 package data;
 
-import com.intellij.openapi.project.Project;
 import data.types.Handler;
 import data.types.attributes.AddAttributeAnnotationHandler;
 import data.types.attributes.ChangeAttributeTypeHandler;
@@ -47,10 +46,13 @@ import data.types.variables.RenameVariableHandler;
 import data.types.variables.SplitVariableHandler;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
 
+/**
+ * Factory that creates RefactoringInfo objects given Refactoring objects
+ * that were retrieved from RefactoringMiner.
+ */
 public class InfoFactory {
 
   private final Map<RefactoringType, Handler> refactoringHandlers = new HashMap<>();
@@ -171,7 +173,7 @@ public class InfoFactory {
   }
 
   /**
-   * Method that creates the relevant RefactoringInfo for a refactoring.
+   * Method that creates the relevant RefactoringInfo for a given Refactoring.
    *
    * @param refactoring to be analyzed
    * @return resulting RefactoringInfo
