@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 import org.refactoringminer.api.RefactoringType;
 import utils.StringUtils;
 
-public class RefactoringInfo {
+public class RefactoringInfo implements Cloneable {
 
   private transient RefactoringEntry entry;
   private transient String groupId;
@@ -146,7 +146,21 @@ public class RefactoringInfo {
         }
       }
       map.put(after, data2);
+      if (moreSided) {
+        ((MoreSidedDiffRequestGenerator) requestGenerator).getClassNames().forEach(name -> {
+          ArrayList<RefactoringInfo> infos = map.getOrDefault(name, new ArrayList<>());
+          try {
+            infos.add(((RefactoringInfo) this.clone())
+                .setElementBefore(getNameAfter()
+                    .substring(getNameAfter().lastIndexOf('.') + 1)));
+          } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+          }
+          map.put(name, infos);
+        });
+      }
     }
+
   }
 
   private void changeKeys(Map<String, ArrayList<RefactoringInfo>> map) {
@@ -307,6 +321,7 @@ public class RefactoringInfo {
   /**
    * Getter for left path list.
    * If empty generates it from data in generator.
+   *
    * @return
    */
   public List<Pair<String, Boolean>> getMoreSidedLeftPaths() {

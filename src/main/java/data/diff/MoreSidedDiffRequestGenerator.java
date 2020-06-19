@@ -27,6 +27,17 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
   public MoreSidedDiffRequestGenerator() {
   }
 
+  /**
+   * Extracts and returns class names (incl. package) from the left paths.
+   * @return list of class names
+   */
+  public List<String> getClassNames() {
+    return lines.stream()
+        .map(Data::getLeftPath)
+        .map(StringUtils::pathToClassName)
+        .collect(Collectors.toList());
+  }
+
   public List<Data> getLines() {
     return lines;
   }
@@ -131,6 +142,10 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
     public String leftPath;
     public transient DiffContent content;
 
+    public String getLeftPath() {
+      return leftPath;
+    }
+
     /**
      * Deserializer.
      */
@@ -163,7 +178,7 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
           StringUtils.sanitize(Integer.toString(endLineRight)),
           StringUtils.sanitize(Integer.toString(startOffsetRight)),
           StringUtils.sanitize(Integer.toString(endOffsetRight)),
-          leftPath);
+          StringUtils.sanitize(leftPath));
     }
 
 
