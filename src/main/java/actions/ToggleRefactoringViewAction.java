@@ -5,6 +5,9 @@ import com.intellij.openapi.actionSystem.ToggleAction;
 import org.jetbrains.annotations.NotNull;
 import services.WindowService;
 
+/**
+ * This is the Show Refactorings Action.
+ */
 public class ToggleRefactoringViewAction extends ToggleAction {
 
   @Override

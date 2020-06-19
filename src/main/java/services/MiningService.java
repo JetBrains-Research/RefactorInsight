@@ -14,38 +14,36 @@ import com.intellij.util.xmlb.annotations.OptionTag;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
-import data.RefactoringLine;
 import git4idea.history.GitHistoryUtils;
 import git4idea.repo.GitRepository;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import processors.CommitMiner;
 import ui.windows.GitWindow;
+import utils.Utils;
 
+/**
+ * This is the MiningService.
+ * It computes, process and stores the data retrieved from RefactoringMiner.
+ * It can mine 1 specific commit, a fixed number of commits, or all commits in the repository.
+ * it stores and persists the detected refactoring data in .idea/refactorings.xml file.
+ */
 @State(name = "MiningRefactoringsState",
     storages = {@Storage("refactorings.xml")})
 @Service
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
-  public static ConcurrentHashMap<String, ArrayList<RefactoringInfo>> methodHistory
-      = new ConcurrentHashMap<String, ArrayList<RefactoringInfo>>();
+  public static ConcurrentHashMap<String, Set<RefactoringInfo>> methodHistory
+      = new ConcurrentHashMap<String, Set<RefactoringInfo>>();
   private boolean mining = false;
   private MyState innerState = new MyState();
 
@@ -67,11 +65,11 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
   @Override
   public void loadState(MyState state) {
-    if (version().equals(state.refactoringsMap.version)) {
+    if (Utils.version().equals(state.refactoringsMap.version)) {
       innerState = state;
     } else {
       innerState = new MyState();
-      innerState.refactoringsMap.version = version();
+      innerState.refactoringsMap.version = Utils.version();
     }
   }
 
@@ -83,7 +81,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   public void mineAll(GitRepository repository) {
     int limit = Integer.MAX_VALUE;
     try {
-      limit = getCommitCount(repository);
+      limit = Utils.getCommitCount(repository);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
@@ -99,7 +97,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   public void mineRepo(GitRepository repository) {
     int limit = SettingsState.getInstance(repository.getProject()).commitLimit;
     try {
-      limit = Math.min(getCommitCount(repository), limit);
+      limit = Math.min(Utils.getCommitCount(repository), limit);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
@@ -116,6 +114,12 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   public void mineRepo(GitRepository repository, int limit) {
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(repository.getProject(), "Mining refactorings") {
+          @Override
+          public void onCancel() {
+            super.onCancel();
+            return;
+          }
+
           public void run(@NotNull ProgressIndicator progressIndicator) {
             mining = true;
             progressIndicator.setText("Mining refactorings");
@@ -192,6 +196,12 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(project, "Mining at commit " + commit.getId().asString()) {
 
+          @Override
+          public void onCancel() {
+            super.onCancel();
+            return;
+          }
+
           public void onFinished() {
             super.onFinished();
             if (contains(commit.getId().asString())) {
@@ -210,22 +220,8 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
         });
   }
 
-  /**
-   * Get the total amount of commits in a repository.
-   *
-   * @param repository GitRepository
-   * @return the amount of commits
-   * @throws IOException in case of a problem
-   */
-  public int getCommitCount(GitRepository repository) throws IOException {
-    Process process = Runtime.getRuntime().exec("git rev-list --all --count", null,
-        new File(repository.getRoot().getCanonicalPath()));
-    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-    String output = reader.readLine();
-    return Integer.parseInt(output);
-  }
 
-  public Map<String, ArrayList<RefactoringInfo>> getRefactoringHistory() {
+  public Map<String, Set<RefactoringInfo>> getRefactoringHistory() {
     return methodHistory;
   }
 
@@ -239,21 +235,8 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
       commitId = refactoringEntry.getParent();
     }
     Collections.reverse(refs);
+    methodHistory.clear();
     refs.forEach(r -> r.addToHistory(methodHistory));
-  }
-
-  private String version() {
-    return RefactoringsBundle.message("version") + String.valueOf(Stream.of(
-        //all classes that can change
-        RefactoringEntry.class,
-        RefactoringInfo.class,
-        RefactoringLine.class,
-        RefactoringLine.RefactoringOffset.class
-    ).flatMap(c -> Arrays.stream(c.getDeclaredFields())
-        .map(Field::getGenericType)
-        .map(Type::getTypeName)
-    ).collect(Collectors.toList()))
-        .hashCode();
   }
 
   public RefactoringEntry get(String commitHash) {

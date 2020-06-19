@@ -48,11 +48,15 @@ public class MoveClassHandler extends Handler {
     //check if it is inner class
     if ((!left.equals(originalClassName) && packageBefore.contains(left))
         || (!right.equals(movedClassName) && packageAfter.contains(right))) {
-      return info
-          .addMarking(ref.getOriginalClass().codeRange(), ref.getMovedClass().codeRange(),
-              null,
-              RefactoringLine.MarkingOption.COLLAPSE,
-              true);
+      String finalOriginalClassName = originalClassName;
+      String finalMovedClassName = movedClassName;
+      return info.addMarking(ref.getOriginalClass().codeRange(), ref.getMovedClass().codeRange(),
+          (line) -> {
+            line.setWord(
+                new String[] {finalOriginalClassName, null, finalMovedClassName});
+          },
+          RefactoringLine.MarkingOption.COLLAPSE,
+          false);
     }
     return info
         .addMarking(ref.getOriginalClass().codeRange(), ref.getMovedClass().codeRange(),

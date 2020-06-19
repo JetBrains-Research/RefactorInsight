@@ -2,6 +2,8 @@ package data;
 
 import static org.refactoringminer.api.RefactoringType.EXTRACT_CLASS;
 import static org.refactoringminer.api.RefactoringType.EXTRACT_SUPERCLASS;
+import static org.refactoringminer.api.RefactoringType.MOVE_ATTRIBUTE;
+import static org.refactoringminer.api.RefactoringType.MOVE_OPERATION;
 import static org.refactoringminer.api.RefactoringType.PULL_UP_ATTRIBUTE;
 import static org.refactoringminer.api.RefactoringType.PULL_UP_OPERATION;
 import static utils.StringUtils.ENTRY;
@@ -16,10 +18,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
-import ui.tree.TreeUtils;
 import utils.StringUtils;
 import utils.Utils;
 
+/**
+ * Class that holds data for a single commit.
+ * Each commit in the refactorings map has a RefactoringEntry object.
+ * It contains the commit id, timestamp, parent, and a list of refactorings.
+ */
 public class RefactoringEntry implements Serializable {
 
   private static final transient InfoFactory factory = new InfoFactory();
@@ -63,11 +69,11 @@ public class RefactoringEntry implements Serializable {
   }
 
   /**
-   * Converter to Json.
+   * Converter to RefactoringEntry given a list of refactorings, commit metadata and project.
    *
    * @param refactorings to be processed.
    * @param commit       current commit.
-   * @return Json string.
+   * @return new refactoring entry.
    */
   public static RefactoringEntry convert(List<Refactoring> refactorings, VcsCommitMetadata commit,
                                          Project project) {
@@ -93,6 +99,12 @@ public class RefactoringEntry implements Serializable {
         .map(RefactoringInfo::toString).collect(Collectors.joining(del));
   }
 
+  /**
+   * Combines related refactorings.
+   * Firstly, it combines Extract SuperClass and Extract Class with its specific move attribute's
+   * and move method's refactorings.
+   * Secondly, it combines the refactorings that have the same group identifiers.
+   */
   private void combineRelated() {
     combineRelatedExtractSuperClass();
     combineRelatedExtractClass();
@@ -159,29 +171,34 @@ public class RefactoringEntry implements Serializable {
   }
 
   private void combineRelatedExtractClass() {
+    //find all extract class refactorings
     List<RefactoringInfo> extractClassRefactorings = refactorings
         .stream().filter(x -> x.getType() == EXTRACT_CLASS).collect(Collectors.toList());
-    for (RefactoringInfo extractClass : extractClassRefactorings) {
-      String displayableElement = TreeUtils
-          .getDisplayableElement(extractClass.getElementBefore(), extractClass.getElementAfter());
-      refactorings.stream().filter(x -> !x.equals(extractClass))
-          .filter(x -> {
-            String displayableDetails =
-                TreeUtils.getDisplayableElement(x.getDetailsBefore(), x.getDetailsAfter());
-            String displayableName =
-                TreeUtils.getDisplayableElement(x.getNameBefore(), x.getNameAfter());
-            if (displayableDetails == null) {
-              return displayableName.equals(displayableElement);
-            }
-            return (displayableDetails.equals(displayableElement)
-                || displayableName.equals(displayableElement));
-          })
-          .forEach(r -> {
+
+    List<RefactoringInfo> moves = refactorings.stream()
+        .filter(info -> info.getType() == MOVE_OPERATION || info.getType() == MOVE_ATTRIBUTE)
+        .collect(Collectors.toList());
+
+    extractClassRefactorings.forEach(
+        extractClass -> {
+          String extracted = extractClass.getMidPath() == null ? extractClass.getRightPath() :
+              extractClass.getMidPath();
+          String leftPath = extractClass.getLeftPath();
+          //Relate
+          List<RefactoringInfo> related = moves.stream()
+              .filter(move -> move.getRightPath().equals(extracted)
+                  && move.getLeftPath().equals(leftPath))
+              .collect(Collectors.toList());
+
+          //Combine ranges
+          related.forEach(r -> {
             extractClass.addIncludedRefactoring(r.getName());
             r.setHidden(true);
           });
-    }
+        }
+    );
   }
+
 
   public List<RefactoringInfo> getRefactorings() {
     return refactorings;

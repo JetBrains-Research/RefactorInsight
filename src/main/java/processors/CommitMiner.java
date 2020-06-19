@@ -19,6 +19,11 @@ import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
 import org.refactoringminer.util.GitServiceImpl;
 import services.RefactoringsBundle;
 
+/**
+ * The CommitMiner is a Consumer of GitCommit.
+ * It mines a commit and updates the refactoring map with the data retrieved for that commit.
+ * Consumes a git commit, calls RefactoringMiner and detects the refactorings for a commit.
+ */
 public class CommitMiner implements Consumer<GitCommit> {
 
 
@@ -75,6 +80,11 @@ public class CommitMiner implements Consumer<GitCommit> {
     }
   }
 
+  /**
+   * Mines a gitCommit.
+   * Method that calls RefactoringMiner and updates the refactoring map.
+   * @param gitCommit to be mined
+   */
   @Override
   public void consume(GitCommit gitCommit) {
     String commitId = gitCommit.getId().asString();
@@ -102,6 +112,9 @@ public class CommitMiner implements Consumer<GitCommit> {
     }
   }
 
+  /**
+   * Increments the progress bar with each mined commit.
+   */
   private void incrementProgress() {
     final int nCommits = commitsDone.incrementAndGet();
     progressIndicator.setText(String.format(progress,

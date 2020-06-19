@@ -10,8 +10,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-class RefactoringsMapConverter extends Converter<RefactoringsMap> {
+/**
+ * RefactoringsMap converter that serializes and deserializes data.
+ * Converts the data in the .xml to a RefactoringMap object.
+ * Converts a RefactoringMap object into a string that can be stored in refactorings.xml.
+ */
+public class RefactoringsMapConverter extends Converter<RefactoringsMap> {
 
+  /**
+   * Deserializes the data in the .idea/refactorings.xml into a refactorings
+   * map object.
+   * @param value to be converted
+   * @return a refactorings map
+   */
   public RefactoringsMap fromString(String value) {
     try {
       String regex1 = delimiter(MAP, true);
@@ -27,6 +38,12 @@ class RefactoringsMapConverter extends Converter<RefactoringsMap> {
     }
   }
 
+  /**
+   * Converts a RefactoringMap object into a string that can be stored
+   * in the .idea/refactorings.xml file.
+   * @param value map to be converted
+   * @return a string representation of the refactorings map
+   */
   public String toString(RefactoringsMap value) {
     return value.version + delimiter(MAP)
         + value.map.keySet().stream()

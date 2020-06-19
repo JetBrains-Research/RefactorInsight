@@ -108,7 +108,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
     List<Hash> parents = Arrays.asList(parent);
     VcsUser user = createTestVcsUser();
 
-    //cannot be mocked since it cannot be null when calling methods
+    //cannot be mocked since its dependencies must not be null
     VcsCommitMetadataImpl vcsCommitMetadata = new VcsCommitMetadataImpl(hash,
         parents, 0, repo.getRoot(), "subject",
         user, "message", user, 0);

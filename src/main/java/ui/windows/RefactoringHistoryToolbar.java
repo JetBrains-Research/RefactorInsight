@@ -34,6 +34,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javax.swing.JComponent;
@@ -80,28 +81,26 @@ public class RefactoringHistoryToolbar {
    * @param refactorings detected refactorings
    * @param objectsName  name of the method
    */
-  public void showToolbar(List<RefactoringInfo> refactorings,
+  public void showToolbar(Set<RefactoringInfo> refactorings,
                           String objectsName, DataContext datacontext, HistoryType type,
-                          @Nullable HashMap<String, ArrayList<RefactoringInfo>> methodsHistory,
-                          @Nullable HashMap<String, ArrayList<RefactoringInfo>> attributesHistory) {
+                          @Nullable HashMap<String, Set<RefactoringInfo>> methodsHistory,
+                          @Nullable HashMap<String, Set<RefactoringInfo>> attributesHistory) {
 
     this.type = type;
     if (refactorings == null || refactorings.isEmpty()) {
       showPopup(datacontext);
     } else {
       JBSplitter splitter = new JBSplitter(false, (float) 0.35);
-      List<RefactoringInfo> infos =
-          refactorings.stream().collect(Collectors.toSet()).stream().collect(Collectors.toList());
-
-      Utils.chronologicalOrder(infos);
+      List<RefactoringInfo> refactoringInfos = refactorings.stream().collect(Collectors.toList());
+      Utils.chronologicalOrder(refactoringInfos);
 
       Tree tree =
-          createTree(infos, methodsHistory, attributesHistory);
+          createTree(refactoringInfos, methodsHistory, attributesHistory);
       tree.setRootVisible(false);
       //TreeUtils.expandAllNodes(tree, 0, tree.getRowCount());
       tree.setCellRenderer(new HistoryToolbarRenderer());
       addMouseListener(splitter, tree);
-      setFirstComponent(infos.size(), splitter, tree);
+      setFirstComponent(refactorings.size(), splitter, tree);
       setSecondComponent(splitter);
       showContent(objectsName, splitter);
     }
@@ -180,8 +179,8 @@ public class RefactoringHistoryToolbar {
 
   @NotNull
   private Tree createTree(List<RefactoringInfo> refactorings,
-                          HashMap<String, ArrayList<RefactoringInfo>> methods,
-                          HashMap<String, ArrayList<RefactoringInfo>> attributes) {
+                          HashMap<String, Set<RefactoringInfo>> methods,
+                          HashMap<String, Set<RefactoringInfo>> attributes) {
 
     DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
     createRefactoringsTree(refactorings, root);
@@ -222,7 +221,7 @@ public class RefactoringHistoryToolbar {
     return tree;
   }
 
-  private void addObjectsToTree(HashMap<String, ArrayList<RefactoringInfo>> objects,
+  private void addObjectsToTree(HashMap<String, Set<RefactoringInfo>> objects,
                                 DefaultMutableTreeNode child, boolean forMethods) {
     objects.forEach((obj, refs) -> {
       if (!refs.isEmpty()) {
@@ -230,10 +229,9 @@ public class RefactoringHistoryToolbar {
             new DefaultMutableTreeNode(forMethods
                 ? obj.substring(obj.lastIndexOf(".") + 1)
                 : obj.substring(obj.lastIndexOf("|") + 1));
-        List<RefactoringInfo> infoList =
-            refs.stream().collect(Collectors.toSet()).stream().collect(Collectors.toList());
-        Utils.chronologicalOrder(infoList);
-        createRefactoringsTree(infoList, m);
+        List<RefactoringInfo> infos = new ArrayList<>(refs);
+        Utils.chronologicalOrder(infos);
+        createRefactoringsTree(infos, m);
         child.add(m);
       }
     });

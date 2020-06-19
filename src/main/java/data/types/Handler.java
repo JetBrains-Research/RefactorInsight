@@ -4,6 +4,10 @@ import data.RefactoringEntry;
 import data.RefactoringInfo;
 import org.refactoringminer.api.Refactoring;
 
+/**
+ * This Handler creates the RefactoringInfo object.
+ * Its implementations handle the refactoring types that RefactoringMiner supports.
+ */
 public abstract class Handler {
 
   /**
