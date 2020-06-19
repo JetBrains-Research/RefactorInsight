@@ -34,7 +34,7 @@ import utils.StringUtils;
  * Here, each refactoring is added to the refactoring history map used in
  * Check Refactoring History Action.
  */
-public class RefactoringInfo implements Cloneable {
+public class RefactoringInfo {
 
   private transient RefactoringEntry entry;
   private transient String groupId;
@@ -154,21 +154,26 @@ public class RefactoringInfo implements Cloneable {
       data2.addAll(data);
       map.put(after, data2);
       if (moreSided) {
-        System.out.println(this.name);
         ((MoreSidedDiffRequestGenerator) requestGenerator).getClassNames()
-            .forEach(System.out::println);
-        ((MoreSidedDiffRequestGenerator) requestGenerator).getClassNames().forEach(name -> {
-          Set<RefactoringInfo> infos = map.getOrDefault(name, new HashSet<>());
-          try {
-            RefactoringInfo info = ((RefactoringInfo) this.clone())
-                .setElementBefore(getNameAfter()
-                    .substring(getNameAfter().lastIndexOf('.') + 1));
-            infos.add(info);
-          } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-          }
-          map.put(name, infos);
-        });
+            .forEach(name -> {
+              Set<RefactoringInfo> infos = map.getOrDefault(name, new HashSet<>());
+              RefactoringInfo info = new RefactoringInfo().setGroup(group)
+                  .setNameBefore(getNameBefore())
+                  .setNameAfter(getNameAfter())
+                  .setName(getName())
+                  .setIncludes(includes)
+                  .setHidden(hidden)
+                  .setRequestGenerator(requestGenerator)
+                  .setLeftPath(getLeftPath())
+                  .setRightPath(getRightPath())
+                  .setMidPath(getMidPath())
+                  .setMoreSided(moreSided)
+                  .setThreeSided(threeSided)
+                  .setEntry(entry)
+                  .setElementBefore(getNameAfter().substring(getNameAfter().lastIndexOf('.') + 1));
+              infos.add(info);
+              map.put(name, infos);
+            });
       }
     }
 
