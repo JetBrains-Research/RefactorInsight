@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.junit.Test;
 
 public class ConverterTest {
@@ -30,23 +31,24 @@ public class ConverterTest {
   public void mapConverterTest() {
     //Test case 1
     String invalidString = "-1" + delimiter(MAP) + "";
-    RefactoringsMap invalidMap = new RefactoringsMap(new HashMap<>(), "-1");
+    RefactoringsMap invalidMap = new RefactoringsMap(new ConcurrentHashMap<>(), "-1");
     //Test case 2
     String oneEntryString = "1.0.5" + delimiter(MAP) + "cccc"
         + delimiter(MAP_ENTRY) + "bbbb"
         + delimiter(ENTRY) + 1234 + delimiter(ENTRY);
-    RefactoringsMap oneEntryMap = new RefactoringsMap(Map.of("cccc",
-        new RefactoringEntry("cccc", "bbbb", 1234)
-            .setRefactorings(new ArrayList<>())), "1.0.5");
+    RefactoringsMap oneEntryMap =
+        new RefactoringsMap(new ConcurrentHashMap<>(Map.of("cccc",
+            new RefactoringEntry("cccc", "bbbb", 1234)
+                .setRefactorings(new ArrayList<>()))), "1.0.5");
     //Test case 3
     String moreEntryString = oneEntryString
         + delimiter(MAP) + "bbbb" + delimiter(MAP_ENTRY) + "aaaa"
         + delimiter(ENTRY) + 5678 + delimiter(ENTRY);
-    RefactoringsMap moreEntryMap = new RefactoringsMap(Map.of(
+    RefactoringsMap moreEntryMap = new RefactoringsMap(new ConcurrentHashMap<>(Map.of(
         "cccc", new RefactoringEntry("cccc", "bbbb", 1234)
             .setRefactorings(new ArrayList<>()),
         "bbbb", new RefactoringEntry("bbbb", "aaaa", 5678)
-            .setRefactorings(new ArrayList<>())
+            .setRefactorings(new ArrayList<>()))
     ), "1.0.5");
     RefactoringsMapConverter converter = new RefactoringsMapConverter();
     Map.of(

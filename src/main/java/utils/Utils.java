@@ -204,6 +204,11 @@ public class Utils {
    * @return the corrected RefactoringInfo
    */
   public static RefactoringInfo check(RefactoringInfo info, Project project) {
+    //check for refactorings without line markings
+    // such as move source folder or rename package
+    if (info.getLeftPath() == null || info.getRightPath() == null) {
+      return info;
+    }
 
     FilePath beforePath = new LocalFilePath(
         project.getBasePath() + "/"
