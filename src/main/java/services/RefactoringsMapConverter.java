@@ -33,7 +33,6 @@ public class RefactoringsMapConverter extends Converter<RefactoringsMap> {
           .collect(Collectors.toMap(entry -> entry[0],
               entry -> RefactoringEntry.fromString(entry[1], entry[0]))), tokens[0]);
     } catch (Exception e) {
-      System.out.println("Deprecated xml format");
       return new RefactoringsMap(new HashMap<>(), "-1");
     }
   }

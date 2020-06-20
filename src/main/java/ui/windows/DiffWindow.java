@@ -40,6 +40,7 @@ import com.intellij.ui.components.JBScrollPane;
 import data.RefactoringEntry;
 import data.RefactoringInfo;
 import data.diff.MoreSidedDiffRequestGenerator;
+import data.diff.MoreSidedDiffRequestGenerator.MoreSidedRange;
 import data.diff.ThreeSidedRange;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -58,7 +59,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
   public static Key<List<ThreeSidedRange>> THREESIDED_RANGES =
       Key.create("refactoringMiner.List<ThreeSidedRange>");
-  public static Key<List<MoreSidedDiffRequestGenerator.Data>> MORESIDED_RANGES =
+  public static Key<List<MoreSidedRange>> MORESIDED_RANGES =
       Key.create("refactoringMiner.List<MoreSidedDiffRequestGenerator.Data>");
   public static Key<Boolean> REFACTORING =
       Key.create("refactoringMiner.isRefactoringDiff");
@@ -197,13 +198,14 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
     }
 
     //Check if diff viewer is more sided
-    List<MoreSidedDiffRequestGenerator.Data> moreSidedRanges =
+    List<MoreSidedRange> moreSidedRanges =
         request.getUserData(MORESIDED_RANGES);
     SimpleDiffViewer myViewer = (SimpleDiffViewer) viewer;
     if (moreSidedRanges != null) {
       myViewer.getTextSettings().setExpandByDefault(true);
       //Sort on filename and code ranges.
-      List<MoreSidedDiffRequestGenerator.Data> sortedRanges = new ArrayList<>(moreSidedRanges);
+      List<MoreSidedRange> sortedRanges =
+          new ArrayList<>(moreSidedRanges);
       Collections.sort(sortedRanges);
 
       //Highlight right part of diff window
@@ -211,34 +213,34 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
       TextAttributes lineColors = scheme.getAttributes(TextAttributesKey.find("DIFF_MODIFIED"));
       TextAttributes offsetColors = scheme.getAttributes(TextAttributesKey.find("DIFF_INSERTED"));
-      sortedRanges.forEach(data -> {
+      sortedRanges.forEach(moreSidedRange -> {
         //  Highlight lines
-        if (data.startLineRight != -1 && data.endLineRight != -1) {
-          for (int i = data.startLineRight - 1; i < data.endLineRight; i++) {
+        if (moreSidedRange.startLineRight != -1 && moreSidedRange.endLineRight != -1) {
+          for (int i = moreSidedRange.startLineRight - 1; i < moreSidedRange.endLineRight; i++) {
             myViewer.getEditor2().getMarkupModel().addLineHighlighter(i, 2, lineColors);
           }
           //  Highlight offsets
           myViewer.getEditor2().getMarkupModel()
-              .addRangeHighlighter(data.startOffsetRight, data.endOffsetRight,
+              .addRangeHighlighter(moreSidedRange.startOffsetRight, moreSidedRange.endOffsetRight,
                   3, offsetColors, HighlighterTargetArea.EXACT_RANGE);
         }
       });
 
       //Generate list for left side of diff window
-      List<Pair<MoreSidedDiffRequestGenerator.Data, Project>> pairs = new ArrayList<>();
+      List<Pair<MoreSidedRange, Project>> pairs = new ArrayList<>();
       String current = "";
-      for (MoreSidedDiffRequestGenerator.Data data : sortedRanges) {
+      for (MoreSidedRange moreSidedRange : sortedRanges) {
         //If new file add title row first by setting project null (this is tested in renderer)
-        if (!data.leftPath.equals(current)) {
-          current = data.leftPath;
-          pairs.add(new Pair<>(data, null));
+        if (!moreSidedRange.leftPath.equals(current)) {
+          current = moreSidedRange.leftPath;
+          pairs.add(new Pair<>(moreSidedRange, null));
         }
-        pairs.add(new Pair<>(data, myViewer.getProject()));
+        pairs.add(new Pair<>(moreSidedRange, myViewer.getProject()));
       }
 
 
       //Generate Left Side UI
-      JBList<Pair<MoreSidedDiffRequestGenerator.Data, Project>> editorList =
+      JBList<Pair<MoreSidedRange, Project>> editorList =
           new JBList<>(JBList.createDefaultListModel(pairs));
       MoreSidedRenderer renderer = new MoreSidedRenderer(editorList.getItemsCount());
       Disposer.register(myViewer, renderer);
@@ -257,7 +259,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
    * Renders the editors and title rows in the left side of diff window.
    */
   public static class MoreSidedRenderer implements Disposable,
-      ListCellRenderer<Pair<MoreSidedDiffRequestGenerator.Data, Project>> {
+      ListCellRenderer<Pair<MoreSidedRange, Project>> {
 
     TitlePanel[] titles;
     Editor[] editors;
@@ -269,8 +271,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
     @Override
     public Component getListCellRendererComponent(
-        JList<? extends Pair<MoreSidedDiffRequestGenerator.Data, Project>> jlist,
-        Pair<MoreSidedDiffRequestGenerator.Data, Project> pair, int i, boolean b,
+        JList<? extends Pair<MoreSidedRange, Project>> jlist,
+        Pair<MoreSidedRange, Project> pair, int i, boolean b,
         boolean b1) {
       //is title panel
       if (pair.second == null) {
@@ -293,7 +295,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
      * @param i    Index of row in left side
      * @param pair RangeData and Project
      */
-    public void generateEditor(int i, Pair<MoreSidedDiffRequestGenerator.Data, Project> pair) {
+    public void generateEditor(int i, Pair<MoreSidedRange, Project> pair) {
 
       //Instantiate editor
       DocumentContent content = (DocumentContent) pair.first.content;

@@ -117,18 +117,15 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
           @Override
           public void onCancel() {
             super.onCancel();
-            return;
           }
 
           public void run(@NotNull ProgressIndicator progressIndicator) {
             mining = true;
-            progressIndicator.setText("Mining refactorings");
+            progressIndicator.setText(RefactoringsBundle.message("mining"));
             progressIndicator.setIndeterminate(false);
             int cores = SettingsState
                 .getInstance(repository.getProject()).threads;
             ExecutorService pool = Executors.newFixedThreadPool(cores);
-            System.out.println("Mining started on " + cores + " cores");
-            long timeStart = System.currentTimeMillis();
             AtomicInteger commitsDone = new AtomicInteger(0);
             CommitMiner miner =
                 new CommitMiner(pool, innerState.refactoringsMap.map, repository, commitsDone,
@@ -150,15 +147,8 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             } catch (InterruptedException e) {
               e.printStackTrace();
             }
-            long timeEnd = System.currentTimeMillis();
-            double time = ((double) (timeEnd - timeStart)) / 1000.0;
-            System.out.println("Mining done in " + time + " sec");
-
             computeRefactoringHistory(repository.getCurrentRevision(), repository.getProject());
-            long timeEnd2 = System.currentTimeMillis();
-            double time2 = ((double) (timeEnd2 - timeEnd)) / 1000.0;
-            System.out.println("Method history computed in " + time2);
-            progressIndicator.setText("Finished");
+            progressIndicator.setText(RefactoringsBundle.message("finished"));
           }
         });
   }
@@ -189,25 +179,22 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    * @param info    to be updated.
    */
   public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow info) {
-    System.out.println("Mining commit " + commit.getId().asString());
     ProgressManager.getInstance()
-        .run(new Task.Backgroundable(project, "Mining at commit " + commit.getId().asString()) {
+        .run(new Task.Backgroundable(project, String.format(
+            RefactoringsBundle.message("mining.at"), commit.getId().asString())) {
 
           @Override
           public void onCancel() {
             super.onCancel();
-            return;
           }
 
           public void onFinished() {
             super.onFinished();
             if (contains(commit.getId().asString())) {
 
-              System.out.println("Mining commit done");
+              System.out.println(RefactoringsBundle.message("finished"));
               ApplicationManager.getApplication()
                   .invokeLater(() -> info.refresh(commit.getId().asString()));
-            } else {
-              System.out.println("Mining commit FAILED!");
             }
           }
 

@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
  */
 @State(
     name = "SettingsState",
-    storages = {@Storage("SdkSettingsPlugin.xml")}
+    storages = {@Storage("RefactorInsightSettings.xml")}
 )
 public class SettingsState implements PersistentStateComponent<SettingsState> {
 

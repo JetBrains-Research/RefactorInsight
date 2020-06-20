@@ -70,12 +70,7 @@ public class Utils {
    * @param infos to be sorted.
    */
   public static void chronologicalOrder(List<RefactoringInfo> infos) {
-    infos.sort(new Comparator<RefactoringInfo>() {
-      @Override
-      public int compare(RefactoringInfo o1, RefactoringInfo o2) {
-        return Long.compare(o1.getEntry().getTimeStamp(), o2.getEntry().getTimeStamp());
-      }
-    });
+    infos.sort(Comparator.comparingLong(o -> o.getEntry().getTimeStamp()));
   }
 
   /**
@@ -179,20 +174,20 @@ public class Utils {
     if (infos.stream().anyMatch(ofType(RENAME_ATTRIBUTE))
         && infos.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
       info = infos.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
-      info.setName("Rename and Change Attribute Type");
+      info.setName(RefactoringsBundle.message("change.rename.attribute"));
     } else if (infos.stream().anyMatch(ofType(RENAME_ATTRIBUTE))) {
       info = infos.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
-      info.setName("Rename Attribute");
+      info.setName(RefactoringsBundle.message("rename.attribute"));
     } else if (infos.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
       info = infos.stream().filter(ofType(CHANGE_ATTRIBUTE_TYPE)).findFirst().get();
-      info.setName("Change Attribute Type");
+      info.setName(RefactoringsBundle.message("change.attribute"));
     } else if (infos.stream().anyMatch(ofType(CHANGE_VARIABLE_TYPE))) {
       info = infos.stream().filter(ofType(CHANGE_VARIABLE_TYPE)).findFirst().get();
-      info.setName("Rename and Change Variable Type");
+      info.setName(RefactoringsBundle.message("change.rename.var"));
     } else if (infos.stream().anyMatch(ofType(RENAME_PARAMETER))
         && infos.stream().anyMatch(ofType(CHANGE_PARAMETER_TYPE))) {
       info = infos.stream().filter(ofType(RENAME_PARAMETER)).findFirst().get();
-      info.setName("Rename and Change Parameter Type");
+      info.setName(RefactoringsBundle.message("change.rename.param"));
     }
     return info;
   }
@@ -246,7 +241,7 @@ public class Utils {
         info.correctMoreSidedLines(befores, after);
       }
     } catch (VcsException e) {
-      System.out.println(info.getName() + " refactoring not implemented yet");
+      e.printStackTrace();
     }
 
     return info;

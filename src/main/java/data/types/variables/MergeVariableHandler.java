@@ -3,6 +3,7 @@ package data.types.variables;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
+import gr.uom.java.xmi.decomposition.VariableDeclaration;
 import gr.uom.java.xmi.diff.MergeVariableRefactoring;
 import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
@@ -26,7 +27,8 @@ public class MergeVariableHandler extends Handler {
     }
 
     return info
-        .setElementBefore(ref.getMergedVariables().stream().map(x -> x.getVariableName()).collect(
+        .setElementBefore(ref.getMergedVariables().stream().map(
+            VariableDeclaration::getVariableName).collect(
             Collectors.joining()))
         .setElementAfter(ref.getNewVariable().getVariableDeclaration().toQualifiedString())
         .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
