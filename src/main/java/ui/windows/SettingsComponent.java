@@ -3,6 +3,7 @@ package ui.windows;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.ui.JBIntSpinner;
 import com.intellij.util.ui.FormBuilder;
@@ -14,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import services.MiningService;
+import services.RefactoringsBundle;
 import services.RefactoringsMapConverter;
 
 public class SettingsComponent {
@@ -31,14 +33,14 @@ public class SettingsComponent {
   public SettingsComponent(Project project) {
 
 
-    JButton clear = new JButton("Clear Cache");
+    JButton clear = new JButton(RefactoringsBundle.message("button.clear"));
     clear.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
         MiningService.getInstance(project).clear();
       }
     });
-    JButton all = new JButton("Mine All");
+    JButton all = new JButton(RefactoringsBundle.message("button.mine"));
     all.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
@@ -47,7 +49,7 @@ public class SettingsComponent {
         MiningService.getInstance(project).mineAll(repository);
       }
     });
-    JButton choose = new JButton("Import xml");
+    JButton choose = new JButton(RefactoringsBundle.message("button.import"));
     choose.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
@@ -63,7 +65,8 @@ public class SettingsComponent {
                 MiningService.getInstance(project).getState().refactoringsMap =
                     new RefactoringsMapConverter().fromString(content);
               } catch (Exception ex) {
-                ex.printStackTrace();
+                Messages.showErrorDialog(RefactoringsBundle.message("bad.file"),
+                    RefactoringsBundle.message("name"));
               }
             }
         );
@@ -71,9 +74,10 @@ public class SettingsComponent {
     });
 
     myMainPanel = FormBuilder.createFormBuilder()
-        .addLabeledComponent("Max commits to mine: ", commitLimit, 1, false)
-        .addLabeledComponent("Max commits to compute history for: ", historyLimit, 1, false)
-        .addLabeledComponent("Number of threads to use for mining: ", threads, 1, false)
+        .addLabeledComponent(RefactoringsBundle.message("label.max.commits"), commitLimit, 1, false)
+        .addLabeledComponent(RefactoringsBundle.message("label.max.history"), historyLimit, 1,
+            false)
+        .addLabeledComponent(RefactoringsBundle.message("label.threads"), threads, 1, false)
         .addComponent(clear)
         .addComponent(all)
         .addComponent(choose)

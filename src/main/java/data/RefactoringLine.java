@@ -40,7 +40,7 @@ public class RefactoringLine {
   private List<TextRange> mid;
   private List<TextRange> right;
   private LineFragmentImpl fragment;
-  private MoreSidedDiffRequestGenerator.Data moreSidedData;
+  private MoreSidedDiffRequestGenerator.MoreSidedRange moreSidedMoreSidedRange;
   private MarkingOption markingOption;
   private boolean moreSided;
 
@@ -119,18 +119,21 @@ public class RefactoringLine {
   }
 
   private void computeMoreSidedRanges(String leftText, String rightText) {
-    MoreSidedDiffRequestGenerator.Data data = new MoreSidedDiffRequestGenerator.Data();
-    data.startLineLeft = lines[LEFT_START] + 1;
-    data.endLineLeft = lines[LEFT_END];
-    data.startOffsetLeft = Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]);
-    data.endOffsetLeft = Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]);
+    MoreSidedDiffRequestGenerator.MoreSidedRange
+        moreSidedRange = new MoreSidedDiffRequestGenerator.MoreSidedRange();
+    moreSidedRange.startLineLeft = lines[LEFT_START] + 1;
+    moreSidedRange.endLineLeft = lines[LEFT_END];
+    moreSidedRange.startOffsetLeft = Utils
+        .getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]);
+    moreSidedRange.endOffsetLeft = Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]);
 
-    data.startLineRight = lines[RIGHT_START] + 1;
-    data.endLineRight = lines[RIGHT_END];
-    data.startOffsetRight =
+    moreSidedRange.startLineRight = lines[RIGHT_START] + 1;
+    moreSidedRange.endLineRight = lines[RIGHT_END];
+    moreSidedRange.startOffsetRight =
         Utils.getOffset(rightText, lines[RIGHT_START] + 1, columns[RIGHT_START]);
-    data.endOffsetRight = Utils.getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END]);
-    moreSidedData = data;
+    moreSidedRange.endOffsetRight = Utils
+        .getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END]);
+    moreSidedMoreSidedRange = moreSidedRange;
   }
 
   private void computeThreeSidedRanges(String leftText, String midText, String rightText) {
@@ -294,8 +297,8 @@ public class RefactoringLine {
     this.moreSided = moreSided;
   }
 
-  public MoreSidedDiffRequestGenerator.Data getMoreSidedData() {
-    return moreSidedData;
+  public MoreSidedDiffRequestGenerator.MoreSidedRange getMoreSidedMoreSidedRange() {
+    return moreSidedMoreSidedRange;
   }
 
   private void processOption(boolean hasMid, MarkingOption option) {

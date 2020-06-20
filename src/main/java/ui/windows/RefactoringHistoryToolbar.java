@@ -71,7 +71,8 @@ public class RefactoringHistoryToolbar {
     factory = VcsProjectLog.getInstance(project).getLogManager()
         .getMainLogUiFactory("method history", VcsLogFilterObject.collection());
     toolWindow =
-        toolWindowManager.registerToolWindow("Refactoring History", true, ToolWindowAnchor.BOTTOM);
+        toolWindowManager.registerToolWindow(RefactoringsBundle.message("history"),
+            true, ToolWindowAnchor.BOTTOM);
 
   }
 
@@ -91,7 +92,7 @@ public class RefactoringHistoryToolbar {
       showPopup(datacontext);
     } else {
       JBSplitter splitter = new JBSplitter(false, (float) 0.35);
-      List<RefactoringInfo> refactoringInfos = refactorings.stream().collect(Collectors.toList());
+      List<RefactoringInfo> refactoringInfos = new ArrayList<>(refactorings);
       Utils.chronologicalOrder(refactoringInfos);
 
       Tree tree =
@@ -108,7 +109,7 @@ public class RefactoringHistoryToolbar {
 
   private void setSecondComponent(JBSplitter splitter) {
     final JBLabel component =
-        new JBLabel("Double click to jump at commit.", SwingConstants.CENTER);
+        new JBLabel(RefactoringsBundle.message("click.to.jump"), SwingConstants.CENTER);
     component.setForeground(Gray._105);
     splitter.setSecondComponent(component);
   }
@@ -116,9 +117,8 @@ public class RefactoringHistoryToolbar {
   private void setFirstComponent(int size, JBSplitter splitter, Tree tree) {
     JBScrollPane pane = new JBScrollPane(tree);
     JBLabel label =
-        new JBLabel(
-            size + (size > 1 ? " refactorings" : " refactoring") + " detected for this "
-                + type.toString().toLowerCase());
+        new JBLabel(String.format(RefactoringsBundle.message("how.many.detected"),
+            size, size > 1 ? "s" : "", type.toString().toLowerCase()));
     label.setForeground(Gray._105);
     pane.setColumnHeaderView(label);
     splitter.setFirstComponent(pane);
@@ -154,27 +154,25 @@ public class RefactoringHistoryToolbar {
 
     Utils.add(openLogTab);
     JComponent mainComponent = openLogTab.getMainComponent();
-    if (mainComponent != null) {
-      mainComponent.setAutoscrolls(true);
-      mainComponent.setSize(splitter.getSecondComponent().getSize());
-      splitter.setSecondComponent(mainComponent);
-      openLogTab.jumpToHash(info.getCommitId());
+    mainComponent.setAutoscrolls(true);
+    mainComponent.setSize(splitter.getSecondComponent().getSize());
+    splitter.setSecondComponent(mainComponent);
+    openLogTab.jumpToHash(info.getCommitId());
 
-      JBSplitter splitter1 = (JBSplitter) mainComponent.getComponent(0);
+    JBSplitter splitter1 = (JBSplitter) mainComponent.getComponent(0);
 
-      BorderLayoutPanel splitter2 = (BorderLayoutPanel) splitter1.getFirstComponent();
+    BorderLayoutPanel splitter2 = (BorderLayoutPanel) splitter1.getFirstComponent();
 
-      OnePixelSplitter panel = (OnePixelSplitter) splitter2.getComponent(1);
-      MainFrame mainFrame = (MainFrame) panel.getComponent(2);
+    OnePixelSplitter panel = (OnePixelSplitter) splitter2.getComponent(1);
+    MainFrame mainFrame = (MainFrame) panel.getComponent(2);
 
-      OnePixelSplitter splitter3 = (OnePixelSplitter) mainFrame.getComponent(0);
-      OnePixelSplitter splitter4 = (OnePixelSplitter) splitter3.getComponent(2);
-      JBLoadingPanel panel1 = (JBLoadingPanel) splitter4.getComponent(1);
-      JComponent loadingDecorator = (JComponent) panel1.getComponent(0);
-      JPanel panel2 = (JPanel) loadingDecorator.getComponent(0);
-      VcsLogChangesBrowser browser = (VcsLogChangesBrowser) panel2.getComponent(0);
-      ((ActionButton) browser.getToolbar().getComponent().getComponent(1)).click();
-    }
+    OnePixelSplitter splitter3 = (OnePixelSplitter) mainFrame.getComponent(0);
+    OnePixelSplitter splitter4 = (OnePixelSplitter) splitter3.getComponent(2);
+    JBLoadingPanel panel1 = (JBLoadingPanel) splitter4.getComponent(1);
+    JComponent loadingDecorator = (JComponent) panel1.getComponent(0);
+    JPanel panel2 = (JPanel) loadingDecorator.getComponent(0);
+    VcsLogChangesBrowser browser = (VcsLogChangesBrowser) panel2.getComponent(0);
+    ((ActionButton) browser.getToolbar().getComponent().getComponent(1)).click();
   }
 
   @NotNull
@@ -190,7 +188,8 @@ public class RefactoringHistoryToolbar {
         .getAndIncrement());
 
     if (methods != null && !methods.isEmpty()) {
-      DefaultMutableTreeNode child = new DefaultMutableTreeNode("Check methods in this class");
+      DefaultMutableTreeNode child = new DefaultMutableTreeNode(
+          RefactoringsBundle.message("check.methods"));
       addObjectsToTree(methods, child, true);
       if (child.getChildCount() > 0) {
         root.add(child);
@@ -198,7 +197,8 @@ public class RefactoringHistoryToolbar {
     }
 
     if (attributes != null && !attributes.isEmpty()) {
-      DefaultMutableTreeNode child = new DefaultMutableTreeNode("Check fields in this class");
+      DefaultMutableTreeNode child = new DefaultMutableTreeNode(
+          RefactoringsBundle.message("check.fields"));
       addObjectsToTree(attributes, child, false);
       if (child.getChildCount() > 0) {
         root.add(child);

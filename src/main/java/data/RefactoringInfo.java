@@ -39,13 +39,13 @@ public class RefactoringInfo {
   private transient RefactoringEntry entry;
   private transient String groupId;
   private transient RefactoringType type;
+  private transient List<Pair<String, Boolean>> moreSidedLeftPaths = new ArrayList<>();
 
   private DiffRequestGenerator requestGenerator = new TwoSidedDiffRequestGenerator();
   private String name;
 
   private String[][] uiStrings = new String[3][2];
   private String[] paths = new String[3];
-  private transient List<Pair<String, Boolean>> moreSidedLeftPaths = new ArrayList<>();
 
   private Group group;
 

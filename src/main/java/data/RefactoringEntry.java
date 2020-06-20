@@ -125,7 +125,6 @@ public class RefactoringEntry implements Serializable {
         RefactoringInfo info = Utils.getMainRefactoringInfo(v);
 
         if (info == null) {
-          System.out.println("Grouping failed");
           return;
         }
 

@@ -8,6 +8,7 @@ import git4idea.repo.GitRepositoryManager;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import services.MiningService;
+import services.RefactoringsBundle;
 
 
 /**
@@ -24,8 +25,8 @@ public class RefactoringAction extends AnAction {
     final List<GitRepository> repositories = GitRepositoryManager
         .getInstance(e.getProject()).getRepositories();
     if (repositories.isEmpty()) {
-      Messages.showErrorDialog("Your project is not connected to VCS.",
-          "Refactorings Detection");
+      Messages.showErrorDialog(RefactoringsBundle.message("no.repo"),
+          RefactoringsBundle.message("name"));
       return;
     }
     GitRepository repository = repositories.get(0);

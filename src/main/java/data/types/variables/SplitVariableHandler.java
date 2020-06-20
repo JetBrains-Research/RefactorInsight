@@ -3,6 +3,7 @@ package data.types.variables;
 import data.Group;
 import data.RefactoringInfo;
 import data.types.Handler;
+import gr.uom.java.xmi.decomposition.VariableDeclaration;
 import gr.uom.java.xmi.diff.SplitVariableRefactoring;
 import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
@@ -29,7 +30,8 @@ public class SplitVariableHandler extends Handler {
         .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
         .setElementBefore(ref.getOldVariable().getVariableDeclaration().toQualifiedString())
-        .setElementAfter(ref.getSplitVariables().stream().map(x -> x.getVariableName()).collect(
-            Collectors.joining()));
+        .setElementAfter(ref.getSplitVariables().stream()
+            .map(VariableDeclaration::getVariableName)
+            .collect(Collectors.joining()));
   }
 }

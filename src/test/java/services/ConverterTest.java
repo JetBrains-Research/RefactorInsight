@@ -134,7 +134,7 @@ public class ConverterTest {
         .setMoreSided(true)
         .setIncludes(new HashSet<>())
         .setRequestGenerator(new MoreSidedDiffRequestGenerator(Arrays.asList(
-            new MoreSidedDiffRequestGenerator.Data(1, 2, 3, 4,
+            new MoreSidedDiffRequestGenerator.MoreSidedRange(1, 2, 3, 4,
                 0, 0, 0, 0, "extraction/left/path.java"))));
 
     Map.of(

@@ -21,7 +21,7 @@ public class SettingsConfigurable implements Configurable {
   @Nls(capitalization = Nls.Capitalization.Title)
   @Override
   public String getDisplayName() {
-    return "Refactoring Detection Settings";
+    return RefactoringsBundle.message("setting");
   }
 
   @Override

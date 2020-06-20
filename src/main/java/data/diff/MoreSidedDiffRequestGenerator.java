@@ -18,9 +18,9 @@ import utils.StringUtils;
 
 public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
 
-  List<Data> lines;
+  List<MoreSidedRange> lines;
 
-  public MoreSidedDiffRequestGenerator(List<Data> lines) {
+  public MoreSidedDiffRequestGenerator(List<MoreSidedRange> lines) {
     this.lines = lines;
   }
 
@@ -34,24 +34,24 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
    */
   public List<String> getClassNames() {
     return lines.stream()
-        .map(Data::getLeftPath)
+        .map(MoreSidedRange::getLeftPath)
         .map(StringUtils::pathToClassName)
         .distinct()
         .collect(Collectors.toList());
   }
 
-  public List<Data> getLines() {
+  public List<MoreSidedRange> getLines() {
     return lines;
   }
 
   /**
    * Serializer.
    *
-   * @return this
+   * @return new MoreSidedDiffRequestGenerator from string
    */
   public static MoreSidedDiffRequestGenerator fromString(String seq) {
-    List<Data> lines = Arrays.asList(seq.split(StringUtils.delimiter(StringUtils.LIST))).stream()
-        .map(dataSt -> Data.fromString(dataSt)).collect(Collectors.toList());
+    List<MoreSidedRange> lines = Arrays.stream(seq.split(StringUtils.delimiter(StringUtils.LIST)))
+        .map(MoreSidedRange::fromString).collect(Collectors.toList());
 
     return new MoreSidedDiffRequestGenerator(lines);
   }
@@ -75,7 +75,7 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
   @Override
   public void prepareJetBrainsRanges(List<RefactoringLine> lineMarkings) {
     lines = lineMarkings.stream()
-        .map(RefactoringLine::getMoreSidedData).collect(Collectors.toList());
+        .map(RefactoringLine::getMoreSidedMoreSidedRange).collect(Collectors.toList());
   }
 
   @Override
@@ -116,10 +116,10 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
     for (int i = 0; i < befores.size(); i++) {
       lineMarkings.get(i).correctLines(befores.get(i), null, after, skipAnnotationsLeft,
           skipAnnotationsMid, skipAnnotationsRight);
-      lineMarkings.get(i).getMoreSidedData().leftPath = pathPair.get(i).first;
+      lineMarkings.get(i).getMoreSidedMoreSidedRange().leftPath = pathPair.get(i).first;
       if (pathPair.get(i).second) {
-        lineMarkings.get(i).getMoreSidedData().startLineRight = -1;
-        lineMarkings.get(i).getMoreSidedData().endLineRight = -1;
+        lineMarkings.get(i).getMoreSidedMoreSidedRange().startLineRight = -1;
+        lineMarkings.get(i).getMoreSidedMoreSidedRange().endLineRight = -1;
       }
     }
     prepareJetBrainsRanges(lineMarkings);
@@ -130,11 +130,11 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
     if (lines == null || lines.size() == 0) {
       return "";
     }
-    return lines.stream().map(Data::toString)
+    return lines.stream().map(MoreSidedRange::toString)
         .collect(Collectors.joining(StringUtils.delimiter(StringUtils.LIST)));
   }
 
-  public static class Data implements Comparable<Data> {
+  public static class MoreSidedRange implements Comparable<MoreSidedRange> {
     public int startLineLeft;
     public int endLineLeft;
     public int startOffsetLeft;
@@ -159,9 +159,11 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
      * @param endOffsetRight   int
      * @param leftPath         path
      */
-    public Data(int startLineLeft, int endLineLeft, int startOffsetLeft, int endOffsetLeft,
-                int startLineRight, int endLineRight, int startOffsetRight, int endOffsetRight,
-                String leftPath) {
+    public MoreSidedRange(int startLineLeft, int endLineLeft,
+                          int startOffsetLeft, int endOffsetLeft,
+                          int startLineRight, int endLineRight,
+                          int startOffsetRight, int endOffsetRight,
+                          String leftPath) {
       this.startLineLeft = startLineLeft;
       this.endLineLeft = endLineLeft;
       this.startOffsetLeft = startOffsetLeft;
@@ -173,7 +175,7 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
       this.leftPath = leftPath;
     }
 
-    public Data() {
+    public MoreSidedRange() {
     }
 
     public String getLeftPath() {
@@ -183,20 +185,20 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
     /**
      * Deserializer.
      */
-    public static Data fromString(String seq) {
+    public static MoreSidedRange fromString(String seq) {
       String value = StringUtils.deSanitize(seq);
       String[] tokens = value.split(StringUtils.delimiter(StringUtils.RANGE));
-      Data data = new Data();
-      data.startLineLeft = Integer.parseInt(tokens[0]);
-      data.endLineLeft = Integer.parseInt(tokens[1]);
-      data.startOffsetLeft = Integer.parseInt(tokens[2]);
-      data.endOffsetLeft = Integer.parseInt(tokens[3]);
-      data.startLineRight = Integer.parseInt(tokens[4]);
-      data.endLineRight = Integer.parseInt(tokens[5]);
-      data.startOffsetRight = Integer.parseInt(tokens[6]);
-      data.endOffsetRight = Integer.parseInt(tokens[7]);
-      data.leftPath = tokens[8];
-      return data;
+      MoreSidedRange moreSidedRange = new MoreSidedRange();
+      moreSidedRange.startLineLeft = Integer.parseInt(tokens[0]);
+      moreSidedRange.endLineLeft = Integer.parseInt(tokens[1]);
+      moreSidedRange.startOffsetLeft = Integer.parseInt(tokens[2]);
+      moreSidedRange.endOffsetLeft = Integer.parseInt(tokens[3]);
+      moreSidedRange.startLineRight = Integer.parseInt(tokens[4]);
+      moreSidedRange.endLineRight = Integer.parseInt(tokens[5]);
+      moreSidedRange.startOffsetRight = Integer.parseInt(tokens[6]);
+      moreSidedRange.endOffsetRight = Integer.parseInt(tokens[7]);
+      moreSidedRange.leftPath = tokens[8];
+      return moreSidedRange;
     }
 
     /**
@@ -217,16 +219,16 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
 
 
     @Override
-    public int compareTo(@NotNull Data data) {
-      if (leftPath.equals(data.leftPath)) {
-        if (startLineLeft == data.startLineLeft) {
+    public int compareTo(@NotNull MoreSidedRange moreSidedRange) {
+      if (leftPath.equals(moreSidedRange.leftPath)) {
+        if (startLineLeft == moreSidedRange.startLineLeft) {
           return 0;
-        } else if (startLineLeft > data.startLineLeft) {
+        } else if (startLineLeft > moreSidedRange.startLineLeft) {
           return 1;
         }
         return -1;
       }
-      return leftPath.compareTo(data.leftPath);
+      return leftPath.compareTo(moreSidedRange.leftPath);
     }
   }
 

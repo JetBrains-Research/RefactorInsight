@@ -19,10 +19,10 @@ public class ReorderParameterHandler extends Handler {
 
     String classNameBefore = ref.getOperationBefore().getClassName();
     String classNameAfter = ref.getOperationAfter().getClassName();
-    List<VariableDeclaration> as = ref.getParametersBefore();
-    List<VariableDeclaration> bs = ref.getParametersAfter();
-    IntStream.range(0, Math.min(as.size(), bs.size()))
-        .mapToObj(i -> new Pair<>(as.get(i), bs.get(i)))
+    List<VariableDeclaration> befores = ref.getParametersBefore();
+    List<VariableDeclaration> afters = ref.getParametersAfter();
+    IntStream.range(0, Math.min(befores.size(), afters.size()))
+        .mapToObj(i -> new Pair<>(befores.get(i), afters.get(i)))
         .forEach(x -> {
           if (!x.first.getVariableDeclaration().getType()
               .equals(x.second.getVariableDeclaration().getType())

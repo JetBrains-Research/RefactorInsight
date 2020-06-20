@@ -170,14 +170,12 @@ public class MiningServiceManualTest extends GitSingleRepoTest {
       collector.checkThat(entry.getParent(), equalTo(hashes[i - 1]));
       collector.checkThat("Issue in: " + commitDirs[i], entry, matches[i]);
     }
-    collector.verify();
-  }
 
-  public void testConverter() {
     RefactoringsMapConverter converter = new RefactoringsMapConverter();
     String serialized = converter.toString(miner.getState().refactoringsMap);
     RefactoringsMap deserialised = converter.fromString(serialized);
-    assertThat(serialized, equalTo(converter.toString(deserialised)));
+    collector.checkThat(serialized, equalTo(converter.toString(deserialised)));
+    collector.verify();
   }
 
   private Predicate<RefactoringInfo> ofType(RefactoringType type) {
