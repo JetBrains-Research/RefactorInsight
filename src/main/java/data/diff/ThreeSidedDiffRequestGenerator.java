@@ -8,6 +8,7 @@ import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import data.RefactoringInfo;
 import data.RefactoringLine;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +19,7 @@ import utils.StringUtils;
  */
 public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
 
-  private List<ThreeSidedRange> ranges;
+  private List<ThreeSidedRange> ranges = new ArrayList<>();
 
   public ThreeSidedDiffRequestGenerator() {
   }
@@ -31,7 +32,11 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
   public static ThreeSidedDiffRequestGenerator fromString(String value) {
     String regex = StringUtils.delimiter(LIST, true);
     ThreeSidedDiffRequestGenerator generator = new ThreeSidedDiffRequestGenerator();
-    generator.ranges = Arrays.stream(value.split(regex))
+    String[] tokens = value.split(regex);
+    if (tokens[0].isEmpty()) {
+      return generator;
+    }
+    generator.ranges = Arrays.stream(tokens)
         .map(ThreeSidedRange::fromString).collect(Collectors.toList());
     return generator;
   }

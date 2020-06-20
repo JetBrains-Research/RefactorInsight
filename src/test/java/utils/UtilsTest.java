@@ -58,5 +58,11 @@ public class UtilsTest {
     assertEquals("testClass.testMethod(String, String)", StringUtils.calculateSignature(psiMethod));
   }
 
-
+  @Test
+  public void sanitizerTest(){
+    String unSanitized = "this/string/is#not_escaped";
+    String sanitized = "this/string/is##not#_escaped";
+    assertEquals(sanitized, StringUtils.sanitize(unSanitized));
+    assertEquals(unSanitized, StringUtils.deSanitize(sanitized));
+  }
 }
