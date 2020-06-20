@@ -1,6 +1,7 @@
 package services;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.refactoringminer.api.RefactoringType.ADD_METHOD_ANNOTATION;
 import static org.refactoringminer.api.RefactoringType.CHANGE_ATTRIBUTE_TYPE;
 import static org.refactoringminer.api.RefactoringType.CHANGE_PARAMETER_TYPE;
@@ -30,7 +31,6 @@ import static org.refactoringminer.api.RefactoringType.RENAME_PACKAGE;
 import static org.refactoringminer.api.RefactoringType.RENAME_PARAMETER;
 import static org.refactoringminer.api.RefactoringType.RENAME_VARIABLE;
 
-
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vcs.Executor;
 import com.intellij.ui.treeStructure.Tree;
@@ -47,14 +47,14 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import org.hamcrest.CustomMatcher;
 import org.hamcrest.Matcher;
 import org.junit.rules.ErrorCollector;
 import org.refactoringminer.api.RefactoringType;
-import ui.tree.renderers.MainCellRenderer;
 import ui.tree.TreeUtils;
+import ui.tree.renderers.MainCellRenderer;
+
 /**
  * Extend GitSingleRepoTest
  * variables as myProject, repo, projectPath and much more are available from super classes
@@ -171,6 +171,13 @@ public class MiningServiceManualTest extends GitSingleRepoTest {
       collector.checkThat("Issue in: " + commitDirs[i], entry, matches[i]);
     }
     collector.verify();
+  }
+
+  public void testConverter() {
+    RefactoringsMapConverter converter = new RefactoringsMapConverter();
+    String serialized = converter.toString(miner.getState().refactoringsMap);
+    RefactoringsMap deserialised = converter.fromString(serialized);
+    assertThat(serialized, equalTo(converter.toString(deserialised)));
   }
 
   private Predicate<RefactoringInfo> ofType(RefactoringType type) {

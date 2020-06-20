@@ -29,6 +29,7 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
 
   /**
    * Extracts and returns class names (incl. package) from the left paths.
+   *
    * @return list of class names
    */
   public List<String> getClassNames() {
@@ -45,6 +46,7 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
 
   /**
    * Serializer.
+   *
    * @return this
    */
   public static MoreSidedDiffRequestGenerator fromString(String seq) {
@@ -102,8 +104,9 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
   /**
    * Compatible correct method for more sided ranges.
    * Corrects lines and offsets.
-   * @param befores All texts of left window (need to be in order!)
-   * @param after Text of right side
+   *
+   * @param befores  All texts of left window (need to be in order!)
+   * @param after    Text of right side
    * @param pathPair Path of file and boolean for revision
    */
   public void correct(List<String> befores, String after, List<Pair<String, Boolean>> pathPair,
@@ -142,6 +145,36 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
     public int endOffsetRight;
     public String leftPath;
     public transient DiffContent content;
+
+    /**
+     * Constructor for Data.
+     *
+     * @param startLineLeft    int
+     * @param endLineLeft      int
+     * @param startOffsetLeft  int
+     * @param endOffsetLeft    int
+     * @param startLineRight   int
+     * @param endLineRight     int
+     * @param startOffsetRight int
+     * @param endOffsetRight   int
+     * @param leftPath         path
+     */
+    public Data(int startLineLeft, int endLineLeft, int startOffsetLeft, int endOffsetLeft,
+                int startLineRight, int endLineRight, int startOffsetRight, int endOffsetRight,
+                String leftPath) {
+      this.startLineLeft = startLineLeft;
+      this.endLineLeft = endLineLeft;
+      this.startOffsetLeft = startOffsetLeft;
+      this.endOffsetLeft = endOffsetLeft;
+      this.startLineRight = startLineRight;
+      this.endLineRight = endLineRight;
+      this.startOffsetRight = startOffsetRight;
+      this.endOffsetRight = endOffsetRight;
+      this.leftPath = leftPath;
+    }
+
+    public Data() {
+    }
 
     public String getLeftPath() {
       return leftPath;

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.refactoringminer.api.Refactoring;
 import utils.StringUtils;
@@ -197,6 +198,21 @@ public class RefactoringEntry implements Serializable {
           });
         }
     );
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    RefactoringEntry entry = (RefactoringEntry) o;
+    return time == entry.time
+        && Objects.equals(commitId, entry.commitId)
+        && Objects.equals(parent, entry.parent)
+        && Objects.equals(refactorings, entry.refactorings);
   }
 
 

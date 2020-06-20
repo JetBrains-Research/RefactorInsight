@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
@@ -59,5 +58,11 @@ public class UtilsTest {
     assertEquals("testClass.testMethod(String, String)", StringUtils.calculateSignature(psiMethod));
   }
 
-
+  @Test
+  public void sanitizerTest(){
+    String unSanitized = "this/string/is#not_escaped";
+    String sanitized = "this/string/is##not#_escaped";
+    assertEquals(sanitized, StringUtils.sanitize(unSanitized));
+    assertEquals(unSanitized, StringUtils.deSanitize(sanitized));
+  }
 }

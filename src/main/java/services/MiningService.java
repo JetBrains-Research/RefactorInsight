@@ -154,16 +154,13 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             double time = ((double) (timeEnd - timeStart)) / 1000.0;
             System.out.println("Mining done in " + time + " sec");
 
-            computeMethodHistory(repository.getCurrentRevision(), repository.getProject());
+            computeRefactoringHistory(repository.getCurrentRevision(), repository.getProject());
             long timeEnd2 = System.currentTimeMillis();
             double time2 = ((double) (timeEnd2 - timeEnd)) / 1000.0;
             System.out.println("Method history computed in " + time2);
             progressIndicator.setText("Finished");
           }
         });
-    synchronized (this) {
-      notifyAll();
-    }
   }
 
   /**
@@ -220,11 +217,12 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
         });
   }
 
-  public Map<String, Set<RefactoringInfo>> getMethodHistory() {
+
+  public Map<String, Set<RefactoringInfo>> getRefactoringHistory() {
     return methodHistory;
   }
 
-  private void computeMethodHistory(@NotNull String commitId, Project project) {
+  private void computeRefactoringHistory(@NotNull String commitId, Project project) {
     List<RefactoringInfo> refs = new ArrayList<>();
     int limit = SettingsState.getInstance(project).historyLimit;
     while (contains(commitId) && limit-- > 0) {
@@ -236,6 +234,9 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     Collections.reverse(refs);
     methodHistory.clear();
     refs.forEach(r -> r.addToHistory(methodHistory));
+    synchronized (this) {
+      notifyAll();
+    }
   }
 
   public RefactoringEntry get(String commitHash) {

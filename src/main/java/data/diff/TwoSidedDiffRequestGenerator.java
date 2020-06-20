@@ -13,6 +13,7 @@ import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.util.DiffUserDataKeysEx;
 import data.RefactoringInfo;
 import data.RefactoringLine;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -27,9 +28,13 @@ import utils.StringUtils;
  */
 public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
 
-  public List<LineFragment> fragments;
+  public List<LineFragment> fragments = new ArrayList<>();
 
   public TwoSidedDiffRequestGenerator() {
+  }
+
+  public TwoSidedDiffRequestGenerator(List<LineFragment> frags) {
+    fragments = frags;
   }
 
   /**

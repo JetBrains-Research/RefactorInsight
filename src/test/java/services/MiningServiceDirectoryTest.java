@@ -5,7 +5,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.Hash;
 import com.intellij.vcs.log.VcsUser;
@@ -38,7 +37,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
   private String head;
   private RefactoringEntry entry;
 
-  //doesnt have to be overwritten,
+  //does not have to be overwritten,
   // but if we want to setup stuff ourselves call super.setup() first
   //No @Before annotation
   public void setUp() throws Exception {
@@ -69,30 +68,65 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
     entry = miner.get(head);
   }
 
-  //Example of using an existing repo
-  //note that the project directory has to contain the .git folder but renamed
+  /**
+   * This test method is used for testing multiple functionalities.
+   * This is the case since the setup method can be heavy and there is no need
+   * in mining multiple times.
+   * This method test the functionality of the MiningService (miner in this case).
+   * It tests the miner at commit method using mocking.
+   * It also tests the renderers.
+   * We use manual printing for a better understanding of the test case.
+   */
   public void testDirectory() {
 
+    System.out.println("Testing the HEAD entry size:");
     assertEquals(3, entry.getRefactorings().size());
     assertTrue(miner.get(head).getRefactorings().size() > 0);
 
-
+    System.out.println("Testing that the mining service does not accept null as project:");
     assertThrows(IllegalArgumentException.class, () -> MiningService.getInstance(null));
+
+    System.out.println("Testing that the current project has a mining service:");
     assertEquals(miner, MiningService.getInstance(myProject));
     assertNotNull(miner.getState());
     assertFalse(miner.getState().refactoringsMap.map.isEmpty());
+
+    System.out.println("Testing that the miner has finished mining:");
     assertTrue(!miner.isMining());
-    assertFalse(miner.getMethodHistory().isEmpty());
+
+    System.out.println("Testing that the refactoring history is computed:");
+    assertFalse(miner.getRefactoringHistory().isEmpty());
+
+    System.out.println("Testing that the mining cannot happen on a null repository:");
     assertThrows(NullPointerException.class, () -> miner.mineAndWait(null));
-  }
 
-  public void testTreeIsBuilt() {
+    //test mine at commit
+    Hash hash = createHashObject(head);
+    Hash parent = mock(Hash.class);
+    //return a random string
+    when(parent.asString()).thenReturn("");
+    List<Hash> parents = Arrays.asList(parent);
+    VcsUser user = createTestVcsUser();
+
+    //cannot be mocked since its dependencies must not be null
+    VcsCommitMetadataImpl vcsCommitMetadata = new VcsCommitMetadataImpl(hash,
+        parents, 0, repo.getRoot(), "subject",
+        user, "message", user, 0);
+
+    GitWindow gitWindow = mock(GitWindow.class);
+    Mockito.doThrow(new NullPointerException()).when(gitWindow).refresh(any());
+
+    System.out.println("Testing that mine at commit works:");
+    miner.mineAtCommit(vcsCommitMetadata, myProject, gitWindow);
+    verify(parent, new Times(1)).asString();
+
+    //test the main cell renderer works as expected on this map
     MainCellRenderer cellRenderer = new MainCellRenderer();
-
     miner.getState().refactoringsMap.map.values()
         .forEach(x -> {
           Tree tree1 = TreeUtils.buildTree(x.getRefactorings());
           tree1.setCellRenderer(cellRenderer);
+          System.out.println("Testing that the VCS tool tree is not null:");
           assertNotNull(tree1);
           DefaultMutableTreeNode root1 = (DefaultMutableTreeNode) tree1.getModel().getRoot();
 
@@ -100,55 +134,35 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
           root1.breadthFirstEnumeration().asIterator().forEachRemaining(node -> {
             cellRenderer.customizeCellRenderer(tree1, node, false,
                 false, node.isLeaf(), 1, false);
+            System.out.println("Testing that for node " + node + " the renderer works");
             assertNotNull(cellRenderer
                 .getTreeCellRendererComponent(tree1, node, false,
                     false, node.isLeaf(), 1, false));
           });
         });
-  }
 
-  public void testHistoryTreeIsBuilt() {
-    HistoryToolbarRenderer cellRenderer = new HistoryToolbarRenderer();
-
-    miner.getMethodHistory()
+    //test the history toolbar renderer works as expected on this map
+    HistoryToolbarRenderer historyToolbarRenderer = new HistoryToolbarRenderer();
+    miner.getRefactoringHistory()
         .forEach((key, refactorings) -> {
           DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
           for (RefactoringInfo ref : refactorings) {
             TreeUtils.createHistoryTree(root, ref);
           }
           Tree tree1 = new Tree(root);
-          tree1.setCellRenderer(cellRenderer);
+          tree1.setCellRenderer(historyToolbarRenderer);
+          System.out.println("Testing that the history toolbar tree is not null:");
           assertNotNull(tree1);
           DefaultMutableTreeNode root1 = (DefaultMutableTreeNode) tree1.getModel().getRoot();
           root1.breadthFirstEnumeration().asIterator().forEachRemaining(node -> {
-            cellRenderer.customizeCellRenderer(tree1, node, false,
+            historyToolbarRenderer.customizeCellRenderer(tree1, node, false,
                 false, node.isLeaf(), 1, false);
-            assertNotNull(cellRenderer
+            System.out.println("Testing that for node " + node + " the renderer works");
+            assertNotNull(historyToolbarRenderer
                 .getTreeCellRendererComponent(tree1, node, false,
                     false, node.isLeaf(), 1, false));
           });
         });
-  }
-
-  public void testMineAtCommit() {
-    String head = repo.getCurrentRevision();
-    Hash hash = createHashObject(head);
-
-    Hash parent = mock(Hash.class);
-    //return a random string
-    when(parent.asString()).thenReturn("");
-    List<Hash> parents = Arrays.asList(parent);
-    VcsUser user = createTestVcsUser();
-
-    //cannot be mocked since it cannot be null when calling methods
-    VcsCommitMetadataImpl vcsCommitMetadata = new VcsCommitMetadataImpl(hash,
-        parents, 0, repo.getRoot(), "subject",
-        user, "message", user, 0);
-
-    GitWindow gitWindow = mock(GitWindow.class);
-    Mockito.doThrow(new NullPointerException()).when(gitWindow).refresh(any());
-    miner.mineAtCommit(vcsCommitMetadata, myProject, gitWindow);
-    verify(parent, new Times(1)).asString();
   }
 
   /**
