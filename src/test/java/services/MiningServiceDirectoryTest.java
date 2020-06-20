@@ -75,29 +75,28 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
    * This method test the functionality of the MiningService (miner in this case).
    * It tests the miner at commit method using mocking.
    * It also tests the renderers.
-   * We use manual printing for a better understanding of the test case.
    */
   public void testDirectory() {
 
-    System.out.println("Testing the HEAD entry size:");
+    //Testing the HEAD entry size:
     assertEquals(3, entry.getRefactorings().size());
     assertTrue(miner.get(head).getRefactorings().size() > 0);
 
-    System.out.println("Testing that the mining service does not accept null as project:");
+    //Testing that the mining service does not accept null as project:
     assertThrows(IllegalArgumentException.class, () -> MiningService.getInstance(null));
 
-    System.out.println("Testing that the current project has a mining service:");
+    //Testing that the current project has a mining service:
     assertEquals(miner, MiningService.getInstance(myProject));
     assertNotNull(miner.getState());
     assertFalse(miner.getState().refactoringsMap.map.isEmpty());
 
-    System.out.println("Testing that the miner has finished mining:");
+    //Testing that the miner has finished mining:
     assertTrue(!miner.isMining());
 
-    System.out.println("Testing that the refactoring history is computed:");
+    //Testing that the refactoring history is computed:
     assertFalse(miner.getRefactoringHistory().isEmpty());
 
-    System.out.println("Testing that the mining cannot happen on a null repository:");
+    //Testing that the mining cannot happen on a null repository:
     assertThrows(NullPointerException.class, () -> miner.mineAndWait(null));
 
     //test mine at commit
@@ -116,7 +115,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
     GitWindow gitWindow = mock(GitWindow.class);
     Mockito.doThrow(new NullPointerException()).when(gitWindow).refresh(any());
 
-    System.out.println("Testing that mine at commit works:");
+    //Testing that mine at commit works:
     miner.mineAtCommit(vcsCommitMetadata, myProject, gitWindow);
     verify(parent, new Times(1)).asString();
 
@@ -126,7 +125,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
         .forEach(x -> {
           Tree tree1 = TreeUtils.buildTree(x.getRefactorings());
           tree1.setCellRenderer(cellRenderer);
-          System.out.println("Testing that the VCS tool tree is not null:");
+          //Testing that the VCS tool tree is not null:
           assertNotNull(tree1);
           DefaultMutableTreeNode root1 = (DefaultMutableTreeNode) tree1.getModel().getRoot();
 
@@ -134,7 +133,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
           root1.breadthFirstEnumeration().asIterator().forEachRemaining(node -> {
             cellRenderer.customizeCellRenderer(tree1, node, false,
                 false, node.isLeaf(), 1, false);
-            System.out.println("Testing that for node " + node + " the renderer works");
+            //Testing that for node "node" the renderer works
             assertNotNull(cellRenderer
                 .getTreeCellRendererComponent(tree1, node, false,
                     false, node.isLeaf(), 1, false));
@@ -151,13 +150,13 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
           }
           Tree tree1 = new Tree(root);
           tree1.setCellRenderer(historyToolbarRenderer);
-          System.out.println("Testing that the history toolbar tree is not null:");
+          //testing that the history toolbar tree is not null
           assertNotNull(tree1);
           DefaultMutableTreeNode root1 = (DefaultMutableTreeNode) tree1.getModel().getRoot();
           root1.breadthFirstEnumeration().asIterator().forEachRemaining(node -> {
             historyToolbarRenderer.customizeCellRenderer(tree1, node, false,
                 false, node.isLeaf(), 1, false);
-            System.out.println("Testing that for node " + node + " the renderer works");
+            //Testing that for node "node" the renderer works"
             assertNotNull(historyToolbarRenderer
                 .getTreeCellRendererComponent(tree1, node, false,
                     false, node.isLeaf(), 1, false));
