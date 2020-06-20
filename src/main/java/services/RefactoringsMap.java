@@ -4,6 +4,7 @@ import data.RefactoringEntry;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * The Refactorings Map.
@@ -11,13 +12,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RefactoringsMap {
 
-  public Map<String, RefactoringEntry> map = new ConcurrentHashMap<>();
+  public ConcurrentMap<String, RefactoringEntry> map = new ConcurrentHashMap<>();
   public String version;
 
   public RefactoringsMap() {
   }
 
-  public RefactoringsMap(Map<String, RefactoringEntry> map, String version) {
+  public RefactoringsMap(ConcurrentMap<String, RefactoringEntry> map, String version) {
     this.map = map;
     this.version = version;
   }

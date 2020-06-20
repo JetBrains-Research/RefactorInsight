@@ -8,6 +8,7 @@ import com.intellij.util.xmlb.Converter;
 import data.RefactoringEntry;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -30,10 +31,10 @@ public class RefactoringsMapConverter extends Converter<RefactoringsMap> {
       String[] tokens = value.split(regex1, 2);
       return new RefactoringsMap(Arrays.stream(tokens[1].split(regex1))
           .map(entry -> entry.split(regex2))
-          .collect(Collectors.toMap(entry -> entry[0],
+          .collect(Collectors.toConcurrentMap(entry -> entry[0],
               entry -> RefactoringEntry.fromString(entry[1], entry[0]))), tokens[0]);
     } catch (Exception e) {
-      return new RefactoringsMap(new HashMap<>(), "-1");
+      return new RefactoringsMap(new ConcurrentHashMap<>(), "-1");
     }
   }
 
