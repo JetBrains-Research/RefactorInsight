@@ -25,7 +25,6 @@ build:
   artifacts:
     paths:
       - build/distributions
-      - build/libs
 
 checkStyle:
   stage: validate
