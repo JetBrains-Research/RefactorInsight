@@ -36,8 +36,10 @@ A new IDE will open up where you can follow the steps presented below.
 
 If you want to import the plugin from disk, click `Download RefactorInsight`.
 We recommend Mac users to download the jar, since MacOS automatically unzips the archive on download.
+
+
 Go to IntelliJ -> Preferences -> Plugin -> Install Plugin
-from Disk and upload the zip file. After an IDE restart, you will be able to follow the steps below.
+from Disk and upload the zip/jar file. After an IDE restart, you will be able to follow the steps below.
 
 #### How to use
 
