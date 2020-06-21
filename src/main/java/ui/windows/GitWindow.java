@@ -21,6 +21,10 @@ import services.MiningService;
 import ui.tree.TreeUtils;
 import ui.tree.renderers.MainCellRenderer;
 
+/**
+ * Is responsible for the additional ui elements in the git tool window.
+ * Listens to mouse events to show refactorings at selected commit.
+ */
 public class GitWindow {
   private Project project;
 

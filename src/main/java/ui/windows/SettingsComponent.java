@@ -18,6 +18,9 @@ import services.MiningService;
 import services.RefactoringsBundle;
 import services.RefactoringsMapConverter;
 
+/**
+ * Holds settings data and generates the setting panel in IntelliJ settings.
+ */
 public class SettingsComponent {
   private final JPanel myMainPanel;
   private final JBIntSpinner commitLimit =

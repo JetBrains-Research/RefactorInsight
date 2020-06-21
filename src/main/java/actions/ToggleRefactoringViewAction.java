@@ -7,6 +7,9 @@ import services.WindowService;
 
 /**
  * This is the Show Refactorings Action.
+ * Adds a toggle button in the git tool window,
+ * toggles between classical diff view and refactoring view.
+ * Invokes the added git ui.
  */
 public class ToggleRefactoringViewAction extends ToggleAction {
 
