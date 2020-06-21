@@ -2,6 +2,10 @@ package services;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
+import git4idea.repo.GitRepository;
+import git4idea.repo.GitRepositoryManager;
+import java.util.List;
 import javax.swing.JComponent;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -50,6 +54,12 @@ public class SettingsConfigurable implements Configurable {
     settings.commitLimit = mySettingsComponent.getCommitLimit();
     settings.historyLimit = mySettingsComponent.getHistoryLimit();
     settings.threads = mySettingsComponent.getThreads();
+    List<GitRepository> repositories = GitRepositoryManager
+        .getInstance(project).getRepositories();
+    if (repositories.isEmpty()) {
+      return;
+    }
+    MiningService.getInstance(project).mineRepo(repositories.get(0));
   }
 
   @Override
