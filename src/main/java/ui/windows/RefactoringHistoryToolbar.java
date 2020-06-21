@@ -49,6 +49,10 @@ import ui.tree.TreeUtils;
 import ui.tree.renderers.HistoryToolbarRenderer;
 import utils.Utils;
 
+/**
+ * Generates and holds the history toolbar.
+ * Is invoked once one activates the history action.
+ */
 public class RefactoringHistoryToolbar {
 
   private final VcsLogManager.VcsLogUiFactory<? extends MainVcsLogUi> factory;

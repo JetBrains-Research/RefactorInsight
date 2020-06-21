@@ -16,6 +16,10 @@ import org.jetbrains.annotations.NotNull;
 import ui.windows.DiffWindow;
 import utils.StringUtils;
 
+/**
+ * Generates data for refactorings needing more than three editors to visualize.
+ *
+ */
 public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
 
   List<MoreSidedRange> lines;
@@ -75,7 +79,7 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
   @Override
   public void prepareJetBrainsRanges(List<RefactoringLine> lineMarkings) {
     lines = lineMarkings.stream()
-        .map(RefactoringLine::getMoreSidedMoreSidedRange).collect(Collectors.toList());
+        .map(RefactoringLine::getMoreSidedRange).collect(Collectors.toList());
   }
 
   @Override
@@ -116,10 +120,10 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
     for (int i = 0; i < befores.size(); i++) {
       lineMarkings.get(i).correctLines(befores.get(i), null, after, skipAnnotationsLeft,
           skipAnnotationsMid, skipAnnotationsRight);
-      lineMarkings.get(i).getMoreSidedMoreSidedRange().leftPath = pathPair.get(i).first;
+      lineMarkings.get(i).getMoreSidedRange().leftPath = pathPair.get(i).first;
       if (pathPair.get(i).second) {
-        lineMarkings.get(i).getMoreSidedMoreSidedRange().startLineRight = -1;
-        lineMarkings.get(i).getMoreSidedMoreSidedRange().endLineRight = -1;
+        lineMarkings.get(i).getMoreSidedRange().startLineRight = -1;
+        lineMarkings.get(i).getMoreSidedRange().endLineRight = -1;
       }
     }
     prepareJetBrainsRanges(lineMarkings);
