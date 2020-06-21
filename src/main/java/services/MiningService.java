@@ -211,7 +211,8 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
   private void computeRefactoringHistory(@NotNull String commitId, Project project) {
     List<RefactoringInfo> refs = new ArrayList<>();
-    int limit = SettingsState.getInstance(project).historyLimit;
+    final SettingsState settingsState = SettingsState.getInstance(project);
+    int limit = settingsState != null? settingsState.historyLimit : Integer.MAX_VALUE/100;
     while (contains(commitId) && limit-- > 0) {
       RefactoringEntry refactoringEntry = get(commitId);
       assert refactoringEntry != null;
