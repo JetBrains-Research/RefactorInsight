@@ -1,0 +1,1 @@
+lib/intellij2.vcs.git.jar filter=lfs diff=lfs merge=lfs -text
