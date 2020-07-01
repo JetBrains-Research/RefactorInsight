@@ -128,19 +128,30 @@ public class StringUtils {
       }
     }
     String before = info.getNameBefore();
-    if (before.contains(".")) {
-      before = info.getNameBefore().substring(info.getNameBefore().lastIndexOf(".") + 1);
-    }
     String after = info.getNameAfter();
-    if (after.contains(".")) {
-      after = info.getNameAfter().substring(info.getNameAfter().lastIndexOf(".") + 1);
+
+    if (info.getGroup() == Group.METHOD) {
+      String paramsBefore = before.substring(before.lastIndexOf("("));
+      String paramsAfter = after.substring(after.lastIndexOf("("));
+      before = before.substring(0, before.lastIndexOf("("));
+      after = after.substring(0, after.lastIndexOf("("));
+      before = before.substring(before.lastIndexOf(".") + 1);
+      after = after.substring(after.lastIndexOf(".") + 1);
+      before = before + paramsBefore;
+      after = after + paramsAfter;
+    } else {
+      if (before.contains(".")) {
+        before = info.getNameBefore().substring(info.getNameBefore().lastIndexOf(".") + 1);
+      }
+      if (after.contains(".")) {
+        after = info.getNameAfter().substring(info.getNameAfter().lastIndexOf(".") + 1);
+      }
     }
     if (before.equals(after)) {
       return before;
     } else {
       return before + " -> " + after;
     }
-
   }
 
   /**
