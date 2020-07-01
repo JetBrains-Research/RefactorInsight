@@ -22,14 +22,6 @@ public class PullUpOperationHandler extends Handler {
         .addMarking(
             ref.getOriginalOperation().codeRange(),
             ref.getMovedOperation().codeRange(),
-            refactoringLine -> {
-              refactoringLine.setWord(new String[] {
-                  ref.getOriginalOperation().getName(),
-                  null,
-                  ref.getMovedOperation().getName()
-              });
-            },
-            RefactoringLine.MarkingOption.COLLAPSE,
             true)
         .setNameBefore(StringUtils.calculateSignature(ref.getOriginalOperation()))
         .setNameAfter(StringUtils.calculateSignature(ref.getMovedOperation()));
