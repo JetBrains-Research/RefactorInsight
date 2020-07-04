@@ -113,7 +113,8 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    */
   public void mineRepo(GitRepository repository, int limit) {
     ProgressManager.getInstance()
-        .run(new Task.Backgroundable(repository.getProject(), "Mining refactorings") {
+        .run(new Task.Backgroundable(repository.getProject(), "Mining refactorings", true) {
+
           @Override
           public void onCancel() {
             super.onCancel();
@@ -131,10 +132,13 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
                 new CommitMiner(pool, innerState.refactoringsMap.map, repository, commitsDone,
                     progressIndicator,
                     limit);
+            progressIndicator.checkCanceled();
             try {
               String logArgs = "--max-count=" + limit;
+              progressIndicator.checkCanceled();
               GitHistoryUtils.loadDetails(repository.getProject(), repository.getRoot(),
                   miner, logArgs);
+              progressIndicator.checkCanceled();
             } catch (Exception exception) {
               exception.printStackTrace();
             } finally {
@@ -191,7 +195,6 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
           public void onFinished() {
             super.onFinished();
             if (contains(commit.getId().asString())) {
-
               System.out.println(RefactoringsBundle.message("finished"));
               ApplicationManager.getApplication()
                   .invokeLater(() -> info.refresh(commit.getId().asString()));
