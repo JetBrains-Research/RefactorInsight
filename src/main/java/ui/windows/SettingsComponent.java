@@ -44,6 +44,7 @@ public class SettingsComponent {
       }
     });
     JButton all = new JButton(RefactoringsBundle.message("button.mine"));
+    all.setPreferredSize(clear.getPreferredSize());
     all.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
@@ -53,6 +54,7 @@ public class SettingsComponent {
       }
     });
     JButton choose = new JButton(RefactoringsBundle.message("button.import"));
+    choose.setPreferredSize(clear.getPreferredSize());
     choose.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {

@@ -1,5 +1,6 @@
 package processors;
 
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.Consumer;
@@ -9,7 +10,7 @@ import git4idea.GitCommit;
 import git4idea.repo.GitRepository;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.refactoringminer.api.GitHistoryRefactoringMiner;
 import org.refactoringminer.api.GitService;
@@ -28,7 +29,7 @@ public class CommitMiner implements Consumer<GitCommit> {
 
 
   private static final String progress = RefactoringsBundle.message("progress");
-  private final Executor pool;
+  private final ExecutorService pool;
   private final Map<String, RefactoringEntry> map;
   private final GitRepository repository;
   private final AtomicInteger commitsDone;
@@ -42,7 +43,7 @@ public class CommitMiner implements Consumer<GitCommit> {
    * @param map        Map to add mined commit data to.
    * @param repository GitRepository.
    */
-  public CommitMiner(Executor pool, Map<String, RefactoringEntry> map, GitRepository repository,
+  public CommitMiner(ExecutorService pool, Map<String, RefactoringEntry> map, GitRepository repository,
                      AtomicInteger commitsDone, ProgressIndicator progressIndicator, int limit) {
 
     this.pool = pool;
@@ -85,11 +86,15 @@ public class CommitMiner implements Consumer<GitCommit> {
    * Method that calls RefactoringMiner and updates the refactoring map.
    * @param gitCommit to be mined
    */
-  @Override
-  public void consume(GitCommit gitCommit) {
+  public void consume(GitCommit gitCommit) throws ProcessCanceledException {
     String commitId = gitCommit.getId().asString();
+
     if (!map.containsKey(commitId)) {
       pool.execute(() -> {
+        if (progressIndicator.isCanceled()) {
+          cancelProgress();
+          return;
+        }
         GitService gitService = new GitServiceImpl();
         GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
         try {
@@ -109,6 +114,7 @@ public class CommitMiner implements Consumer<GitCommit> {
       });
     } else {
       incrementProgress();
+      progressIndicator.checkCanceled();
     }
   }
 
@@ -119,9 +125,12 @@ public class CommitMiner implements Consumer<GitCommit> {
     final int nCommits = commitsDone.incrementAndGet();
     progressIndicator.setText(String.format(progress,
         nCommits, limit));
-    progressIndicator.setFraction(
-        (float) nCommits / limit);
+    progressIndicator.setFraction((float) nCommits / limit);
+  }
 
-
+  private void cancelProgress() {
+    final int nCommits = commitsDone.incrementAndGet();
+    progressIndicator.setFraction((float) nCommits / limit);
+    progressIndicator.setText("Cancelling");
   }
 }

@@ -96,6 +96,7 @@ public class GitWindow {
     }
 
     String commitId = table.getModel().getCommitId(index).getHash().asString();
+
     VcsCommitMetadata metadata = table.getModel().getCommitMetadata(index);
 
 
