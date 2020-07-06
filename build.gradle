@@ -57,10 +57,11 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version '2020.1.2'
-    plugins 'java', 'git4idea'
+    version '2020.1'
+    plugins 'java', 'git4idea', 'android'
     downloadSources true
 }
+
 
 checkstyle {
     toolVersion "8.31"

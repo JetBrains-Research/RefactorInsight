@@ -7,6 +7,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.VcsCommitMetadata;
+import com.intellij.vcs.log.VcsLogFilterCollection;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
@@ -48,6 +49,9 @@ public class GitWindow {
     miner = MiningService.getInstance(project);
     MainVcsLogUi logUI = e.getData(VcsLogInternalDataKeys.MAIN_UI);
     table = logUI.getTable();
+    VcsLogFilterCollection filters = logUI.getFilterUi().getFilters();
+    
+
     table.getSelectionModel().addListSelectionListener(listSelectionEvent -> {
       if (!state || listSelectionEvent.getValueIsAdjusting()) {
         return;

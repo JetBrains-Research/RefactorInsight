@@ -1,28 +1,18 @@
 # RefactorInsight
 
-[![pipeline status](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2019-2020-q4/cluster-0/detecting-refactorings-in-code-changes/detecting-refactorings-in-code-changes/badges/master/pipeline.svg)](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2019-2020-q4/cluster-0/detecting-refactorings-in-code-changes/detecting-refactorings-in-code-changes/badges/master)
-[![coverage report](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2019-2020-q4/cluster-0/detecting-refactorings-in-code-changes/detecting-refactorings-in-code-changes/badges/master/coverage.svg)](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2019-2020-q4/cluster-0/detecting-refactorings-in-code-changes/detecting-refactorings-in-code-changes/badges/master)
+[![pipeline status](https://github.com/JetBrains-Research/refactorinsight/badges/master/pipeline.svg)](https://github.com/JetBrains-Research/refactorinsight/badges/master)
+[![coverage report](https://github.com/JetBrains-Research/refactorinsight/badges/master/coverage.svg)](https://github.com/JetBrains-Research/refactorinsight/badges/master)
 
 This project aims to introduce a RefactorInsight, a plugin for IntelliJ IDEA that detects code refactorings in the version control history of Java repositories. 
 The main framework that is used in order to retrieve the refactorings is the RefactoringMiner API.
 
-Every sprint planning and retrospective can be found in the [Milestones section](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2019-2020-q4/cluster-0/detecting-refactorings-in-code-changes/detecting-refactorings-in-code-changes/-/milestones?sort=due_date_desc&state=all). 
-
-The CI/CD pipelines have 3 stages: build, validate and coverage.
-
-In the `build` stage, the project and its dependencies are built. This is followed by the `validation` stage where 
-`checkstyle`, and `test` jobs are run. Finally, the `coverage` is calculated for the entire project,
-excluding the package `ui.windows`. The reason is that the ui objects cannot be tested, since they have many dependencies
-that cannot be mocked.
-
-If any stage fails, the badge will turn red.
 
 How to build & run
 -------------
 
 #### Clone and build
 
-Download or clone the project in IntelliJ IDEA 2020.1.2 or up and run `gradle build` in order to install all the required dependencies.
+Download or clone the project in IntelliJ IDEA 2020.1 or up and run `gradle build` in order to install all the required dependencies.
 Use `gradle runIde` task to run the project. 
 A new IDE will open up where you can follow the steps presented below.
 
