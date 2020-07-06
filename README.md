@@ -1,7 +1,10 @@
 # RefactorInsight
 
+[![JB Research](https://jb.gg/badges/research-flat-square.svg)](https://research.jetbrains.org/)
 [![pipeline status](https://github.com/JetBrains-Research/refactorinsight/badges/master/pipeline.svg)](https://github.com/JetBrains-Research/refactorinsight/badges/master)
 [![coverage report](https://github.com/JetBrains-Research/refactorinsight/badges/master/coverage.svg)](https://github.com/JetBrains-Research/refactorinsight/badges/master)
+
+
 
 This project aims to introduce a RefactorInsight, a plugin for IntelliJ IDEA that detects code refactorings in the version control history of Java repositories. 
 The main framework that is used in order to retrieve the refactorings is the RefactoringMiner API.
