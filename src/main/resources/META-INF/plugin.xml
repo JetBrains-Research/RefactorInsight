@@ -1,11 +1,10 @@
 <idea-plugin>
     <id>org.example.detecting-refactorings-in-code-change.refactorinsight</id>
     <name>RefactorInsight</name>
-    <vendor email="bobbrockbernd@gmail.com" url="http://www.tudelft.nl">TUDelft</vendor>
+    <vendor>JetBrains</vendor>
 
     <description><![CDATA[
-    This plugin adds functionality to the git tab in order to allow the developer to visualize specific refactorings in commits.
-    It also provides the refactoring history of a class, field or method.
+    Discovers refactorings in the commit history of the project, visualizes them, and provides the refactoring history for classes, methods, and fields.
       ]]></description>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
@@ -17,16 +16,19 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <projectConfigurable parentId="tools" instance="services.SettingsConfigurable"
-                                 id="services.SettingsConfigurable"
-                                 displayName="RefactorInsight"/>
+                             id="services.SettingsConfigurable"
+                             displayName="RefactorInsight"/>
         <diff.DiffExtension implementation="ui.windows.DiffWindow"/>
         <projectService serviceImplementation="services.MiningService"/>
         <projectService serviceImplementation="services.WindowService"/>
         <projectService serviceImplementation="services.SettingsState"/>
+        <errorHandler implementation="reporter.RefactorInsightErrorReporter"/>
+
     </extensions>
 
     <actions>
-        <action id="actions.ToggleRefactoringViewAction" class="actions.ToggleRefactoringViewAction" text="Show Refactorings" description="actions.ToggleRefactoringViewAction">
+        <action id="actions.ToggleRefactoringViewAction" class="actions.ToggleRefactoringViewAction"
+                text="Show Refactorings" description="actions.ToggleRefactoringViewAction">
             <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>
         </action>
         <!-- Add your actions here -->
@@ -35,7 +37,8 @@
                 description="Clear refactoring cache">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
         </action>
-        <action id="actions.RefactoringHistoryAction" class="actions.RefactoringHistoryAction" text="Check Refactoring History"
+        <action id="actions.RefactoringHistoryAction" class="actions.RefactoringHistoryAction"
+                text="Check Refactoring History"
                 description="Retrieve refactorings history for this method">
             <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
             <keyboard-shortcut first-keystroke="control alt R" keymap="$default"/>
