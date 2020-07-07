@@ -21,7 +21,7 @@ A new IDE will open up where you can follow the steps presented below.
 
 #### Import from disk 
 
-If you want to install the plugin from disk, download the latest release.
+If you want to install the plugin from disk, download the [latest release](https://github.com/JetBrains-Research/refactorinsight/releases/latest/download/refactorinsight.zip).
 
 
 Go to IntelliJ -> Preferences -> Plugin -> Install Plugin
