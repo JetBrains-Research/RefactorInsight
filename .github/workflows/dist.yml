@@ -28,6 +28,11 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew --build-cache assemble
+    - name: Zip Distribution
+      uses: papeloto/action-zip@v1
+      with:
+        files: build/distributions
+        dest: refactorinsight.zip
     - name: Get latest release
       id: release_tag
       uses: pozetroninc/github-action-get-latest-release@master
@@ -55,6 +60,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: build/distributions/*
+        asset_path: refactorinsight.zip
         asset_name: refactorinsight.zip
-        asset_content_type: application.zip
+        asset_content_type: application/zip
