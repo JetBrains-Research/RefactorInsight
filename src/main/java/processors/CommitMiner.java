@@ -43,7 +43,8 @@ public class CommitMiner implements Consumer<GitCommit> {
    * @param map        Map to add mined commit data to.
    * @param repository GitRepository.
    */
-  public CommitMiner(ExecutorService pool, Map<String, RefactoringEntry> map, GitRepository repository,
+  public CommitMiner(ExecutorService pool, Map<String, RefactoringEntry> map,
+                     GitRepository repository,
                      AtomicInteger commitsDone, ProgressIndicator progressIndicator, int limit) {
 
     this.pool = pool;

@@ -75,6 +75,8 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
   @Override
   public SimpleDiffRequest generate(DiffContent[] contents, RefactoringInfo info) {
     SimpleDiffRequest request;
+    assert contents[0] != null;
+    assert contents[2] != null;
     request = new SimpleDiffRequest(info.getName(),
         contents[0], contents[2], info.getLeftPath(), info.getRightPath());
     request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,

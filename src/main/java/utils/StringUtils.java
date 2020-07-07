@@ -130,7 +130,7 @@ public class StringUtils {
     String before = info.getNameBefore();
     String after = info.getNameAfter();
 
-    if (info.getGroup() == Group.METHOD) {
+    if (info.getGroup() == Group.METHOD || info.getGroup() == Group.VARIABLE) {
       String paramsBefore = before.substring(before.lastIndexOf("("));
       String paramsAfter = after.substring(after.lastIndexOf("("));
       before = before.substring(0, before.lastIndexOf("("));

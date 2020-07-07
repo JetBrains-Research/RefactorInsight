@@ -98,7 +98,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
   private static DiffContent[] getDiffContents(Collection<Change> changes,
                                                RefactoringInfo info, Project project) {
-    if (info.getLeftPath() == null) {
+    if (info.getLeftPath() == null || info.getRightPath() == null) {
       return null;
     }
     return info.isMoreSided() ? getMoreSidedDiffContents(changes, info, project) :
