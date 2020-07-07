@@ -27,6 +27,11 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew --build-cache assemble
+    - name: Upload distribution
+      uses: actions/upload-artifact@v2
+      with:
+        name: distribution
+        path: build/distributions/*
 
   test:
     needs: build
