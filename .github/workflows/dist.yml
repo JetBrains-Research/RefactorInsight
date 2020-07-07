@@ -30,7 +30,7 @@ jobs:
       run: ./gradlew --build-cache assemble
     - name: Get latest release
       id: release_tag
-      uses: pozetronic/github-action-get-latest-release@master
+      uses: pozetroninc/github-action-get-latest-release@master
       with:
         repository: JetBrains-Research/refactorinsight
     - name: Increment version
