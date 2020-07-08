@@ -26,7 +26,9 @@ public class InlineOperationHandler extends Handler {
         .setElementBefore(ref.getInlinedOperation().getName())
         .setElementAfter(null)
         .setNameBefore(StringUtils.calculateSignature(ref.getTargetOperationBeforeInline()))
-        .setNameAfter(StringUtils.calculateSignature(ref.getTargetOperationAfterInline()));
+        .setNameAfter(StringUtils.calculateSignature(ref.getTargetOperationAfterInline()))
+        .addMarking(ref.getTargetOperationCodeRangeBeforeInline(),
+            ref.getTargetOperationCodeRangeAfterInline(), false);
 
     if (ref.getInlinedOperation().codeRange().getFilePath()
         .equals(ref.getTargetOperationAfterInline().codeRange().getFilePath())) {

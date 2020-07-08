@@ -88,8 +88,20 @@ public class StringUtils {
     StringBuilder builder = new StringBuilder();
     builder.append(operation.getClassName())
         .append(".")
-        .append(operation.getName())
-        .append("(");
+        .append(calculateSignatureWithoutClassName(operation));
+    return builder.toString();
+  }
+
+  /**
+   * Builder for a method's signature.
+   *
+   * @param operation retrieved from RefactoringMiner
+   * @return a String signature of the operation.
+   */
+  public static String calculateSignatureWithoutClassName(UMLOperation operation) {
+    StringBuilder builder = new StringBuilder();
+    builder.append(operation.getName())
+            .append("(");
 
     operation.getParameterTypeList().forEach(x -> builder.append(x).append(", "));
 
@@ -139,7 +151,7 @@ public class StringUtils {
       after = after.substring(after.lastIndexOf(".") + 1);
       before = before + paramsBefore;
       after = after + paramsAfter;
-    } else {
+    } else if (info.getGroup() != Group.ATTRIBUTE) {
       if (before.contains(".")) {
         before = info.getNameBefore().substring(info.getNameBefore().lastIndexOf(".") + 1);
       }
