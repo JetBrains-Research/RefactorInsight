@@ -111,6 +111,11 @@ public class Utils {
    */
   public static int skipJavadoc(String text, int line, boolean skipAnnotations) {
     String[] lines = text.split("\r\n|\r|\n");
+    if (line >= lines.length) {
+      System.out.println(text);
+
+      System.out.println(line);
+    }
     if (lines[line].contains("/**")) {
       for (int i = line + 1; i < lines.length; i++) {
         if (lines[i].contains("*/")) {

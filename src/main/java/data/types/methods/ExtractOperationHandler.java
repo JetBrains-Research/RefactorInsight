@@ -18,14 +18,15 @@ public class ExtractOperationHandler extends Handler {
     String classNameBefore = ref.getSourceOperationBeforeExtraction().getClassName();
     String classNameAfter = ref.getExtractedOperation().getClassName();
 
-    String extractedMethod = StringUtils.calculateSignature(ref.getExtractedOperation());
+    String extractedMethod = StringUtils
+            .calculateSignatureWithoutClassName(ref.getExtractedOperation());
 
     if (ref.getRefactoringType() == RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
       info.setGroup(Group.METHOD)
           .setThreeSided(true)
           .setDetailsBefore(classNameBefore)
           .setDetailsAfter(classNameAfter)
-          .setElementBefore(extractedMethod.substring(extractedMethod.lastIndexOf(".") + 1))
+          .setElementBefore(extractedMethod)
           .setElementAfter(null)
           .setNameBefore(StringUtils.calculateSignature(ref.getSourceOperationBeforeExtraction()))
           .setNameAfter(StringUtils.calculateSignature(ref.getSourceOperationAfterExtraction()))
@@ -57,10 +58,13 @@ public class ExtractOperationHandler extends Handler {
       info.setGroup(Group.METHOD)
           .setDetailsBefore(classNameBefore)
           .setDetailsAfter(classNameAfter)
-          .setElementBefore(extractedMethod.substring(extractedMethod.lastIndexOf(".") + 1))
+          .setElementBefore(extractedMethod)
           .setElementAfter(null)
           .setNameBefore(StringUtils.calculateSignature(ref.getSourceOperationBeforeExtraction()))
           .setNameAfter(StringUtils.calculateSignature(ref.getSourceOperationAfterExtraction()))
+              .addMarking(ref.getSourceOperationCodeRangeBeforeExtraction(),
+                      ref.getSourceOperationCodeRangeAfterExtraction(),
+                      false)
           .addMarking(ref.getExtractedCodeRangeFromSourceOperation(),
               ref.getExtractedCodeRangeToExtractedOperation(),
               true);

@@ -54,7 +54,7 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
     generator.fragments = Arrays.stream(tokens).map(string -> {
       String[] toks = string.split(regex2, 9);
       String[] diffs = toks[8].split(regex2);
-      List<DiffFragment> frags = diffs[0].isEmpty() ? null
+      List<DiffFragment> frags = diffs[0].isEmpty() ? new ArrayList<>()
           : IntStream.range(0, diffs.length / 4).map(i -> i * 4).mapToObj(i -> new DiffFragmentImpl(
           Integer.parseInt(diffs[i]),
           Integer.parseInt(diffs[i + 1]),
