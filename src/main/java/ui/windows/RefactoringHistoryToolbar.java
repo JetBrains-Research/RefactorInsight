@@ -1,6 +1,5 @@
 package ui.windows;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.project.Project;
@@ -28,6 +27,7 @@ import com.intellij.vcs.log.ui.frame.MainFrame;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
 import com.intellij.vcs.log.visible.filters.VcsLogFilterObject;
 import data.RefactoringInfo;
+import icons.RefactorInsightIcons;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -257,8 +256,9 @@ public class RefactoringHistoryToolbar {
       content = contentFactory.createContent(tree, methodName, false);
       toolWindow.getContentManager().addContent(content);
     }
+
     toolWindow.getContentManager().setSelectedContent(content);
-    toolWindow.setIcon(AllIcons.Actions.RefactoringBulb);
+    toolWindow.setIcon(RefactorInsightIcons.toolWindow);
     toolWindow.show();
   }
 

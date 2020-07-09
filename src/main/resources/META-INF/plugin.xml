@@ -28,7 +28,8 @@
     </extensions>
 
     <actions>
-        <action id="actions.ToggleRefactoringViewAction" class="actions.ToggleRefactoringViewAction"
+        <action id="actions.ToggleRefactoringViewAction"
+                class="actions.ToggleRefactoringViewAction" icon="RefactorInsightIcons.toggle"
                 text="Show Refactorings" description="actions.ToggleRefactoringViewAction">
             <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>
         </action>
