@@ -116,6 +116,7 @@ public class RefactoringHistoryAction extends AnAction {
 
   private void showHistoryMethod(Project project, DataContext dataContext, PsiMethod method) {
     String signature = StringUtils.calculateSignature(method);
+    System.out.println(signature);
     getToolbarWindow(project)
         .showToolbar(map.getOrDefault(signature, new HashSet<>()),
             method.getName(), dataContext, HistoryType.METHOD, null, null);
