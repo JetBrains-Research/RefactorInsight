@@ -48,7 +48,7 @@ In order to see the refactoring history of a method, class or attribute,
 
 
 Click on 'Check Refactoring History' in order to see the refactorings history.
-An example for a class `LuxuryCar` is presented below.
+An example for a method named `Repl` is presented below.
 
 <img src="assets/img/history_example.png" alt="RefactoringHistory2" width="400">
 
