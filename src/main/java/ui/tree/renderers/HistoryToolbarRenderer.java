@@ -5,6 +5,7 @@ import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.text.JBDateFormat;
 import data.RefactoringInfo;
+import icons.RefactorInsightIcons;
 import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -52,7 +53,7 @@ public class HistoryToolbarRenderer extends ColoredTreeCellRenderer {
       append(object.getContent());
     } else if (node.getUserObject() instanceof RefactoringInfo) {
       append(info.getName());
-      icon = AllIcons.Actions.SuggestedRefactoringBulb;
+      icon = RefactorInsightIcons.node;
     } else if (node.getParent().equals(node.getRoot())) {
       append(node.toString(), SimpleTextAttributes.GRAY_ATTRIBUTES);
     } else {

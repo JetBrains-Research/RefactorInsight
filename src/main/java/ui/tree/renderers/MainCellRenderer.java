@@ -1,9 +1,9 @@
 package ui.tree.renderers;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import data.RefactoringInfo;
+import icons.RefactorInsightIcons;
 import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -43,7 +43,7 @@ public class MainCellRenderer extends ColoredTreeCellRenderer {
                 .toString().replace("[", "").replace("]", ""),
             SimpleTextAttributes.GRAY_ATTRIBUTES);
       }
-      icon = AllIcons.Actions.SuggestedRefactoringBulb;
+      icon = RefactorInsightIcons.node;
     } else if (leaf) {
       append((info.getLineMarkings().size() > 0
               ? ((info.getLineMarkings().get(0).getRightStart() + 1) + " ") : ""),
