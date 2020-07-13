@@ -16,30 +16,30 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <projectConfigurable parentId="tools" instance="services.SettingsConfigurable"
+        <projectConfigurable parentId="tools" instance="org.jetbrains.research.refactorinsight.services.SettingsConfigurable"
                              id="services.SettingsConfigurable"
                              displayName="RefactorInsight"/>
-        <diff.DiffExtension implementation="ui.windows.DiffWindow"/>
-        <projectService serviceImplementation="services.MiningService"/>
-        <projectService serviceImplementation="services.WindowService"/>
-        <projectService serviceImplementation="services.SettingsState"/>
-        <errorHandler implementation="reporter.RefactorInsightErrorReporter"/>
+        <diff.DiffExtension implementation="org.jetbrains.research.refactorinsight.ui.windows.DiffWindow"/>
+        <projectService serviceImplementation="org.jetbrains.research.refactorinsight.services.MiningService"/>
+        <projectService serviceImplementation="org.jetbrains.research.refactorinsight.services.WindowService"/>
+        <projectService serviceImplementation="org.jetbrains.research.refactorinsight.services.SettingsState"/>
+        <errorHandler implementation="org.jetbrains.research.refactorinsight.reporter.RefactorInsightErrorReporter"/>
 
     </extensions>
 
     <actions>
         <action id="actions.ToggleRefactoringViewAction"
-                class="actions.ToggleRefactoringViewAction" icon="RefactorInsightIcons.toggle"
+                class="org.jetbrains.research.refactorinsight.actions.ToggleRefactoringViewAction" icon="RefactorInsightIcons.toggle"
                 text="Show Refactorings" description="actions.ToggleRefactoringViewAction">
             <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>
         </action>
         <!-- Add your actions here -->
 
-        <action id="RefAction" class="actions.RefactoringAction" text="Mine All Refactorings"
+        <action id="RefAction" class="org.jetbrains.research.refactorinsight.actions.RefactoringAction" text="Mine All Refactorings"
                 description="Clear refactoring cache">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
         </action>
-        <action id="actions.RefactoringHistoryAction" class="actions.RefactoringHistoryAction"
+        <action id="actions.RefactoringHistoryAction" class="org.jetbrains.research.refactorinsight.actions.RefactoringHistoryAction"
                 text="Check Refactoring History"
                 description="Retrieve refactorings history for this method">
             <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
@@ -48,8 +48,8 @@
     </actions>
 
     <projectListeners>
-        <listener class="processors.CommitListener" topic="git4idea.repo.GitRepositoryChangeListener"/>
-        <listener class="processors.ProjectListener" topic="com.intellij.openapi.project.ProjectManagerListener"/>
+        <listener class="org.jetbrains.research.refactorinsight.processors.CommitListener" topic="git4idea.repo.GitRepositoryChangeListener"/>
+        <listener class="org.jetbrains.research.refactorinsight.processors.ProjectListener" topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </projectListeners>
 
 
