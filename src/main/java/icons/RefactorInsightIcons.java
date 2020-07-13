@@ -1,14 +1,12 @@
 package icons;
 
 import com.intellij.ui.IconManager;
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.Icon;
+import org.jetbrains.annotations.NotNull;
 
 public class RefactorInsightIcons {
 
-  private static @NotNull
-  Icon load(@NotNull String path) {
+  private static @NotNull Icon load(@NotNull String path) {
     return IconManager.getInstance().getIcon(path, RefactorInsightIcons.class);
   }
 
