@@ -44,7 +44,6 @@ dependencies {
 //    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
 //    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
     testImplementation('junit:junit:4.13')
-    implementation files('lib/RefactoringMiner-1.0.jar')
     implementation files('lib/intellij.vcs.git.jar')
     implementation files('lib/intellij.platform.vcs.testFramework.jar')
     compile 'org.eclipse.jgit:org.eclipse.jgit:5.2.1.201812262042-r'
@@ -52,6 +51,7 @@ dependencies {
     compile 'org.eclipse.jdt:org.eclipse.jdt.core:3.16.0'
     compile 'org.apache.commons:commons-text:1.6'
     compile 'org.kohsuke:github-api:1.95'
+    compile group: 'com.github.tsantalis', name: 'refactoring-miner', version: '2.0'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
 }
 
