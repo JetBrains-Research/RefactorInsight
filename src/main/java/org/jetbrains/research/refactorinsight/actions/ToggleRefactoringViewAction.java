@@ -26,6 +26,7 @@ public class ToggleRefactoringViewAction extends ToggleAction {
   @Override
   public void update(@NotNull AnActionEvent e) {
     e.getPresentation().setVisible(true);
+    WindowService.getInstance(e.getProject()).update(e);
     super.update(e);
   }
 }

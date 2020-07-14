@@ -238,6 +238,11 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     return innerState.refactoringsMap.map.containsKey(commitHash);
   }
 
+  public boolean containsRefactoring(String commitHash) {
+    return innerState.refactoringsMap.map.containsKey(commitHash)
+        && innerState.refactoringsMap.map.get(commitHash).getRefactorings().size() != 0;
+  }
+
   public void clear() {
     innerState.refactoringsMap.map.clear();
   }

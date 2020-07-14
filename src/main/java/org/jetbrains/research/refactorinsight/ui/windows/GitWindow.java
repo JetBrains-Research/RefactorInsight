@@ -1,19 +1,24 @@
 package org.jetbrains.research.refactorinsight.ui.windows;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
+import com.intellij.ui.ColoredTableCellRenderer;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBViewport;
+import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import com.intellij.vcs.log.VcsLogFilterCollection;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
+import com.intellij.vcs.log.ui.table.VcsLogColumn;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JTable;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
@@ -50,8 +55,8 @@ public class GitWindow {
     MainVcsLogUi logUI = e.getData(VcsLogInternalDataKeys.MAIN_UI);
     table = logUI.getTable();
     VcsLogFilterCollection filters = logUI.getFilterUi().getFilters();
-    
 
+    table.setDefaultRenderer(String.class, new VcsTableRefactoringRenderer(e.getProject()));
     table.getSelectionModel().addListSelectionListener(listSelectionEvent -> {
       if (!state || listSelectionEvent.getValueIsAdjusting()) {
         return;
@@ -135,6 +140,40 @@ public class GitWindow {
       }
     });
     viewport.setView(tree);
+  }
+
+  public static class VcsTableRefactoringRenderer extends ColoredTableCellRenderer {
+
+    private MiningService miner;
+
+    public VcsTableRefactoringRenderer(Project project) {
+      miner = ServiceManager.getService(project, MiningService.class);
+    }
+
+    protected void customizeCellRenderer(JTable table, Object value, boolean selected,
+                                         boolean hasFocus, int row, int column) {
+      setBorder(null);
+      if (value == null) {
+        return;
+      }
+
+      VcsLogGraphTable graphTable = (VcsLogGraphTable) table;
+
+      if (column == graphTable.getColumnViewIndex(VcsLogColumn.DATE)) {
+        String ref =
+            miner.containsRefactoring(graphTable.getModel().getCommitId(row).getHash().asString())
+                ? "R" : "  ";
+        append(ref + "  ", graphTable.applyHighlighters(this, row, column, hasFocus, selected));
+      }
+
+      append(value.toString(),
+          graphTable.applyHighlighters(this, row, column, hasFocus, selected));
+
+      if (column == graphTable.getColumnViewIndex(VcsLogColumn.COMMIT)
+          || column == graphTable.getColumnViewIndex(VcsLogColumn.AUTHOR)) {
+        SpeedSearchUtil.applySpeedSearchHighlighting(table, this, false, selected);
+      }
+    }
   }
 
 }
