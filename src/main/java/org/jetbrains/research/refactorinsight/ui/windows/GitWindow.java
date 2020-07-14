@@ -16,6 +16,7 @@ import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
 import com.intellij.vcs.log.ui.table.VcsLogColumn;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
+import icons.RefactorInsightIcons;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JTable;
@@ -158,12 +159,16 @@ public class GitWindow {
       }
 
       VcsLogGraphTable graphTable = (VcsLogGraphTable) table;
-
+      //TODO: Show different icon for not mined
       if (column == graphTable.getColumnViewIndex(VcsLogColumn.DATE)) {
-        String ref =
-            miner.containsRefactoring(graphTable.getModel().getCommitId(row).getHash().asString())
-                ? "R" : "  ";
-        append(ref + "  ", graphTable.applyHighlighters(this, row, column, hasFocus, selected));
+        if (miner.containsRefactoring(
+            graphTable.getModel().getCommitId(row).getHash().asString())) {
+          setIcon(RefactorInsightIcons.node);
+          setTransparentIconBackground(true);
+        } else {
+          append("      ",
+              graphTable.applyHighlighters(this, row, column, hasFocus, selected));
+        }
       }
 
       append(value.toString(),
