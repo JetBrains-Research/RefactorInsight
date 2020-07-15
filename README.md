@@ -28,8 +28,10 @@ If you double-click on a leaf node in a tree, the VCS log opens at that specific
 By default, for performance reasons, refactorings are only retrieved from the last 100 commits in history. This number can be adjusted in the plugin's settings. Alternatively, you can use `Mine All Refactorings` action in the `Tools` menu to go through all commits in the history of yout project.
 The detected code refactorings are stored in `.idea/refactorings.xml`. If this file is deleted, RefactorInsight will mine refactorings again once you make a commit.
 
+
 ## Contribution and feedback
-To submit a bug report or suggest a feature, or for other feedback please [open an issue](https://github.com/JetBrains-Research/IntelliJDeodorant/issues). 
+To submit a bug report or suggest a feature, please [open an issue](https://github.com/JetBrains-Research/IntelliJDeodorant/issues). 
 Pull requests are welcome and encouraged.
+
 
 [This paper](https://users.encs.concordia.ca/~nikolaos/publications/TSE_2020.pdf) provides a detailed overview of RefactoringMiner -- the tool RefactorInsight relies on to identify refactorings.
