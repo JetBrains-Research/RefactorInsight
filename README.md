@@ -49,6 +49,6 @@ The detected code refactorings are stored and persisted in the `refactorings.xml
 `.idea` folder. If the file is deleted, the commits are mined with the next repository changed event.
 
 ## Got any questions?
-If you have any questions about the plugin or want to report any bugs, feel free to contact us using [GitHub Issues](https://github.com/JetBrains-Research/IntelliJDeodorant/issues). 
+If you have any questions about the plugin or want to report any bugs, feel free to contact us using [GitHub Issues](https://github.com/JetBrains-Research/refactorinsight/issues). 
 
 If you want to know more about RefactoringMiner that the plugin is based on, please refer to this [paper](https://users.encs.concordia.ca/~nikolaos/publications/TSE_2020.pdf).
