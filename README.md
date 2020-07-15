@@ -11,7 +11,7 @@ The plugin is available for download in the Marketplace: [RefactorInsight](https
 
 ## Getting started
 ### Refactorings in commits
-In order to see the refactorings in a git repository, make sure it was cloned the repository and open the built-in the `Git` tab. On the right side, you will see a toggle button ![](assets/img/refactorinsight_toggle.svg).
+In order to see the refactorings in a git repository, make sure it was cloned with full history and open the built-in `Git` tab. On the right side, you will see a toggle button ![](assets/img/refactorinsight_toggle.svg).
 
 Click on a commit and then on the ![](assets/img/refactorinsight_toggle.svg) to see the refactorings detected in that commit. It looks like this:
 
