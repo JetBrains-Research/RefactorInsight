@@ -8,7 +8,7 @@
 RefactorInsight is a plugin for IntelliJ IDEA that enables the IDE to visualize refactorings in the commit history of Java projects. RefactorInsight relies on [RefactoringMiner](https://github.com/tsantalis/RefactoringMiner) for retrieval of refactorings.
 
 ## Getting started
-RefactorInsight is сompatible with IntelliJ IDEA 2020.1 and is available for free in the Plugin Marketplace: [RefactorInsight](https://plugins.jetbrains.com/plugin/14704-refactorinsight). 
+RefactorInsight is сompatible with IntelliJ IDEA 2020.1 and is available for free in the Marketplace: [RefactorInsight](https://plugins.jetbrains.com/plugin/14704-refactorinsight). 
 
 ### Refactorings in commits
 To see the refactorings in a git repository, open the built-in `Git` tab. On the right side, you will see a toggle button ![](assets/img/refactorinsight_toggle.svg).
@@ -25,13 +25,13 @@ In order to see the refactoring history of a method, class, or attribute, right-
 If you double-click on a leaf node in a tree, the VCS log opens at that specific commit and shows a list of detected refactorings in that commit.
 
 ### Settings
-By default, for performance reasons, refactorings are only retrieved from the last 100 commits in history. This number can be adjusted in the plugin's settings. Alternatively, you can use `Mine All Refactorings` action in the `Tools` menu to go through all commits in the history of yout project.
+By default, for performance reasons, refactorings are only retrieved from the last 100 commits in history. This number can be adjusted in the plugin's settings. Alternatively, you can use `Mine All Refactorings` action in the `Tools` menu to go through all commits in the history of your project.
 The detected code refactorings are stored in `.idea/refactorings.xml`. If this file is deleted, RefactorInsight will mine refactorings again once you make a commit.
 
 
 ## Contribution and feedback
-To submit a bug report or suggest a feature, please [open an issue](https://github.com/JetBrains-Research/IntelliJDeodorant/issues). 
+To submit a bug report or suggest a feature, please [open an issue](https://github.com/JetBrains-Research/refactorinsight/issues). 
 Pull requests are welcome and encouraged.
 
 
-[This paper](https://users.encs.concordia.ca/~nikolaos/publications/TSE_2020.pdf) provides a detailed overview of RefactoringMiner -- the tool RefactorInsight relies on to identify refactorings.
+[This paper](https://users.encs.concordia.ca/~nikolaos/publications/TSE_2020.pdf) provides a detailed overview of RefactoringMiner — the tool RefactorInsight relies on to identify refactorings.
