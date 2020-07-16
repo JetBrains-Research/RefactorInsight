@@ -151,7 +151,9 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             } catch (InterruptedException e) {
               e.printStackTrace();
             }
-            computeRefactoringHistory(repository.getCurrentRevision(), repository.getProject());
+            if (repository.getCurrentRevision() != null) {
+              computeRefactoringHistory(repository.getCurrentRevision(), repository.getProject());
+            }
             progressIndicator.setText(RefactoringsBundle.message("finished"));
           }
         });
