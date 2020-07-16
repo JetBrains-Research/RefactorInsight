@@ -5,50 +5,34 @@
 [![coverage report](https://codecov.io/gh/JetBrains-Research/refactorinsight/branch/master/graph/badge.svg)](https://codecov.io/gh/JetBrains-Research/refactorinsight)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/14704-refactorinsight.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/14704-refactorinsight)
 
-An IntelliJ IDEA plugin that discovers performed refactorings in the commit history of the Java projects and visualizes them. The main framework that is used in order to retrieve the refactorings is [RefactoringMiner](https://github.com/tsantalis/RefactoringMiner).
-
-The plugin is available for download in the Marketplace: [RefactorInsight](https://plugins.jetbrains.com/plugin/14704-refactorinsight)
+RefactorInsight is a plugin for IntelliJ IDEA that enables the IDE to visualize refactorings in the commit history of Java projects. RefactorInsight relies on [RefactoringMiner](https://github.com/tsantalis/RefactoringMiner) for retrieval of refactorings.
 
 ## Getting started
+RefactorInsight is сompatible with IntelliJ IDEA 2020.1 and is available for free in the Marketplace: [RefactorInsight](https://plugins.jetbrains.com/plugin/14704-refactorinsight). 
 
-In order to see the refactorings in a git repository, make sure you cloned the repository and 
-open the built-in Git tab. On the right side, you will see a toggle button as highlighted below.
+### Refactorings in commits
+To see the refactorings in a git repository, open the built-in `Git` tab. On the right side, you will see a toggle button ![](assets/img/refactorinsight_toggle.svg).
 
-<img src="assets/img/refactorings.png" alt="VcsLogUI" width="300">
+Click on a commit and then on the ![](assets/img/refactorinsight_toggle.svg) to see the refactorings detected in that commit. It looks like this:
 
+<img src="assets/img/refactorinsight_main.png" alt="Example" width="900">
 
-Click on a commit and then on the `Show Refactorings` button presented above to see the refactorings detected at that commit. 
-This should look as below.
+### Refactoring history of an object
+In order to see the refactoring history of a method, class, or attribute, right-click on the object's signature and select `Check Refactoring History`. Here is an example for a method named `Repl`:
 
-<img src="assets/img/example.png" alt="Example" width="900">
+<img src="assets/img/refactorinsight_history.png" alt="RefactoringHistory" width="400">
 
+If you double-click on a leaf node in a tree, the VCS log opens at that specific commit and shows a list of detected refactorings in that commit.
 
-In order to see the refactoring history of a method, class or attribute,
- right-click on the object's signature as below.
-
-<img src="assets/img/refactoring_history.png" alt="RefactoringHistory" width="400">
-
-
-Click on `Check Refactoring History` in order to see the refactorings history.
-An example for a method named `Repl` is presented below.
-
-<img src="assets/img/history_example.png" alt="RefactoringHistory2" width="400">
+### Settings
+By default, for performance reasons, refactorings are only retrieved from the last 100 commits in history. This number can be adjusted in the plugin's settings. Alternatively, you can use `Mine All Refactorings` action in the `Tools` menu to go through all commits in the history of your project.
+The plugin also keeps track of new commits and processes them.
+The detected code refactorings are stored in `.idea/refactorings.xml`. If this file is deleted, RefactorInsight will mine refactorings again once you make a commit.
 
 
-If you double-click on a leaf node in a tree, the VCS log opens at that specific commit.
-
-<img src="assets/img/history_example2.png" alt="RefactoringHistory3" width="900">
-
-
-In the main `Tools` menu, you can select `Mine All Refactorings` if the commits have not been mined.
-
-<img src="assets/img/toolbar.png" alt="Tools" width="200">
+## Contribution and feedback
+To submit a bug report or suggest a feature, please [open an issue](https://github.com/JetBrains-Research/refactorinsight/issues). 
+Pull requests are welcome and encouraged.
 
 
-The detected code refactorings are stored and persisted in the `refactorings.xml` file that can be found in the
-`.idea` folder. If the file is deleted, the commits are mined with the next repository changed event.
-
-## Got any questions?
-If you have any questions about the plugin or want to report any bugs, feel free to contact us using [GitHub Issues](https://github.com/JetBrains-Research/refactorinsight/issues). 
-
-If you want to know more about RefactoringMiner that the plugin is based on, please refer to this [paper](https://users.encs.concordia.ca/~nikolaos/publications/TSE_2020.pdf).
+[This paper](https://users.encs.concordia.ca/~nikolaos/publications/TSE_2020.pdf) provides a detailed overview of RefactoringMiner — the tool RefactorInsight relies on to identify refactorings.
