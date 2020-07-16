@@ -26,6 +26,7 @@ If you double-click on a leaf node in a tree, the VCS log opens at that specific
 
 ### Settings
 By default, for performance reasons, refactorings are only retrieved from the last 100 commits in history. This number can be adjusted in the plugin's settings. Alternatively, you can use `Mine All Refactorings` action in the `Tools` menu to go through all commits in the history of your project.
+The plugin also keeps track of new commits and processes them.
 The detected code refactorings are stored in `.idea/refactorings.xml`. If this file is deleted, RefactorInsight will mine refactorings again once you make a commit.
 
 
