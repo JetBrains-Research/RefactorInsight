@@ -36,6 +36,12 @@
             <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>
         </action>
 
+        <action id="actions.ToggleLabelsAction"
+                class="org.jetbrains.research.refactorinsight.actions.ToggleLabelsAction"
+                text="Show Refactoring Labels" description="Adds the refactoring icon to commits containing refactorings">
+            <add-to-group group-id="Vcs.Log.PresentationSettings" anchor="first"/>
+        </action>
+
         <action id="RefAction" class="org.jetbrains.research.refactorinsight.actions.RefactoringAction"
                 text="Mine All Refactorings"
                 description="Clear refactoring cache">

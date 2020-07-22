@@ -35,13 +35,22 @@ public class WindowService {
    */
   public void setSelected(@NotNull AnActionEvent e, boolean state) {
     VcsLogGraphTable table = e.getData(VcsLogInternalDataKeys.MAIN_UI).getTable();
-    gitInfo.computeIfAbsent(table, vcsLogGraphTable -> new GitWindow(e));
     gitInfo.get(table).setSelected(state);
   }
 
   public boolean isSelected(@NotNull AnActionEvent e) {
     VcsLogGraphTable table = e.getData(VcsLogInternalDataKeys.MAIN_UI).getTable();
     return gitInfo.containsKey(table) && gitInfo.get(table).isSelected();
+  }
+
+  public void setLabelsVisible(@NotNull AnActionEvent e, boolean visible) {
+    VcsLogGraphTable table = e.getData(VcsLogInternalDataKeys.MAIN_UI).getTable();
+    gitInfo.get(table).setLabelsVisible(visible);
+  }
+
+  public boolean isLabelsVisible(@NotNull AnActionEvent e) {
+    VcsLogGraphTable table = e.getData(VcsLogInternalDataKeys.MAIN_UI).getTable();
+    return gitInfo.containsKey(table) && gitInfo.get(table).isLabelsVisible();
   }
 
   public void update(@NotNull AnActionEvent e) {

@@ -40,6 +40,7 @@ public class GitWindow {
   private VcsLogGraphTable table;
   private MiningService miner;
   private boolean state = false;
+  private boolean labelsVisible = true;
 
   /**
    * Constructor for a GitWindowInfo.
@@ -68,6 +69,14 @@ public class GitWindow {
 
   public boolean isSelected() {
     return state;
+  }
+
+  public boolean isLabelsVisible() {
+    return labelsVisible;
+  }
+
+  public void setLabelsVisible(boolean visible) {
+    labelsVisible = visible;
   }
 
   /**
@@ -143,7 +152,7 @@ public class GitWindow {
     viewport.setView(tree);
   }
 
-  public static class VcsTableRefactoringRenderer extends ColoredTableCellRenderer {
+  public class VcsTableRefactoringRenderer extends ColoredTableCellRenderer {
 
     private MiningService miner;
 
@@ -159,14 +168,17 @@ public class GitWindow {
       }
 
       VcsLogGraphTable graphTable = (VcsLogGraphTable) table;
-      //TODO: Show different icon for not mined
-      if (column == graphTable.getColumnViewIndex(VcsLogColumn.DATE)) {
-        if (miner.containsRefactoring(
-            graphTable.getModel().getCommitId(row).getHash().asString())) {
+      if (labelsVisible && column == graphTable.getColumnViewIndex(VcsLogColumn.DATE)) {
+        String commitHash = graphTable.getModel().getCommitId(row).getHash().asString();
+        if (miner.containsRefactoring(commitHash)) {
           setIcon(RefactorInsightIcons.node);
           setTransparentIconBackground(true);
-        } else {
+        } else if (miner.containsCommit(commitHash)) {
           append("      ",
+              graphTable.applyHighlighters(this, row, column, hasFocus, selected));
+        } else {
+          //Todo make icon for this
+          append("  ?  ",
               graphTable.applyHighlighters(this, row, column, hasFocus, selected));
         }
       }
