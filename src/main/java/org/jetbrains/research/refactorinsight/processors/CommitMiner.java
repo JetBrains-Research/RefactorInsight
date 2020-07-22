@@ -50,7 +50,8 @@ public class CommitMiner implements Consumer<GitCommit> {
     this.pool = pool;
     this.map = map;
     myProject = repository.getProject();
-    myRepository = openRepository(myProject.getBasePath()); //NB: nullable, check if initialized correctly
+    //NB: nullable, check if initialized correctly
+    myRepository = openRepository(myProject.getBasePath()); 
     this.commitsDone = commitsDone;
     this.progressIndicator = progressIndicator;
     this.limit = limit;
