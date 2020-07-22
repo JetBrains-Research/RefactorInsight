@@ -50,7 +50,8 @@ dependencies {
     compile 'org.eclipse.jdt:org.eclipse.jdt.core:3.16.0'
     compile 'org.apache.commons:commons-text:1.6'
     compile 'org.kohsuke:github-api:1.95'
-    compile group: 'com.github.tsantalis', name: 'refactoring-miner', version: '2.0'
+//    compile group: 'com.github.tsantalis', name: 'refactoring-miner', version: '2.0'
+    compile project(':RefactoringMiner')
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
 }
 

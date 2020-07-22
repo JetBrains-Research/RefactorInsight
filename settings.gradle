@@ -1,0 +1,2 @@
+include 'RefactoringMiner'
+project(':RefactoringMiner').projectDir = file('../RefactoringMiner')
