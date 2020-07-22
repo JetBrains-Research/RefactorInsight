@@ -2,7 +2,7 @@ package org.jetbrains.research.refactorinsight.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.project.DumbAwareToggleAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
@@ -15,7 +15,7 @@ import org.jetbrains.research.refactorinsight.services.WindowService;
  * toggles between classical diff view and refactoring view.
  * Invokes the added git ui.
  */
-public class ToggleRefactoringViewAction extends ToggleAction {
+public class ToggleRefactoringViewAction extends DumbAwareToggleAction {
 
   @Override
   public void setSelected(@NotNull AnActionEvent e, boolean state) {
