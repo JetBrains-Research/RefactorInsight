@@ -4,6 +4,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
+import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 import java.util.HashMap;
@@ -34,9 +36,12 @@ public class WindowService {
    * @param state true for selected, false for unselected
    */
   public void setSelected(@NotNull AnActionEvent e, boolean state) {
-    VcsLogGraphTable table = e.getData(VcsLogInternalDataKeys.MAIN_UI).getTable();
-    gitInfo.putIfAbsent(table, new GitWindow(e));
-    gitInfo.get(table).setSelected(state);
+    MainVcsLogUi ui = e.getData(VcsLogInternalDataKeys.MAIN_UI);
+    GitWindow gitWindow = gitInfo.computeIfAbsent(ui.getTable(), table -> {
+      Disposer.register(ui, () -> gitInfo.remove(ui.getTable()));
+      return new GitWindow(e);
+    });
+    gitWindow.setSelected(state);
   }
 
   public boolean isSelected(@NotNull AnActionEvent e) {
