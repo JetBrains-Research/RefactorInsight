@@ -173,12 +173,8 @@ public class GitWindow {
         if (miner.containsRefactoring(commitHash)) {
           setIcon(RefactorInsightIcons.node);
           setTransparentIconBackground(true);
-        } else if (miner.containsCommit(commitHash)) {
-          append("      ",
-              graphTable.applyHighlighters(this, row, column, hasFocus, selected));
         } else {
-          //Todo make icon for this
-          append("  ?  ",
+          append("      ",
               graphTable.applyHighlighters(this, row, column, hasFocus, selected));
         }
       }
