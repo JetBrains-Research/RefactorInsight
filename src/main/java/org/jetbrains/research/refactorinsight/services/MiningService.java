@@ -1,13 +1,11 @@
 package org.jetbrains.research.refactorinsight.services;
 
-import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -48,8 +46,6 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
       = new ConcurrentHashMap<String, Set<RefactoringInfo>>();
   private boolean mining = false;
   private MyState innerState = new MyState();
-  
-  private Logger log = Logger.getInstance("RefactorInsight MiningService");
 
   public MiningService() {
   }
@@ -124,7 +120,6 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
           }
 
           public void run(@NotNull ProgressIndicator progressIndicator) {
-            long startMillis = System.currentTimeMillis();
             mining = true;
             progressIndicator.setText(RefactoringsBundle.message("mining"));
             progressIndicator.setIndeterminate(false);
@@ -159,8 +154,6 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
               computeRefactoringHistory(repository.getCurrentRevision(), repository.getProject());
             }
             progressIndicator.setText(RefactoringsBundle.message("finished"));
-            long nowMillis = System.currentTimeMillis();
-            log.warn(String.format("Mined refactorings in %s commits in %s ms", limit, nowMillis - startMillis));
           }
         });
   }
