@@ -86,7 +86,7 @@ public class GitWindow {
    */
   public void refresh(String commitId) {
     int index = table.getSelectionModel().getAnchorSelectionIndex();
-    if (table.getModel().getCommitId(index).getHash().asString().equals(commitId)) {
+    if (index >= 0 && table.getModel().getCommitId(index).getHash().asString().equals(commitId)) {
       buildComponent();
     }
   }
