@@ -67,7 +67,6 @@ public class RefactoringEntry implements Serializable {
         .setRefactorings(Arrays.stream(refs)
             .map(RefactoringInfo::fromString).collect(Collectors.toList()));
     entry.timeout = Boolean.parseBoolean(tokens[2]);
-    System.out.println(tokens[2]);
     entry.getRefactorings().forEach(r -> r.setEntry(entry));
     return entry;
   }
