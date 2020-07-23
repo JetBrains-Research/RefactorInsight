@@ -1,21 +1,20 @@
 package org.jetbrains.research.refactorinsight.ui.windows;
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.ui.UIUtil;
 import com.intellij.vcs.log.VcsCommitMetadata;
-import com.intellij.vcs.log.VcsLogFilterCollection;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
-import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
-import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.services.MiningService;
@@ -38,19 +37,15 @@ public class GitWindow {
   /**
    * Constructor for a GitWindowInfo.
    *
-   * @param e action event
+   * @param p        context project
+   * @param vcsLogUi target log tab
    */
-  public GitWindow(AnActionEvent e) {
-    VcsLogChangesBrowser changesBrowser =
-        (VcsLogChangesBrowser) e.getData(VcsLogChangesBrowser.DATA_KEY);
-    changesTree = changesBrowser.getViewer();
+  public GitWindow(@NotNull Project p, @NotNull MainVcsLogUi vcsLogUi) {
+    project = p;
+    changesTree = Objects.requireNonNull(UIUtil.findComponentOfType(vcsLogUi.getMainComponent(), ChangesTree.class));
     viewport = (JBViewport) changesTree.getParent();
-    project = e.getProject();
+    table = vcsLogUi.getTable();
     miner = MiningService.getInstance(project);
-    MainVcsLogUi logUI = e.getData(VcsLogInternalDataKeys.MAIN_UI);
-    table = logUI.getTable();
-    VcsLogFilterCollection filters = logUI.getFilterUi().getFilters();
-    
 
     table.getSelectionModel().addListSelectionListener(listSelectionEvent -> {
       if (!state || listSelectionEvent.getValueIsAdjusting()) {
