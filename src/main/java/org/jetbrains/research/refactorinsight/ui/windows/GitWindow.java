@@ -2,22 +2,30 @@ package org.jetbrains.research.refactorinsight.ui.windows;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
+import com.intellij.ui.Gray;
+import com.intellij.ui.JBSplitter;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
+import icons.RefactorInsightIcons;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Objects;
+import javax.swing.JButton;
+import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.services.MiningService;
+import org.jetbrains.research.refactorinsight.services.RefactoringsBundle;
 import org.jetbrains.research.refactorinsight.ui.tree.TreeUtils;
 import org.jetbrains.research.refactorinsight.ui.tree.renderers.MainCellRenderer;
 
@@ -43,7 +51,7 @@ public class GitWindow {
   public GitWindow(@NotNull Project p, @NotNull MainVcsLogUi vcsLogUi) {
     project = p;
     changesTree = Objects.requireNonNull(UIUtil.findComponentOfType(vcsLogUi.getMainComponent(),
-            ChangesTree.class));
+        ChangesTree.class));
     viewport = (JBViewport) changesTree.getParent();
     table = vcsLogUi.getTable();
     miner = MiningService.getInstance(project);
@@ -102,11 +110,33 @@ public class GitWindow {
 
     RefactoringEntry entry = miner.get(commitId);
 
-    if (entry == null || miner.isMining()) {
-      miner.mineAtCommit(metadata, project, this);
+    if (entry == null) {
+      miner.mineAtCommit(metadata, project, this, true);
       return;
     }
 
+    if (entry.timeout) {
+      JBSplitter splitter = new JBSplitter(true, (float) 0.4);
+      final JBLabel component =
+          new JBLabel(RefactoringsBundle.message("commit.timeout"), SwingConstants.CENTER);
+      component.setForeground(Gray._105);
+      splitter.setFirstComponent(component);
+      final JButton button =
+          new JButton(RefactoringsBundle.message("mine.anyway"), RefactorInsightIcons.toggle);
+      GitWindow window = this;
+      button.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+          miner.mineAtCommit(metadata, project, window, false);
+        }
+      });
+      button.setBackground(splitter.getBackground());
+      JBPanel panel = new JBPanel();
+      panel.add(button);
+      splitter.setSecondComponent(panel);
+      viewport.setView(splitter);
+      return;
+    }
 
     Tree tree = TreeUtils.buildTree(entry.getRefactorings());
     tree.setCellRenderer(new MainCellRenderer());

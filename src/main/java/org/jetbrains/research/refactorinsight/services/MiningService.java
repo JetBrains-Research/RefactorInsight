@@ -114,7 +114,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   public void mineRepo(GitRepository repository, int limit) {
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(repository.getProject(), "Mining refactorings", true) {
-          
+
           @Override
           public void onCancel() {
             super.onCancel();
@@ -184,7 +184,8 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    * @param project current project.
    * @param info    to be updated.
    */
-  public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow info) {
+  public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow info,
+                           boolean timeout) {
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(project, String.format(
             RefactoringsBundle.message("mining.at"), commit.getId().asString())) {
@@ -204,7 +205,11 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
           }
 
           public void run(@NotNull ProgressIndicator progressIndicator) {
-            CommitMiner.mineAtCommit(commit, innerState.refactoringsMap.map, project);
+            if (timeout) {
+              CommitMiner.mineAtCommitTimeout(commit, innerState.refactoringsMap.map, project);
+            } else {
+              CommitMiner.mineAtCommit(commit, innerState.refactoringsMap.map, project);
+            }
           }
         });
   }

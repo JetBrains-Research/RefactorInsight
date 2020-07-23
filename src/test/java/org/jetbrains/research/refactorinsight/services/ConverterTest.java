@@ -27,21 +27,24 @@ public class ConverterTest {
     //Test case 2
     String oneEntryString = "1.0.5" + delimiter(MAP) + "cccc"
         + delimiter(MAP_ENTRY) + "bbbb"
-        + delimiter(ENTRY) + 1234 + delimiter(ENTRY);
+        + delimiter(ENTRY) + 1234
+        + delimiter(ENTRY) + "true"
+        + delimiter(ENTRY);
+    final RefactoringEntry refactoringEntry = new RefactoringEntry("cccc", "bbbb", 1234);
+    refactoringEntry.setTimeout(true);
     RefactoringsMap oneEntryMap =
         new RefactoringsMap(new ConcurrentHashMap<>(Map.of("cccc",
-            new RefactoringEntry("cccc", "bbbb", 1234)
+            refactoringEntry
                 .setRefactorings(new ArrayList<>()))), "1.0.5");
     //Test case 3
     String moreEntryString = oneEntryString
         + delimiter(MAP) + "bbbb" + delimiter(MAP_ENTRY) + "aaaa"
-        + delimiter(ENTRY) + 5678 + delimiter(ENTRY);
+        + delimiter(ENTRY) + 5678
+        + delimiter(ENTRY) + "false" + delimiter(ENTRY);
+    final RefactoringEntry refactoringEntry1 = new RefactoringEntry("bbbb", "aaaa", 5678);
     RefactoringsMap moreEntryMap = new RefactoringsMap(new ConcurrentHashMap<>(Map.of(
-        "cccc", new RefactoringEntry("cccc", "bbbb", 1234)
-            .setRefactorings(new ArrayList<>()),
-        "bbbb", new RefactoringEntry("bbbb", "aaaa", 5678)
-            .setRefactorings(new ArrayList<>()))
-    ), "1.0.5");
+        "cccc", refactoringEntry.setRefactorings(new ArrayList<>()),
+        "bbbb", refactoringEntry1.setRefactorings(new ArrayList<>()))), "1.0.5");
     RefactoringsMapConverter converter = new RefactoringsMapConverter();
     Map.of(
         invalidString, invalidMap,

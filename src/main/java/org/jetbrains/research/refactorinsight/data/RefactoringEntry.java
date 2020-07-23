@@ -35,6 +35,7 @@ public class RefactoringEntry implements Serializable {
   private final String parent;
   private final long time;
   private List<RefactoringInfo> refactorings;
+  public boolean timeout = false;
 
   /**
    * Constructor for method refactoring.
@@ -56,8 +57,8 @@ public class RefactoringEntry implements Serializable {
    */
   public static RefactoringEntry fromString(String value, String commitId) {
     String regex = StringUtils.delimiter(ENTRY, true);
-    String[] tokens = value.split(regex, 3);
-    String[] refs = tokens[2].split(regex);
+    String[] tokens = value.split(regex, 4);
+    String[] refs = tokens[3].split(regex);
     if (refs[0].isEmpty()) {
       refs = new String[0];
     }
@@ -65,8 +66,14 @@ public class RefactoringEntry implements Serializable {
         commitId, tokens[0], Long.parseLong(tokens[1]))
         .setRefactorings(Arrays.stream(refs)
             .map(RefactoringInfo::fromString).collect(Collectors.toList()));
+    entry.timeout = Boolean.parseBoolean(tokens[2]);
+    System.out.println(tokens[2]);
     entry.getRefactorings().forEach(r -> r.setEntry(entry));
     return entry;
+  }
+
+  public void setTimeout(boolean timeout) {
+    this.timeout = timeout;
   }
 
   /**
@@ -96,7 +103,7 @@ public class RefactoringEntry implements Serializable {
   @Override
   public String toString() {
     String del = StringUtils.delimiter(ENTRY);
-    return parent + del + time + del + refactorings.stream()
+    return parent + del + time + del + timeout + del + refactorings.stream()
         .map(RefactoringInfo::toString).collect(Collectors.joining(del));
   }
 
