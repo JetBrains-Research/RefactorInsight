@@ -114,7 +114,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   public void mineRepo(GitRepository repository, int limit) {
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(repository.getProject(), "Mining refactorings", true) {
-
+          
           @Override
           public void onCancel() {
             super.onCancel();

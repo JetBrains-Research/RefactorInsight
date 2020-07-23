@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.eclipse.jgit.lib.Repository;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.services.RefactoringsBundle;
 import org.refactoringminer.api.GitHistoryRefactoringMiner;
@@ -26,12 +27,11 @@ import org.refactoringminer.util.GitServiceImpl;
  * Consumes a git commit, calls RefactoringMiner and detects the refactorings for a commit.
  */
 public class CommitMiner implements Consumer<GitCommit> {
-
-
   private static final String progress = RefactoringsBundle.message("progress");
   private final ExecutorService pool;
   private final Map<String, RefactoringEntry> map;
-  private final GitRepository repository;
+  private final Project myProject;
+  private final Repository myRepository;
   private final AtomicInteger commitsDone;
   private final ProgressIndicator progressIndicator;
   private final int limit;
@@ -49,13 +49,23 @@ public class CommitMiner implements Consumer<GitCommit> {
 
     this.pool = pool;
     this.map = map;
-    this.repository = repository;
+    myProject = repository.getProject();
+    //NB: nullable, check if initialized correctly
+    myRepository = openRepository(myProject.getBasePath()); 
     this.commitsDone = commitsDone;
     this.progressIndicator = progressIndicator;
     this.limit = limit;
-
   }
 
+  private static Repository openRepository(final String path) {
+    try {
+      return new GitServiceImpl().openRepository(path);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+  
   /**
    * Method that mines only one commit.
    *
@@ -96,16 +106,15 @@ public class CommitMiner implements Consumer<GitCommit> {
           cancelProgress();
           return;
         }
-        GitService gitService = new GitServiceImpl();
         GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
         try {
-          miner.detectAtCommit(gitService.openRepository(repository.getProject().getBasePath()),
+          miner.detectAtCommit(myRepository,
               commitId, new RefactoringHandler() {
                 @Override
                 public void handle(String commitId, List<Refactoring> refactorings) {
                   map.put(commitId,
                       RefactoringEntry
-                          .convert(refactorings, gitCommit, repository.getProject()));
+                          .convert(refactorings, gitCommit, myProject));
                   incrementProgress();
                 }
               });
