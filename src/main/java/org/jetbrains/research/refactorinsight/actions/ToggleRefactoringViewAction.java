@@ -26,7 +26,9 @@ public class ToggleRefactoringViewAction extends DumbAwareToggleAction {
 
   @Override
   public boolean isSelected(@NotNull AnActionEvent e) {
-    if (!isEnabled(e)) return false;
+    if (!isEnabled(e)) {
+      return false;
+    }
     Project project = e.getRequiredData(PlatformDataKeys.PROJECT);
     MainVcsLogUi vcsLogUi = e.getRequiredData(VcsLogInternalDataKeys.MAIN_UI);
     return WindowService.getInstance(project).isSelected(vcsLogUi);

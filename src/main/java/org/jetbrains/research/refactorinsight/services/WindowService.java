@@ -6,11 +6,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.research.refactorinsight.ui.windows.GitWindow;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.research.refactorinsight.ui.windows.GitWindow;
 
 /**
  * Service that holds a git window map per opened project.

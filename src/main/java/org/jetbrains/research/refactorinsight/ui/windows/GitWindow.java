@@ -42,7 +42,8 @@ public class GitWindow {
    */
   public GitWindow(@NotNull Project p, @NotNull MainVcsLogUi vcsLogUi) {
     project = p;
-    changesTree = Objects.requireNonNull(UIUtil.findComponentOfType(vcsLogUi.getMainComponent(), ChangesTree.class));
+    changesTree = Objects.requireNonNull(UIUtil.findComponentOfType(vcsLogUi.getMainComponent(),
+            ChangesTree.class));
     viewport = (JBViewport) changesTree.getParent();
     table = vcsLogUi.getTable();
     miner = MiningService.getInstance(project);
