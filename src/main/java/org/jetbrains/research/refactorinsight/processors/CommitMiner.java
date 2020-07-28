@@ -183,11 +183,8 @@ public class CommitMiner implements Consumer<GitCommit> {
                 .convert(new ArrayList<>(), gitCommit, myProject);
             refactoringEntry.setTimeout(true);
             map.put(commitId, refactoringEntry);
-            System.out.println(commitId);
           }
-        } catch (ExecutionException e) {
-          e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
           e.printStackTrace();
         } finally {
           service.shutdown();

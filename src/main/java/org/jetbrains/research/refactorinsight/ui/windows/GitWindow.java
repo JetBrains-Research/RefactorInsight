@@ -116,28 +116,20 @@ public class GitWindow {
     }
 
     if (entry.timeout) {
-      JBSplitter splitter = new JBSplitter(true, (float) 0.4);
       final JBLabel component =
-          new JBLabel(RefactoringsBundle.message("commit.timeout"), SwingConstants.CENTER);
+          new JBLabel(RefactoringsBundle.message("no.ref"), SwingConstants.CENTER);
       component.setForeground(Gray._105);
-      splitter.setFirstComponent(component);
-      final JButton button =
-          new JButton(RefactoringsBundle.message("mine.anyway"), RefactorInsightIcons.toggle);
-      GitWindow window = this;
-      button.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-          miner.mineAtCommit(metadata, project, window, false);
-        }
-      });
-      button.setBackground(splitter.getBackground());
-      JBPanel panel = new JBPanel();
-      panel.add(button);
-      splitter.setSecondComponent(panel);
-      viewport.setView(splitter);
+      viewport.setView(component);
       return;
     }
 
+    if (entry.getRefactorings().isEmpty()) {
+      final JBLabel component =
+          new JBLabel(RefactoringsBundle.message("no.ref"), SwingConstants.CENTER);
+      component.setForeground(Gray._105);
+      viewport.setView(component);
+      return;
+    }
     Tree tree = TreeUtils.buildTree(entry.getRefactorings());
     tree.setCellRenderer(new MainCellRenderer());
 
