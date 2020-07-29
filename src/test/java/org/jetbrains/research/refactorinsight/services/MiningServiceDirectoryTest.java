@@ -116,7 +116,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
     Mockito.doThrow(new NullPointerException()).when(gitWindow).refresh(any());
 
     //Testing that mine at commit works:
-    miner.mineAtCommit(vcsCommitMetadata, myProject, gitWindow, false);
+    miner.mineAtCommit(vcsCommitMetadata, myProject, gitWindow);
     verify(parent, new Times(1)).asString();
 
     //test the main cell renderer works as expected on this map

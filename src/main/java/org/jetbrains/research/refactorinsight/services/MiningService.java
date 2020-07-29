@@ -184,8 +184,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    * @param project current project.
    * @param info    to be updated.
    */
-  public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow info,
-                           boolean timeout) {
+  public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow info) {
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(project, String.format(
             RefactoringsBundle.message("mining.at"), commit.getId().asString())) {
@@ -205,11 +204,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
           }
 
           public void run(@NotNull ProgressIndicator progressIndicator) {
-            if (timeout) {
               CommitMiner.mineAtCommitTimeout(commit, innerState.refactoringsMap.map, project);
-            } else {
-              CommitMiner.mineAtCommit(commit, innerState.refactoringsMap.map, project);
-            }
           }
         });
   }

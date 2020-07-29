@@ -111,11 +111,11 @@ public class GitWindow {
     RefactoringEntry entry = miner.get(commitId);
 
     if (entry == null) {
-      miner.mineAtCommit(metadata, project, this, true);
+      miner.mineAtCommit(metadata, project, this);
       return;
     }
 
-    if (entry.timeout) {
+    if (entry.timeout || entry.getRefactorings().isEmpty()) {
       final JBLabel component =
           new JBLabel(RefactoringsBundle.message("no.ref"), SwingConstants.CENTER);
       component.setForeground(Gray._105);
@@ -123,13 +123,6 @@ public class GitWindow {
       return;
     }
 
-    if (entry.getRefactorings().isEmpty()) {
-      final JBLabel component =
-          new JBLabel(RefactoringsBundle.message("no.ref"), SwingConstants.CENTER);
-      component.setForeground(Gray._105);
-      viewport.setView(component);
-      return;
-    }
     Tree tree = TreeUtils.buildTree(entry.getRefactorings());
     tree.setCellRenderer(new MainCellRenderer());
 
