@@ -5,6 +5,9 @@ import com.intellij.openapi.actionSystem.ToggleAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.services.WindowService;
 
+/**
+ * Toggle labeling of commits containing refactorings in VCSTable.
+ */
 public class ToggleLabelsAction extends ToggleAction {
 
   @Override
