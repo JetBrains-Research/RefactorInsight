@@ -7,9 +7,15 @@ import com.intellij.util.Consumer;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import git4idea.GitCommit;
 import git4idea.repo.GitRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.jgit.lib.Repository;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
@@ -51,7 +57,7 @@ public class CommitMiner implements Consumer<GitCommit> {
     this.map = map;
     myProject = repository.getProject();
     //NB: nullable, check if initialized correctly
-    myRepository = openRepository(myProject.getBasePath()); 
+    myRepository = openRepository(myProject.getBasePath());
     this.commitsDone = commitsDone;
     this.progressIndicator = progressIndicator;
     this.limit = limit;
@@ -65,7 +71,7 @@ public class CommitMiner implements Consumer<GitCommit> {
       return null;
     }
   }
-  
+
   /**
    * Method that mines only one commit.
    *
@@ -93,8 +99,58 @@ public class CommitMiner implements Consumer<GitCommit> {
   }
 
   /**
+   * Mines a single commit if the mining process does not take longer than
+   * 60 seconds.
+   *
+   * @param commit  to be mined
+   * @param map     refactorings map
+   * @param project the current project
+   */
+  public static void mineAtCommitTimeout(VcsCommitMetadata commit,
+                                         Map<String, RefactoringEntry> map,
+                                         Project project) {
+    GitService gitService = new GitServiceImpl();
+    GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
+    ExecutorService service = Executors.newSingleThreadExecutor();
+    Future<?> f = null;
+    final Repository repository;
+    try {
+      repository = gitService.openRepository(project.getBasePath());
+    } catch (Exception e) {
+      return;
+    }
+    try {
+      Runnable r = () -> {
+        miner.detectAtCommit(repository,
+            commit.getId().asString(), new RefactoringHandler() {
+              @Override
+              public void handle(String commitId, List<Refactoring> refactorings) {
+                map.put(commitId,
+                    RefactoringEntry
+                        .convert(refactorings, commit, project));
+              }
+            });
+      };
+      f = service.submit(r);
+      f.get(60, TimeUnit.SECONDS);
+    } catch (TimeoutException e) {
+      if (f.cancel(true)) {
+        RefactoringEntry refactoringEntry = RefactoringEntry
+            .convert(new ArrayList<>(), commit, project);
+        refactoringEntry.setTimeout(true);
+        map.put(commit.getId().asString(), refactoringEntry);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      service.shutdown();
+    }
+  }
+
+  /**
    * Mines a gitCommit.
    * Method that calls RefactoringMiner and updates the refactoring map.
+   *
    * @param gitCommit to be mined
    */
   public void consume(GitCommit gitCommit) throws ProcessCanceledException {
@@ -107,19 +163,31 @@ public class CommitMiner implements Consumer<GitCommit> {
           return;
         }
         GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        Future<?> f = null;
         try {
-          miner.detectAtCommit(myRepository,
-              commitId, new RefactoringHandler() {
-                @Override
-                public void handle(String commitId, List<Refactoring> refactorings) {
-                  map.put(commitId,
-                      RefactoringEntry
-                          .convert(refactorings, gitCommit, myProject));
-                  incrementProgress();
-                }
-              });
+          Runnable r = () -> miner.detectAtCommit(myRepository, commitId, new RefactoringHandler() {
+            @Override
+            public void handle(String commitId, List<Refactoring> refactorings) {
+              map.put(commitId,
+                  RefactoringEntry
+                      .convert(refactorings, gitCommit, myProject));
+              incrementProgress();
+            }
+          });
+          f = service.submit(r);
+          f.get(60, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+          if (f.cancel(true)) {
+            RefactoringEntry refactoringEntry = RefactoringEntry
+                .convert(new ArrayList<>(), gitCommit, myProject);
+            refactoringEntry.setTimeout(true);
+            map.put(commitId, refactoringEntry);
+          }
         } catch (Exception e) {
           e.printStackTrace();
+        } finally {
+          service.shutdown();
         }
       });
     } else {
