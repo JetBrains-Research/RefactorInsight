@@ -3,21 +3,18 @@ package org.jetbrains.research.refactorinsight.ui.windows;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
 import com.intellij.ui.Gray;
-import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
-import icons.RefactorInsightIcons;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Objects;
-import javax.swing.JButton;
 import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -25,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.services.MiningService;
-import org.jetbrains.research.refactorinsight.services.RefactoringsBundle;
+import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.ui.tree.TreeUtils;
 import org.jetbrains.research.refactorinsight.ui.tree.renderers.MainCellRenderer;
 
@@ -117,7 +114,7 @@ public class GitWindow {
 
     if (entry.timeout || entry.getRefactorings().isEmpty()) {
       final JBLabel component =
-          new JBLabel(RefactoringsBundle.message("no.ref"), SwingConstants.CENTER);
+          new JBLabel(RefactorInsightBundle.message("no.ref"), SwingConstants.CENTER);
       component.setForeground(Gray._105);
       viewport.setView(component);
       return;

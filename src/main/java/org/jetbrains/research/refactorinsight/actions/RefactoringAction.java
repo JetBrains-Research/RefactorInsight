@@ -8,7 +8,7 @@ import git4idea.repo.GitRepositoryManager;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.services.MiningService;
-import org.jetbrains.research.refactorinsight.services.RefactoringsBundle;
+import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 
 
 /**
@@ -25,8 +25,8 @@ public class RefactoringAction extends AnAction {
     final List<GitRepository> repositories = GitRepositoryManager
         .getInstance(e.getProject()).getRepositories();
     if (repositories.isEmpty()) {
-      Messages.showErrorDialog(RefactoringsBundle.message("no.repo"),
-          RefactoringsBundle.message("name"));
+      Messages.showErrorDialog(RefactorInsightBundle.message("no.repo"),
+          RefactorInsightBundle.message("name"));
       return;
     }
     GitRepository repository = repositories.get(0);

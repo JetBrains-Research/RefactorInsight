@@ -10,7 +10,6 @@ import git4idea.repo.GitRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -19,7 +18,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.jgit.lib.Repository;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
-import org.jetbrains.research.refactorinsight.services.RefactoringsBundle;
+import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.refactoringminer.api.GitHistoryRefactoringMiner;
 import org.refactoringminer.api.GitService;
 import org.refactoringminer.api.Refactoring;
@@ -33,7 +32,7 @@ import org.refactoringminer.util.GitServiceImpl;
  * Consumes a git commit, calls RefactoringMiner and detects the refactorings for a commit.
  */
 public class CommitMiner implements Consumer<GitCommit> {
-  private static final String progress = RefactoringsBundle.message("progress");
+  private static final String progress = RefactorInsightBundle.message("progress");
   private final ExecutorService pool;
   private final Map<String, RefactoringEntry> map;
   private final Project myProject;

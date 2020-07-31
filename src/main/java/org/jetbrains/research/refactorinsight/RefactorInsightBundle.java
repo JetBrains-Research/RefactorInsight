@@ -1,4 +1,4 @@
-package org.jetbrains.research.refactorinsight.services;
+package org.jetbrains.research.refactorinsight;
 
 import com.intellij.AbstractBundle;
 import com.intellij.reference.SoftReference;
@@ -6,11 +6,11 @@ import java.lang.ref.Reference;
 import java.util.ResourceBundle;
 import org.jetbrains.annotations.PropertyKey;
 
-public final class RefactoringsBundle {
-  private static final String BUNDLE = "RefactoringsBundle";
+public final class RefactorInsightBundle {
+  private static final String BUNDLE = "RefactorInsightBundle";
   private static Reference<ResourceBundle> INSTANCE;
 
-  private RefactoringsBundle() {
+  private RefactorInsightBundle() {
   }
 
   public static String message(@PropertyKey(resourceBundle = BUNDLE) String key, Object... params) {

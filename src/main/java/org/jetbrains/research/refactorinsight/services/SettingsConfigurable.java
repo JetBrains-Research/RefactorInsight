@@ -2,13 +2,13 @@ package org.jetbrains.research.refactorinsight.services;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import git4idea.repo.GitRepository;
 import git4idea.repo.GitRepositoryManager;
 import java.util.List;
 import javax.swing.JComponent;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.ui.windows.SettingsComponent;
 
 /**
@@ -25,7 +25,7 @@ public class SettingsConfigurable implements Configurable {
   @Nls(capitalization = Nls.Capitalization.Title)
   @Override
   public String getDisplayName() {
-    return RefactoringsBundle.message("setting");
+    return RefactorInsightBundle.message("setting");
   }
 
   @Override

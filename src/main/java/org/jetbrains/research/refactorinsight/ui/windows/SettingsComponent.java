@@ -15,7 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import org.jetbrains.research.refactorinsight.services.MiningService;
-import org.jetbrains.research.refactorinsight.services.RefactoringsBundle;
+import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.services.RefactoringsMapConverter;
 
 /**
@@ -36,14 +36,14 @@ public class SettingsComponent {
   public SettingsComponent(Project project) {
 
 
-    JButton clear = new JButton(RefactoringsBundle.message("button.clear"));
+    JButton clear = new JButton(RefactorInsightBundle.message("button.clear"));
     clear.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
         MiningService.getInstance(project).clear();
       }
     });
-    JButton all = new JButton(RefactoringsBundle.message("button.mine"));
+    JButton all = new JButton(RefactorInsightBundle.message("button.mine"));
     all.setPreferredSize(clear.getPreferredSize());
     all.addMouseListener(new MouseAdapter() {
       @Override
@@ -53,7 +53,7 @@ public class SettingsComponent {
         MiningService.getInstance(project).mineAll(repository);
       }
     });
-    JButton choose = new JButton(RefactoringsBundle.message("button.import"));
+    JButton choose = new JButton(RefactorInsightBundle.message("button.import"));
     choose.setPreferredSize(clear.getPreferredSize());
     choose.addMouseListener(new MouseAdapter() {
       @Override
@@ -70,8 +70,8 @@ public class SettingsComponent {
                 MiningService.getInstance(project).getState().refactoringsMap =
                     new RefactoringsMapConverter().fromString(content);
               } catch (Exception ex) {
-                Messages.showErrorDialog(RefactoringsBundle.message("bad.file"),
-                    RefactoringsBundle.message("name"));
+                Messages.showErrorDialog(RefactorInsightBundle.message("bad.file"),
+                    RefactorInsightBundle.message("name"));
               }
             }
         );
@@ -79,10 +79,10 @@ public class SettingsComponent {
     });
 
     myMainPanel = FormBuilder.createFormBuilder()
-        .addLabeledComponent(RefactoringsBundle.message("label.max.commits"), commitLimit, 1, false)
-        .addLabeledComponent(RefactoringsBundle.message("label.max.history"), historyLimit, 1,
+        .addLabeledComponent(RefactorInsightBundle.message("label.max.commits"), commitLimit, 1, false)
+        .addLabeledComponent(RefactorInsightBundle.message("label.max.history"), historyLimit, 1,
             false)
-        .addLabeledComponent(RefactoringsBundle.message("label.threads"), threads, 1, false)
+        .addLabeledComponent(RefactorInsightBundle.message("label.threads"), threads, 1, false)
         .addComponent(clear)
         .addComponent(all)
         .addComponent(choose)

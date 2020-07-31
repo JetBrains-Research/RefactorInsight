@@ -43,7 +43,7 @@ import javax.swing.tree.TreePath;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.services.RefactoringsBundle;
+import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.ui.tree.TreeUtils;
 import org.jetbrains.research.refactorinsight.ui.tree.renderers.HistoryToolbarRenderer;
 import org.jetbrains.research.refactorinsight.utils.Utils;
@@ -74,7 +74,7 @@ public class RefactoringHistoryToolbar {
     factory = VcsProjectLog.getInstance(project).getLogManager()
         .getMainLogUiFactory("method history", VcsLogFilterObject.collection());
     toolWindow =
-        toolWindowManager.registerToolWindow(RefactoringsBundle.message("history"),
+        toolWindowManager.registerToolWindow(RefactorInsightBundle.message("history"),
             true, ToolWindowAnchor.BOTTOM);
 
   }
@@ -112,7 +112,7 @@ public class RefactoringHistoryToolbar {
 
   private void setSecondComponent(JBSplitter splitter) {
     final JBLabel component =
-        new JBLabel(RefactoringsBundle.message("click.to.jump"), SwingConstants.CENTER);
+        new JBLabel(RefactorInsightBundle.message("click.to.jump"), SwingConstants.CENTER);
     component.setForeground(Gray._105);
     splitter.setSecondComponent(component);
   }
@@ -120,7 +120,7 @@ public class RefactoringHistoryToolbar {
   private void setFirstComponent(int size, JBSplitter splitter, Tree tree) {
     JBScrollPane pane = new JBScrollPane(tree);
     JBLabel label =
-        new JBLabel(String.format(RefactoringsBundle.message("how.many.detected"),
+        new JBLabel(String.format(RefactorInsightBundle.message("how.many.detected"),
             size, size > 1 ? "s" : "", type.toString().toLowerCase()));
     label.setForeground(Gray._105);
     pane.setColumnHeaderView(label);
@@ -192,7 +192,7 @@ public class RefactoringHistoryToolbar {
 
     if (methods != null && !methods.isEmpty()) {
       DefaultMutableTreeNode child = new DefaultMutableTreeNode(
-          RefactoringsBundle.message("check.methods"));
+          RefactorInsightBundle.message("check.methods"));
       addObjectsToTree(methods, child, true);
       if (child.getChildCount() > 0) {
         root.add(child);
@@ -201,7 +201,7 @@ public class RefactoringHistoryToolbar {
 
     if (attributes != null && !attributes.isEmpty()) {
       DefaultMutableTreeNode child = new DefaultMutableTreeNode(
-          RefactoringsBundle.message("check.fields"));
+          RefactorInsightBundle.message("check.fields"));
       addObjectsToTree(attributes, child, false);
       if (child.getChildCount() > 0) {
         root.add(child);
@@ -264,7 +264,7 @@ public class RefactoringHistoryToolbar {
 
   private void showPopup(DataContext datacontext) {
     JBPanel panel = new JBPanel(new GridLayout(0, 1));
-    panel.add(new JBLabel(RefactoringsBundle.message("no.ref.history")));
+    panel.add(new JBLabel(RefactorInsightBundle.message("no.ref.history")));
     JBPopup popup = JBPopupFactory.getInstance()
         .createComponentPopupBuilder(panel, null).createPopup();
     popup.showInBestPositionFor(datacontext);
