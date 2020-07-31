@@ -25,16 +25,19 @@ import org.jetbrains.research.refactorinsight.data.types.classes.MoveRenameClass
 import org.jetbrains.research.refactorinsight.data.types.classes.RemoveClassAnnotationHandler;
 import org.jetbrains.research.refactorinsight.data.types.classes.RenameClassHandler;
 import org.jetbrains.research.refactorinsight.data.types.methods.AddMethodAnnotationHandler;
+import org.jetbrains.research.refactorinsight.data.types.methods.AddParameterAnnotationHandler;
 import org.jetbrains.research.refactorinsight.data.types.methods.AddParameterHandler;
 import org.jetbrains.research.refactorinsight.data.types.methods.ChangeReturnTypeHandler;
 import org.jetbrains.research.refactorinsight.data.types.methods.ExtractOperationHandler;
 import org.jetbrains.research.refactorinsight.data.types.methods.InlineOperationHandler;
 import org.jetbrains.research.refactorinsight.data.types.methods.MergeOperationHandler;
 import org.jetbrains.research.refactorinsight.data.types.methods.ModifyMethodAnnotationHandler;
+import org.jetbrains.research.refactorinsight.data.types.methods.ModifyParameterAnnotationHandler;
 import org.jetbrains.research.refactorinsight.data.types.methods.MoveOperationHandler;
 import org.jetbrains.research.refactorinsight.data.types.methods.PullUpOperationHandler;
 import org.jetbrains.research.refactorinsight.data.types.methods.PushDownOperationHandler;
 import org.jetbrains.research.refactorinsight.data.types.methods.RemoveMethodAnnotationHandler;
+import org.jetbrains.research.refactorinsight.data.types.methods.RemoveParameterAnnotationHandler;
 import org.jetbrains.research.refactorinsight.data.types.methods.RemoveParameterHandler;
 import org.jetbrains.research.refactorinsight.data.types.methods.RenameMethodHandler;
 import org.jetbrains.research.refactorinsight.data.types.methods.ReorderParameterHandler;
@@ -170,6 +173,12 @@ public class InfoFactory {
         new ModifyClassAnnotationHandler());
     refactoringHandlers.put(RefactoringType.REORDER_PARAMETER,
         new ReorderParameterHandler());
+    refactoringHandlers.put(RefactoringType.ADD_PARAMETER_ANNOTATION,
+        new AddParameterAnnotationHandler());
+    refactoringHandlers.put(RefactoringType.REMOVE_PARAMETER_ANNOTATION,
+        new RemoveParameterAnnotationHandler());
+    refactoringHandlers.put(RefactoringType.MODIFY_PARAMETER_ANNOTATION,
+        new ModifyParameterAnnotationHandler());
   }
 
   /**
@@ -179,8 +188,8 @@ public class InfoFactory {
    * @return resulting RefactoringInfo
    */
   public RefactoringInfo create(Refactoring refactoring, RefactoringEntry entry) {
-    return refactoringHandlers.get(refactoring.getRefactoringType())
-        .handle(refactoring, entry);
+    final Handler handler = refactoringHandlers.get(refactoring.getRefactoringType());
+    return handler.handle(refactoring, entry);
   }
 
 }

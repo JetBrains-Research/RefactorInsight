@@ -5,12 +5,16 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
 import com.intellij.ui.ColoredTableCellRenderer;
+import com.intellij.ui.Gray;
+import com.intellij.ui.JBSplitter;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.ui.UIUtil;
 import com.intellij.vcs.log.VcsCommitMetadata;
-import com.intellij.vcs.log.VcsLogFilterCollection;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
@@ -20,11 +24,16 @@ import icons.RefactorInsightIcons;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JTable;
+import java.util.Objects;
+import javax.swing.JButton;
+import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.services.MiningService;
+import org.jetbrains.research.refactorinsight.services.RefactoringsBundle;
 import org.jetbrains.research.refactorinsight.ui.tree.TreeUtils;
 import org.jetbrains.research.refactorinsight.ui.tree.renderers.MainCellRenderer;
 
@@ -45,18 +54,16 @@ public class GitWindow {
   /**
    * Constructor for a GitWindowInfo.
    *
-   * @param e action event
+   * @param p        context project
+   * @param vcsLogUi target log tab
    */
-  public GitWindow(AnActionEvent e) {
-    VcsLogChangesBrowser changesBrowser =
-        (VcsLogChangesBrowser) e.getData(VcsLogChangesBrowser.DATA_KEY);
-    changesTree = changesBrowser.getViewer();
+  public GitWindow(@NotNull Project p, @NotNull MainVcsLogUi vcsLogUi) {
+    project = p;
+    changesTree = Objects.requireNonNull(UIUtil.findComponentOfType(vcsLogUi.getMainComponent(),
+        ChangesTree.class));
     viewport = (JBViewport) changesTree.getParent();
-    project = e.getProject();
+    table = vcsLogUi.getTable();
     miner = MiningService.getInstance(project);
-    MainVcsLogUi logUI = e.getData(VcsLogInternalDataKeys.MAIN_UI);
-    table = logUI.getTable();
-    VcsLogFilterCollection filters = logUI.getFilterUi().getFilters();
 
     table.setDefaultRenderer(String.class, new VcsTableRefactoringRenderer(e.getProject()));
     table.getSelectionModel().addListSelectionListener(listSelectionEvent -> {
@@ -101,7 +108,7 @@ public class GitWindow {
    */
   public void refresh(String commitId) {
     int index = table.getSelectionModel().getAnchorSelectionIndex();
-    if (table.getModel().getCommitId(index).getHash().asString().equals(commitId)) {
+    if (index >= 0 && table.getModel().getCommitId(index).getHash().asString().equals(commitId)) {
       buildComponent();
     }
   }
@@ -121,11 +128,18 @@ public class GitWindow {
 
     RefactoringEntry entry = miner.get(commitId);
 
-    if (entry == null || miner.isMining()) {
+    if (entry == null) {
       miner.mineAtCommit(metadata, project, this);
       return;
     }
 
+    if (entry.timeout || entry.getRefactorings().isEmpty()) {
+      final JBLabel component =
+          new JBLabel(RefactoringsBundle.message("no.ref"), SwingConstants.CENTER);
+      component.setForeground(Gray._105);
+      viewport.setView(component);
+      return;
+    }
 
     Tree tree = TreeUtils.buildTree(entry.getRefactorings());
     tree.setCellRenderer(new MainCellRenderer());

@@ -1,10 +1,10 @@
 package org.jetbrains.research.refactorinsight.services;
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
+import com.intellij.openapi.util.Disposer;
+import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,10 +17,11 @@ import org.jetbrains.research.refactorinsight.ui.windows.GitWindow;
  */
 @Service
 public class WindowService {
-
+  private final Project project;
   private Map<VcsLogGraphTable, GitWindow> gitInfo = new HashMap<>();
 
-  public WindowService() {
+  public WindowService(@NotNull Project p) {
+    project = p;
   }
 
   public static WindowService getInstance(@NotNull Project project) {
@@ -30,16 +31,19 @@ public class WindowService {
   /**
    * Applies selects or deselects the tool window.
    *
-   * @param e     the action event
+   * @param ui    target vcs log tab
    * @param state true for selected, false for unselected
    */
-  public void setSelected(@NotNull AnActionEvent e, boolean state) {
-    VcsLogGraphTable table = e.getData(VcsLogInternalDataKeys.MAIN_UI).getTable();
-    gitInfo.get(table).setSelected(state);
+  public void setSelected(@NotNull MainVcsLogUi ui, boolean state) {
+    GitWindow gitWindow = gitInfo.computeIfAbsent(ui.getTable(), table -> {
+      Disposer.register(ui, () -> gitInfo.remove(ui.getTable()));
+      return new GitWindow(project, ui);
+    });
+    gitWindow.setSelected(state);
   }
 
-  public boolean isSelected(@NotNull AnActionEvent e) {
-    VcsLogGraphTable table = e.getData(VcsLogInternalDataKeys.MAIN_UI).getTable();
+  public boolean isSelected(@NotNull MainVcsLogUi vcsLogUi) {
+    VcsLogGraphTable table = vcsLogUi.getTable();
     return gitInfo.containsKey(table) && gitInfo.get(table).isSelected();
   }
 
