@@ -23,7 +23,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +48,7 @@ import org.jetbrains.research.refactorinsight.utils.Utils;
  * it stores and persists the detected refactoring data in .idea/refactorings.xml file.
  */
 @State(name = "MiningRefactoringsState",
-        storages = {@Storage("refactorings.xml")})
+    storages = {@Storage("refactorings.xml")})
 @Service
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
@@ -180,81 +187,85 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     }
   }
 
-    /**
-     * Mine refactorings in the specific commit.
-     *
-     * @param commit  to be mined.
-     * @param project current project.
-     * @param info    to be updated.
-     */
-    public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow info) {
-        ProgressManager.getInstance()
-                .run(new Task.Backgroundable(project, String.format(
-                        RefactorInsightBundle.message("mining.at"), commit.getId().asString())) {
+  /**
+   * Mine refactorings in the specific commit.
+   *
+   * @param commit  to be mined.
+   * @param project current project.
+   * @param info    to be updated.
+   */
+  public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow info) {
+    ProgressManager.getInstance()
+        .run(new Task.Backgroundable(project, String.format(
+            RefactorInsightBundle.message("mining.at"), commit.getId().asString())) {
 
-                    @Override
-                    public void onFinished() {
-                        if (contains(commit.getId().asString())) {
-                            ApplicationManager.getApplication()
-                                    .invokeLater(() -> info.refresh(commit.getId().asString()));
-                        }
-                    }
-
-                    @Override
-                    public void run(@NotNull ProgressIndicator progressIndicator) {
-                        try {
-                            runWithCheckCanceled(() -> {
-                                        CommitMiner.mineAtCommitTimeout(commit, innerState.refactoringsMap.map, project);
-                                        return null;
-                                    },
-                                    progressIndicator);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-    }
-
-    /**
-     * Allows to interrupt a process which does not performs checkCancelled() calls by itself.
-     */
-    private <T> void runWithCheckCanceled(@NotNull final Callable<T> callable, @NotNull final ProgressIndicator indicator) throws Exception {
-        final Ref<T> result = Ref.create();
-        final Ref<Throwable> error = Ref.create();
-
-        Future<?> future = ApplicationManager.getApplication().executeOnPooledThread(() -> ProgressManager.getInstance().executeProcessUnderProgress(() -> {
-            try {
-                result.set(callable.call());
-            } catch (Throwable t) {
-                error.set(t);
+          @Override
+          public void onFinished() {
+            if (contains(commit.getId().asString())) {
+              ApplicationManager.getApplication()
+                  .invokeLater(() -> info.refresh(commit.getId().asString()));
             }
-        }, indicator));
+          }
 
-        try {
-            runWithCheckCanceled(future, indicator);
-            ExceptionUtil.rethrowAll(error.get());
-        } catch (ProcessCanceledException e) {
-            future.cancel(true);
-            throw e;
-        }
-    }
-
-    /**
-     * Waits for {@code future} to be complete, or the current thread's indicator to be canceled.
-     */
-    private <T> void runWithCheckCanceled(@NotNull Future<T> future,
-                                                 @NotNull final ProgressIndicator indicator) throws ExecutionException {
-        while (true) {
-            indicator.checkCanceled();
+          @Override
+          public void run(@NotNull ProgressIndicator progressIndicator) {
             try {
-                future.get(10, TimeUnit.MILLISECONDS);
-                return;
-            } catch (InterruptedException e) {
-                throw new ProcessCanceledException(e);
-            } catch (TimeoutException ignored) {
+              runWithCheckCanceled(() -> {
+                    CommitMiner.mineAtCommitTimeout(commit, innerState.refactoringsMap.map, project);
+                    return null;
+                  },
+                  progressIndicator);
+            } catch (Exception e) {
+              e.printStackTrace();
             }
-        }
+          }
+        });
+  }
+
+  /**
+   * Allows to interrupt a process which does not performs checkCancelled() calls by itself.
+   */
+  private <T> void runWithCheckCanceled(@NotNull final Callable<T> callable,
+                                        @NotNull final ProgressIndicator indicator) throws Exception {
+    final Ref<T> result = Ref.create();
+    final Ref<Throwable> error = Ref.create();
+
+    Future<?> future = ApplicationManager.getApplication().executeOnPooledThread(
+        () -> ProgressManager.getInstance().executeProcessUnderProgress(() -> {
+          try {
+            result.set(callable.call());
+          } catch (Throwable t) {
+            error.set(t);
+          }
+        }, indicator)
+    );
+
+    try {
+      runWithCheckCanceled(future, indicator);
+      ExceptionUtil.rethrowAll(error.get());
+    } catch (ProcessCanceledException e) {
+      future.cancel(true);
+      throw e;
     }
+  }
+
+  /**
+   * Waits for {@code future} to be complete, or the current thread's indicator to be canceled.
+   */
+  private <T> void runWithCheckCanceled(@NotNull Future<T> future,
+                                        @NotNull final ProgressIndicator indicator) throws ExecutionException {
+    while (true) {
+      indicator.checkCanceled();
+      try {
+        future.get(10, TimeUnit.MILLISECONDS);
+        return;
+      } catch (InterruptedException e) {
+        throw new ProcessCanceledException(e);
+      } catch (TimeoutException ignored) {
+        ignored.printStackTrace();
+      }
+    }
+  }
 
   public Map<String, Set<RefactoringInfo>> getRefactoringHistory() {
     return methodHistory;
