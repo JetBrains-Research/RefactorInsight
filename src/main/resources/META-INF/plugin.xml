@@ -48,7 +48,7 @@
         <action id="actions.ToggleLabelsAction"
                 class="org.jetbrains.research.refactorinsight.actions.ToggleLabelsAction"
                 text="Show Refactoring Labels" description="Adds the refactoring icon to commits containing refactorings">
-            <add-to-group group-id="Vcs.Log.PresentationSettings" anchor="first"/>
+            <add-to-group group-id="Vcs.Log.PresentationSettings" anchor="after" relative-to-action="Vcs.Log.PreferCommitDate"/>
         </action>
 
         <action id="RefAction" class="org.jetbrains.research.refactorinsight.actions.RefactoringAction"
