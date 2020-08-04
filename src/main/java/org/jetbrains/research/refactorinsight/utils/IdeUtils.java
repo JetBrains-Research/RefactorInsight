@@ -1,6 +1,7 @@
 package org.jetbrains.research.refactorinsight.utils;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -14,6 +15,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class IdeUtils {
+
+  private static final Logger logger = Logger.getInstance(IdeUtils.class);
+
   /**
    * Allows to interrupt a process which does not performs checkCancelled() calls by itself.
    */
@@ -53,7 +57,7 @@ public class IdeUtils {
       } catch (InterruptedException e) {
         throw new ProcessCanceledException(e);
       } catch (TimeoutException ignored) {
-        ignored.printStackTrace();
+        logger.info("The timeout has been exceeded while checking task cancellation");
       }
     }
   }

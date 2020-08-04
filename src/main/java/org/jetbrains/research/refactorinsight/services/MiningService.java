@@ -10,6 +10,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.xmlb.annotations.OptionTag;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import git4idea.history.GitHistoryUtils;
@@ -51,6 +52,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
       = new ConcurrentHashMap<>();
   private boolean mining = false;
   private MyState innerState = new MyState();
+  private final Logger logger = Logger.getInstance(MiningService.class);
 
   public MiningService() {
   }
@@ -205,12 +207,12 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
           @Override
           public void run(@NotNull ProgressIndicator progressIndicator) {
             try {
-              runWithCheckCanceled(() -> {
-                    CommitMiner.mineAtCommitTimeout(commit, innerState.refactoringsMap.map, project);
-                  },
-                  progressIndicator);
+              runWithCheckCanceled(
+                  () -> CommitMiner.mineAtCommitTimeout(commit, innerState.refactoringsMap.map, project),
+                  progressIndicator
+              );
             } catch (Exception e) {
-              e.printStackTrace();
+              logger.info(String.format("The mining of refactorings at the commit %s was canceled", commit.getId()));
             }
           }
         });
