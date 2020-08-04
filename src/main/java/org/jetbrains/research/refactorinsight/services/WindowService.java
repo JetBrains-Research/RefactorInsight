@@ -1,10 +1,12 @@
 package org.jetbrains.research.refactorinsight.services;
 
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
+import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,15 +37,39 @@ public class WindowService {
    * @param state true for selected, false for unselected
    */
   public void setSelected(@NotNull MainVcsLogUi ui, boolean state) {
-    GitWindow gitWindow = gitInfo.computeIfAbsent(ui.getTable(), table -> {
-      Disposer.register(ui, () -> gitInfo.remove(ui.getTable()));
-      return new GitWindow(project, ui);
-    });
+    GitWindow gitWindow = gitInfo.get(ui.getTable());
     gitWindow.setSelected(state);
   }
 
   public boolean isSelected(@NotNull MainVcsLogUi vcsLogUi) {
     VcsLogGraphTable table = vcsLogUi.getTable();
     return gitInfo.containsKey(table) && gitInfo.get(table).isSelected();
+  }
+
+  /**
+   * Sets visibility of refactoring labels in VCSTable.
+   * @param e Event
+   * @param visible boolean
+   */
+  public void setLabelsVisible(@NotNull AnActionEvent e, boolean visible) {
+    VcsLogGraphTable table = e.getData(VcsLogInternalDataKeys.MAIN_UI).getTable();
+    gitInfo.get(table).setLabelsVisible(visible);
+  }
+
+  public boolean isLabelsVisible(@NotNull AnActionEvent e) {
+    VcsLogGraphTable table = e.getData(VcsLogInternalDataKeys.MAIN_UI).getTable();
+    return gitInfo.containsKey(table) && gitInfo.get(table).isLabelsVisible();
+  }
+
+  /**
+   * Generates if needed a GitWindow (RefactorInsight) object.
+   * @param e Event
+   */
+  public void update(@NotNull AnActionEvent e) {
+    MainVcsLogUi ui = e.getData(VcsLogInternalDataKeys.MAIN_UI);
+    gitInfo.computeIfAbsent(ui.getTable(), table -> {
+      Disposer.register(ui, () -> gitInfo.remove(ui.getTable()));
+      return new GitWindow(project, ui);
+    });
   }
 }
