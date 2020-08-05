@@ -198,7 +198,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
           @Override
           public void onFinished() {
-            if (contains(commit.getId().asString())) {
+            if (containsCommit(commit.getId().asString())) {
               ApplicationManager.getApplication()
                   .invokeLater(() -> info.refresh(commit.getId().asString()));
             }
@@ -226,7 +226,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     List<RefactoringInfo> refs = new ArrayList<>();
     final SettingsState settingsState = SettingsState.getInstance(project);
     int limit = settingsState != null ? settingsState.historyLimit : Integer.MAX_VALUE / 100;
-    while (contains(commitId) && limit-- > 0) {
+    while (containsCommit(commitId) && limit-- > 0) {
       RefactoringEntry refactoringEntry = get(commitId);
       assert refactoringEntry != null;
       refs.addAll(refactoringEntry.getRefactorings());
@@ -244,8 +244,13 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     return innerState.refactoringsMap.map.get(commitHash);
   }
 
-  public boolean contains(String commitHash) {
+  public boolean containsCommit(String commitHash) {
     return innerState.refactoringsMap.map.containsKey(commitHash);
+  }
+
+  public boolean containsRefactoring(String commitHash) {
+    return innerState.refactoringsMap.map.containsKey(commitHash)
+        && innerState.refactoringsMap.map.get(commitHash).getRefactorings().size() != 0;
   }
 
   public void clear() {
