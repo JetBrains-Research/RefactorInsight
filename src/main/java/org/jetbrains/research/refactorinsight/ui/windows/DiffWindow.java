@@ -10,14 +10,18 @@ import com.intellij.diff.chains.SimpleDiffRequestChain;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.contents.DocumentContent;
 import com.intellij.diff.requests.DiffRequest;
+import com.intellij.diff.tools.simple.SimpleDiffTool;
 import com.intellij.diff.tools.simple.SimpleDiffViewer;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
 import com.intellij.diff.tools.simple.ThreesideDiffChangeBase;
 import com.intellij.diff.tools.util.base.DiffViewerListener;
+import com.intellij.diff.tools.util.base.IgnorePolicy;
+import com.intellij.diff.util.DiffUserDataKeysEx;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
@@ -37,8 +41,12 @@ import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.components.panels.Wrapper;
+import com.intellij.util.ui.components.BorderLayoutPanel;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -89,6 +97,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
         .filter(showable).collect(Collectors.toList()).indexOf(info);
     if (index != -1) {
       chain.setIndex(index);
+      chain.putUserData(DiffUserDataKeysEx.FORCE_DIFF_TOOL, SimpleDiffTool.INSTANCE);
       DiffManager.getInstance().showDiff(project, chain,
           new DiffDialogHints(WindowWrapper.Mode.FRAME));
     }
@@ -198,7 +207,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
     if (threeSidedRanges != null) {
       SimpleThreesideDiffViewer myViewer = (SimpleThreesideDiffViewer) viewer;
       myViewer.getTextSettings().setExpandByDefault(false);
-      myViewer.addListener(new MyDiffViewerListener(myViewer, threeSidedRanges));
+      myViewer.addListener(new MyThreeSidedDiffViewerListener(myViewer, threeSidedRanges));
       return;
     }
 
@@ -206,6 +215,16 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
     List<MoreSidedRange> moreSidedRanges =
         request.getUserData(MORESIDED_RANGES);
     SimpleDiffViewer myViewer = (SimpleDiffViewer) viewer;
+
+    //Set diff window settings and hide
+    try {
+      myViewer.getTextSettings().setIgnorePolicy(IgnorePolicy.DEFAULT);
+    } catch (IllegalStateException ignored) {
+      //
+    }
+
+    myViewer.addListener(new MyTwoSidedDiffViewerListener(myViewer));
+
     if (moreSidedRanges != null) {
       myViewer.getTextSettings().setExpandByDefault(true);
       //Sort on filename and code ranges.
@@ -349,7 +368,48 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
     }
   }
 
-  public static class MyDiffViewerListener extends DiffViewerListener {
+  /**
+   * Hides diff settings which might crash the refactorings diff viewer.
+   * Should be called onAfterRediff.
+   * @param diffViewerComponent Component from diff viewer
+   */
+  public static void hideToolbarActions(Component diffViewerComponent) {
+    BorderLayoutPanel panel =
+        (BorderLayoutPanel) diffViewerComponent.getParent().getParent().getParent().getComponent(0);
+    Wrapper wrapper = (Wrapper) panel.getComponent(0);
+    ActionToolbarImpl toolbar = (ActionToolbarImpl) wrapper.getComponent(0);
+    toolbar.addContainerListener(new ContainerListener() {
+      @Override
+      public void componentAdded(ContainerEvent containerEvent) {
+        if (containerEvent.getChild() instanceof JPanel) {
+          containerEvent.getChild().setVisible(false);
+        }
+      }
+
+      @Override
+      public void componentRemoved(ContainerEvent containerEvent) {
+
+      }
+    });
+  }
+
+  public static class MyTwoSidedDiffViewerListener extends DiffViewerListener {
+
+    private final SimpleDiffViewer viewer;
+
+    public MyTwoSidedDiffViewerListener(SimpleDiffViewer viewer) {
+      this.viewer = viewer;
+    }
+
+    @Override
+    protected void onAfterRediff() {
+      super.onAfterRediff();
+      hideToolbarActions(viewer.getComponent());
+    }
+  }
+
+
+  public static class MyThreeSidedDiffViewerListener extends DiffViewerListener {
 
     private final SimpleThreesideDiffViewer viewer;
     private final List<ThreeSidedRange> ranges;
@@ -360,8 +420,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
      * @param viewer DiffViewer
      * @param ranges List of ThreeSidedRanges
      */
-    public MyDiffViewerListener(SimpleThreesideDiffViewer viewer,
-                                List<ThreeSidedRange> ranges) {
+    public MyThreeSidedDiffViewerListener(SimpleThreesideDiffViewer viewer,
+                                          List<ThreeSidedRange> ranges) {
       this.ranges = ranges;
       this.viewer = viewer;
     }
@@ -375,6 +435,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
           .map(r -> r.getDiffChange(viewer))
           .collect(Collectors.toList())
       );
+      hideToolbarActions(viewer.getComponent());
     }
   }
 }
