@@ -208,8 +208,8 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
           public void run(@NotNull ProgressIndicator progressIndicator) {
             try {
               runWithCheckCanceled(
-                  () -> CommitMiner.mineAtCommitTimeout(commit, innerState.refactoringsMap.map, project),
-                  progressIndicator
+                  () -> CommitMiner.mineAtCommit(commit, innerState.refactoringsMap.map, project),
+                  progressIndicator, commit, project
               );
             } catch (Exception e) {
               logger.info(String.format("The mining of refactorings at the commit %s was canceled", commit.getId()));
