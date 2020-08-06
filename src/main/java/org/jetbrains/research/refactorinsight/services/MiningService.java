@@ -1,6 +1,5 @@
 package org.jetbrains.research.refactorinsight.services;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.ServiceManager;
@@ -32,10 +31,9 @@ import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.processors.CommitMiner;
+import org.jetbrains.research.refactorinsight.processors.SingleCommitRefactoringTask;
 import org.jetbrains.research.refactorinsight.ui.windows.GitWindow;
 import org.jetbrains.research.refactorinsight.utils.Utils;
-
-import static org.jetbrains.research.refactorinsight.utils.IdeUtils.runWithCheckCanceled;
 
 /**
  * This is the MiningService.
@@ -52,6 +50,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
       = new ConcurrentHashMap<>();
   private boolean mining = false;
   private MyState innerState = new MyState();
+  private SingleCommitRefactoringTask task = null;
   private final Logger logger = Logger.getInstance(MiningService.class);
 
   public MiningService() {
@@ -189,33 +188,14 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    *
    * @param commit  to be mined.
    * @param project current project.
-   * @param info    to be updated.
+   * @param window  to be updated.
    */
-  public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow info) {
-    ProgressManager.getInstance()
-        .run(new Task.Backgroundable(project, String.format(
-            RefactorInsightBundle.message("mining.at"), commit.getId().asString())) {
-
-          @Override
-          public void onFinished() {
-            if (containsCommit(commit.getId().asString())) {
-              ApplicationManager.getApplication()
-                  .invokeLater(() -> info.refresh(commit.getId().asString()));
-            }
-          }
-
-          @Override
-          public void run(@NotNull ProgressIndicator progressIndicator) {
-            try {
-              runWithCheckCanceled(
-                  () -> CommitMiner.mineAtCommit(commit, innerState.refactoringsMap.map, project),
-                  progressIndicator, commit, project
-              );
-            } catch (Exception e) {
-              logger.info(String.format("The mining of refactorings at the commit %s was canceled", commit.getId()));
-            }
-          }
-        });
+  public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow window) {
+    if (task != null) {
+      task.cancel();
+    }
+    task = new SingleCommitRefactoringTask(project, commit, window);
+    ProgressManager.getInstance().run(task);
   }
 
   public Map<String, Set<RefactoringInfo>> getRefactoringHistory() {
