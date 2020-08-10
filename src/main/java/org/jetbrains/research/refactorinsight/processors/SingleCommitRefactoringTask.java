@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.eclipse.jgit.lib.Repository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
@@ -25,10 +26,11 @@ import org.jetbrains.research.refactorinsight.ui.windows.GitWindow;
 
 public class SingleCommitRefactoringTask extends Task.Backgroundable {
 
-  private Project project;
-  private VcsCommitMetadata commit;
-  private GitWindow window;
-  private MiningService service;
+  private final Project project;
+  private final VcsCommitMetadata commit;
+  private final GitWindow window;
+  private final MiningService service;
+  private final Repository myRepository;
   private boolean canceled = false;
   private final Logger logger = Logger.getInstance(SingleCommitRefactoringTask.class);
 
@@ -44,11 +46,12 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
       VcsCommitMetadata commit,
       GitWindow window) {
     super(project,
-        String.format(RefactorInsightBundle.message("mining.at"), commit.getId().asString()));
+        String.format(RefactorInsightBundle.message("mining.at"), commit.getId().toShortString()));
     this.project = project;
     this.commit = commit;
     this.window = window;
     this.service = ServiceManager.getService(project, MiningService.class);
+    this.myRepository = service.getRepository();
   }
 
   @Override
@@ -70,7 +73,7 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
   public void run(@NotNull ProgressIndicator progressIndicator) {
     try {
       runWithCheckCanceled(
-          () -> CommitMiner.mineAtCommit(commit, service.getState().refactoringsMap.map, project),
+          () -> CommitMiner.mineAtCommit(commit, service.getState().refactoringsMap.map, project, myRepository),
           progressIndicator, commit, project
       );
     } catch (Exception e) {

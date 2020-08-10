@@ -9,7 +9,6 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.xmlb.annotations.OptionTag;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import git4idea.history.GitHistoryUtils;
@@ -26,6 +25,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.eclipse.jgit.lib.Repository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
@@ -34,6 +34,7 @@ import org.jetbrains.research.refactorinsight.processors.CommitMiner;
 import org.jetbrains.research.refactorinsight.processors.SingleCommitRefactoringTask;
 import org.jetbrains.research.refactorinsight.ui.windows.GitWindow;
 import org.jetbrains.research.refactorinsight.utils.Utils;
+import org.refactoringminer.util.GitServiceImpl;
 
 /**
  * This is the MiningService.
@@ -51,7 +52,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   private boolean mining = false;
   private MyState innerState = new MyState();
   private SingleCommitRefactoringTask task = null;
-  private final Logger logger = Logger.getInstance(MiningService.class);
+  private Repository myRepository = null;
 
   public MiningService() {
   }
@@ -76,6 +77,19 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     } else {
       innerState = new MyState();
       innerState.refactoringsMap.version = Utils.version();
+    }
+  }
+
+  public Repository getRepository() {
+    return myRepository;
+  }
+
+  private static Repository openRepository(final String path) {
+    try {
+      return new GitServiceImpl().openRepository(path);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
     }
   }
 
@@ -118,6 +132,9 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    * @param limit      int
    */
   public void mineRepo(GitRepository repository, int limit) {
+    if (myRepository == null) {
+      myRepository = openRepository(repository.getProject().getBasePath());
+    }
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(repository.getProject(), RefactorInsightBundle.message("mining"), true) {
 
@@ -194,6 +211,10 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     if (task != null) {
       task.cancel();
     }
+    if (myRepository == null) {
+      myRepository = openRepository(project.getBasePath());
+    }
+
     task = new SingleCommitRefactoringTask(project, commit, window);
     ProgressManager.getInstance().run(task);
   }
