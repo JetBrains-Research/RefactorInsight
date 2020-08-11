@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
-import org.jetbrains.research.refactorinsight.services.RefactoringsBundle;
+import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.refactoringminer.api.RefactoringType;
 
 public class Utils {
@@ -179,20 +179,20 @@ public class Utils {
     if (infos.stream().anyMatch(ofType(RENAME_ATTRIBUTE))
         && infos.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
       info = infos.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
-      info.setName(RefactoringsBundle.message("change.rename.attribute"));
+      info.setName(RefactorInsightBundle.message("change.rename.attribute"));
     } else if (infos.stream().anyMatch(ofType(RENAME_ATTRIBUTE))) {
       info = infos.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
-      info.setName(RefactoringsBundle.message("rename.attribute"));
+      info.setName(RefactorInsightBundle.message("rename.attribute"));
     } else if (infos.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
       info = infos.stream().filter(ofType(CHANGE_ATTRIBUTE_TYPE)).findFirst().get();
-      info.setName(RefactoringsBundle.message("change.attribute"));
+      info.setName(RefactorInsightBundle.message("change.attribute"));
     } else if (infos.stream().anyMatch(ofType(CHANGE_VARIABLE_TYPE))) {
       info = infos.stream().filter(ofType(CHANGE_VARIABLE_TYPE)).findFirst().get();
-      info.setName(RefactoringsBundle.message("change.rename.var"));
+      info.setName(RefactorInsightBundle.message("change.rename.var"));
     } else if (infos.stream().anyMatch(ofType(RENAME_PARAMETER))
         && infos.stream().anyMatch(ofType(CHANGE_PARAMETER_TYPE))) {
       info = infos.stream().filter(ofType(RENAME_PARAMETER)).findFirst().get();
-      info.setName(RefactoringsBundle.message("change.rename.param"));
+      info.setName(RefactorInsightBundle.message("change.rename.param"));
     }
     return info;
   }
@@ -296,7 +296,7 @@ public class Utils {
    * @return the current version.
    */
   public static String version() {
-    return RefactoringsBundle.message("version") + String.valueOf(Stream.of(
+    return RefactorInsightBundle.message("version") + String.valueOf(Stream.of(
         //all classes that can change
         RefactoringEntry.class,
         RefactoringInfo.class,

@@ -1,6 +1,5 @@
 package org.jetbrains.research.refactorinsight.services;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.ServiceManager;
@@ -14,6 +13,7 @@ import com.intellij.util.xmlb.annotations.OptionTag;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import git4idea.history.GitHistoryUtils;
 import git4idea.repo.GitRepository;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,17 +24,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.eclipse.jgit.lib.Repository;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.processors.CommitMiner;
+import org.jetbrains.research.refactorinsight.processors.SingleCommitRefactoringTask;
 import org.jetbrains.research.refactorinsight.ui.windows.GitWindow;
 import org.jetbrains.research.refactorinsight.utils.Utils;
+import org.refactoringminer.util.GitServiceImpl;
 
 /**
  * This is the MiningService.
  * It computes, process and stores the data retrieved from RefactoringMiner.
- * It can mine 1 specific commit, a fixed number of commits, or all commits in the repository.
+ * It can mine one specific commit, a fixed number of commits, or all commits in the repository.
  * it stores and persists the detected refactoring data in .idea/refactorings.xml file.
  */
 @State(name = "MiningRefactoringsState",
@@ -43,9 +48,11 @@ import org.jetbrains.research.refactorinsight.utils.Utils;
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
   public static ConcurrentHashMap<String, Set<RefactoringInfo>> methodHistory
-      = new ConcurrentHashMap<String, Set<RefactoringInfo>>();
+      = new ConcurrentHashMap<>();
   private boolean mining = false;
   private MyState innerState = new MyState();
+  private SingleCommitRefactoringTask task = null;
+  private Repository myRepository = null;
 
   public MiningService() {
   }
@@ -70,6 +77,19 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     } else {
       innerState = new MyState();
       innerState.refactoringsMap.version = Utils.version();
+    }
+  }
+
+  public Repository getRepository() {
+    return myRepository;
+  }
+
+  private static Repository openRepository(final String path) {
+    try {
+      return new GitServiceImpl().openRepository(path);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
     }
   }
 
@@ -112,8 +132,11 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    * @param limit      int
    */
   public void mineRepo(GitRepository repository, int limit) {
+    if (myRepository == null) {
+      myRepository = openRepository(repository.getProject().getBasePath());
+    }
     ProgressManager.getInstance()
-        .run(new Task.Backgroundable(repository.getProject(), "Mining refactorings", true) {
+        .run(new Task.Backgroundable(repository.getProject(), RefactorInsightBundle.message("mining"), true) {
 
           @Override
           public void onCancel() {
@@ -122,7 +145,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
           public void run(@NotNull ProgressIndicator progressIndicator) {
             mining = true;
-            progressIndicator.setText(RefactoringsBundle.message("mining"));
+            progressIndicator.setText(RefactorInsightBundle.message("mining"));
             progressIndicator.setIndeterminate(false);
             int cores = SettingsState
                 .getInstance(repository.getProject()).threads;
@@ -154,7 +177,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             if (repository.getCurrentRevision() != null) {
               computeRefactoringHistory(repository.getCurrentRevision(), repository.getProject());
             }
-            progressIndicator.setText(RefactoringsBundle.message("finished"));
+            progressIndicator.setText(RefactorInsightBundle.message("finished"));
           }
         });
   }
@@ -178,37 +201,23 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   }
 
   /**
-   * Method for mining a single commit.
+   * Mine refactorings in the specific commit.
    *
    * @param commit  to be mined.
    * @param project current project.
-   * @param info    to be updated.
+   * @param window  to be updated.
    */
-  public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow info) {
-    ProgressManager.getInstance()
-        .run(new Task.Backgroundable(project, String.format(
-            RefactoringsBundle.message("mining.at"), commit.getId().asString())) {
+  public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow window) {
+    if (task != null) {
+      task.cancel();
+    }
+    if (myRepository == null) {
+      myRepository = openRepository(project.getBasePath());
+    }
 
-          @Override
-          public void onCancel() {
-            super.onCancel();
-          }
-
-          public void onFinished() {
-            super.onFinished();
-            if (containsCommit(commit.getId().asString())) {
-              System.out.println(RefactoringsBundle.message("finished"));
-              ApplicationManager.getApplication()
-                  .invokeLater(() -> info.refresh(commit.getId().asString()));
-            }
-          }
-
-          public void run(@NotNull ProgressIndicator progressIndicator) {
-              CommitMiner.mineAtCommitTimeout(commit, innerState.refactoringsMap.map, project);
-          }
-        });
+    task = new SingleCommitRefactoringTask(project, commit, window);
+    ProgressManager.getInstance().run(task);
   }
-
 
   public Map<String, Set<RefactoringInfo>> getRefactoringHistory() {
     return methodHistory;
