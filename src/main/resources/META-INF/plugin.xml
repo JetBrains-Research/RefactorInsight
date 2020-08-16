@@ -2,13 +2,20 @@
     <id>org.jetbrains.research.refactorinsight</id>
     <name>RefactorInsight</name>
     <vendor>JetBrains</vendor>
-    <version>2020.2-1.0</version>
+    <version>2020.2-1.1</version>
 
     <description><![CDATA[
     Discovers refactorings in the commit history of the project, visualizes them, and provides the refactoring history for classes, methods, and fields.
       ]]></description>
 
     <change-notes><![CDATA[
+        <h4>2020.2-1.1</h4>
+        <ul>
+            <li>Label the commits that contain refactorings. To enable the option, select it in the Presentation settings</li>
+            <li>Limit the time on mining of refactorings for each commit to avoid long time-consuming calculations</li>
+            <li>Minor bug fixes</li>
+        </ul>
+
         <h4>2020.2-1.0</h4>
         <ul>
             <li>Add compatibility with IDEA 2020.2</li>
