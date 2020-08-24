@@ -17,12 +17,10 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.UIUtil;
-import com.intellij.vcs.log.data.VcsLogData;
 import com.intellij.vcs.log.impl.VcsLogManager;
 import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
-import com.intellij.vcs.log.visible.filters.VcsLogFilterObject;
 import icons.RefactorInsightIcons;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
@@ -51,8 +49,6 @@ import org.jetbrains.research.refactorinsight.utils.Utils;
  */
 public class RefactoringHistoryToolbar {
 
-  private final VcsLogManager.VcsLogUiFactory<? extends MainVcsLogUi> factory;
-
   private MainVcsLogUi openLogTab;
   private ToolWindowManager toolWindowManager;
   private ToolWindow toolWindow;
@@ -68,8 +64,6 @@ public class RefactoringHistoryToolbar {
     this.project = project;
     toolWindowManager = ToolWindowManager.getInstance(project);
     Utils.manager = toolWindowManager;
-    factory = VcsProjectLog.getInstance(project).getLogManager()
-        .getMainLogUiFactory("method history", VcsLogFilterObject.collection());
     toolWindow =
         toolWindowManager.registerToolWindow(RefactorInsightBundle.message("history"),
             true, ToolWindowAnchor.BOTTOM);
@@ -148,9 +142,12 @@ public class RefactoringHistoryToolbar {
   }
 
   private void showLogTab(RefactoringInfo info, JBSplitter splitter) {
-    VcsLogData data = VcsProjectLog.getInstance(project).getLogManager().getDataManager();
+    VcsLogManager logManager = VcsProjectLog.getInstance(project).getLogManager();
+    if (logManager == null) {
+      return;
+    }
 
-    openLogTab = factory.createLogUi(project, data);
+    openLogTab = logManager.createLogUi(logManager.getMainLogUiFactory("method history", null), VcsLogManager.LogWindowKind.STANDALONE);
 
     Utils.add(openLogTab);
     JComponent mainComponent = openLogTab.getMainComponent();
