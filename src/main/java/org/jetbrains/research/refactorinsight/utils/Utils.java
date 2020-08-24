@@ -14,6 +14,8 @@ import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.vcs.LocalFilePath;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.vcs.log.impl.VcsLogManager;
+import com.intellij.vcs.log.impl.VcsProjectLog;
 import git4idea.GitContentRevision;
 import git4idea.GitRevisionNumber;
 import git4idea.repo.GitRepository;
@@ -30,6 +32,8 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
@@ -307,5 +311,20 @@ public class Utils {
         .map(Type::getTypeName)
     ).collect(Collectors.toList()))
         .hashCode();
+  }
+
+  public static void disposeWithVcsLogManager(@NotNull Project project, @NotNull Disposable disposable) {
+    Disposable connectionDisposable = Disposer.newDisposable();
+    project.getMessageBus().connect(connectionDisposable).subscribe(VcsProjectLog.VCS_PROJECT_LOG_CHANGED, new VcsProjectLog.ProjectLogListener() {
+      @Override
+      public void logCreated(@NotNull VcsLogManager manager) {
+      }
+
+      @Override
+      public void logDisposed(@NotNull VcsLogManager manager) {
+        Disposer.dispose(connectionDisposable);
+        Disposer.dispose(disposable);
+      }
+    });
   }
 }

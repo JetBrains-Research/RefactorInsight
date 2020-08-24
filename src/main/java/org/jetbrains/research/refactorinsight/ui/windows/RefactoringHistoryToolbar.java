@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -152,11 +153,15 @@ public class RefactoringHistoryToolbar {
     MainVcsLogUi openLogTab = logManager.createLogUi(logManager.getMainLogUiFactory(logId, null),
             VcsLogManager.LogWindowKind.STANDALONE);
 
-    Utils.add(openLogTab);
     JComponent mainComponent = openLogTab.getMainComponent();
     mainComponent.setAutoscrolls(true);
     mainComponent.setSize(splitter.getSecondComponent().getSize());
     splitter.setSecondComponent(new VcsLogPanel(logManager, openLogTab));
+
+    Utils.disposeWithVcsLogManager(project, () -> {
+      setSecondComponent(splitter);
+      Disposer.dispose(openLogTab);
+    });
 
     openLogTab.jumpToHash(info.getCommitId());
 
