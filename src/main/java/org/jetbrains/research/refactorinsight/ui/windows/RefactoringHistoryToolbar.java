@@ -20,6 +20,7 @@ import com.intellij.util.ui.UIUtil;
 import com.intellij.vcs.log.impl.VcsLogManager;
 import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
+import com.intellij.vcs.log.ui.VcsLogPanel;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
 import icons.RefactorInsightIcons;
 import java.awt.GridLayout;
@@ -153,7 +154,8 @@ public class RefactoringHistoryToolbar {
     JComponent mainComponent = openLogTab.getMainComponent();
     mainComponent.setAutoscrolls(true);
     mainComponent.setSize(splitter.getSecondComponent().getSize());
-    splitter.setSecondComponent(mainComponent);
+    splitter.setSecondComponent(new VcsLogPanel(logManager, openLogTab));
+
     openLogTab.jumpToHash(info.getCommitId());
 
     VcsLogChangesBrowser browser = Objects.requireNonNull(UIUtil.findComponentOfType(openLogTab.getMainComponent(),
