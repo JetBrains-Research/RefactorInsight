@@ -10,7 +10,7 @@ import static org.refactoringminer.api.RefactoringType.PULL_UP_OPERATION;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
-import com.intellij.vcs.log.VcsCommitMetadata;
+import com.intellij.vcs.log.TimedVcsCommit;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,7 +82,7 @@ public class RefactoringEntry implements Serializable {
    * @param commit       current commit.
    * @return new refactoring entry.
    */
-  public static RefactoringEntry convert(List<Refactoring> refactorings, VcsCommitMetadata commit,
+  public static RefactoringEntry convert(List<Refactoring> refactorings, TimedVcsCommit commit,
                                          Project project) {
 
     RefactoringEntry entry =

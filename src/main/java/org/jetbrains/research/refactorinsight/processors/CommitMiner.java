@@ -5,8 +5,7 @@ import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.Consumer;
-import com.intellij.vcs.log.VcsCommitMetadata;
-import git4idea.GitCommit;
+import com.intellij.vcs.log.TimedVcsCommit;
 import git4idea.repo.GitRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,7 @@ import org.refactoringminer.util.GitServiceImpl;
  * It mines a commit and updates the refactoring map with the data retrieved for that commit.
  * Consumes a git commit, calls RefactoringMiner and detects the refactorings for a commit.
  */
-public class CommitMiner implements Consumer<GitCommit> {
+public class CommitMiner implements Consumer<TimedVcsCommit> {
   private static final String progress = RefactorInsightBundle.message("progress");
   private final ExecutorService pool;
   private final Map<String, RefactoringEntry> map;
@@ -71,7 +70,7 @@ public class CommitMiner implements Consumer<GitCommit> {
    * @param project the current project
    * @param repository Git Repository
    */
-  public static void mineAtCommit(VcsCommitMetadata commit, Map<String, RefactoringEntry> map,
+  public static void mineAtCommit(TimedVcsCommit commit, Map<String, RefactoringEntry> map,
                                   Project project, Repository repository) {
     GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
     try {
@@ -94,7 +93,7 @@ public class CommitMiner implements Consumer<GitCommit> {
    *
    * @param gitCommit to be mined
    */
-  public void consume(GitCommit gitCommit) throws ProcessCanceledException {
+  public void consume(TimedVcsCommit gitCommit) throws ProcessCanceledException {
     String commitId = gitCommit.getId().asString();
 
     if (!map.containsKey(commitId)) {

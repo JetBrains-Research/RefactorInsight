@@ -10,6 +10,7 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
 import com.intellij.util.ExceptionUtil;
+import com.intellij.vcs.log.TimedVcsCommit;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -115,8 +116,8 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
    * or the current thread's indicator to be canceled.
    */
   private <T> void runWithCheckCanceled(@NotNull Future<T> future,
-                                               @NotNull final ProgressIndicator indicator,
-                                               VcsCommitMetadata commit, Project project) throws
+                                        @NotNull final ProgressIndicator indicator,
+                                        TimedVcsCommit commit, Project project) throws
       ExecutionException {
     int timeout = 6000;
     while (timeout > 0) {
