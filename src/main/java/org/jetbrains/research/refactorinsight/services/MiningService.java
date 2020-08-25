@@ -159,7 +159,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             try {
               String logArgs = "--max-count=" + limit;
               progressIndicator.checkCanceled();
-              GitHistoryUtils.loadDetails(repository.getProject(), repository.getRoot(),
+              GitHistoryUtils.loadTimedCommits(repository.getProject(), repository.getRoot(),
                   miner, logArgs);
               progressIndicator.checkCanceled();
             } catch (Exception exception) {
