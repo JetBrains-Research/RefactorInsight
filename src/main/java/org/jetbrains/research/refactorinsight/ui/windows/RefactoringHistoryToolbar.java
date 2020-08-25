@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.JComponent;
 import javax.swing.SwingConstants;
@@ -148,7 +149,9 @@ public class RefactoringHistoryToolbar {
       return;
     }
 
-    openLogTab = logManager.createLogUi(logManager.getMainLogUiFactory("method history", null), VcsLogManager.LogWindowKind.STANDALONE);
+    String logId = "method history " + UUID.randomUUID();
+    openLogTab = logManager.createLogUi(logManager.getMainLogUiFactory(logId, null),
+            VcsLogManager.LogWindowKind.STANDALONE);
 
     Utils.add(openLogTab);
     JComponent mainComponent = openLogTab.getMainComponent();
