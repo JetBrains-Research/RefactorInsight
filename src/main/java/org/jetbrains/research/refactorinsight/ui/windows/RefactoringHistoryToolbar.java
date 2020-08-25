@@ -51,7 +51,6 @@ import org.jetbrains.research.refactorinsight.utils.Utils;
  */
 public class RefactoringHistoryToolbar {
 
-  private MainVcsLogUi openLogTab;
   private ToolWindowManager toolWindowManager;
   private ToolWindow toolWindow;
   private Project project;
@@ -150,7 +149,7 @@ public class RefactoringHistoryToolbar {
     }
 
     String logId = "method history " + UUID.randomUUID();
-    openLogTab = logManager.createLogUi(logManager.getMainLogUiFactory(logId, null),
+    MainVcsLogUi openLogTab = logManager.createLogUi(logManager.getMainLogUiFactory(logId, null),
             VcsLogManager.LogWindowKind.STANDALONE);
 
     Utils.add(openLogTab);
