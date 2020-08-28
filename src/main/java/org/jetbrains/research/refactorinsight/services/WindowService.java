@@ -52,11 +52,22 @@ public class WindowService {
    * @param visible boolean
    */
   public void setLabelsVisible(@NotNull AnActionEvent e, boolean visible) {
+    if (e.getData(VcsLogInternalDataKeys.MAIN_UI) == null) {
+      return;
+    }
     VcsLogGraphTable table = e.getData(VcsLogInternalDataKeys.MAIN_UI).getTable();
     gitInfo.get(table).setLabelsVisible(visible);
   }
 
+  /**
+   * Checks if the displayed table has the lables visible.
+   * @param e the action event
+   * @return true if the labels are visible, false otherwise
+   */
   public boolean isLabelsVisible(@NotNull AnActionEvent e) {
+    if (e.getData(VcsLogInternalDataKeys.MAIN_UI) == null) {
+      return false;
+    }
     VcsLogGraphTable table = e.getData(VcsLogInternalDataKeys.MAIN_UI).getTable();
     return gitInfo.containsKey(table) && gitInfo.get(table).isLabelsVisible();
   }
@@ -66,6 +77,9 @@ public class WindowService {
    * @param e Event
    */
   public void update(@NotNull AnActionEvent e) {
+    if (e.getData(VcsLogInternalDataKeys.MAIN_UI) == null) {
+      return;
+    }
     MainVcsLogUi ui = e.getData(VcsLogInternalDataKeys.MAIN_UI);
     gitInfo.computeIfAbsent(ui.getTable(), table -> {
       Disposer.register(ui, () -> gitInfo.remove(ui.getTable()));
