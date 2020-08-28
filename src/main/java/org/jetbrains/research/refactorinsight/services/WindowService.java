@@ -59,6 +59,11 @@ public class WindowService {
     gitInfo.get(table).setLabelsVisible(visible);
   }
 
+  /**
+   * Checks if the displayed table has the lables visible.
+   * @param e the action event
+   * @return true if the labels are visible, false otherwise
+   */
   public boolean isLabelsVisible(@NotNull AnActionEvent e) {
     if (e.getData(VcsLogInternalDataKeys.MAIN_UI) == null) {
       return false;
