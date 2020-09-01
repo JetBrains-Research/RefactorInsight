@@ -313,9 +313,13 @@ public class Utils {
         .hashCode();
   }
 
+  /**
+   * Disposes the Vcs Log panel.
+   */
   public static void disposeWithVcsLogManager(@NotNull Project project, @NotNull Disposable disposable) {
     Disposable connectionDisposable = Disposer.newDisposable();
-    project.getMessageBus().connect(connectionDisposable).subscribe(VcsProjectLog.VCS_PROJECT_LOG_CHANGED, new VcsProjectLog.ProjectLogListener() {
+    project.getMessageBus().connect(connectionDisposable)
+            .subscribe(VcsProjectLog.VCS_PROJECT_LOG_CHANGED, new VcsProjectLog.ProjectLogListener() {
       @Override
       public void logCreated(@NotNull VcsLogManager manager) {
       }
