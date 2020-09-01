@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -17,12 +18,11 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.UIUtil;
-import com.intellij.vcs.log.data.VcsLogData;
 import com.intellij.vcs.log.impl.VcsLogManager;
 import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
+import com.intellij.vcs.log.ui.VcsLogPanel;
 import com.intellij.vcs.log.ui.frame.VcsLogChangesBrowser;
-import com.intellij.vcs.log.visible.filters.VcsLogFilterObject;
 import icons.RefactorInsightIcons;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.JComponent;
 import javax.swing.SwingConstants;
@@ -51,9 +52,6 @@ import org.jetbrains.research.refactorinsight.utils.Utils;
  */
 public class RefactoringHistoryToolbar {
 
-  private final VcsLogManager.VcsLogUiFactory<? extends MainVcsLogUi> factory;
-
-  private MainVcsLogUi openLogTab;
   private ToolWindowManager toolWindowManager;
   private ToolWindow toolWindow;
   private Project project;
@@ -68,8 +66,6 @@ public class RefactoringHistoryToolbar {
     this.project = project;
     toolWindowManager = ToolWindowManager.getInstance(project);
     Utils.manager = toolWindowManager;
-    factory = VcsProjectLog.getInstance(project).getLogManager()
-        .getMainLogUiFactory("method history", VcsLogFilterObject.collection());
     toolWindow =
         toolWindowManager.registerToolWindow(RefactorInsightBundle.message("history"),
             true, ToolWindowAnchor.BOTTOM);
@@ -148,15 +144,25 @@ public class RefactoringHistoryToolbar {
   }
 
   private void showLogTab(RefactoringInfo info, JBSplitter splitter) {
-    VcsLogData data = VcsProjectLog.getInstance(project).getLogManager().getDataManager();
+    VcsLogManager logManager = VcsProjectLog.getInstance(project).getLogManager();
+    if (logManager == null) {
+      return;
+    }
 
-    openLogTab = factory.createLogUi(project, data);
+    String logId = "method history " + UUID.randomUUID();
+    MainVcsLogUi openLogTab = logManager.createLogUi(logManager.getMainLogUiFactory(logId, null),
+            VcsLogManager.LogWindowKind.STANDALONE);
 
-    Utils.add(openLogTab);
     JComponent mainComponent = openLogTab.getMainComponent();
     mainComponent.setAutoscrolls(true);
     mainComponent.setSize(splitter.getSecondComponent().getSize());
-    splitter.setSecondComponent(mainComponent);
+    splitter.setSecondComponent(new VcsLogPanel(logManager, openLogTab));
+
+    Utils.disposeWithVcsLogManager(project, () -> {
+      setSecondComponent(splitter);
+      Disposer.dispose(openLogTab);
+    });
+
     openLogTab.jumpToHash(info.getCommitId());
 
     VcsLogChangesBrowser browser = Objects.requireNonNull(UIUtil.findComponentOfType(openLogTab.getMainComponent(),
