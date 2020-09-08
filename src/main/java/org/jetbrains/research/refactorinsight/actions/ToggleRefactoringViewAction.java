@@ -36,7 +36,7 @@ public class ToggleRefactoringViewAction extends DumbAwareToggleAction {
 
   @Override
   public void update(@NotNull AnActionEvent e) {
-    e.getPresentation().setEnabled(isEnabled(e));
+    e.getPresentation().setEnabledAndVisible(isEnabled(e));
     WindowService.getInstance(e.getProject()).update(e);
     super.update(e);
   }
