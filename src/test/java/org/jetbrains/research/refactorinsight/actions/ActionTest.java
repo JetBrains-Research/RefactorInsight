@@ -25,7 +25,7 @@ public class ActionTest extends BasePlatformTestCase {
     myFixture.configureByFile("src/main/java/vehicles/cars/Car.java");
     AnAction action = new RefactoringHistoryAction();
     Presentation presentation = myFixture.testAction(action);
-    assertTrue(presentation.isEnabled());
-    assertTrue(presentation.isVisible());
+    assertFalse(presentation.isEnabled());
+    assertFalse(presentation.isVisible());
   }
 }

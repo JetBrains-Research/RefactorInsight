@@ -66,8 +66,8 @@
 
         <action id="actions.RefactoringHistoryAction"
                 class="org.jetbrains.research.refactorinsight.actions.RefactoringHistoryAction"
-                text="Check Refactoring History"
-                description="Retrieve refactorings history for this method">
+                text="Show Refactoring History"
+                description="Retrieve refactorings history for the element">
             <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
             <keyboard-shortcut first-keystroke="control alt R" keymap="$default"/>
         </action>

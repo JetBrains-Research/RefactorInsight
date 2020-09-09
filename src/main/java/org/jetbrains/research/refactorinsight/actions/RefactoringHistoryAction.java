@@ -5,12 +5,14 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.usages.PsiElementUsageTarget;
 import com.intellij.usages.UsageTarget;
 import com.intellij.usages.UsageView;
 import git4idea.repo.GitRepositoryManager;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,11 +29,11 @@ import org.jetbrains.research.refactorinsight.utils.StringUtils;
 import org.jetbrains.research.refactorinsight.utils.Utils;
 
 /**
- * This is the Check Refactorings History Action.
+ * Represents the Show Refactoring History action.
  * If the currently opened project is a git repository, it retrieves
  * the refactoring history map that should be in the MiningService instance
  * of this project.
- * It checks if the selected PsiElement is instances of Class, Method or Field.
+ * It checks if the selected PsiElement is instances of PsiClass, PsiMethod, or PsiField.
  * It computes the last object's signature and retrieves the data from the
  * refactoring history map.
  */
@@ -68,45 +70,38 @@ public class RefactoringHistoryAction extends AnAction {
     if (usageTarget != null) {
       UsageTarget target = usageTarget[0];
       if (target instanceof PsiElementUsageTarget) {
-        if (((PsiElementUsageTarget) target).getElement() instanceof PsiMethod) {
-          PsiMethod method = (PsiMethod) ((PsiElementUsageTarget) target).getElement();
-          showHistoryMethod(project, dataContext, method);
-
-        } else if (((PsiElementUsageTarget) target).getElement() instanceof PsiClass) {
-          PsiClass psiClass = (PsiClass) ((PsiElementUsageTarget) target).getElement();
-
-          showHistoryClass(project, dataContext, psiClass);
-        } else if (((PsiElementUsageTarget) target).getElement() instanceof PsiField) {
-          showHistoryAttribute(project, dataContext, (PsiElementUsageTarget) target);
+        PsiElementUsageTarget elementUsageTarget = (PsiElementUsageTarget) target;
+        PsiElement targetElement = elementUsageTarget.getElement();
+        if (targetElement instanceof PsiMethod) {
+          showHistoryMethod(project, dataContext, (PsiMethod) targetElement);
+        } else if (targetElement instanceof PsiClass) {
+          showHistoryClass(project, dataContext, (PsiClass) targetElement);
+        } else if (targetElement instanceof PsiField) {
+          showHistoryAttribute(project, dataContext, (PsiField) targetElement);
         }
       }
     }
   }
 
   private void showHistoryAttribute(Project project, DataContext dataContext,
-                                    PsiElementUsageTarget target) {
-    PsiField field = (PsiField) target.getElement();
-    String signature = StringUtils.getFieldSignature(field);
+                                    PsiField target) {
+    String signature = StringUtils.getFieldSignature(target);
     getToolbarWindow(project)
         .showToolbar(map.getOrDefault(signature, new HashSet<>()),
-            field.getName(), dataContext, HistoryType.ATTRIBUTE, null, null);
+            target.getName(), dataContext, HistoryType.ATTRIBUTE, null, null);
   }
 
   private void showHistoryClass(Project project, DataContext dataContext, PsiClass psiClass) {
     String signature = psiClass.getQualifiedName();
-    List<String> methods = Arrays.asList(psiClass.getMethods()).stream()
-        .map(method -> StringUtils.calculateSignature(method)).collect(Collectors.toList());
+    List<String> methods = Arrays.stream(psiClass.getMethods())
+        .map(StringUtils::calculateSignature).collect(Collectors.toList());
     HashMap<String, Set<RefactoringInfo>> methodsHistory = new HashMap<>();
-    methods.forEach(method -> {
-      methodsHistory.put(method, map.getOrDefault(method, new HashSet<>()));
-    });
+    methods.forEach(method -> methodsHistory.put(method, map.getOrDefault(method, new HashSet<>())));
 
-    List<String> fields = Arrays.asList(psiClass.getFields()).stream()
-        .map(field -> StringUtils.getFieldSignature(field)).collect(Collectors.toList());
+    List<String> fields = Arrays.stream(psiClass.getFields())
+        .map(StringUtils::getFieldSignature).collect(Collectors.toList());
     HashMap<String, Set<RefactoringInfo>> fieldsHistory = new HashMap<>();
-    fields.forEach(field -> {
-      fieldsHistory.put(field, map.getOrDefault(field, new HashSet<>()));
-    });
+    fields.forEach(field -> fieldsHistory.put(field, map.getOrDefault(field, new HashSet<>())));
 
     getToolbarWindow(project)
         .showToolbar(map.getOrDefault(signature, new HashSet<>()),
@@ -115,7 +110,6 @@ public class RefactoringHistoryAction extends AnAction {
 
   private void showHistoryMethod(Project project, DataContext dataContext, PsiMethod method) {
     String signature = StringUtils.calculateSignature(method);
-    System.out.println(signature);
     getToolbarWindow(project)
         .showToolbar(map.getOrDefault(signature, new HashSet<>()),
             method.getName(), dataContext, HistoryType.METHOD, null, null);
@@ -123,8 +117,35 @@ public class RefactoringHistoryAction extends AnAction {
 
   @Override
   public void update(@NotNull AnActionEvent e) {
-    e.getPresentation().setVisible(true);
+    e.getPresentation().setEnabledAndVisible(isRefactoringHistoryNotEmpty(e.getDataContext(), e.getProject()));
     super.update(e);
+  }
+
+  /**
+   * Checks if refactoring history is not empty for the selected element.
+   */
+  private boolean isRefactoringHistoryNotEmpty(DataContext dataContext, Project project) {
+    UsageTarget[] usageTarget = dataContext.getData(UsageView.USAGE_TARGETS_KEY);
+    String key = "";
+    UsageTarget target = usageTarget != null ? usageTarget[0] : null;
+    if (target != null) {
+      PsiElement element = ((PsiElementUsageTarget) target).getElement();
+      if (element instanceof PsiMethod) {
+        key = StringUtils.calculateSignature((PsiMethod) element);
+      } else if (element instanceof PsiClass) {
+        key = ((PsiClass) element).getQualifiedName();
+      } else if (element instanceof PsiField) {
+        key = StringUtils.getFieldSignature((PsiField) element);
+      }
+    }
+
+    map = project.getService(MiningService.class).getRefactoringHistory();
+
+    if (map != null) {
+      return map.get(key) != null && !map.get(key).isEmpty();
+    } else {
+      return false;
+    }
   }
 
   /**
