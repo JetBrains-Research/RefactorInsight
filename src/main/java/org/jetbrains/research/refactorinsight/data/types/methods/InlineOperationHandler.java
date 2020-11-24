@@ -1,6 +1,7 @@
 package org.jetbrains.research.refactorinsight.data.types.methods;
 
 import gr.uom.java.xmi.diff.InlineOperationRefactoring;
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
@@ -14,9 +15,8 @@ public class InlineOperationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     InlineOperationRefactoring ref = (InlineOperationRefactoring) refactoring;
 
-    ref.getInlinedOperationInvocations().forEach(c -> {
-      info.addMarking(c.codeRange(), ref.getInlinedCodeRangeInTargetOperation(), true);
-    });
+    ref.getInlinedOperationInvocations().forEach(c ->
+        info.addMarking(new CodeRange(c.codeRange()), new CodeRange(ref.getInlinedCodeRangeInTargetOperation()), true));
     String classNameBefore = ref.getTargetOperationBeforeInline().getClassName();
     String classNameAfter = ref.getTargetOperationAfterInline().getClassName();
 
@@ -27,13 +27,45 @@ public class InlineOperationHandler extends Handler {
         .setElementAfter(null)
         .setNameBefore(StringUtils.calculateSignature(ref.getTargetOperationBeforeInline()))
         .setNameAfter(StringUtils.calculateSignature(ref.getTargetOperationAfterInline()))
-        .addMarking(ref.getTargetOperationCodeRangeBeforeInline(),
-            ref.getTargetOperationCodeRangeAfterInline(), false);
+        .addMarking(new CodeRange(ref.getTargetOperationCodeRangeBeforeInline()),
+            new CodeRange(ref.getTargetOperationCodeRangeAfterInline()), false);
 
     if (ref.getInlinedOperation().codeRange().getFilePath()
         .equals(ref.getTargetOperationAfterInline().codeRange().getFilePath())) {
-      info.addMarking(ref.getInlinedOperationCodeRange(),
-          ref.getInlinedCodeRangeInTargetOperation(),
+      info.addMarking(new CodeRange(ref.getInlinedOperationCodeRange()),
+          new CodeRange(ref.getInlinedCodeRangeInTargetOperation()),
+          null,
+          RefactoringLine.MarkingOption.REMOVE,
+          false);
+    }
+    return info;
+  }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    org.jetbrains.research.kotlinrminer.diff.refactoring.InlineOperationRefactoring ref =
+        (org.jetbrains.research.kotlinrminer.diff.refactoring.InlineOperationRefactoring) refactoring;
+
+    ref.getInlinedOperationInvocations().forEach(c ->
+        info.addMarking(new CodeRange(c.codeRange()), new CodeRange(ref.getInlinedCodeRangeInTargetOperation()), true));
+    String classNameBefore = ref.getTargetOperationBeforeInline().getClassName();
+    String classNameAfter = ref.getTargetOperationAfterInline().getClassName();
+
+    info.setGroup(Group.METHOD)
+        .setDetailsBefore(classNameBefore)
+        .setDetailsAfter(classNameAfter)
+        .setElementBefore(ref.getInlinedOperation().getName())
+        .setElementAfter(null)
+        .setNameBefore(StringUtils.calculateSignature(ref.getTargetOperationBeforeInline()))
+        .setNameAfter(StringUtils.calculateSignature(ref.getTargetOperationAfterInline()))
+        .addMarking(new CodeRange(ref.getTargetOperationCodeRangeBeforeInline()),
+            new CodeRange(ref.getTargetOperationCodeRangeAfterInline()), false);
+
+    if (ref.getInlinedOperation().codeRange().getFilePath()
+        .equals(ref.getTargetOperationAfterInline().codeRange().getFilePath())) {
+      info.addMarking(new CodeRange(ref.getInlinedOperationCodeRange()),
+          new CodeRange(ref.getInlinedCodeRangeInTargetOperation()),
           null,
           RefactoringLine.MarkingOption.REMOVE,
           false);

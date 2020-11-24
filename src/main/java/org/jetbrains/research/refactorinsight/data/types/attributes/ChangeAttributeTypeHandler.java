@@ -1,6 +1,7 @@
 package org.jetbrains.research.refactorinsight.data.types.attributes;
 
 import gr.uom.java.xmi.diff.ChangeAttributeTypeRefactoring;
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
@@ -21,9 +22,15 @@ public class ChangeAttributeTypeHandler extends Handler {
         .setDetailsAfter(classNameAfter)
         .setNameBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())
         .setNameAfter(ref.getChangedTypeAttribute().getVariableDeclaration().toQualifiedString())
-        .addMarking(ref.getOriginalAttribute().getType().codeRange(),
-            ref.getChangedTypeAttribute().getType().codeRange(),
+        .addMarking(new CodeRange(ref.getOriginalAttribute().getType().codeRange()),
+            new CodeRange(ref.getChangedTypeAttribute().getType().codeRange()),
             true);
+  }
 
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    //This kind of refactoring is not supported by kotlinRMiner yet.
+    return null;
   }
 }

@@ -1,16 +1,17 @@
 package org.jetbrains.research.refactorinsight.data;
 
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.EXTRACT_CLASS;
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.EXTRACT_SUPERCLASS;
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.MOVE_ATTRIBUTE;
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.MOVE_OPERATION;
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.PULL_UP_ATTRIBUTE;
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.PULL_UP_OPERATION;
 import static org.jetbrains.research.refactorinsight.utils.StringUtils.ENTRY;
-import static org.refactoringminer.api.RefactoringType.EXTRACT_CLASS;
-import static org.refactoringminer.api.RefactoringType.EXTRACT_SUPERCLASS;
-import static org.refactoringminer.api.RefactoringType.MOVE_ATTRIBUTE;
-import static org.refactoringminer.api.RefactoringType.MOVE_OPERATION;
-import static org.refactoringminer.api.RefactoringType.PULL_UP_ATTRIBUTE;
-import static org.refactoringminer.api.RefactoringType.PULL_UP_OPERATION;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.vcs.log.TimedVcsCommit;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 import org.jetbrains.research.refactorinsight.utils.Utils;
 import org.refactoringminer.api.Refactoring;
@@ -82,8 +85,35 @@ public class RefactoringEntry implements Serializable {
    * @param commit       current commit.
    * @return new refactoring entry.
    */
-  public static RefactoringEntry convert(List<Refactoring> refactorings, TimedVcsCommit commit,
-                                         Project project) {
+  public static RefactoringEntry convertJavaRefactorings(List<Refactoring> refactorings, TimedVcsCommit commit,
+                                                         Project project) {
+
+    RefactoringEntry entry =
+        new RefactoringEntry(commit.getId().asString(),
+            commit.getParents().get(0).asString(), commit.getTimestamp());
+
+    List<RefactoringInfo> infos =
+        refactorings.stream().map(ref -> factory.create(ref, entry)).collect(
+            Collectors.toList());
+
+    entry.setRefactorings(infos).combineRelated();
+
+    entry.refactorings.forEach(info -> Utils.check(info, project));
+    return entry;
+  }
+
+  /**
+   * Converter to RefactoringEntry given a list of refactorings, commit metadata and project.
+   *
+   * @param refactorings to be processed.
+   * @param commit       current commit.
+   * @param project      opened project.
+   * @return new refactoring entry.
+   */
+  public static RefactoringEntry convertKotlinRefactorings(
+      List<org.jetbrains.research.kotlinrminer.api.Refactoring> refactorings,
+      TimedVcsCommit commit,
+      Project project) {
 
     RefactoringEntry entry =
         new RefactoringEntry(commit.getId().asString(),
@@ -147,20 +177,20 @@ public class RefactoringEntry implements Serializable {
   private void combineRelatedExtractSuperClass() {
     //Find all extract Super Class Refactorings
     List<RefactoringInfo> superClassRefs = refactorings.stream()
-        .filter(info -> info.getType() == EXTRACT_SUPERCLASS)
+        .filter(info -> info != null && info.getType().name().equals(EXTRACT_SUPERCLASS.name()))
         .collect(Collectors.toList());
 
     //Find all pull up refactorings
     List<RefactoringInfo> pullUpRefs = refactorings.stream()
-        .filter(info -> info.getType() == PULL_UP_ATTRIBUTE || info.getType() == PULL_UP_OPERATION)
+        .filter(info -> info != null && info.getType().name().equals(PULL_UP_ATTRIBUTE.name())
+            || info != null && info.getType().name().equals(PULL_UP_OPERATION.name()))
         .collect(Collectors.toList());
-
 
     superClassRefs.forEach(info -> {
       String superPath = info.getRightPath();
       //Relate
       List<RefactoringInfo> related = pullUpRefs.stream()
-          .filter(pullUp -> pullUp.getRightPath().equals(superPath))
+          .filter(pullUp -> pullUp != null && pullUp.getRightPath().equals(superPath))
           .collect(Collectors.toList());
 
       //Combine ranges
@@ -173,16 +203,16 @@ public class RefactoringEntry implements Serializable {
         });
       });
     });
-
   }
 
   private void combineRelatedExtractClass() {
     //find all extract class refactorings
     List<RefactoringInfo> extractClassRefactorings = refactorings
-        .stream().filter(x -> x.getType() == EXTRACT_CLASS).collect(Collectors.toList());
+        .stream().filter(x -> x.getType().name().equals(EXTRACT_CLASS.name())).collect(Collectors.toList());
 
     List<RefactoringInfo> moves = refactorings.stream()
-        .filter(info -> info.getType() == MOVE_OPERATION || info.getType() == MOVE_ATTRIBUTE)
+        .filter(info -> info.getType().name().equals(MOVE_OPERATION.name())
+            || info.getType().name().equals(MOVE_ATTRIBUTE.name()))
         .collect(Collectors.toList());
 
     extractClassRefactorings.forEach(
@@ -225,7 +255,11 @@ public class RefactoringEntry implements Serializable {
     return refactorings;
   }
 
-  public RefactoringEntry setRefactorings(List<RefactoringInfo> refactorings) {
+  public void addRefactorings(List<RefactoringInfo> refactorings) {
+    this.refactorings.addAll(refactorings);
+  }
+
+  public RefactoringEntry setRefactorings(@NotNull List<RefactoringInfo> refactorings) {
     this.refactorings = refactorings;
     return this;
   }

@@ -1,6 +1,7 @@
 package org.jetbrains.research.refactorinsight.data.types.methods;
 
 import gr.uom.java.xmi.diff.ModifyMethodAnnotationRefactoring;
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
@@ -21,9 +22,17 @@ public class ModifyMethodAnnotationHandler extends Handler {
         .setDetailsAfter(classNameAfter)
         .setElementBefore(ref.getAnnotationBefore().toString())
         .setElementAfter(ref.getAnnotationAfter().toString())
-        .addMarking(ref.getAnnotationBefore().codeRange(), ref.getAnnotationAfter().codeRange(),
+        .addMarking(new CodeRange(ref.getAnnotationBefore().codeRange()),
+            new CodeRange(ref.getAnnotationAfter().codeRange()),
             true)
         .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()));
+  }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    //This kind of refactoring is not supported by kotlinRMiner yet.
+    return null;
   }
 }

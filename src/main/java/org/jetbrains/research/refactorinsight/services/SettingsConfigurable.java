@@ -4,25 +4,24 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
 import git4idea.repo.GitRepository;
 import git4idea.repo.GitRepositoryManager;
-import java.util.List;
-import javax.swing.JComponent;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.ui.windows.SettingsComponent;
+
+import javax.swing.JComponent;
+import java.util.List;
 
 /**
  * Provides controller functionality for application settings.
  */
 public class SettingsConfigurable implements Configurable {
   private SettingsComponent mySettingsComponent;
-  private Project project;
+  private final Project project;
 
   public SettingsConfigurable(Project project) {
     this.project = project;
   }
 
-  @Nls(capitalization = Nls.Capitalization.Title)
   @Override
   public String getDisplayName() {
     return RefactorInsightBundle.message("setting");

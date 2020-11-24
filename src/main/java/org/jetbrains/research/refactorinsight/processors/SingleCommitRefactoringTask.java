@@ -12,11 +12,13 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.util.ExceptionUtil;
 import com.intellij.vcs.log.TimedVcsCommit;
 import com.intellij.vcs.log.VcsCommitMetadata;
+
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
 import org.eclipse.jgit.lib.Repository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -90,8 +92,8 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
    * Allows to interrupt a process which does not performs checkCancelled() calls by itself.
    */
   public void runWithCheckCanceled(@NotNull final Runnable runnable,
-                                          @NotNull final ProgressIndicator indicator,
-                                          VcsCommitMetadata commit, Project project) throws Exception {
+                                   @NotNull final ProgressIndicator indicator,
+                                   VcsCommitMetadata commit, Project project) throws Exception {
     final Ref<Throwable> error = Ref.create();
     Future<?> future = ApplicationManager.getApplication().executeOnPooledThread(
         () -> ProgressManager.getInstance().executeProcessUnderProgress(() -> {
@@ -137,7 +139,7 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
     }
     if (timeout == 0) {
       RefactoringEntry refactoringEntry = RefactoringEntry
-          .convert(new ArrayList<>(), commit, project);
+          .convertJavaRefactorings(new ArrayList<>(), commit, project);
       refactoringEntry.setTimeout(true);
       MiningService.getInstance(project).getState().refactoringsMap.map.put(commit.getId().asString(),
           refactoringEntry);

@@ -5,11 +5,13 @@ import com.intellij.diff.fragments.DiffFragmentImpl;
 import com.intellij.diff.fragments.LineFragmentImpl;
 import com.intellij.diff.fragments.MergeLineFragmentImpl;
 import com.intellij.openapi.util.TextRange;
-import gr.uom.java.xmi.LocationInfo;
-import gr.uom.java.xmi.diff.CodeRange;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
+import org.jetbrains.research.refactorinsight.adapters.LocationInfo;
 import org.jetbrains.research.refactorinsight.data.diff.MoreSidedDiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedRange;
 import org.jetbrains.research.refactorinsight.utils.Utils;
@@ -30,9 +32,9 @@ public class RefactoringLine {
   private static final int RIGHT_START = 4;
   private static final int RIGHT_END = 5;
   VisualisationType type;
-  private int[] lines = new int[6];
+  private final int[] lines = new int[6];
   private int[] columns = new int[6];
-  private List<RefactoringOffset> offsets = new ArrayList<>();
+  private final List<RefactoringOffset> offsets = new ArrayList<>();
   private boolean hasColumns = false;
   private String[] word;
   private boolean lazy = false;
@@ -41,7 +43,7 @@ public class RefactoringLine {
   private List<TextRange> right;
   private LineFragmentImpl fragment;
   private MoreSidedDiffRequestGenerator.MoreSidedRange moreSidedRange;
-  private MarkingOption markingOption;
+  private final MarkingOption markingOption;
   private boolean moreSided;
 
   /**
@@ -194,7 +196,7 @@ public class RefactoringLine {
       return;
     }
     hasColumns = true;
-    columns = new int[] {1, 1, 0, 0, columns[RIGHT_START], columns[RIGHT_END]};
+    columns = new int[]{1, 1, 0, 0, columns[RIGHT_START], columns[RIGHT_END]};
     if (word[0] != null && word[1] == null && word[2] == null) {
       int[] beforeColumns =
           Utils.findColumnsBackwards(leftText, word[0], lines[LEFT_START]);

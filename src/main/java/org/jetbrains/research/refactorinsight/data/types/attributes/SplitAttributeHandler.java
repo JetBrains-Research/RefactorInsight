@@ -2,7 +2,10 @@ package org.jetbrains.research.refactorinsight.data.types.attributes;
 
 import gr.uom.java.xmi.decomposition.VariableDeclaration;
 import gr.uom.java.xmi.diff.SplitAttributeRefactoring;
+
 import java.util.stream.Collectors;
+
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
@@ -14,7 +17,7 @@ public class SplitAttributeHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     SplitAttributeRefactoring ref = (SplitAttributeRefactoring) refactoring;
     ref.getSplitAttributes().forEach(attr ->
-        info.addMarking(ref.getOldAttribute().codeRange(), attr.codeRange(), true));
+        info.addMarking(new CodeRange(ref.getOldAttribute().codeRange()), new CodeRange(attr.codeRange()), true));
 
     String classNameBefore = ref.getClassNameBefore();
     String classNameAfter = ref.getClassNameAfter();
@@ -25,5 +28,12 @@ public class SplitAttributeHandler extends Handler {
         .setNameBefore(ref.getOldAttribute().getVariableName())
         .setNameAfter(ref.getSplitAttributes().stream().map(VariableDeclaration::getVariableName)
             .collect(Collectors.joining()));
+  }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    //This kind of refactoring is not supported by kotlinRMiner yet.
+    return null;
   }
 }

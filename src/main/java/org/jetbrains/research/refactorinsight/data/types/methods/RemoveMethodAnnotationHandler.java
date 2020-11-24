@@ -4,6 +4,8 @@ import static org.jetbrains.research.refactorinsight.data.RefactoringLine.Markin
 
 import gr.uom.java.xmi.UMLAnnotation;
 import gr.uom.java.xmi.diff.RemoveMethodAnnotationRefactoring;
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
+import org.jetbrains.research.refactorinsight.adapters.LocationInfo;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
@@ -26,13 +28,20 @@ public class RemoveMethodAnnotationHandler extends Handler {
         .setElementBefore(ref.getAnnotation().toString())
         .setElementAfter(null)
         .addMarking(
-            annotation.codeRange(),
-            ref.getOperationAfter().codeRange(),
-            line -> line.addOffset(annotation.getLocationInfo(),
+            new CodeRange(annotation.codeRange()),
+            new CodeRange(ref.getOperationAfter().codeRange()),
+            line -> line.addOffset(new LocationInfo(annotation.getLocationInfo()),
                 REMOVE),
             REMOVE,
             false)
         .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()));
+  }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    //This kind of refactoring is not supported by kotlinRMiner yet.
+    return null;
   }
 }

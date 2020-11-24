@@ -1,6 +1,7 @@
 package org.jetbrains.research.refactorinsight.data.types.methods;
 
 import gr.uom.java.xmi.diff.ModifyVariableAnnotationRefactoring;
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
@@ -23,7 +24,14 @@ public class ModifyParameterAnnotationHandler
         .setElementAfter(ref.getAnnotationAfter().toString() + " for parameter "
             + ref.getVariableAfter().getVariableName())
         .setElementBefore(ref.getAnnotationBefore().toString())
-        .addMarking(ref.getAnnotationBefore().codeRange(), ref.getAnnotationAfter().codeRange(),
-            true);
+        .addMarking(new CodeRange(ref.getAnnotationBefore().codeRange()),
+            new CodeRange(ref.getAnnotationAfter().codeRange()), true);
+  }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    //This kind of refactoring is not supported by kotlinRMiner yet.
+    return null;
   }
 }

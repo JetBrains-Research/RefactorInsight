@@ -2,11 +2,12 @@ package org.jetbrains.research.refactorinsight.data;
 
 import static org.jetbrains.research.refactorinsight.utils.StringUtils.INFO;
 import static org.jetbrains.research.refactorinsight.utils.StringUtils.delimiter;
+import static org.jetbrains.research.refactorinsight.utils.Utils.fixPath;
 
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.openapi.util.Pair;
-import gr.uom.java.xmi.diff.CodeRange;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,12 +18,14 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
+import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.diff.DiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.data.diff.MoreSidedDiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedDiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.data.diff.TwoSidedDiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
-import org.refactoringminer.api.RefactoringType;
 
 /**
  * This is the RefactoringInfo object that stores the information needed
@@ -44,8 +47,8 @@ public class RefactoringInfo {
   private DiffRequestGenerator requestGenerator = new TwoSidedDiffRequestGenerator();
   private String name;
 
-  private String[][] uiStrings = new String[3][2];
-  private String[] paths = new String[3];
+  private final String[][] uiStrings = new String[3][2];
+  private final String[] paths = new String[3];
 
   private Group group;
 
@@ -393,7 +396,7 @@ public class RefactoringInfo {
   }
 
   public RefactoringInfo setLeftPath(String leftPath) {
-    paths[0] = leftPath;
+    paths[0] = fixPath(leftPath);
     return this;
   }
 
@@ -402,7 +405,7 @@ public class RefactoringInfo {
   }
 
   public RefactoringInfo setMidPath(String midPath) {
-    paths[1] = midPath;
+    paths[1] = fixPath(midPath);
     return this;
   }
 
@@ -411,7 +414,7 @@ public class RefactoringInfo {
   }
 
   public RefactoringInfo setRightPath(String rightPath) {
-    paths[2] = rightPath;
+    paths[2] = fixPath(rightPath);
     return this;
   }
 

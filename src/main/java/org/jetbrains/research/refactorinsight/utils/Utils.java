@@ -1,11 +1,5 @@
 package org.jetbrains.research.refactorinsight.utils;
 
-import static org.refactoringminer.api.RefactoringType.CHANGE_ATTRIBUTE_TYPE;
-import static org.refactoringminer.api.RefactoringType.CHANGE_PARAMETER_TYPE;
-import static org.refactoringminer.api.RefactoringType.CHANGE_VARIABLE_TYPE;
-import static org.refactoringminer.api.RefactoringType.RENAME_ATTRIBUTE;
-import static org.refactoringminer.api.RefactoringType.RENAME_PARAMETER;
-
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
@@ -19,6 +13,7 @@ import com.intellij.vcs.log.impl.VcsProjectLog;
 import git4idea.GitContentRevision;
 import git4idea.GitRevisionNumber;
 import git4idea.repo.GitRepository;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -34,11 +29,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
-import org.refactoringminer.api.RefactoringType;
+
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.CHANGE_ATTRIBUTE_TYPE;
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.CHANGE_PARAMETER_TYPE;
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.CHANGE_VARIABLE_TYPE;
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.RENAME_ATTRIBUTE;
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.RENAME_PARAMETER;
 
 public class Utils {
 
@@ -46,7 +47,7 @@ public class Utils {
   /**
    * Used for storing and disposing the MainVcsLogs used for method history action.
    */
-  private static ArrayList<Disposable> logs = new ArrayList<>();
+  private static final ArrayList<Disposable> logs = new ArrayList<>();
 
   /**
    * Method used for disposing the logs that were created and shown for the method history action.
@@ -89,11 +90,12 @@ public class Utils {
     String[] lines = text.split("\r\n|\r|\n");
     int startColumn = lines[line].indexOf(word) + 1;
     int endColumn = startColumn + word.length();
-    return new int[] {startColumn, endColumn};
+    return new int[]{startColumn, endColumn};
   }
 
   /**
    * Similar to find columns but starts from the back of the line.
+   *
    * @param text Java code
    * @param word Word to look for
    * @param line Line to look in
@@ -103,7 +105,7 @@ public class Utils {
     String[] lines = text.split("\r\n|\r|\n");
     int startColumn = lines[line].lastIndexOf(word) + 1;
     int endColumn = startColumn + word.length();
-    return new int[] {startColumn, endColumn};
+    return new int[]{startColumn, endColumn};
   }
 
   /**
@@ -202,7 +204,21 @@ public class Utils {
   }
 
   private static Predicate<RefactoringInfo> ofType(RefactoringType type) {
-    return (r) -> r.getType() == type;
+    return (r) -> r.getType().name().equals(type.name());
+  }
+
+  /**
+   * Removes the extra part of the file path.
+   *
+   * @param path path to the file.
+   * @return fixed path.
+   */
+  public static String fixPath(String path) {
+    if (path != null && path.contains(".gradle/caches/")) {
+      return path.substring(path.lastIndexOf("/bin/") + 5);
+    } else {
+      return path;
+    }
   }
 
   /**
@@ -248,7 +264,7 @@ public class Utils {
         for (Pair<String, Boolean> pathPair : info.getMoreSidedLeftPaths()) {
           GitRevisionNumber number = pathPair.second ? afterNumber : beforeNumber;
           FilePath filePath =
-              new LocalFilePath(project.getBasePath() + "/" + pathPair.first, false);
+              new LocalFilePath(project.getBasePath() + "/" + fixPath(pathPair.first), false);
           befores.add(
               GitContentRevision.createRevision(filePath, number, project).getContent());
         }
@@ -319,16 +335,16 @@ public class Utils {
   public static void disposeWithVcsLogManager(@NotNull Project project, @NotNull Disposable disposable) {
     Disposable connectionDisposable = Disposer.newDisposable();
     project.getMessageBus().connect(connectionDisposable)
-            .subscribe(VcsProjectLog.VCS_PROJECT_LOG_CHANGED, new VcsProjectLog.ProjectLogListener() {
-      @Override
-      public void logCreated(@NotNull VcsLogManager manager) {
-      }
+        .subscribe(VcsProjectLog.VCS_PROJECT_LOG_CHANGED, new VcsProjectLog.ProjectLogListener() {
+          @Override
+          public void logCreated(@NotNull VcsLogManager manager) {
+          }
 
-      @Override
-      public void logDisposed(@NotNull VcsLogManager manager) {
-        Disposer.dispose(connectionDisposable);
-        Disposer.dispose(disposable);
-      }
-    });
+          @Override
+          public void logDisposed(@NotNull VcsLogManager manager) {
+            Disposer.dispose(connectionDisposable);
+            Disposer.dispose(disposable);
+          }
+        });
   }
 }

@@ -1,6 +1,7 @@
 package org.jetbrains.research.refactorinsight.data.types.methods;
 
 import gr.uom.java.xmi.diff.ChangeReturnTypeRefactoring;
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
@@ -29,9 +30,17 @@ public class ChangeReturnTypeHandler extends Handler {
         .setElementAfter(ref.getChangedType().toString())
         .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
-        .addMarking(ref.getOriginalType().codeRange(), ref.getChangedType().codeRange(),
+        .addMarking(new CodeRange(ref.getOriginalType().codeRange()),
+            new CodeRange(ref.getChangedType().codeRange()),
             true);
 
+  }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    //This kind of refactoring is not supported by kotlinRMiner yet.
+    return null;
   }
 
 }

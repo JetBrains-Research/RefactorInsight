@@ -8,7 +8,14 @@ public class MergeOperationHandler extends Handler {
 
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
-    //Is not supported by RefactoringMiner yet
+    //This kind of refactoring is not supported by RefactoringMiner yet.
+    return null;
+  }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    //This kind of refactoring is not supported by kotlinRMiner yet.
     return null;
   }
 }
