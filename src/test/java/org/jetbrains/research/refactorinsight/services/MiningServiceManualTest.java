@@ -1,7 +1,6 @@
 package org.jetbrains.research.refactorinsight.services;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.refactoringminer.api.RefactoringType.ADD_METHOD_ANNOTATION;
 import static org.refactoringminer.api.RefactoringType.CHANGE_ATTRIBUTE_TYPE;
 import static org.refactoringminer.api.RefactoringType.CHANGE_PARAMETER_TYPE;
@@ -174,7 +173,7 @@ public class MiningServiceManualTest extends GitSingleRepoTest {
   }
 
   private Predicate<RefactoringInfo> ofType(RefactoringType type) {
-    return r -> r.getType().equals(type);
+    return r -> r.getType().name().equals(type.name());
   }
 
   private Matcher<RefactoringEntry> matcher(Predicate<RefactoringInfo>... predicates) {
