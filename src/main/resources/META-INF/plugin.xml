@@ -27,6 +27,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.java</depends>
     <depends>com.intellij.modules.lang</depends>
+    <depends>org.jetbrains.plugins.github</depends>
     <depends>Git4Idea</depends>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -42,13 +43,14 @@
         <projectService serviceImplementation="org.jetbrains.research.refactorinsight.services.SettingsState"/>
 
         <errorHandler implementation="org.jetbrains.research.refactorinsight.reporter.RefactorInsightErrorReporter"/>
+        <fileEditorProvider implementation="org.jetbrains.research.refactorinsight.pullrequests.PRFileEditorProvider"/>
     </extensions>
 
     <actions>
-        <action id="actions.ToggleRefactoringViewAction"
-                class="org.jetbrains.research.refactorinsight.actions.ToggleRefactoringViewAction"
+        <action id="actions.GitLogToggleRefactoringViewAction"
+                class="org.jetbrains.research.refactorinsight.actions.GitLogToggleRefactoringViewAction"
                 icon="RefactorInsightIcons.toggle"
-                text="Show Refactorings" description="actions.ToggleRefactoringViewAction">
+                text="Show Refactorings" description="actions.GitLogToggleRefactoringViewAction">
             <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>
         </action>
 
@@ -70,6 +72,13 @@
                 description="Retrieve refactorings history for the element">
             <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
             <keyboard-shortcut first-keystroke="control alt R" keymap="$default"/>
+        </action>
+
+        <action id="actions.PRToggleRefactoringViewAction"
+                class="org.jetbrains.research.refactorinsight.actions.PRToggleRefactoringViewAction"
+                icon="RefactorInsightIcons.toggle"
+                text="Show Refactorings" description="actions.PRToggleRefactoringViewAction">
+            <add-to-group group-id="Github.PullRequest.Changes.Toolbar" anchor="after" relative-to-action="ChangesView.GroupBy"/>
         </action>
     </actions>
 

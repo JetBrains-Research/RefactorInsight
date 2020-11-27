@@ -8,12 +8,10 @@ import com.intellij.ui.Gray;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBViewport;
-import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
-import com.intellij.vcs.log.ui.table.VcsLogColumn;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 
 import java.awt.event.MouseAdapter;
@@ -39,7 +37,6 @@ import org.jetbrains.research.refactorinsight.ui.tree.renderers.MainCellRenderer
  */
 public class GitWindow {
   private Project project;
-
   private ChangesTree changesTree;
   private JBViewport viewport;
   private VcsLogGraphTable table;
@@ -154,7 +151,7 @@ public class GitWindow {
                 node.getUserObjectPath()[1];
 
             DiffWindow.showDiff(table.getModel().getFullDetails(index)
-                .getChanges(0), info, project, entry);
+                .getChanges(0), info, project, entry.getRefactorings());
           }
         }
       }
@@ -183,6 +180,7 @@ public class GitWindow {
       }
 
       VcsLogGraphTable graphTable = (VcsLogGraphTable) table;
+      /* TODO: VcsLogColumn.DATE, VcsLogColumn.COMMIT, VcsLogColumn.AUTHOR were removed from SDK
       if (labelsVisible && column == graphTable.getColumnViewIndex(VcsLogColumn.DATE)) {
         String commitHash = graphTable.getModel().getCommitId(row).getHash().asString();
         if (miner.containsRefactoring(commitHash)) {
@@ -192,15 +190,14 @@ public class GitWindow {
           append("      ",
               graphTable.applyHighlighters(this, row, column, hasFocus, selected));
         }
-      }
+      }*/
 
       append(value.toString(),
           graphTable.applyHighlighters(this, row, column, hasFocus, selected));
-
-      if (column == graphTable.getColumnViewIndex(VcsLogColumn.COMMIT)
+      /* if (column == graphTable.getColumnViewIndex(VcsLogColumn.COMMIT)
           || column == graphTable.getColumnViewIndex(VcsLogColumn.AUTHOR)) {
         SpeedSearchUtil.applySpeedSearchHighlighting(table, this, false, selected);
-      }
+      }*/
     }
   }
 }

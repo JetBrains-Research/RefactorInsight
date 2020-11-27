@@ -10,7 +10,7 @@ import static org.refactoringminer.api.RefactoringType.PULL_UP_OPERATION;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
-import com.intellij.vcs.log.TimedVcsCommit;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 import org.jetbrains.research.refactorinsight.utils.Utils;
 import org.refactoringminer.api.Refactoring;
@@ -78,16 +79,18 @@ public class RefactoringEntry implements Serializable {
   /**
    * Converter to RefactoringEntry given a list of refactorings, commit metadata and project.
    *
-   * @param refactorings to be processed.
-   * @param commit       current commit.
+   * @param refactorings     to be processed.
+   * @param commitHash       current commit.
+   * @param commitParentHash parent commit hash.
+   * @param commitTimestamp  commit timestamp.
    * @return new refactoring entry.
    */
-  public static RefactoringEntry convert(List<Refactoring> refactorings, TimedVcsCommit commit,
+  public static RefactoringEntry convert(List<Refactoring> refactorings, String commitHash,
+                                         String commitParentHash, long commitTimestamp,
                                          Project project) {
 
     RefactoringEntry entry =
-        new RefactoringEntry(commit.getId().asString(),
-            commit.getParents().get(0).asString(), commit.getTimestamp());
+        new RefactoringEntry(commitHash, commitParentHash, commitTimestamp);
 
     List<RefactoringInfo> infos =
         refactorings.stream().map(ref -> factory.create(ref, entry)).collect(

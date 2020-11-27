@@ -31,10 +31,13 @@ import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.processors.CommitMiner;
+import org.jetbrains.research.refactorinsight.processors.PRMiningBackgroundableTask;
 import org.jetbrains.research.refactorinsight.processors.SingleCommitRefactoringTask;
 import org.jetbrains.research.refactorinsight.ui.windows.GitWindow;
 import org.jetbrains.research.refactorinsight.utils.Utils;
 import org.refactoringminer.util.GitServiceImpl;
+
+import javax.swing.JScrollPane;
 
 /**
  * This is the MiningService.
@@ -52,6 +55,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   private boolean mining = false;
   private MyState innerState = new MyState();
   private SingleCommitRefactoringTask task = null;
+  private PRMiningBackgroundableTask prTask = null;
   private Repository myRepository = null;
 
   public MiningService() {
@@ -217,6 +221,24 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
     task = new SingleCommitRefactoringTask(project, commit, window);
     ProgressManager.getInstance().run(task);
+  }
+
+  /**
+   * Runs detection of refactorings in the specific commit from Pull Request.
+   *
+   * @param commitHash       commit hash.
+   * @param commitParentHash commit parent hash.
+   * @param commitTimestamp  commit timestamp.
+   * @param project          current project.
+   * @param scrollPane       scrollPane to be updated.
+   */
+  public void mineAtCommitFromPR(String commitHash, String commitParentHash, long commitTimestamp,
+                                 Project project, JScrollPane scrollPane) {
+    if (myRepository == null) {
+      myRepository = openRepository(project.getBasePath());
+    }
+    prTask = new PRMiningBackgroundableTask(project, commitHash, commitParentHash, commitTimestamp, scrollPane);
+    ProgressManager.getInstance().run(prTask);
   }
 
   public Map<String, Set<RefactoringInfo>> getRefactoringHistory() {

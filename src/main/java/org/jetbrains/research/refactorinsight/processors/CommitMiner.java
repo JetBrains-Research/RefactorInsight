@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.Consumer;
 import com.intellij.vcs.log.TimedVcsCommit;
 import git4idea.repo.GitRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,16 +17,15 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.eclipse.jgit.lib.Repository;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.services.MiningService;
 import org.refactoringminer.api.GitHistoryRefactoringMiner;
-import org.refactoringminer.api.GitService;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringHandler;
 import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
-import org.refactoringminer.util.GitServiceImpl;
 
 /**
  * The CommitMiner is a Consumer of GitCommit.
@@ -65,20 +65,24 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
   /**
    * Method that mines only one commit.
    *
-   * @param commit  commit metadata
-   * @param map     the inner map that should be updated
-   * @param project the current project
-   * @param repository Git Repository
+   * @param commitHash       commit hash.
+   * @param commitParentHash commit parent's hash.
+   * @param commitTimestamp  commit timestamp.
+   * @param map              the inner map that should be updated.
+   * @param project          the current project.
+   * @param repository       Git Repository.
    */
-  public static void mineAtCommit(TimedVcsCommit commit, Map<String, RefactoringEntry> map,
+  public static void mineAtCommit(String commitHash, String commitParentHash, long commitTimestamp,
+                                  Map<String, RefactoringEntry> map,
                                   Project project, Repository repository) {
     GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
     try {
-      miner.detectAtCommit(repository, commit.getId().asString(),
+      miner.detectAtCommit(repository, commitHash,
           new RefactoringHandler() {
             @Override
             public void handle(String commitId, List<Refactoring> refactorings) {
-              map.put(commitId, RefactoringEntry.convert(refactorings, commit, project));
+              map.put(commitId, RefactoringEntry.convert(refactorings, commitHash, commitParentHash, commitTimestamp,
+                  project));
             }
           }
       );
@@ -111,7 +115,9 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
             public void handle(String commitId, List<Refactoring> refactorings) {
               map.put(commitId,
                   RefactoringEntry
-                      .convert(refactorings, gitCommit, myProject));
+                      .convert(refactorings, gitCommit.getId().asString(),
+                          gitCommit.getParents().get(0).asString(),
+                          gitCommit.getTimestamp(), myProject));
               incrementProgress();
             }
           });
@@ -120,7 +126,9 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
         } catch (TimeoutException e) {
           if (f.cancel(true)) {
             RefactoringEntry refactoringEntry = RefactoringEntry
-                .convert(new ArrayList<>(), gitCommit, myProject);
+                .convert(new ArrayList<>(), gitCommit.getId().asString(),
+                    gitCommit.getParents().get(0).asString(),
+                    gitCommit.getTimestamp(), myProject);
             refactoringEntry.setTimeout(true);
             map.put(commitId, refactoringEntry);
           }
