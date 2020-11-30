@@ -1,6 +1,9 @@
 package org.jetbrains.research.refactorinsight.pullrequests;
 
 import com.intellij.diff.util.FileEditorBase;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
@@ -9,10 +12,9 @@ import com.intellij.ui.Gray;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.ui.treeStructure.Tree;
-import com.intellij.vcs.log.Hash;
 import com.intellij.vcs.log.VcsFullCommitDetails;
+import com.intellij.vcs.log.VcsLogProvider;
 import com.intellij.vcs.log.data.VcsLogData;
-import com.intellij.vcs.log.impl.HashImpl;
 import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.util.VcsLogUtil;
 import org.jetbrains.annotations.Nls;
@@ -37,14 +39,17 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * PRFileEditor is intended to show a list of discovered refactorings in opened Pull Request.
  */
 public class PRFileEditor extends FileEditorBase {
-  PRVirtualFile file;
-  Project project;
-  JScrollPane panel;
+  private final PRVirtualFile file;
+  private final Project project;
+  private JScrollPane panel;
+  private final ConcurrentHashMap<String, VcsFullCommitDetails> commitsDetails = new ConcurrentHashMap<>();
 
   /**
    * Creates a new editor.
@@ -55,6 +60,7 @@ public class PRFileEditor extends FileEditorBase {
   public PRFileEditor(Project project, PRVirtualFile prVirtualFile) {
     this.file = prVirtualFile;
     this.project = project;
+    collectCommitsDetails();
     this.panel = buildComponent();
   }
 
@@ -63,28 +69,50 @@ public class PRFileEditor extends FileEditorBase {
     return panel;
   }
 
+  //TODO: Make the task modal and add JBLoadingPanel
+  private void collectCommitsDetails() {
+    ProgressManager.getInstance().run(new Task.Backgroundable(
+        project, "Collecting information about commits' details", true) {
+      List<? extends VcsFullCommitDetails> details;
+
+      @Override
+      public void run(@NotNull ProgressIndicator progressIndicator) {
+        VcsLogData vcsLogData = VcsProjectLog.getInstance(project).getLogManager().getDataManager();
+        VirtualFile root = vcsLogData.getRoots().iterator().next();
+        VcsLogProvider vcsLogProvider = VcsProjectLog.getInstance(project).getDataManager().getLogProvider(root);
+        try {
+          details = VcsLogUtil.getDetails(vcsLogProvider, root, file.getCommitsIds());
+        } catch (VcsException e) {
+          e.printStackTrace();
+        }
+      }
+
+      @Override
+      public void onFinished() {
+        saveCommitsDetails(details);
+      }
+    });
+  }
+
+  private void saveCommitsDetails(List<? extends VcsFullCommitDetails> vcsFullCommitDetails) {
+    for (VcsFullCommitDetails data : vcsFullCommitDetails) {
+      commitsDetails.put(data.getId().asString(), data);
+    }
+  }
+
   private JScrollPane buildComponent() {
     panel = new JScrollPane();
     panel.setAutoscrolls(true);
     JBViewport viewport = new JBViewport();
     viewport.add(new JScrollBar());
     viewport.setAutoscrolls(true);
-    MiningService miner = MiningService.getInstance(project);
 
     List<RefactoringInfo> refactoringsFromAllCommits = new ArrayList<>();
-    VcsLogData vcsLogData = VcsProjectLog.getInstance(project).getLogManager().getDataManager();
-    VirtualFile root = vcsLogData.getRoots().iterator().next();
 
     for (String commitId : file.getCommitsIds()) {
-      Hash hash = HashImpl.build(commitId);
-      @NotNull VcsFullCommitDetails details = null;
-      try {
-        details = VcsLogUtil.getDetails(vcsLogData, root, hash);
-      } catch (VcsException e) {
-        e.printStackTrace();
-      }
-
-      miner.mineAtCommitFromPR(commitId, details.getParents().get(0).asString(), details.getTimestamp(),
+      MiningService miner = MiningService.getInstance(project);
+      miner.mineAtCommitFromPR(commitId, commitsDetails.get(commitId).getParents().get(0).asString(),
+          commitsDetails.get(commitId).getTimestamp(),
           project, panel);
       RefactoringEntry entry = miner.get(commitId);
       if (entry != null) {
@@ -98,9 +126,7 @@ public class PRFileEditor extends FileEditorBase {
           new JBLabel(RefactorInsightBundle.message("no.ref"), SwingConstants.CENTER);
       component.setForeground(Gray._105);
       viewport.setView(component);
-      panel.setViewportView(viewport);
     } else {
-
       Tree tree = TreeUtils.buildTree(refactoringsFromAllCommits);
       tree.setCellRenderer(new MainCellRenderer());
       tree.setAutoscrolls(true);
@@ -117,21 +143,16 @@ public class PRFileEditor extends FileEditorBase {
             if (node.isLeaf()) {
               RefactoringInfo info = (RefactoringInfo)
                   node.getUserObjectPath()[1];
-              Hash hash = HashImpl.build(info.getCommitId());
-              try {
-                @NotNull VcsFullCommitDetails details = VcsLogUtil.getDetails(vcsLogData, root, hash);
-                @NotNull Collection<Change> changes = details.getChanges();
-                DiffWindow.showDiff(changes, info, project, refactoringsFromAllCommits);
-              } catch (VcsException e) {
-                e.printStackTrace();
-              }
+              final Collection<Change> changes = Optional.ofNullable(commitsDetails.get(info.getCommitId()))
+                  .map(VcsFullCommitDetails::getChanges).orElse(new ArrayList<>());
+              DiffWindow.showDiff(changes, info, project, info.getEntry().getRefactorings());
             }
           }
         }
       });
       viewport.setView(tree);
-      panel.setViewportView(viewport);
     }
+    panel.setViewportView(viewport);
     return panel;
   }
 
