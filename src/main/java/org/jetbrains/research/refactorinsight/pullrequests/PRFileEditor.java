@@ -69,9 +69,9 @@ public class PRFileEditor extends FileEditorBase {
     return panel;
   }
 
-  //TODO: Make the task modal and add JBLoadingPanel
+  //TODO: Show JBLoadingPanel while calculation of commits' details
   private void collectCommitsDetails() {
-    ProgressManager.getInstance().run(new Task.Backgroundable(
+    ProgressManager.getInstance().run(new Task.Modal(
         project, "Collecting information about commits' details", true) {
       List<? extends VcsFullCommitDetails> details;
 
@@ -95,8 +95,10 @@ public class PRFileEditor extends FileEditorBase {
   }
 
   private void saveCommitsDetails(List<? extends VcsFullCommitDetails> vcsFullCommitDetails) {
-    for (VcsFullCommitDetails data : vcsFullCommitDetails) {
-      commitsDetails.put(data.getId().asString(), data);
+    if (!vcsFullCommitDetails.isEmpty()) {
+      for (VcsFullCommitDetails data : vcsFullCommitDetails) {
+        commitsDetails.put(data.getId().asString(), data);
+      }
     }
   }
 
