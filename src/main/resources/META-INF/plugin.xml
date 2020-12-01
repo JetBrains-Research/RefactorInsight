@@ -83,8 +83,8 @@
     </actions>
 
     <projectListeners>
-        <listener class="org.jetbrains.research.refactorinsight.processors.CommitListener"
-                  topic="git4idea.repo.GitRepositoryChangeListener"/>
+<!--        <listener class="org.jetbrains.research.refactorinsight.processors.CommitListener"
+                  topic="git4idea.repo.GitRepositoryChangeListener"/>-->
         <listener class="org.jetbrains.research.refactorinsight.processors.ProjectListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </projectListeners>

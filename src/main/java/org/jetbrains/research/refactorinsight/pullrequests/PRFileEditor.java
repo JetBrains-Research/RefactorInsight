@@ -10,6 +10,8 @@ import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.Gray;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBLoadingPanel;
+import com.intellij.ui.components.JBLoadingPanelListener;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.vcs.log.VcsFullCommitDetails;
@@ -28,12 +30,10 @@ import org.jetbrains.research.refactorinsight.ui.tree.TreeUtils;
 import org.jetbrains.research.refactorinsight.ui.tree.renderers.MainCellRenderer;
 import org.jetbrains.research.refactorinsight.ui.windows.DiffWindow;
 
-import javax.swing.JComponent;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -48,7 +48,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PRFileEditor extends FileEditorBase {
   private final PRVirtualFile file;
   private final Project project;
-  private JScrollPane panel;
+  private final JScrollPane panel;
+  private JBLoadingPanel loadingPanel;
   private final ConcurrentHashMap<String, VcsFullCommitDetails> commitsDetails = new ConcurrentHashMap<>();
 
   /**
@@ -60,16 +61,16 @@ public class PRFileEditor extends FileEditorBase {
   public PRFileEditor(Project project, PRVirtualFile prVirtualFile) {
     this.file = prVirtualFile;
     this.project = project;
+    this.panel = new JScrollPane();
+    createLoadingPanel();
     collectCommitsDetails();
-    this.panel = buildComponent();
   }
 
   @Override
   public @NotNull JComponent getComponent() {
-    return panel;
+    return loadingPanel;
   }
 
-  //TODO: Show JBLoadingPanel while calculation of commits' details
   private void collectCommitsDetails() {
     ProgressManager.getInstance().run(new Task.Modal(
         project, "Collecting information about commits' details", true) {
@@ -77,6 +78,7 @@ public class PRFileEditor extends FileEditorBase {
 
       @Override
       public void run(@NotNull ProgressIndicator progressIndicator) {
+        loadingPanel.startLoading();
         VcsLogData vcsLogData = VcsProjectLog.getInstance(project).getLogManager().getDataManager();
         VirtualFile root = vcsLogData.getRoots().iterator().next();
         VcsLogProvider vcsLogProvider = VcsProjectLog.getInstance(project).getDataManager().getLogProvider(root);
@@ -85,11 +87,12 @@ public class PRFileEditor extends FileEditorBase {
         } catch (VcsException e) {
           e.printStackTrace();
         }
+        saveCommitsDetails(details);
       }
 
       @Override
       public void onFinished() {
-        saveCommitsDetails(details);
+        calculateRefactorings();
       }
     });
   }
@@ -102,20 +105,32 @@ public class PRFileEditor extends FileEditorBase {
     }
   }
 
-  private JScrollPane buildComponent() {
-    panel = new JScrollPane();
+  private void createLoadingPanel() {
+    loadingPanel = new JBLoadingPanel(new BorderLayout(), this);
+    loadingPanel.addListener(new JBLoadingPanelListener.Adapter() {
+      @Override
+      public void onLoadingFinish() {
+        panel.updateUI();
+        loadingPanel.updateUI();
+      }
+    });
+    loadingPanel.add(panel);
+  }
+
+  private void calculateRefactorings() {
+    MiningService.getInstance(project).mineAtCommitFromPR(new ArrayList<>(commitsDetails.values()),
+        project, this);
+  }
+
+  public void buildComponent() {
     panel.setAutoscrolls(true);
     JBViewport viewport = new JBViewport();
     viewport.add(new JScrollBar());
     viewport.setAutoscrolls(true);
-
+    MiningService miner = MiningService.getInstance(project);
     List<RefactoringInfo> refactoringsFromAllCommits = new ArrayList<>();
 
     for (String commitId : file.getCommitsIds()) {
-      MiningService miner = MiningService.getInstance(project);
-      miner.mineAtCommitFromPR(commitId, commitsDetails.get(commitId).getParents().get(0).asString(),
-          commitsDetails.get(commitId).getTimestamp(),
-          project, panel);
       RefactoringEntry entry = miner.get(commitId);
       if (entry != null) {
         refactoringsFromAllCommits.addAll(entry.getRefactorings());
@@ -155,7 +170,8 @@ public class PRFileEditor extends FileEditorBase {
       viewport.setView(tree);
     }
     panel.setViewportView(viewport);
-    return panel;
+    loadingPanel.stopLoading();
+    loadingPanel.add(panel);
   }
 
   @Override

@@ -10,15 +10,16 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
 import com.intellij.util.ExceptionUtil;
+import com.intellij.vcs.log.VcsFullCommitDetails;
 import org.eclipse.jgit.lib.Repository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
+import org.jetbrains.research.refactorinsight.pullrequests.PRFileEditor;
 import org.jetbrains.research.refactorinsight.services.MiningService;
 
-import javax.swing.JScrollPane;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -26,33 +27,27 @@ import java.util.concurrent.TimeoutException;
 
 public class PRMiningBackgroundableTask extends Task.Backgroundable {
   private final Project project;
-  private final String commit;
-  private final JScrollPane panel;
+  private final PRFileEditor prFileEditor;
   private final MiningService service;
   private final Repository myRepository;
-  private final String commitParentHash;
-  private final long commitTimestamp;
   private boolean canceled = false;
   private final Logger logger = Logger.getInstance(PRMiningBackgroundableTask.class);
+  List<VcsFullCommitDetails> commitDetails;
 
   /**
-   * Cancelable mining task for mining a single commit.
+   * Cancelable mining task for mining refactorings in pull request.
    *
-   * @param project    current  project.
-   * @param commitHash commit hash.
+   * @param project       current  project.
+   * @param commitDetails pull request's commits details.
    */
   public PRMiningBackgroundableTask(
-      @Nullable Project project,
-      String commitHash, String commitParentHash, long commitTimestamp, JScrollPane panel) {
-    super(project,
-        String.format(RefactorInsightBundle.message("mining.at"), commitHash));
+      @Nullable Project project, List<VcsFullCommitDetails> commitDetails, PRFileEditor prFileEditor) {
+    super(project, "Mining refactorings", true);
     this.project = project;
-    this.commit = commitHash;
     this.service = ServiceManager.getService(project, MiningService.class);
     this.myRepository = service.getRepository();
-    this.panel = panel;
-    this.commitParentHash = commitParentHash;
-    this.commitTimestamp = commitTimestamp;
+    this.prFileEditor = prFileEditor;
+    this.commitDetails = commitDetails;
   }
 
   @Override
@@ -63,24 +58,23 @@ public class PRMiningBackgroundableTask extends Task.Backgroundable {
   @Override
   public void onFinished() {
     super.onFinished();
-    if (service.containsCommit(commit)) {
-      ApplicationManager.getApplication()
-          .invokeLater(panel::updateUI);
-    }
+    ApplicationManager.getApplication()
+        .invokeLater(prFileEditor::buildComponent);
   }
 
   @Override
   public void run(@NotNull ProgressIndicator progressIndicator) {
-    try {
-      runWithCheckCanceled(
-          () -> CommitMiner.mineAtCommit(commit, commitParentHash,
-              commitTimestamp, service.getState().refactoringsMap.map, project, myRepository),
-          progressIndicator, commit, project
-      );
-    } catch (Exception e) {
-      logger.info(String.format("The mining of refactorings at the commit %s was canceled", commit));
+    for (VcsFullCommitDetails commit : commitDetails) {
+      try {
+        runWithCheckCanceled(
+            () -> CommitMiner.mineAtCommit(commit.getId().asString(), commit.getParents().get(0).asString(),
+                commit.getTimestamp(), service.getState().refactoringsMap.map, project, myRepository),
+            progressIndicator, commit, project
+        );
+      } catch (Exception e) {
+        logger.info(String.format("The mining of refactorings at the commit %s was canceled", commit.getId().asString()));
+      }
     }
-
   }
 
   public void cancel() {
@@ -92,7 +86,7 @@ public class PRMiningBackgroundableTask extends Task.Backgroundable {
    */
   public void runWithCheckCanceled(@NotNull final Runnable runnable,
                                    @NotNull final ProgressIndicator indicator,
-                                   String commit, Project project) throws Exception {
+                                   VcsFullCommitDetails commit, Project project) throws Exception {
     final Ref<Throwable> error = Ref.create();
     Future<?> future = ApplicationManager.getApplication().executeOnPooledThread(
         () -> ProgressManager.getInstance().executeProcessUnderProgress(() -> {
@@ -118,7 +112,7 @@ public class PRMiningBackgroundableTask extends Task.Backgroundable {
    */
   private <T> void runWithCheckCanceled(@NotNull Future<T> future,
                                         @NotNull final ProgressIndicator indicator,
-                                        String commit, Project project) throws
+                                        VcsFullCommitDetails commit, Project project) throws
       ExecutionException {
     int timeout = 6000;
     while (timeout > 0) {
@@ -138,10 +132,10 @@ public class PRMiningBackgroundableTask extends Task.Backgroundable {
     }
     if (timeout == 0) {
       RefactoringEntry refactoringEntry = RefactoringEntry
-          .convert(new ArrayList<>(), commit, commitParentHash,
-              commitTimestamp, project);
+          .convert(new ArrayList<>(), commit.getId().asString(), commit.getParents().get(0).asString(),
+              commit.getTimestamp(), project);
       refactoringEntry.setTimeout(true);
-      MiningService.getInstance(project).getState().refactoringsMap.map.put(commit, refactoringEntry);
+      MiningService.getInstance(project).getState().refactoringsMap.map.put(commit.getId().asString(), refactoringEntry);
     }
   }
 }

@@ -40,7 +40,7 @@ public class PRToggleRefactoringViewAction extends DumbAwareToggleAction {
     } catch (InterruptedException | ExecutionException interruptedException) {
       interruptedException.printStackTrace();
     }
-    PRVirtualFile prVirtualFile = new PRVirtualFile("Discovered refactorings", null, 0, commitIds);
+    PRVirtualFile prVirtualFile = new PRVirtualFile("Discovered refactorings in PR", null, 0, commitIds);
     ApplicationManager.getApplication()
         .invokeAndWait(() -> FileEditorManager.getInstance(project)
             .openEditor(new OpenFileDescriptor(project, prVirtualFile), true));
