@@ -125,7 +125,6 @@ public class PRFileEditor extends FileEditorBase {
   public void buildComponent() {
     panel.setAutoscrolls(true);
     JBViewport viewport = new JBViewport();
-    viewport.add(new JScrollBar());
     viewport.setAutoscrolls(true);
     MiningService miner = MiningService.getInstance(project);
     List<RefactoringInfo> refactoringsFromAllCommits = new ArrayList<>();
@@ -169,7 +168,7 @@ public class PRFileEditor extends FileEditorBase {
       });
       viewport.setView(tree);
     }
-    panel.setViewportView(viewport);
+    panel.setViewport(viewport);
     loadingPanel.stopLoading();
     loadingPanel.add(panel);
   }
