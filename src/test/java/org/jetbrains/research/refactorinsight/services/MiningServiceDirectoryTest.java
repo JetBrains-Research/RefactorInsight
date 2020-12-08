@@ -117,7 +117,7 @@ public class MiningServiceDirectoryTest extends GitSingleRepoTest {
 
     //Testing that mine at commit works:
     miner.mineAtCommit(vcsCommitMetadata, myProject, gitWindow);
-    verify(parent, new Times(1)).asString();
+    verify(parent, new Times(2)).asString();
 
     //test the main cell renderer works as expected on this map
     MainCellRenderer cellRenderer = new MainCellRenderer();
