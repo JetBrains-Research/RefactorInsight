@@ -75,7 +75,7 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
   public void run(@NotNull ProgressIndicator progressIndicator) {
     try {
       runWithCheckCanceled(
-          () -> CommitMiner.mineAtCommit(commit, service.getState().refactoringsMap.map, project, myRepository),
+          CommitMiner.mineAtCommit(commit, service.getState().refactoringsMap.map, project, myRepository),
           progressIndicator, commit, project
       );
     } catch (Exception e) {
