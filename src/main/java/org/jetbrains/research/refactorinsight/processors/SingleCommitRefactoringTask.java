@@ -13,7 +13,6 @@ import com.intellij.util.ExceptionUtil;
 import com.intellij.vcs.log.TimedVcsCommit;
 import com.intellij.vcs.log.VcsCommitMetadata;
 
-import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -138,8 +137,7 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
       timeout -= 1;
     }
     if (timeout == 0) {
-      RefactoringEntry refactoringEntry = RefactoringEntry
-          .convertJavaRefactorings(new ArrayList<>(), commit, project);
+      RefactoringEntry refactoringEntry = RefactoringEntry.createEmptyEntry(commit);
       refactoringEntry.setTimeout(true);
       MiningService.getInstance(project).getState().refactoringsMap.map.put(commit.getId().asString(),
           refactoringEntry);

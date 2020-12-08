@@ -129,6 +129,19 @@ public class RefactoringEntry implements Serializable {
     return entry;
   }
 
+  /**
+   * Creates an empty entry for a commit that doesn't contain any refactoring.
+   *
+   * @param commit current commit.
+   * @return a new empty refactoring empty.
+   */
+  public static RefactoringEntry createEmptyEntry(TimedVcsCommit commit) {
+    RefactoringEntry refactoringEntry = new RefactoringEntry(commit.getId().asString(),
+        commit.getParents().get(0).asString(), commit.getTimestamp());
+    refactoringEntry.setRefactorings(new ArrayList<>());
+    return refactoringEntry;
+  }
+
   @Override
   public String toString() {
     String del = StringUtils.delimiter(ENTRY);

@@ -8,7 +8,6 @@ import com.intellij.util.Consumer;
 import com.intellij.vcs.log.TimedVcsCommit;
 import git4idea.repo.GitRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -172,8 +171,7 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
       f.get(60, TimeUnit.SECONDS);
     } catch (TimeoutException e) {
       if (f.cancel(true)) {
-        RefactoringEntry refactoringEntry = RefactoringEntry
-            .convertJavaRefactorings(new ArrayList<>(), commit, myProject);
+        RefactoringEntry refactoringEntry = RefactoringEntry.createEmptyEntry(commit);
         refactoringEntry.setTimeout(true);
         map.put(commitId, refactoringEntry);
       }
