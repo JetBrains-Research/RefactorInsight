@@ -30,10 +30,12 @@ import org.jetbrains.research.refactorinsight.ui.tree.TreeUtils;
 import org.jetbrains.research.refactorinsight.ui.tree.renderers.MainCellRenderer;
 import org.jetbrains.research.refactorinsight.ui.windows.DiffWindow;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -122,6 +124,9 @@ public class PRFileEditor extends FileEditorBase {
         project, this);
   }
 
+  /**
+   * Builds a panel to show the discovered refactorings in opened Pull Request.
+   */
   public void buildComponent() {
     panel.setAutoscrolls(true);
     JBViewport viewport = new JBViewport();

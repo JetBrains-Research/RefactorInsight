@@ -72,7 +72,8 @@ public class PRMiningBackgroundableTask extends Task.Backgroundable {
             progressIndicator, commit, project
         );
       } catch (Exception e) {
-        logger.info(String.format("The mining of refactorings at the commit %s was canceled", commit.getId().asString()));
+        logger.info(String.format("The mining of refactorings at the commit %s was canceled",
+            commit.getId().asString()));
       }
     }
   }
@@ -135,7 +136,9 @@ public class PRMiningBackgroundableTask extends Task.Backgroundable {
           .convert(new ArrayList<>(), commit.getId().asString(), commit.getParents().get(0).asString(),
               commit.getTimestamp(), project);
       refactoringEntry.setTimeout(true);
-      MiningService.getInstance(project).getState().refactoringsMap.map.put(commit.getId().asString(), refactoringEntry);
+      MiningService.getInstance(project).getState().refactoringsMap.map.put(
+          commit.getId().asString(),
+          refactoringEntry);
     }
   }
 }
