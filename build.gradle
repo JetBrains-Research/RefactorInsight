@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'checkstyle'
     id 'jacoco'
-    id 'org.jetbrains.intellij' version '0.6.4'
+    id 'org.jetbrains.intellij' version '0.6.5'
 }
 
 group 'org.jetbrains.research.refactorinsight'
@@ -55,8 +55,8 @@ dependencies {
 }
 
 intellij {
-    version = 'LATEST-EAP-SNAPSHOT'
-    plugins 'java', 'git4idea', "github"
+    version = '2020.3'
+    plugins = ['java', 'git4idea', "github"]
     downloadSources true
 }
 
