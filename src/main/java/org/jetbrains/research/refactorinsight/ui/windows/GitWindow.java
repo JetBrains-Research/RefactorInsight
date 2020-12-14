@@ -8,6 +8,7 @@ import com.intellij.ui.Gray;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBViewport;
+import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.vcs.log.VcsCommitMetadata;
@@ -22,6 +23,9 @@ import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import com.intellij.vcs.log.ui.table.column.Author;
+import com.intellij.vcs.log.ui.table.column.Commit;
+import com.intellij.vcs.log.ui.table.column.Date;
 import icons.RefactorInsightIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
@@ -180,8 +184,7 @@ public class GitWindow {
       }
 
       VcsLogGraphTable graphTable = (VcsLogGraphTable) table;
-      /* TODO: VcsLogColumn.DATE, VcsLogColumn.COMMIT, VcsLogColumn.AUTHOR were removed from SDK
-      if (labelsVisible && column == graphTable.getColumnViewIndex(VcsLogColumn.DATE)) {
+      if (labelsVisible && column == graphTable.getColumnViewIndex(Date.INSTANCE)) {
         String commitHash = graphTable.getModel().getCommitId(row).getHash().asString();
         if (miner.containsRefactoring(commitHash)) {
           setIcon(RefactorInsightIcons.node);
@@ -190,14 +193,14 @@ public class GitWindow {
           append("      ",
               graphTable.applyHighlighters(this, row, column, hasFocus, selected));
         }
-      }*/
+      }
 
       append(value.toString(),
           graphTable.applyHighlighters(this, row, column, hasFocus, selected));
-      /* if (column == graphTable.getColumnViewIndex(VcsLogColumn.COMMIT)
-          || column == graphTable.getColumnViewIndex(VcsLogColumn.AUTHOR)) {
+      if (column == graphTable.getColumnViewIndex(Commit.INSTANCE)
+          || column == graphTable.getColumnViewIndex(Author.INSTANCE)) {
         SpeedSearchUtil.applySpeedSearchHighlighting(table, this, false, selected);
-      }*/
+      }
     }
   }
 }

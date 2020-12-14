@@ -7,6 +7,7 @@ import com.intellij.openapi.vfs.VirtualFilePathWrapper;
 import com.intellij.openapi.vfs.VirtualFileWithoutContent;
 import com.intellij.testFramework.LightVirtualFileBase;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -51,7 +52,7 @@ public class PRVirtualFile extends LightVirtualFileBase implements VirtualFileWi
 
   @Override
   public @NotNull String getPresentablePath() {
-    return "Discovered refactorings in opened PR";
+    return RefactorInsightBundle.message("discovered.refactorings.in.pr");
   }
 
   @Override

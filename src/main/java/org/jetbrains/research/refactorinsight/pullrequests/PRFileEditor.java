@@ -75,7 +75,7 @@ public class PRFileEditor extends FileEditorBase {
 
   private void collectCommitsDetails() {
     ProgressManager.getInstance().run(new Task.Modal(
-        project, "Collecting information about commits' details", true) {
+        project, "", true) {
       List<? extends VcsFullCommitDetails> details;
 
       @Override
@@ -107,6 +107,9 @@ public class PRFileEditor extends FileEditorBase {
     }
   }
 
+  /**
+   * Creates a loading panel that is shown during the refactoring detection.
+   */
   private void createLoadingPanel() {
     loadingPanel = new JBLoadingPanel(new BorderLayout(), this);
     loadingPanel.addListener(new JBLoadingPanelListener.Adapter() {

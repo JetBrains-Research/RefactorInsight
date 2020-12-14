@@ -14,6 +14,7 @@ import com.intellij.vcs.log.VcsFullCommitDetails;
 import org.eclipse.jgit.lib.Repository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.pullrequests.PRFileEditor;
 import org.jetbrains.research.refactorinsight.services.MiningService;
@@ -42,7 +43,7 @@ public class PRMiningBackgroundableTask extends Task.Backgroundable {
    */
   public PRMiningBackgroundableTask(
       @Nullable Project project, List<VcsFullCommitDetails> commitDetails, PRFileEditor prFileEditor) {
-    super(project, "Mining refactorings", true);
+    super(project, RefactorInsightBundle.message("mining"), true);
     this.project = project;
     this.service = ServiceManager.getService(project, MiningService.class);
     this.myRepository = service.getRepository();

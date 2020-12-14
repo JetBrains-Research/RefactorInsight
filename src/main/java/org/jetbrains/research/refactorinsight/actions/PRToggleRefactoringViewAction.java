@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.github.api.data.GHCommit;
 import org.jetbrains.plugins.github.pullrequest.action.GHPRActionKeys;
 import org.jetbrains.plugins.github.pullrequest.data.provider.GHPRChangesDataProvider;
+import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.services.WindowService;
 import org.jetbrains.research.refactorinsight.pullrequests.PRVirtualFile;
 
@@ -34,13 +35,14 @@ public class PRToggleRefactoringViewAction extends DumbAwareToggleAction {
     try {
       List<GHCommit> ghCommits = loadedCommits.get();
       for (GHCommit ghCommit : ghCommits) {
-        ghCommit.getParents().get(0).getId();
         commitIds.add(ghCommit.getOid());
       }
     } catch (InterruptedException | ExecutionException interruptedException) {
       interruptedException.printStackTrace();
     }
-    PRVirtualFile prVirtualFile = new PRVirtualFile("Discovered refactorings in PR", null, 0, commitIds);
+
+    PRVirtualFile prVirtualFile = new PRVirtualFile(RefactorInsightBundle.message("discovered.refactorings.in.pr"),
+        null, 0, commitIds);
     ApplicationManager.getApplication()
         .invokeAndWait(() -> FileEditorManager.getInstance(project)
             .openEditor(new OpenFileDescriptor(project, prVirtualFile), true));
