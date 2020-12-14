@@ -181,12 +181,21 @@ public class RefactoringLine {
           ? lines[LEFT_START] : lines[LEFT_START] + 1;
       int rightStart = lines[RIGHT_START] == lines[RIGHT_END]
           ? lines[RIGHT_START] : lines[RIGHT_START] + 1;
-      fragments.add(new DiffFragmentImpl(
-          Utils.getOffset(leftText, leftStart, columns[LEFT_START]),
-          Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]),
-          Utils.getOffset(rightText, rightStart, columns[RIGHT_START]),
-          Utils.getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END])));
+
+      int leftStartOffset = Utils.getOffset(leftText, leftStart, columns[LEFT_START]);
+      int leftEndOffset = Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]);
+      int rightStartOffset = Utils.getOffset(rightText, rightStart, columns[RIGHT_START]);
+      int rightEndOffset = Utils.getOffset(rightText, lines[RIGHT_END], columns[RIGHT_END]);
+
+      if ((leftStartOffset != leftEndOffset) && (rightStartOffset != rightEndOffset)) {
+        fragments.add(new DiffFragmentImpl(
+            leftStartOffset,
+            leftEndOffset,
+            rightStartOffset,
+            rightEndOffset));
+      }
     }
+
     fragment = new LineFragmentImpl(lines[LEFT_START], lines[LEFT_END], lines[RIGHT_START],
         lines[RIGHT_END], 0, 0, 0, 0, fragments);
   }
