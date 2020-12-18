@@ -43,7 +43,7 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
   private final int limit;
 
   /**
-   * misc.CommitMiner for mining a single commit.
+   * CommitMiner for mining a single commit.
    *
    * @param pool       ThreadPool to submit to.
    * @param map        Map to add mined commit data to.
