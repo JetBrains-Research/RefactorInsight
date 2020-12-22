@@ -20,7 +20,7 @@ Click on a commit and then on the ![](assets/img/refactorinsight_toggle.svg) to 
 ### Refactorings in Pull Requests
 To see the refactorings in a specific pull request, open the `Pull Requests` tab, select any pull request and click on the ![](assets/img/refactorinsight_toggle.svg).
 
-<img src="assets/img/refactorinsight_pull_requests.png" alt="PullRequests" width="900">
+<img src="assets/img/refactorinsight_pull_requests.png" alt="PullRequests" width="600">
 
 ### Refactoring history of an object
 In order to see the refactoring history of a method, class, or attribute, right-click on the object's signature and select `Check Refactoring History`. Here is an example for a method named `Repl`:
