@@ -1,0 +1,8 @@
+pluginManagement {
+    repositories {
+        maven {
+            url 'https://www.jetbrains.com/intellij-repository/snapshots/'
+        }
+        gradlePluginPortal()
+    }
+}

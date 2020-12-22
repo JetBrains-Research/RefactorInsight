@@ -13,7 +13,6 @@ import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
-import com.intellij.vcs.log.ui.table.VcsLogColumn;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 
 import java.awt.event.MouseAdapter;
@@ -24,6 +23,9 @@ import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import com.intellij.vcs.log.ui.table.column.Author;
+import com.intellij.vcs.log.ui.table.column.Commit;
+import com.intellij.vcs.log.ui.table.column.Date;
 import icons.RefactorInsightIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
@@ -39,7 +41,6 @@ import org.jetbrains.research.refactorinsight.ui.tree.renderers.MainCellRenderer
  */
 public class GitWindow {
   private Project project;
-
   private ChangesTree changesTree;
   private JBViewport viewport;
   private VcsLogGraphTable table;
@@ -154,7 +155,7 @@ public class GitWindow {
                 node.getUserObjectPath()[1];
 
             DiffWindow.showDiff(table.getModel().getFullDetails(index)
-                .getChanges(0), info, project, entry);
+                .getChanges(0), info, project, entry.getRefactorings());
           }
         }
       }
@@ -183,7 +184,7 @@ public class GitWindow {
       }
 
       VcsLogGraphTable graphTable = (VcsLogGraphTable) table;
-      if (labelsVisible && column == graphTable.getColumnViewIndex(VcsLogColumn.DATE)) {
+      if (labelsVisible && column == graphTable.getColumnViewIndex(Date.INSTANCE)) {
         String commitHash = graphTable.getModel().getCommitId(row).getHash().asString();
         if (miner.containsRefactoring(commitHash)) {
           setIcon(RefactorInsightIcons.node);
@@ -196,9 +197,8 @@ public class GitWindow {
 
       append(value.toString(),
           graphTable.applyHighlighters(this, row, column, hasFocus, selected));
-
-      if (column == graphTable.getColumnViewIndex(VcsLogColumn.COMMIT)
-          || column == graphTable.getColumnViewIndex(VcsLogColumn.AUTHOR)) {
+      if (column == graphTable.getColumnViewIndex(Commit.INSTANCE)
+          || column == graphTable.getColumnViewIndex(Author.INSTANCE)) {
         SpeedSearchUtil.applySpeedSearchHighlighting(table, this, false, selected);
       }
     }

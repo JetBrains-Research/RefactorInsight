@@ -224,13 +224,6 @@
             <message key="ws.notPreceded"
               value="GenericWhitespace ''{0}'' is not preceded with whitespace."/>
         </module>
-        <module name="AbbreviationAsWordInName">
-            <property name="ignoreFinal" value="false"/>
-            <property name="allowedAbbreviationLength" value="1"/>
-            <property name="tokens"
-              value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, ANNOTATION_DEF, ANNOTATION_FIELD_DEF,
-                    PARAMETER_DEF, VARIABLE_DEF, METHOD_DEF"/>
-        </module>
         <module name="OverloadMethodsDeclarationOrder"/>
         <module name="MethodParamPad">
             <property name="tokens"
