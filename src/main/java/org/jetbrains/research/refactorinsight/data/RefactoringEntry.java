@@ -1,12 +1,12 @@
 package org.jetbrains.research.refactorinsight.data;
 
 import static org.jetbrains.research.refactorinsight.utils.StringUtils.ENTRY;
-import static org.refactoringminer.api.RefactoringType.EXTRACT_CLASS;
-import static org.refactoringminer.api.RefactoringType.EXTRACT_SUPERCLASS;
-import static org.refactoringminer.api.RefactoringType.MOVE_ATTRIBUTE;
-import static org.refactoringminer.api.RefactoringType.MOVE_OPERATION;
-import static org.refactoringminer.api.RefactoringType.PULL_UP_ATTRIBUTE;
-import static org.refactoringminer.api.RefactoringType.PULL_UP_OPERATION;
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.EXTRACT_CLASS;
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.EXTRACT_SUPERCLASS;
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.MOVE_ATTRIBUTE;
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.MOVE_OPERATION;
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.PULL_UP_ATTRIBUTE;
+import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.PULL_UP_OPERATION;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
