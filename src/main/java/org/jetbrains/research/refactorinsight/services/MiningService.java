@@ -11,6 +11,7 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.annotations.OptionTag;
 import com.intellij.vcs.log.VcsCommitMetadata;
+import com.intellij.vcs.log.VcsFullCommitDetails;
 import git4idea.history.GitHistoryUtils;
 import git4idea.repo.GitRepository;
 
@@ -31,7 +32,9 @@ import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.processors.CommitMiner;
+import org.jetbrains.research.refactorinsight.processors.PRMiningBackgroundableTask;
 import org.jetbrains.research.refactorinsight.processors.SingleCommitRefactoringTask;
+import org.jetbrains.research.refactorinsight.pullrequests.PRFileEditor;
 import org.jetbrains.research.refactorinsight.ui.windows.GitWindow;
 import org.jetbrains.research.refactorinsight.utils.Utils;
 import org.refactoringminer.util.GitServiceImpl;
@@ -52,6 +55,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   private boolean mining = false;
   private MyState innerState = new MyState();
   private SingleCommitRefactoringTask task = null;
+  private PRMiningBackgroundableTask prTask = null;
   private Repository myRepository = null;
 
   public MiningService() {
@@ -217,6 +221,22 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
     task = new SingleCommitRefactoringTask(project, commit, window);
     ProgressManager.getInstance().run(task);
+  }
+
+  /**
+   * Runs detection of refactorings in Pull Request.
+   *
+   * @param commitDetails pull request's commits details.
+   * @param project       current project.
+   * @param scrollPane    scrollPane to be updated.
+   */
+  public void mineAtCommitFromPR(List<VcsFullCommitDetails> commitDetails,
+                                 Project project, PRFileEditor scrollPane) {
+    if (myRepository == null) {
+      myRepository = openRepository(project.getBasePath());
+    }
+    prTask = new PRMiningBackgroundableTask(project, commitDetails, scrollPane);
+    ProgressManager.getInstance().run(prTask);
   }
 
   public Map<String, Set<RefactoringInfo>> getRefactoringHistory() {

@@ -8,7 +8,7 @@
 RefactorInsight is a plugin for IntelliJ IDEA that enables the IDE to visualize refactorings in the commit history of Java projects. RefactorInsight relies on [RefactoringMiner](https://github.com/tsantalis/RefactoringMiner) for retrieval of refactorings.
 
 ## Getting started
-RefactorInsight is сompatible with IntelliJ IDEA 2020.2 and is available for free in the Marketplace: [RefactorInsight](https://plugins.jetbrains.com/plugin/14704-refactorinsight). 
+RefactorInsight is сompatible with IntelliJ IDEA 2020.3 and is available for free in the Marketplace: [RefactorInsight](https://plugins.jetbrains.com/plugin/14704-refactorinsight).
 
 ### Refactorings in commits
 To see the refactorings in a git repository, open the built-in `Git` tab. On the right side, you will see a toggle button ![](assets/img/refactorinsight_toggle.svg).
@@ -16,6 +16,11 @@ To see the refactorings in a git repository, open the built-in `Git` tab. On the
 Click on a commit and then on the ![](assets/img/refactorinsight_toggle.svg) to see the refactorings detected in that commit. It looks like this:
 
 <img src="assets/img/refactorinsight_main.png" alt="Example" width="900">
+
+### Refactorings in Pull Requests
+To see the refactorings in a specific pull request, open the `Pull Requests` tab, select any pull request and click on the ![](assets/img/refactorinsight_toggle.svg).
+
+<img src="assets/img/refactorinsight_pull_requests.png" alt="PullRequests" width="600">
 
 ### Refactoring history of an object
 In order to see the refactoring history of a method, class, or attribute, right-click on the object's signature and select `Check Refactoring History`. Here is an example for a method named `Repl`:

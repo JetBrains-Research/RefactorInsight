@@ -59,7 +59,6 @@ import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.diff.MoreSidedDiffRequestGenerator.MoreSidedRange;
 import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedRange;
@@ -89,15 +88,15 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
    * @param project Current project
    */
   public static void showDiff(Collection<Change> changes, RefactoringInfo info,
-                              Project project, RefactoringEntry entry) {
+                              Project project, List<RefactoringInfo> refactoringInfos) {
     final Predicate<RefactoringInfo> showable =
         i -> !i.isHidden() && i.getLeftPath() != null;
-    List<DiffRequest> requests = entry.getRefactorings().stream()
+    List<DiffRequest> requests = refactoringInfos.stream()
         .filter(showable)
         .map(i -> i.generate(getDiffContents(changes, i, project)))
         .collect(Collectors.toList());
     DiffRequestChain chain = new SimpleDiffRequestChain(requests);
-    final int index = entry.getRefactorings().stream()
+    final int index = refactoringInfos.stream()
         .filter(showable).collect(Collectors.toList()).indexOf(info);
     if (index != -1) {
       chain.setIndex(index);
@@ -106,7 +105,6 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
           new DiffDialogHints(WindowWrapper.Mode.FRAME));
     }
   }
-
 
   private static DiffContent[] getDiffContents(Collection<Change> changes,
                                                RefactoringInfo info, Project project) {

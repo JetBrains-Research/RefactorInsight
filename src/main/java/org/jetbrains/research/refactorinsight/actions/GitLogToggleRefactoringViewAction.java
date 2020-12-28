@@ -15,7 +15,7 @@ import org.jetbrains.research.refactorinsight.services.WindowService;
  * toggles between classical diff view and refactoring view.
  * Invokes the added git ui.
  */
-public class ToggleRefactoringViewAction extends DumbAwareToggleAction {
+public class GitLogToggleRefactoringViewAction extends DumbAwareToggleAction {
 
   @Override
   public void setSelected(@NotNull AnActionEvent e, boolean state) {

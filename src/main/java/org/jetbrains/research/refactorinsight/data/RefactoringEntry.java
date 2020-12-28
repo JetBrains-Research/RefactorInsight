@@ -1,16 +1,15 @@
 package org.jetbrains.research.refactorinsight.data;
 
-import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.EXTRACT_CLASS;
-import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.EXTRACT_SUPERCLASS;
-import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.MOVE_ATTRIBUTE;
-import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.MOVE_OPERATION;
-import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.PULL_UP_ATTRIBUTE;
-import static org.jetbrains.research.refactorinsight.adapters.RefactoringType.PULL_UP_OPERATION;
 import static org.jetbrains.research.refactorinsight.utils.StringUtils.ENTRY;
+import static org.refactoringminer.api.RefactoringType.EXTRACT_CLASS;
+import static org.refactoringminer.api.RefactoringType.EXTRACT_SUPERCLASS;
+import static org.refactoringminer.api.RefactoringType.MOVE_ATTRIBUTE;
+import static org.refactoringminer.api.RefactoringType.MOVE_OPERATION;
+import static org.refactoringminer.api.RefactoringType.PULL_UP_ATTRIBUTE;
+import static org.refactoringminer.api.RefactoringType.PULL_UP_OPERATION;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
-import com.intellij.vcs.log.TimedVcsCommit;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -81,16 +80,19 @@ public class RefactoringEntry implements Serializable {
   /**
    * Converter to RefactoringEntry given a list of refactorings, commit metadata and project.
    *
-   * @param refactorings to be processed.
-   * @param commit       current commit.
+   * @param refactorings     to be processed.
+   * @param commitHash       current commit.
+   * @param commitParentHash parent commit hash.
+   * @param commitTimestamp  commit timestamp.
    * @return new refactoring entry.
    */
-  public static RefactoringEntry convertJavaRefactorings(List<Refactoring> refactorings, TimedVcsCommit commit,
+  public static RefactoringEntry convertJavaRefactorings(List<Refactoring> refactorings,
+                                                         String commitHash,
+                                                         String commitParentHash,
+                                                         long commitTimestamp,
                                                          Project project) {
-
     RefactoringEntry entry =
-        new RefactoringEntry(commit.getId().asString(),
-            commit.getParents().get(0).asString(), commit.getTimestamp());
+        new RefactoringEntry(commitHash, commitParentHash, commitTimestamp);
 
     List<RefactoringInfo> infos =
         refactorings.stream().map(ref -> factory.create(ref, entry)).collect(
@@ -105,19 +107,20 @@ public class RefactoringEntry implements Serializable {
   /**
    * Converter to RefactoringEntry given a list of refactorings, commit metadata and project.
    *
-   * @param refactorings to be processed.
-   * @param commit       current commit.
-   * @param project      opened project.
+   * @param refactorings     to be processed.
+   * @param commitHash       current commit.
+   * @param commitParentHash parent commit hash.
+   * @param commitTimestamp  commit timestamp.
    * @return new refactoring entry.
    */
   public static RefactoringEntry convertKotlinRefactorings(
       List<org.jetbrains.research.kotlinrminer.api.Refactoring> refactorings,
-      TimedVcsCommit commit,
+      String commitHash,
+      String commitParentHash,
+      long commitTimestamp,
       Project project) {
-
     RefactoringEntry entry =
-        new RefactoringEntry(commit.getId().asString(),
-            commit.getParents().get(0).asString(), commit.getTimestamp());
+        new RefactoringEntry(commitHash, commitParentHash, commitTimestamp);
 
     List<RefactoringInfo> infos =
         refactorings.stream().map(ref -> factory.create(ref, entry)).collect(
@@ -132,12 +135,16 @@ public class RefactoringEntry implements Serializable {
   /**
    * Creates an empty entry for a commit that doesn't contain any refactoring.
    *
-   * @param commit current commit.
+   * @param commitHash       current commit.
+   * @param commitParentHash parent commit hash.
+   * @param commitTimestamp  commit timestamp.
    * @return a new empty refactoring empty.
    */
-  public static RefactoringEntry createEmptyEntry(TimedVcsCommit commit) {
-    RefactoringEntry refactoringEntry = new RefactoringEntry(commit.getId().asString(),
-        commit.getParents().get(0).asString(), commit.getTimestamp());
+  public static RefactoringEntry createEmptyEntry(String commitHash,
+                                                  String commitParentHash,
+                                                  long commitTimestamp) {
+    RefactoringEntry refactoringEntry = new RefactoringEntry(commitHash,
+        commitParentHash, commitTimestamp);
     refactoringEntry.setRefactorings(new ArrayList<>());
     return refactoringEntry;
   }

@@ -10,50 +10,44 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
 import com.intellij.util.ExceptionUtil;
-import com.intellij.vcs.log.TimedVcsCommit;
-import com.intellij.vcs.log.VcsCommitMetadata;
-
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
+import com.intellij.vcs.log.VcsFullCommitDetails;
 import org.eclipse.jgit.lib.Repository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
+import org.jetbrains.research.refactorinsight.pullrequests.PRFileEditor;
 import org.jetbrains.research.refactorinsight.services.MiningService;
-import org.jetbrains.research.refactorinsight.ui.windows.GitWindow;
 
-public class SingleCommitRefactoringTask extends Task.Backgroundable {
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+public class PRMiningBackgroundableTask extends Task.Backgroundable {
   private final Project project;
-  private final VcsCommitMetadata commit;
-  private final GitWindow window;
+  private final PRFileEditor prFileEditor;
   private final MiningService service;
   private final Repository myRepository;
   private boolean canceled = false;
-  private final Logger logger = Logger.getInstance(SingleCommitRefactoringTask.class);
+  private final Logger logger = Logger.getInstance(PRMiningBackgroundableTask.class);
+  List<VcsFullCommitDetails> commitDetails;
 
   /**
-   * Cancelable mining task for mining a single commit.
+   * Cancelable mining task for mining refactorings in pull request.
    *
-   * @param project Current IDEA project
-   * @param commit  Commit meta data
-   * @param window  Git Window for callback
+   * @param project       current  project.
+   * @param commitDetails pull request's commits details.
    */
-  public SingleCommitRefactoringTask(
-      @Nullable Project project,
-      VcsCommitMetadata commit,
-      GitWindow window) {
-    super(project,
-        String.format(RefactorInsightBundle.message("mining.at"), commit.getId().toShortString()));
+  public PRMiningBackgroundableTask(
+      @Nullable Project project, List<VcsFullCommitDetails> commitDetails, PRFileEditor prFileEditor) {
+    super(project, RefactorInsightBundle.message("mining"), true);
     this.project = project;
-    this.commit = commit;
-    this.window = window;
     this.service = ServiceManager.getService(project, MiningService.class);
     this.myRepository = service.getRepository();
+    this.prFileEditor = prFileEditor;
+    this.commitDetails = commitDetails;
   }
 
   @Override
@@ -64,23 +58,23 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
   @Override
   public void onFinished() {
     super.onFinished();
-    if (service.containsCommit(commit.getId().asString())) {
-      System.out.println(RefactorInsightBundle.message("finished"));
-      ApplicationManager.getApplication()
-          .invokeLater(() -> window.refresh(commit.getId().asString()));
-    }
+    ApplicationManager.getApplication()
+        .invokeLater(prFileEditor::buildComponent);
   }
 
   @Override
   public void run(@NotNull ProgressIndicator progressIndicator) {
-    try {
-      runWithCheckCanceled(
-          CommitMiner.mineAtCommit(commit.getId().asString(), commit.getParents().get(0).asString(),
-              commit.getTimestamp(), service.getState().refactoringsMap.map, project, myRepository),
-          progressIndicator, commit, project
-      );
-    } catch (Exception e) {
-      logger.info(String.format("The mining of refactorings at the commit %s was canceled", commit.getId()));
+    for (VcsFullCommitDetails commit : commitDetails) {
+      try {
+        runWithCheckCanceled(
+            () -> CommitMiner.mineAtCommit(commit.getId().asString(), commit.getParents().get(0).asString(),
+                commit.getTimestamp(), service.getState().refactoringsMap.map, project, myRepository),
+            progressIndicator, commit, project
+        );
+      } catch (Exception e) {
+        logger.info(String.format("The mining of refactorings at the commit %s was canceled",
+            commit.getId().asString()));
+      }
     }
   }
 
@@ -93,7 +87,7 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
    */
   public void runWithCheckCanceled(@NotNull final Runnable runnable,
                                    @NotNull final ProgressIndicator indicator,
-                                   VcsCommitMetadata commit, Project project) throws Exception {
+                                   VcsFullCommitDetails commit, Project project) throws Exception {
     final Ref<Throwable> error = Ref.create();
     Future<?> future = ApplicationManager.getApplication().executeOnPooledThread(
         () -> ProgressManager.getInstance().executeProcessUnderProgress(() -> {
@@ -119,7 +113,7 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
    */
   private <T> void runWithCheckCanceled(@NotNull Future<T> future,
                                         @NotNull final ProgressIndicator indicator,
-                                        TimedVcsCommit commit, Project project) throws
+                                        VcsFullCommitDetails commit, Project project) throws
       ExecutionException {
     int timeout = 6000;
     while (timeout > 0) {
@@ -138,11 +132,12 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
       timeout -= 1;
     }
     if (timeout == 0) {
-      RefactoringEntry refactoringEntry =
-          RefactoringEntry.createEmptyEntry(commit.getId().asString(), commit.getParents().get(0).asString(),
+      RefactoringEntry refactoringEntry = RefactoringEntry
+          .createEmptyEntry(commit.getId().asString(), commit.getParents().get(0).asString(),
               commit.getTimestamp());
       refactoringEntry.setTimeout(true);
-      MiningService.getInstance(project).getState().refactoringsMap.map.put(commit.getId().asString(),
+      MiningService.getInstance(project).getState().refactoringsMap.map.put(
+          commit.getId().asString(),
           refactoringEntry);
     }
   }

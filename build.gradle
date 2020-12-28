@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'checkstyle'
     id 'jacoco'
-    id 'org.jetbrains.intellij' version '0.4.21'
+    id 'org.jetbrains.intellij' version '0.6.5'
 }
 
 group 'org.jetbrains.research.refactorinsight'
@@ -43,8 +43,6 @@ dependencies {
 //    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
 //    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
     testImplementation('junit:junit:4.13')
-    implementation files('lib/intellij.vcs.git.jar')
-    implementation files('lib/intellij.platform.vcs.testFramework.jar')
     implementation files('lib/kotlinRMiner-1.0.jar')
     compile 'org.eclipse.jgit:org.eclipse.jgit:5.2.1.201812262042-r'
     compile 'org.slf4j:slf4j-log4j12:1.7.7'
@@ -56,8 +54,8 @@ dependencies {
 }
 
 intellij {
-    version '2020.2'
-    plugins 'java', 'git4idea'
+    version = '2020.3'
+    plugins = ['java', 'git4idea', "github"]
     downloadSources true
 }
 

@@ -44,7 +44,7 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
   private final int limit;
 
   /**
-   * misc.CommitMiner for mining a single commit.
+   * CommitMiner for mining a single commit.
    *
    * @param pool       ThreadPool to submit to.
    * @param map        Map to add mined commit data to.
@@ -66,48 +66,54 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
   /**
    * Returns a runnable that processes only one commit by consistently running RefactoringMiner and kotlinRMiner.
    *
-   * @param commit     commit metadata.
-   * @param map        the inner map that should be updated.
-   * @param project    the current project.
-   * @param repository Git Repository.
+   * @param commitHash       commit hash.
+   * @param commitParentHash commit parent's hash.
+   * @param commitTimestamp  commit timestamp.
+   * @param map              the inner map that should be updated.
+   * @param project          the current project.
+   * @param repository       Git Repository.
    */
-  public static Runnable mineAtCommit(TimedVcsCommit commit, Map<String, RefactoringEntry> map,
+  public static Runnable mineAtCommit(String commitHash, String commitParentHash, long commitTimestamp,
+                                      Map<String, RefactoringEntry> map,
                                       Project project, Repository repository) {
-    return getRunnableToDetectRefactorings(map, commit, repository, project);
+    return getRunnableToDetectRefactorings(map, commitHash, commitParentHash, commitTimestamp, repository, project);
   }
 
   /**
    * Creates a runnable to detect refactorings in Kotlin and Java code.
    *
-   * @param commit     commit metadata.
-   * @param map        the inner map that should be updated.
-   * @param project    the current project.
-   * @param repository Git Repository.
+   * @param commitHash       commit hash.
+   * @param commitParentHash commit parent's hash.
+   * @param commitTimestamp  commit timestamp.
+   * @param map              the inner map that should be updated.
+   * @param project          the current project.
+   * @param repository       Git Repository.
    * @return a runnable.
    */
-  private static Runnable getRunnableToDetectRefactorings(Map<String, RefactoringEntry> map, TimedVcsCommit commit,
+  private static Runnable getRunnableToDetectRefactorings(Map<String, RefactoringEntry> map, String commitHash,
+                                                          String commitParentHash, long commitTimestamp,
                                                           Repository repository, Project project) {
-    String commitId = commit.getId().asString();
-
     GitHistoryKotlinRMiner kminer = new GitHistoryKotlinRMiner();
     GitHistoryRefactoringMiner jminer = new GitHistoryRefactoringMinerImpl();
 
     return () -> {
       try {
-        jminer.detectAtCommit(repository, commitId, new RefactoringHandler() {
+        jminer.detectAtCommit(repository, commitHash, new RefactoringHandler() {
           @Override
           public void handle(String commitId, List<Refactoring> refactorings) {
-            map.put(commitId, RefactoringEntry.convertJavaRefactorings(refactorings, commit, project));
+            map.put(commitId, RefactoringEntry.convertJavaRefactorings(refactorings, commitHash,
+                commitParentHash, commitTimestamp, project));
           }
         });
 
-        kminer.detectAtCommit(repository, commitId,
+        kminer.detectAtCommit(repository, commitHash,
             new org.jetbrains.research.kotlinrminer.api.RefactoringHandler() {
               @Override
               public void handle(String commitId,
                                  List<org.jetbrains.research.kotlinrminer.api.Refactoring> refactorings) {
                 final RefactoringEntry convertedKtRefactorings =
-                    RefactoringEntry.convertKotlinRefactorings(refactorings, commit, project);
+                    RefactoringEntry.convertKotlinRefactorings(refactorings, commitHash,
+                        commitParentHash, commitTimestamp, project);
                 Optional.ofNullable(map.get(commitId)).ifPresentOrElse(
                     re -> re.addRefactorings(convertedKtRefactorings.getRefactorings()),
                     () -> map.put(commitId, convertedKtRefactorings)
@@ -135,7 +141,10 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
           cancelProgress();
           return;
         }
-        detectRefactorings(getRunnableToDetectRefactorings(map, gitCommit, myRepository, myProject), gitCommit);
+        detectRefactorings(getRunnableToDetectRefactorings(map, commitId,
+            gitCommit.getParents().get(0).asString(), gitCommit.getTimestamp(),
+            myRepository, myProject), gitCommit.getId().asString(),
+            gitCommit.getParents().get(0).asString(), gitCommit.getTimestamp());
         incrementProgress();
       });
     } else {
@@ -144,8 +153,8 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
     }
   }
 
-  private void detectRefactorings(Runnable runnable, TimedVcsCommit commit) {
-    String commitId = commit.getId().asString();
+  private void detectRefactorings(Runnable runnable, String commitHash,
+                                  String commitParentHash, long commitTimestamp) {
     ExecutorService service = Executors.newSingleThreadExecutor();
     Future<?> f = null;
     try {
@@ -153,9 +162,10 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
       f.get(120, TimeUnit.SECONDS);
     } catch (TimeoutException e) {
       if (f.cancel(true)) {
-        RefactoringEntry refactoringEntry = RefactoringEntry.createEmptyEntry(commit);
+        RefactoringEntry refactoringEntry =
+            RefactoringEntry.createEmptyEntry(commitHash, commitParentHash, commitTimestamp);
         refactoringEntry.setTimeout(true);
-        map.put(commitId, refactoringEntry);
+        map.put(commitHash, refactoringEntry);
       }
     } catch (Exception e) {
       e.printStackTrace();
