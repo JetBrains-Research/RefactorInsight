@@ -67,7 +67,7 @@ public class PRMiningBackgroundableTask extends Task.Backgroundable {
     for (VcsFullCommitDetails commit : commitDetails) {
       try {
         runWithCheckCanceled(
-            () -> CommitMiner.mineAtCommit(commit.getId().asString(), commit.getParents().get(0).asString(),
+            CommitMiner.mineAtCommit(commit.getId().asString(), commit.getParents().get(0).asString(),
                 commit.getTimestamp(), service.getState().refactoringsMap.map, project, myRepository),
             progressIndicator, commit, project
         );
