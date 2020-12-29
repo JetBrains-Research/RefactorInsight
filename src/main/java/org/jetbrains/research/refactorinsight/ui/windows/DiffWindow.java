@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.swing.JList;
@@ -94,6 +95,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
     List<DiffRequest> requests = refactoringInfos.stream()
         .filter(showable)
         .map(i -> i.generate(getDiffContents(changes, i, project)))
+        .filter(Objects::nonNull)
         .collect(Collectors.toList());
     DiffRequestChain chain = new SimpleDiffRequestChain(requests);
     final int index = refactoringInfos.stream()

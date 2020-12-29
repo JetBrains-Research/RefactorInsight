@@ -11,6 +11,7 @@ import com.intellij.diff.fragments.LineFragment;
 import com.intellij.diff.fragments.LineFragmentImpl;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.util.DiffUserDataKeysEx;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
@@ -75,8 +77,9 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
   @Override
   public SimpleDiffRequest generate(DiffContent[] contents, RefactoringInfo info) {
     SimpleDiffRequest request;
-    assert contents[0] != null;
-    assert contents[2] != null;
+    if (contents[0] == null || contents[2] == null) {
+      return null;
+    }
     request = new SimpleDiffRequest(info.getName(),
         contents[0], contents[2], info.getLeftPath(), info.getRightPath());
     request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,

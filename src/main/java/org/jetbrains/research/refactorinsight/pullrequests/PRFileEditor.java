@@ -69,14 +69,15 @@ public class PRFileEditor extends FileEditorBase {
   }
 
   @Override
-  public @NotNull JComponent getComponent() {
+  public @NotNull
+  JComponent getComponent() {
     return loadingPanel;
   }
 
   private void collectCommitsDetails() {
     ProgressManager.getInstance().run(new Task.Modal(
         project, "", true) {
-      List<? extends VcsFullCommitDetails> details;
+      List<? extends VcsFullCommitDetails> details = new ArrayList<>();
 
       @Override
       public void run(@NotNull ProgressIndicator progressIndicator) {
@@ -182,17 +183,20 @@ public class PRFileEditor extends FileEditorBase {
   }
 
   @Override
-  public @Nullable JComponent getPreferredFocusedComponent() {
+  public @Nullable
+  JComponent getPreferredFocusedComponent() {
     return panel;
   }
 
   @Override
-  public @NotNull String getName() {
+  public @NotNull
+  String getName() {
     return "RefactorInsight";
   }
 
   @Override
-  public @Nullable VirtualFile getFile() {
+  public @Nullable
+  VirtualFile getFile() {
     return file;
   }
 }
