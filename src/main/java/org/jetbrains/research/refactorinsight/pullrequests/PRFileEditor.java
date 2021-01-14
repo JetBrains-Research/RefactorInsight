@@ -19,7 +19,6 @@ import com.intellij.vcs.log.VcsLogProvider;
 import com.intellij.vcs.log.data.VcsLogData;
 import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.util.VcsLogUtil;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
@@ -170,7 +169,9 @@ public class PRFileEditor extends FileEditorBase {
                   node.getUserObjectPath()[1];
               final Collection<Change> changes = Optional.ofNullable(commitsDetails.get(info.getCommitId()))
                   .map(VcsFullCommitDetails::getChanges).orElse(new ArrayList<>());
-              DiffWindow.showDiff(changes, info, project, info.getEntry().getRefactorings());
+              if (changes.size() != 0) {
+                DiffWindow.showDiff(changes, info, project, info.getEntry().getRefactorings());
+              }
             }
           }
         }

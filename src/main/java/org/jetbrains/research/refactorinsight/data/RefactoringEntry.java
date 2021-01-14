@@ -228,7 +228,8 @@ public class RefactoringEntry implements Serializable {
   private void combineRelatedExtractClass() {
     //find all extract class refactorings
     List<RefactoringInfo> extractClassRefactorings = refactorings
-        .stream().filter(x -> x.getType().name().equals(EXTRACT_CLASS.name())).collect(Collectors.toList());
+        .stream().filter(x -> x != null && x.getType().name().equals(EXTRACT_CLASS.name()))
+        .collect(Collectors.toList());
 
     List<RefactoringInfo> moves = refactorings.stream()
         .filter(info -> info.getType().name().equals(MOVE_OPERATION.name())
