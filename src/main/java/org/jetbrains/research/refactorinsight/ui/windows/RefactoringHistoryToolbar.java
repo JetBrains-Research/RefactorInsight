@@ -163,7 +163,7 @@ public class RefactoringHistoryToolbar {
       Disposer.dispose(openLogTab);
     });
 
-    openLogTab.jumpToHash(info.getCommitId());
+    openLogTab.getVcsLog().jumpToReference(info.getCommitId());
 
     VcsLogChangesBrowser browser = Objects.requireNonNull(UIUtil.findComponentOfType(openLogTab.getMainComponent(),
             VcsLogChangesBrowser.class));
