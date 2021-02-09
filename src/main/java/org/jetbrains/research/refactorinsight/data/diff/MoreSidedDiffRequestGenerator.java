@@ -19,7 +19,7 @@ import org.jetbrains.research.refactorinsight.ui.windows.DiffWindow;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 
 /**
- * Generates data for refactorings needing more than three editors to visualize.
+ * Generates data for refactorings that need more than three editors to visualize.
  */
 public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
 
@@ -35,7 +35,7 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
   /**
    * Extracts and returns class names (incl. package) from the left paths.
    *
-   * @return list of class names
+   * @return list of class names.
    */
   public List<String> getClassNames() {
     return lines.stream()
@@ -50,9 +50,7 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
   }
 
   /**
-   * Serializer.
-   *
-   * @return new MoreSidedDiffRequestGenerator from string
+   * Deserializes an {@link MoreSidedDiffRequestGenerator} instance from the string.
    */
   public static MoreSidedDiffRequestGenerator fromString(String seq) {
     List<MoreSidedRange> lines = Arrays.stream(seq.split(StringUtils.delimiter(StringUtils.LIST)))
@@ -69,18 +67,18 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
         lines.get(i).content = contents[i + 1];
       }
       request = new SimpleDiffRequest(info.getName(),
-          contents[1], contents[0], "Subclasses", info.getRightPath());
+                                      contents[1], contents[0], "Subclasses", info.getRightPath());
       request.putUserData(DiffWindow.REFACTORING, true);
       request.putUserData(DiffWindow.MORESIDED_RANGES, lines);
       request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
-          (text1, text2, policy, innerChanges, indicator)
-              -> new ArrayList<>());
+                          (text1, text2, policy, innerChanges, indicator)
+                              -> new ArrayList<>());
     }
     return request;
   }
 
   @Override
-  public void prepareJetBrainsRanges(List<RefactoringLine> lineMarkings) {
+  public void prepareRanges(List<RefactoringLine> lineMarkings) {
     lines = lineMarkings.stream()
         .map(RefactoringLine::getMoreSidedRange).collect(Collectors.toList());
   }
@@ -99,8 +97,8 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
   }
 
   /**
-   * Correct method that is NOT compatible with more sided ranges.
-   * Throws Exception if called.
+   * Corrects method that is NOT compatible with more sided ranges.
+   * Throws an exception if called.
    */
   @Override
   public void correct(String before, String mid, String after, boolean skipAnnotationsLeft,
@@ -112,9 +110,9 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
    * Compatible correct method for more sided ranges.
    * Corrects lines and offsets.
    *
-   * @param befores  All texts of left window (need to be in order!)
-   * @param after    Text of right side
-   * @param pathPair Path of file and boolean for revision
+   * @param befores  all texts of left window (need to be in order!).
+   * @param after    text of right side.
+   * @param pathPair path of file and boolean for revision.
    */
   public void correct(List<String> befores, String after, List<Pair<String, Boolean>> pathPair,
                       boolean skipAnnotationsLeft,
@@ -122,14 +120,14 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
     assert pathPair.size() == lineMarkings.size();
     for (int i = 0; i < befores.size(); i++) {
       lineMarkings.get(i).correctLines(befores.get(i), null, after, skipAnnotationsLeft,
-          skipAnnotationsMid, skipAnnotationsRight);
+                                       skipAnnotationsMid, skipAnnotationsRight);
       lineMarkings.get(i).getMoreSidedRange().leftPath = pathPair.get(i).first;
       if (pathPair.get(i).second) {
         lineMarkings.get(i).getMoreSidedRange().startLineRight = -1;
         lineMarkings.get(i).getMoreSidedRange().endLineRight = -1;
       }
     }
-    prepareJetBrainsRanges(lineMarkings);
+    prepareRanges(lineMarkings);
   }
 
   @Override
@@ -190,7 +188,7 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
     }
 
     /**
-     * Deserializer.
+     * Deserializes an {@link MoreSidedRange} instance from the string.
      */
     public static MoreSidedRange fromString(String seq) {
       String value = StringUtils.deSanitize(seq);
@@ -213,15 +211,15 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
      */
     public String toString() {
       return String.join(StringUtils.delimiter(StringUtils.RANGE),
-          StringUtils.sanitize(Integer.toString(startLineLeft)),
-          StringUtils.sanitize(Integer.toString(endLineLeft)),
-          StringUtils.sanitize(Integer.toString(startOffsetLeft)),
-          StringUtils.sanitize(Integer.toString(endOffsetLeft)),
-          StringUtils.sanitize(Integer.toString(startLineRight)),
-          StringUtils.sanitize(Integer.toString(endLineRight)),
-          StringUtils.sanitize(Integer.toString(startOffsetRight)),
-          StringUtils.sanitize(Integer.toString(endOffsetRight)),
-          StringUtils.sanitize(leftPath));
+                         StringUtils.sanitize(Integer.toString(startLineLeft)),
+                         StringUtils.sanitize(Integer.toString(endLineLeft)),
+                         StringUtils.sanitize(Integer.toString(startOffsetLeft)),
+                         StringUtils.sanitize(Integer.toString(endOffsetLeft)),
+                         StringUtils.sanitize(Integer.toString(startLineRight)),
+                         StringUtils.sanitize(Integer.toString(endLineRight)),
+                         StringUtils.sanitize(Integer.toString(startOffsetRight)),
+                         StringUtils.sanitize(Integer.toString(endOffsetRight)),
+                         StringUtils.sanitize(leftPath));
     }
 
 

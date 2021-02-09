@@ -5,13 +5,12 @@ import org.jetbrains.research.refactorinsight.data.types.Handler;
 import org.refactoringminer.api.Refactoring;
 
 /**
- * Factory that creates RefactoringInfo objects given Refactoring objects
- * that were retrieved from RefactoringMiner.
+ * Creates {@link RefactoringInfo} objects for refactorings provided by RefactoringMiner and kotlinRMiner.
  */
 public class InfoFactory {
 
   /**
-   * Method that creates the relevant RefactoringInfo for a given Refactoring provided by RefactoringMiner.
+   * Creates a relevant {@link RefactoringInfo} instance for a given Refactoring provided by RefactoringMiner.
    *
    * @param refactoring to be analyzed.
    * @return resulting RefactoringInfo.
@@ -22,7 +21,7 @@ public class InfoFactory {
   }
 
   /**
-   * Method that creates the relevant RefactoringInfo for a given Refactoring provided by kotlinRMiner.
+   * Creates a relevant {@link RefactoringInfo} instance for a given Refactoring provided by kotlinRMiner.
    *
    * @param refactoring to be analyzed.
    * @return resulting RefactoringInfo.

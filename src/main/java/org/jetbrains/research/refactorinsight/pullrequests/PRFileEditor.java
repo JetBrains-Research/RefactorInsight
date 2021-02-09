@@ -44,7 +44,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * PRFileEditor is intended to show a list of discovered refactorings in opened Pull Request.
+ * Shows a list of discovered refactorings in opened Pull Request.
  */
 public class PRFileEditor extends FileEditorBase {
   private final PRVirtualFile file;

@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.services.WindowService;
 
 /**
- * Toggle labeling of commits containing refactorings in VCSTable.
+ * Toggles the labeling of commits that contain refactorings in VCSTable.
  */
 public class ToggleLabelsAction extends DumbAwareToggleAction {
 
@@ -24,7 +24,7 @@ public class ToggleLabelsAction extends DumbAwareToggleAction {
   @Override
   public void update(@NotNull AnActionEvent e) {
     e.getPresentation().setEnabledAndVisible(e.getProject() != null
-            && e.getData(VcsLogInternalDataKeys.MAIN_UI) != null);
+                                                 && e.getData(VcsLogInternalDataKeys.MAIN_UI) != null);
     super.update(e);
   }
 }

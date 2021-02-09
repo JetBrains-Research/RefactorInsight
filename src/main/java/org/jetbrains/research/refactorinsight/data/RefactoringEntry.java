@@ -25,9 +25,7 @@ import org.jetbrains.research.refactorinsight.utils.Utils;
 import org.refactoringminer.api.Refactoring;
 
 /**
- * Class that holds data for a single commit.
- * Each commit in the refactorings map has a RefactoringEntry object.
- * It contains the commit id, timestamp, parent, and a list of refactorings.
+ * Collects data for a single commit: commit id, timestamp, parent, and a list of refactorings.
  */
 public class RefactoringEntry implements Serializable {
 
@@ -40,7 +38,7 @@ public class RefactoringEntry implements Serializable {
   public boolean timeout = false;
 
   /**
-   * Constructor for method refactoring.
+   * Constructor for refactoring entry.
    *
    * @param parent the commit id of the parent.
    * @param time   timestamp of the commit.
@@ -52,10 +50,10 @@ public class RefactoringEntry implements Serializable {
   }
 
   /**
-   * Deserializes a RefactoringEntry.
+   * Deserializes an {@link RefactoringEntry} instance from string.
    *
-   * @param value String
-   * @return the RefactoringEntry
+   * @param value String.
+   * @return the RefactoringEntry.
    */
   public static RefactoringEntry fromString(String value, String commitId) {
     String regex = StringUtils.delimiter(ENTRY, true);
@@ -67,7 +65,7 @@ public class RefactoringEntry implements Serializable {
     RefactoringEntry entry = new RefactoringEntry(
         commitId, tokens[0], Long.parseLong(tokens[1]))
         .setRefactorings(Arrays.stream(refs)
-            .map(RefactoringInfo::fromString).collect(Collectors.toList()));
+                             .map(RefactoringInfo::fromString).collect(Collectors.toList()));
     entry.timeout = Boolean.parseBoolean(tokens[2]);
     entry.getRefactorings().forEach(r -> r.setEntry(entry));
     return entry;
@@ -144,7 +142,7 @@ public class RefactoringEntry implements Serializable {
                                                   String commitParentHash,
                                                   long commitTimestamp) {
     RefactoringEntry refactoringEntry = new RefactoringEntry(commitHash,
-        commitParentHash, commitTimestamp);
+                                                             commitParentHash, commitTimestamp);
     refactoringEntry.setRefactorings(new ArrayList<>());
     return refactoringEntry;
   }
@@ -158,7 +156,7 @@ public class RefactoringEntry implements Serializable {
 
   /**
    * Combines related refactorings.
-   * Firstly, it combines Extract SuperClass and Extract Class with its specific move attribute's
+   * Firstly, it combines Extract Superclass and Extract Class with its specific move attribute's
    * and move method's refactorings.
    * Secondly, it combines the refactorings that have the same group identifiers.
    */

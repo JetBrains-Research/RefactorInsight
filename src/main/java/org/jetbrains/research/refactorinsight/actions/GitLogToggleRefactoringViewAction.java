@@ -10,10 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.services.WindowService;
 
 /**
- * This is the Show Refactorings Action.
- * Adds a toggle button in the git tool window,
- * toggles between classical diff view and refactoring view.
- * Invokes the added git ui.
+ * Represents `Show Refactorings` action.
+ * Adds a toggle button to the Git Log tab,
+ * toggles between base diff view and refactoring view.
  */
 public class GitLogToggleRefactoringViewAction extends DumbAwareToggleAction {
 

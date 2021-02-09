@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.services.MiningService;
 
 /**
- * The CommitListener triggers the MiningService with any new VCS event.
+ * Triggers an {@link MiningService} instance with any new VCS event.
  */
 public class CommitListener implements GitRepositoryChangeListener {
 

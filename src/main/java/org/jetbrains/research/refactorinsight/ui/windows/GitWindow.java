@@ -36,7 +36,7 @@ import org.jetbrains.research.refactorinsight.ui.tree.TreeUtils;
 import org.jetbrains.research.refactorinsight.ui.tree.renderers.MainCellRenderer;
 
 /**
- * Is responsible for the additional ui elements in the git tool window.
+ * Adds additional UI elements to the Git Log tab.
  * Listens to mouse events to show refactorings at selected commit.
  */
 public class GitWindow {
@@ -49,15 +49,14 @@ public class GitWindow {
   private boolean labelsVisible = false;
 
   /**
-   * Constructor for a GitWindowInfo.
-   *
-   * @param p        context project
-   * @param vcsLogUi target log tab
+   * Constructor for GitWindow.
+   * @param p        context project.
+   * @param vcsLogUi target Log tab.
    */
   public GitWindow(@NotNull Project p, @NotNull MainVcsLogUi vcsLogUi) {
     project = p;
     changesTree = Objects.requireNonNull(UIUtil.findComponentOfType(vcsLogUi.getMainComponent(),
-        ChangesTree.class));
+                                                                    ChangesTree.class));
     viewport = (JBViewport) changesTree.getParent();
     table = vcsLogUi.getTable();
     miner = MiningService.getInstance(project);
@@ -119,10 +118,7 @@ public class GitWindow {
     }
 
     String commitId = table.getModel().getCommitId(index).getHash().asString();
-
     VcsCommitMetadata metadata = table.getModel().getCommitMetadata(index);
-
-
     RefactoringEntry entry = miner.get(commitId);
 
     if (entry == null) {
@@ -155,7 +151,7 @@ public class GitWindow {
                 node.getUserObjectPath()[1];
 
             DiffWindow.showDiff(table.getModel().getFullDetails(index)
-                .getChanges(0), info, project, entry.getRefactorings());
+                                    .getChanges(0), info, project, entry.getRefactorings());
           }
         }
       }
@@ -164,8 +160,8 @@ public class GitWindow {
   }
 
   /**
-   * Custom cell renderer for VCSTable.
-   * Enables labeling of refactored commits.
+   * Custom {@link ColoredTableCellRenderer} for VCSTable.
+   * Enables labeling the commits that contain refactorings.
    */
   public class VcsTableRefactoringRenderer extends ColoredTableCellRenderer {
 
@@ -191,12 +187,12 @@ public class GitWindow {
           setTransparentIconBackground(true);
         } else {
           append("      ",
-              graphTable.applyHighlighters(this, row, column, hasFocus, selected));
+                 graphTable.applyHighlighters(this, row, column, hasFocus, selected));
         }
       }
 
       append(value.toString(),
-          graphTable.applyHighlighters(this, row, column, hasFocus, selected));
+             graphTable.applyHighlighters(this, row, column, hasFocus, selected));
       if (column == graphTable.getColumnViewIndex(Commit.INSTANCE)
           || column == graphTable.getColumnViewIndex(Author.INSTANCE)) {
         SpeedSearchUtil.applySpeedSearchHighlighting(table, this, false, selected);

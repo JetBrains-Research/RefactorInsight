@@ -48,17 +48,12 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
       VcsCommitMetadata commit,
       GitWindow window) {
     super(project,
-        String.format(RefactorInsightBundle.message("mining.at"), commit.getId().toShortString()));
+          String.format(RefactorInsightBundle.message("mining.at"), commit.getId().toShortString()));
     this.project = project;
     this.commit = commit;
     this.window = window;
     this.service = ServiceManager.getService(project, MiningService.class);
     this.myRepository = service.getRepository();
-  }
-
-  @Override
-  public void onCancel() {
-    super.onCancel();
   }
 
   @Override
@@ -76,7 +71,8 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
     try {
       runWithCheckCanceled(
           CommitMiner.mineAtCommit(commit.getId().asString(), commit.getParents().get(0).asString(),
-              commit.getTimestamp(), service.getState().refactoringsMap.map, project, myRepository),
+                                   commit.getTimestamp(), service.getState().refactoringsMap.map, project,
+                                   myRepository),
           progressIndicator, commit, project
       );
     } catch (Exception e) {
@@ -140,10 +136,10 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
     if (timeout == 0) {
       RefactoringEntry refactoringEntry =
           RefactoringEntry.createEmptyEntry(commit.getId().asString(), commit.getParents().get(0).asString(),
-              commit.getTimestamp());
+                                            commit.getTimestamp());
       refactoringEntry.setTimeout(true);
       MiningService.getInstance(project).getState().refactoringsMap.map.put(commit.getId().asString(),
-          refactoringEntry);
+                                                                            refactoringEntry);
     }
   }
 }

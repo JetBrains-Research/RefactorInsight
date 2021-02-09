@@ -51,11 +51,6 @@ public class PRMiningBackgroundableTask extends Task.Backgroundable {
   }
 
   @Override
-  public void onCancel() {
-    super.onCancel();
-  }
-
-  @Override
   public void onFinished() {
     super.onFinished();
     ApplicationManager.getApplication()
@@ -68,12 +63,13 @@ public class PRMiningBackgroundableTask extends Task.Backgroundable {
       try {
         runWithCheckCanceled(
             CommitMiner.mineAtCommit(commit.getId().asString(), commit.getParents().get(0).asString(),
-                commit.getTimestamp(), service.getState().refactoringsMap.map, project, myRepository),
+                                     commit.getTimestamp(), service.getState().refactoringsMap.map, project,
+                                     myRepository),
             progressIndicator, commit, project
         );
       } catch (Exception e) {
         logger.info(String.format("The mining of refactorings at the commit %s was canceled",
-            commit.getId().asString()));
+                                  commit.getId().asString()));
       }
     }
   }
@@ -134,7 +130,7 @@ public class PRMiningBackgroundableTask extends Task.Backgroundable {
     if (timeout == 0) {
       RefactoringEntry refactoringEntry = RefactoringEntry
           .createEmptyEntry(commit.getId().asString(), commit.getParents().get(0).asString(),
-              commit.getTimestamp());
+                            commit.getTimestamp());
       refactoringEntry.setTimeout(true);
       MiningService.getInstance(project).getState().refactoringsMap.map.put(
           commit.getId().asString(),

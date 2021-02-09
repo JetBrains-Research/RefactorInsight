@@ -25,8 +25,7 @@ import org.jetbrains.research.refactorinsight.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 
 /**
- * In order to create a two sided diff window, the LineFragments are needed.
- * This class converts RefactoringLines into LineFragments objects.
+ * Converts {@link RefactoringLine} instances into {@link LineFragment} objects to create two sided diff window.
  */
 public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
 
@@ -40,10 +39,10 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
   }
 
   /**
-   * Deserializes a TwoSidedDiffRequestGenerator.
+   * Deserializes an {@link TwoSidedDiffRequestGenerator} instance.
    *
-   * @param value string
-   * @return the TwoSidedDiffRequestGenerator
+   * @param value string.
+   * @return the TwoSidedDiffRequestGenerator.
    */
   public static TwoSidedDiffRequestGenerator fromString(String value) {
     String regex1 = StringUtils.delimiter(LIST, true);
@@ -81,16 +80,16 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
       return null;
     }
     request = new SimpleDiffRequest(info.getName(),
-        contents[0], contents[2], info.getLeftPath(), info.getRightPath());
+                                    contents[0], contents[2], info.getLeftPath(), info.getRightPath());
     request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
-        (text1, text2, policy, innerChanges, indicator)
-            -> fragments);
+                        (text1, text2, policy, innerChanges, indicator)
+                            -> fragments);
     request.putUserData(REFACTORING, true);
     return request;
   }
 
   @Override
-  public void prepareJetBrainsRanges(List<RefactoringLine> lineMarkings) {
+  public void prepareRanges(List<RefactoringLine> lineMarkings) {
     fragments = lineMarkings.stream()
         .map(RefactoringLine::getTwoSidedRange)
         .filter(Objects::nonNull)
@@ -98,9 +97,9 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
   }
 
   /**
-   * Serializes a TwoSidedDiffRequestGenerator.
+   * Serializes an {@link TwoSidedDiffRequestGenerator} instance.
    *
-   * @return the string value
+   * @return the string value.
    */
   public String toString() {
     if (fragments == null) {

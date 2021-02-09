@@ -28,14 +28,11 @@ import org.jetbrains.research.refactorinsight.data.diff.TwoSidedDiffRequestGener
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 
 /**
- * This is the RefactoringInfo object that stores the information needed
- * for displaying one refactoring. It stores a diff request generator,
- * a name, ui node strings, paths, the group where it belongs,
- * if it is hidden, three-sided or a more-sided refactoring. RefactoringInfo
- * contains also information about any refactoring that it implies
- * (used when combining refactorings).
- * Here, each refactoring is added to the refactoring history map used in
- * Check Refactoring History Action.
+ * Stores the information needed for displaying one refactoring:
+ * diff request generator, name, ui node strings, paths, the group where it belongs,
+ * if it is hidden, three-sided or a more-sided refactoring.
+ * Contains also information about any refactoring that it implies (used when combining refactorings).
+ * Here, each refactoring is added to the refactoring history map used in `Show Refactoring History` action.
  */
 public class RefactoringInfo {
 
@@ -59,10 +56,10 @@ public class RefactoringInfo {
   private boolean moreSided = false;
 
   /**
-   * Deserializes a RefactoringInfo.
+   * Deserializes an {@link RefactoringInfo} instance from string.
    *
-   * @param value string
-   * @return the RefactoringInfo
+   * @param value string.
+   * @return the RefactoringInfo.
    */
   public static RefactoringInfo fromString(String value) {
     String regex = delimiter(INFO, true);
@@ -102,9 +99,9 @@ public class RefactoringInfo {
   }
 
   /**
-   * Serializes a RefactoringInfo.
+   * Serializes an {@link RefactoringInfo} instance to string.
    *
-   * @return string value
+   * @return string value.
    */
   public String toString() {
     return String.join(delimiter(INFO),
@@ -135,10 +132,10 @@ public class RefactoringInfo {
   }
 
   /**
-   * Adds this refactoring to the method history map.
+   * Adds the refactoring to the method history map.
    * Note that it should be called in chronological order.
    *
-   * @param map for method history
+   * @param map for method history.
    */
   public void addToHistory(Map<String, Set<RefactoringInfo>> map) {
     changeKeys(map);
@@ -227,7 +224,7 @@ public class RefactoringInfo {
 
   public RefactoringInfo addMarking(CodeRange left, CodeRange right, boolean hasColumns) {
     return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, null,
-        RefactoringLine.MarkingOption.NONE, hasColumns);
+                      RefactoringLine.MarkingOption.NONE, hasColumns);
   }
 
   public RefactoringInfo addMarking(CodeRange left, CodeRange right,
@@ -235,12 +232,12 @@ public class RefactoringInfo {
                                     RefactoringLine.MarkingOption option,
                                     boolean hasColumns) {
     return addMarking(left, null, right, RefactoringLine.VisualisationType.TWO, offsetFunction,
-        option, hasColumns);
+                      option, hasColumns);
   }
 
   /**
    * Add line marking for diffwindow used to display refactorings.
-   * Includes possibility for sub-highlighting
+   * Includes possibility for sub-highlighting.
    */
   public RefactoringInfo addMarking(CodeRange left, CodeRange mid, CodeRange right,
                                     RefactoringLine.VisualisationType type,
@@ -348,7 +345,7 @@ public class RefactoringInfo {
       MoreSidedDiffRequestGenerator generator = (MoreSidedDiffRequestGenerator) requestGenerator;
       moreSidedLeftPaths = generator.getLines().stream()
           .map(line ->
-              new Pair<>(line.leftPath, line.startLineRight == -1 && line.endLineRight == -1))
+                   new Pair<>(line.leftPath, line.startLineRight == -1 && line.endLineRight == -1))
           .collect(Collectors.toList());
 
     }
@@ -523,7 +520,7 @@ public class RefactoringInfo {
 
   public void correctMoreSidedLines(List<String> befores, String after) {
     ((MoreSidedDiffRequestGenerator) requestGenerator).correct(befores, after, moreSidedLeftPaths,
-        true, false, true);
+                                                               true, false, true);
   }
 
 }

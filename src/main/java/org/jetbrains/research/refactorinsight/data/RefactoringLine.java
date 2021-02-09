@@ -17,11 +17,10 @@ import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedRange;
 import org.jetbrains.research.refactorinsight.utils.Utils;
 
 /**
- * RefactoringLine holds the data needed in order to create a LineFragment,
- * or a ThreeSidedRange that are used for the diff window.
- * It is a processing class.
- * It retrieves information about RefactoringMiner's code ranges and
- * it corrects and modify the data such that it can be displayed in a diff window.
+ * Holds the data needed in order to create an {@link LineFragmentImpl} or an {@link ThreeSidedRange} instance
+ * that are used for the diff window.
+ * Retrieves information about refactorings' code ranges, corrects and modifies the data such that it can be
+ * displayed in a diff window.
  */
 public class RefactoringLine {
 
@@ -69,9 +68,9 @@ public class RefactoringLine {
   /**
    * Corrects lines and offsets returned by RefactoringMiner.
    *
-   * @param leftText  String containing whole left file contents
-   * @param midText   String containing whole middle file contents
-   * @param rightText String containing whole right file contents
+   * @param leftText  String containing whole left file contents.
+   * @param midText   String containing whole middle file contents.
+   * @param rightText String containing whole right file contents.
    */
   public void correctLines(String leftText, String midText, String rightText,
                            boolean skipAnnotationsLeft, boolean skipAnnotationsMid,
@@ -159,9 +158,9 @@ public class RefactoringLine {
         int rightStartOffset = Utils.getOffset(rightText, lines[RIGHT_START] + 1, 1);
         right.add(new TextRange(
             Utils.getOffset(rightText, lines[RIGHT_START] + 1,
-                columns[RIGHT_START]) - rightStartOffset,
+                            columns[RIGHT_START]) - rightStartOffset,
             Utils.getOffset(rightText, lines[RIGHT_END],
-                columns[RIGHT_END]) - rightStartOffset
+                            columns[RIGHT_END]) - rightStartOffset
         ));
       } catch (Exception e) {
         e.printStackTrace();
@@ -197,7 +196,7 @@ public class RefactoringLine {
     }
 
     fragment = new LineFragmentImpl(lines[LEFT_START], lines[LEFT_END], lines[RIGHT_START],
-        lines[RIGHT_END], 0, 0, 0, 0, fragments);
+                                    lines[RIGHT_END], 0, 0, 0, 0, fragments);
   }
 
   private void computeHighlighting(String leftText, String midText, String rightText) {
@@ -246,15 +245,15 @@ public class RefactoringLine {
    */
   public RefactoringLine addOffset(LocationInfo left, LocationInfo right) {
     offsets.add(new RefactoringOffset(left.getStartOffset(), left.getEndOffset(),
-        right.getStartOffset(), right.getEndOffset()));
+                                      right.getStartOffset(), right.getEndOffset()));
     return this;
   }
 
   /**
    * Adds offsets to offset list.
    *
-   * @param location Location info of the offset
-   * @param option   ADD for addition, REMOVE for removals
+   * @param location Location info of the offset.
+   * @param option   ADD for addition, REMOVE for removals.
    * @return this
    */
   public RefactoringLine addOffset(LocationInfo location, MarkingOption option) {
@@ -286,11 +285,11 @@ public class RefactoringLine {
    */
   public ThreeSidedRange getThreeSidedRange() {
     return new ThreeSidedRange(left, mid, right, type,
-        new MergeLineFragmentImpl(
-            lines[LEFT_START], lines[LEFT_END],
-            lines[MID_START], lines[MID_END],
-            lines[RIGHT_START], lines[RIGHT_END]
-        )
+                               new MergeLineFragmentImpl(
+                                   lines[LEFT_START], lines[LEFT_END],
+                                   lines[MID_START], lines[MID_END],
+                                   lines[RIGHT_START], lines[RIGHT_END]
+                               )
     );
   }
 

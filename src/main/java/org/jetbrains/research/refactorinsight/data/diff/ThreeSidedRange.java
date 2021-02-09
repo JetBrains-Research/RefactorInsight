@@ -13,14 +13,16 @@ import com.intellij.diff.util.MergeConflictType;
 import com.intellij.diff.util.TextDiffType;
 import com.intellij.diff.util.ThreeSide;
 import com.intellij.openapi.util.TextRange;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
 import org.jetbrains.research.refactorinsight.data.RefactoringLine.VisualisationType;
 
 /**
- * Used to hold information about a highlighting for a three sided diff window.
+ * Used to hold information about highlighting for a three sided diff window.
  */
 public class ThreeSidedRange {
 
@@ -34,12 +36,11 @@ public class ThreeSidedRange {
 
   /**
    * Constructor for ThreeSidedRange.
-   *
-   * @param left     TextRanges
-   * @param mid      TextRanges
-   * @param right    TextRanges
-   * @param type     VisualisationType
-   * @param fragment MergeLineFragment
+   * @param left     text ranges.
+   * @param mid      text ranges.
+   * @param right    text ranges.
+   * @param type     visualisation type.
+   * @param fragment MergeLineFragment.
    */
   public ThreeSidedRange(List<TextRange> left, List<TextRange> mid, List<TextRange> right,
                          VisualisationType type,
@@ -61,10 +62,10 @@ public class ThreeSidedRange {
   }
 
   /**
-   * Deserializes a ThreeSidedRange.
+   * Deserializes an {@link ThreeSidedRange} instance.
    *
-   * @param value string
-   * @return the ThreeSidedRange
+   * @param value string.
+   * @return range.
    */
   public static ThreeSidedRange fromString(String value) {
     String regex = delimiter(FRAG, true);
@@ -86,21 +87,21 @@ public class ThreeSidedRange {
 
   public SimpleThreesideDiffChange getDiffChange(SimpleThreesideDiffViewer viewer) {
     return new SimpleThreesideDiffChange(fragment, getMergeConflictType(type),
-        new MergeInnerDifferences(left, mid, right), viewer);
+                                         new MergeInnerDifferences(left, mid, right), viewer);
   }
 
   @Override
   public String toString() {
     return Stream.of(type.toString(),
-        fragment.getStartLine(ThreeSide.LEFT),
-        fragment.getEndLine(ThreeSide.LEFT),
-        fragment.getStartLine(ThreeSide.BASE),
-        fragment.getEndLine(ThreeSide.BASE),
-        fragment.getStartLine(ThreeSide.RIGHT),
-        fragment.getEndLine(ThreeSide.RIGHT),
-        stringify(left),
-        stringify(mid),
-        stringify(right)
+                     fragment.getStartLine(ThreeSide.LEFT),
+                     fragment.getEndLine(ThreeSide.LEFT),
+                     fragment.getStartLine(ThreeSide.BASE),
+                     fragment.getEndLine(ThreeSide.BASE),
+                     fragment.getStartLine(ThreeSide.RIGHT),
+                     fragment.getEndLine(ThreeSide.RIGHT),
+                     stringify(left),
+                     stringify(mid),
+                     stringify(right)
     ).map(String::valueOf).collect(Collectors.joining(delimiter(FRAG)));
   }
 

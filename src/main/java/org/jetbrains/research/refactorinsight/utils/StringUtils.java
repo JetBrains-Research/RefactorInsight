@@ -65,20 +65,20 @@ public class StringUtils {
    * @return the signature.
    */
   public static String calculateSignature(PsiMethod method) {
-    String signature = method.getName();
-    signature = method.getContainingClass().getQualifiedName() + "." + signature + "(";
+    StringBuilder signature = new StringBuilder(method.getName());
+    signature = new StringBuilder(method.getContainingClass().getQualifiedName() + "." + signature + "(");
     PsiParameterList parameterList = method.getParameterList();
     int parametersCount = parameterList.getParametersCount();
 
     for (int i = 0; i < parametersCount; i++) {
       if (i != parametersCount - 1) {
-        signature += parameterList.getParameter(i).getType().getPresentableText() + ", ";
+        signature.append(parameterList.getParameter(i).getType().getPresentableText()).append(", ");
       } else {
-        signature += parameterList.getParameter(i).getType().getPresentableText();
+        signature.append(parameterList.getParameter(i).getType().getPresentableText());
       }
     }
-    signature += ")";
-    return signature;
+    signature.append(")");
+    return signature.toString();
   }
 
   /**

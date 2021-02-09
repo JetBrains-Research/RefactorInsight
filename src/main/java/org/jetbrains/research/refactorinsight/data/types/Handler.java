@@ -6,17 +6,16 @@ import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.refactoringminer.api.Refactoring;
 
 /**
- * This Handler creates the RefactoringInfo object.
- * Its implementations handle the refactoring types that RefactoringMiner supports.
+ * Handles provided refactorings and creates {@link RefactoringInfo} instances.
  */
 public abstract class Handler {
 
   /**
-   * Start generating RefactoringInfo from Refactoring.
+   * Creates an {@link RefactoringInfo} instance from {@link Refactoring}.
    *
-   * @param refactoring Refactoring from RefactoringMiner.
-   * @param entry       Refactoring entry to handle.
-   * @return RefactoringInfo
+   * @param refactoring refactoring from RefactoringMiner.
+   * @param entry       refactoring entry to handle.
+   * @return RefactoringInfo.
    */
   public RefactoringInfo handle(Refactoring refactoring, RefactoringEntry entry) {
     RefactoringInfo info = new RefactoringInfo()
@@ -27,10 +26,10 @@ public abstract class Handler {
   }
 
   /**
-   * Start generating RefactoringInfo from Refactoring.
+   * Creates an {@link RefactoringInfo} instance from {@link org.jetbrains.research.kotlinrminer.api.Refactoring}.
    *
-   * @param refactoring Refactoring from kotlinRMiner.
-   * @param entry       Refactoring entry to handle.
+   * @param refactoring refactoring from kotlinRMiner.
+   * @param entry       refactoring entry to handle.
    * @return RefactoringInfo.
    */
   public RefactoringInfo handle(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,

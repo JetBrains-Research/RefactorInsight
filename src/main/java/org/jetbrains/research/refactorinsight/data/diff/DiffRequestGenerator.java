@@ -1,7 +1,9 @@
 package org.jetbrains.research.refactorinsight.data.diff;
 
 import com.intellij.diff.contents.DiffContent;
+import com.intellij.diff.requests.DiffRequest;
 import com.intellij.diff.requests.SimpleDiffRequest;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -11,10 +13,8 @@ import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
 
 /**
- * This is a DiffRequestGenerator.
- * Its implementations represent all types of diff requests that this plugin supports.
- * The DiffRequestGenerator is used to collect data from the RefactoringLines, to correct them,
- * and to create a diff request in order to display the data.
+ * Collects data from the {@link RefactoringLine} instances, corrects them if needed,
+ * and creates {@link DiffRequest} in order to visualize the detected refactorings.
  */
 public abstract class DiffRequestGenerator {
 
@@ -25,12 +25,11 @@ public abstract class DiffRequestGenerator {
 
   public abstract SimpleDiffRequest generate(DiffContent[] contents, RefactoringInfo info);
 
-  public abstract void prepareJetBrainsRanges(List<RefactoringLine> lineMarkings);
-
+  public abstract void prepareRanges(List<RefactoringLine> lineMarkings);
 
   /**
-   * Add line marking for diffwindow used to display refactorings.
-   * Includes possibility for sub-highlighting
+   * Add line marking for DiffWindow used to display refactorings.
+   * Includes a possibility for sub-highlighting.
    */
   public void addMarking(CodeRange left, CodeRange mid, CodeRange right,
                          RefactoringLine.VisualisationType type,
@@ -50,20 +49,20 @@ public abstract class DiffRequestGenerator {
   }
 
   /**
-   * Corrects each line if necessary.
+   * Corrects each line if needed.
    *
-   * @param before               text left diff window
-   * @param mid                  text mid diff window
-   * @param after                text right diff window
-   * @param skipAnnotationsLeft  always true, except when remove or modify annotation happen
-   * @param skipAnnotationsMid   true
-   * @param skipAnnotationsRight always true, except when add or modify annotation happen
+   * @param before               text left diff window.
+   * @param mid                  text mid diff window.
+   * @param after                text right diff window.
+   * @param skipAnnotationsLeft  always true, except when Remove or Modify Annotation refactorings happen.
+   * @param skipAnnotationsMid   true.
+   * @param skipAnnotationsRight always true, except when Add or Modify Annotation refactoring happen.
    */
   public void correct(String before, String mid, String after, boolean skipAnnotationsLeft,
                       boolean skipAnnotationsMid, boolean skipAnnotationsRight) {
     lineMarkings.forEach(l -> l
         .correctLines(before, mid, after, skipAnnotationsLeft, skipAnnotationsMid,
-            skipAnnotationsRight));
-    prepareJetBrainsRanges(lineMarkings);
+                      skipAnnotationsRight));
+    prepareRanges(lineMarkings);
   }
 }

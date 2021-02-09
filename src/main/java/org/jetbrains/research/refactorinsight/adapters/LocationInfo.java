@@ -13,7 +13,7 @@ public class LocationInfo {
   /**
    * Creates a wrapper for LocationInfo instance provided by RefactoringMiner.
    *
-   * @param locationInfo form RefactoringMiner
+   * @param locationInfo form RefactoringMiner.
    */
   public LocationInfo(gr.uom.java.xmi.LocationInfo locationInfo) {
     this.filePath = locationInfo.getFilePath();
@@ -29,7 +29,7 @@ public class LocationInfo {
   /**
    * Creates a wrapper for LocationInfo instance provided by kotlinRMiner.
    *
-   * @param locationInfo from kotlinRMiner
+   * @param locationInfo from kotlinRMiner.
    */
   public LocationInfo(org.jetbrains.research.kotlinrminer.decomposition.LocationInfo locationInfo) {
     this.filePath = locationInfo.getFilePath();

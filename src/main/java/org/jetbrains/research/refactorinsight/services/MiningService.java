@@ -142,11 +142,6 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(repository.getProject(), RefactorInsightBundle.message("mining"), true) {
 
-          @Override
-          public void onCancel() {
-            super.onCancel();
-          }
-
           public void run(@NotNull ProgressIndicator progressIndicator) {
             mining = true;
             progressIndicator.setText(RefactorInsightBundle.message("mining"));
@@ -157,14 +152,14 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             AtomicInteger commitsDone = new AtomicInteger(0);
             CommitMiner miner =
                 new CommitMiner(pool, innerState.refactoringsMap.map, repository, commitsDone,
-                    progressIndicator,
-                    limit);
+                                progressIndicator,
+                                limit);
             progressIndicator.checkCanceled();
             try {
               String logArgs = "--max-count=" + limit;
               progressIndicator.checkCanceled();
               GitHistoryUtils.loadTimedCommits(repository.getProject(), repository.getRoot(),
-                  miner, logArgs);
+                                               miner, logArgs);
               progressIndicator.checkCanceled();
             } catch (Exception exception) {
               exception.printStackTrace();

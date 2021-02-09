@@ -6,16 +6,18 @@ import static org.jetbrains.research.refactorinsight.utils.StringUtils.LIST;
 
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 
 /**
- * Creates ThreeSidedRanges out of RefactoringLines in order to create three sided diff windows.
+ * Creates an {@link ThreeSidedRange} instance for three sided diff windows.
  */
 public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
 
@@ -25,9 +27,9 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
   }
 
   /**
-   * Serializes a ThreeSidedDiffRequestGenerator.
+   * Deserializes an {@link ThreeSidedDiffRequestGenerator} instance.
    *
-   * @return the string value
+   * @param value string value.
    */
   public static ThreeSidedDiffRequestGenerator fromString(String value) {
     String regex = StringUtils.delimiter(LIST, true);
@@ -44,15 +46,15 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
   @Override
   public SimpleDiffRequest generate(DiffContent[] contents, RefactoringInfo info) {
     SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
-        contents[0], contents[1], contents[2],
-        info.getLeftPath(), info.getMidPath(), info.getRightPath());
+                                                      contents[0], contents[1], contents[2],
+                                                      info.getLeftPath(), info.getMidPath(), info.getRightPath());
     request.putUserData(THREESIDED_RANGES, ranges);
     request.putUserData(REFACTORING, true);
     return request;
   }
 
   @Override
-  public void prepareJetBrainsRanges(List<RefactoringLine> lineMarkings) {
+  public void prepareRanges(List<RefactoringLine> lineMarkings) {
     ranges = lineMarkings.stream().map(RefactoringLine::getThreeSidedRange)
         .collect(Collectors.toList());
   }

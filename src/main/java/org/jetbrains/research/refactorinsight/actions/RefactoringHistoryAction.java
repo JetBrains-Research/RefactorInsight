@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.services.MiningService;
@@ -29,13 +30,11 @@ import org.jetbrains.research.refactorinsight.utils.StringUtils;
 import org.jetbrains.research.refactorinsight.utils.Utils;
 
 /**
- * Represents the Show Refactoring History action.
- * If the currently opened project is a git repository, it retrieves
- * the refactoring history map that should be in the MiningService instance
- * of this project.
- * It checks if the selected PsiElement is instances of PsiClass, PsiMethod, or PsiField.
- * It computes the last object's signature and retrieves the data from the
- * refactoring history map.
+ * Represents the `Show Refactoring History` action.
+ * First, it retrieves the refactoring history map from {@link MiningService}.
+ * Next, it checks if the selected by user {@link PsiElement} is an instance of {@link PsiClass},
+ * {@link PsiMethod}, or {@link PsiField}.
+ * Last, it computes the object's signature and retrieves the data from the refactoring history map.
  */
 public class RefactoringHistoryAction extends AnAction {
 
@@ -59,11 +58,11 @@ public class RefactoringHistoryAction extends AnAction {
   }
 
   /**
-   * Checks if the selected object is instance of Class, Field or Method.
+   * Checks if the selected element is instance of {@link PsiClass}, {@link PsiMethod}, or {@link PsiField}.
    *
-   * @param project     the currently opened project
-   * @param dataContext context in editor
-   * @param usageTarget the target of the action call
+   * @param project     the currently opened project.
+   * @param dataContext context in editor.
+   * @param usageTarget the target of the action call.
    */
   private void showHistory(Project project, DataContext dataContext,
                            UsageTarget[] usageTarget) {
@@ -88,7 +87,7 @@ public class RefactoringHistoryAction extends AnAction {
     String signature = StringUtils.getFieldSignature(target);
     getToolbarWindow(project)
         .showToolbar(map.getOrDefault(signature, new HashSet<>()),
-            target.getName(), dataContext, HistoryType.ATTRIBUTE, null, null);
+                     target.getName(), dataContext, HistoryType.ATTRIBUTE, null, null);
   }
 
   private void showHistoryClass(Project project, DataContext dataContext, PsiClass psiClass) {
@@ -105,14 +104,14 @@ public class RefactoringHistoryAction extends AnAction {
 
     getToolbarWindow(project)
         .showToolbar(map.getOrDefault(signature, new HashSet<>()),
-            psiClass.getName(), dataContext, HistoryType.CLASS, methodsHistory, fieldsHistory);
+                     psiClass.getName(), dataContext, HistoryType.CLASS, methodsHistory, fieldsHistory);
   }
 
   private void showHistoryMethod(Project project, DataContext dataContext, PsiMethod method) {
     String signature = StringUtils.calculateSignature(method);
     getToolbarWindow(project)
         .showToolbar(map.getOrDefault(signature, new HashSet<>()),
-            method.getName(), dataContext, HistoryType.METHOD, null, null);
+                     method.getName(), dataContext, HistoryType.METHOD, null, null);
   }
 
   @Override
