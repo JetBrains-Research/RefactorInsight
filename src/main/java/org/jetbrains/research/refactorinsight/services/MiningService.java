@@ -39,8 +39,6 @@ import org.jetbrains.research.refactorinsight.ui.windows.GitWindow;
 import org.jetbrains.research.refactorinsight.utils.Utils;
 import org.refactoringminer.util.GitServiceImpl;
 
-import javax.swing.JScrollPane;
-
 /**
  * This is the MiningService.
  * It computes, process and stores the data retrieved from RefactoringMiner.

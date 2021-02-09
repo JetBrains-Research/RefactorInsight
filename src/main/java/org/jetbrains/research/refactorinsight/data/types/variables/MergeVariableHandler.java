@@ -2,7 +2,10 @@ package org.jetbrains.research.refactorinsight.data.types.variables;
 
 import gr.uom.java.xmi.decomposition.VariableDeclaration;
 import gr.uom.java.xmi.diff.MergeVariableRefactoring;
+
 import java.util.stream.Collectors;
+
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
@@ -16,7 +19,7 @@ public class MergeVariableHandler extends Handler {
     MergeVariableRefactoring ref = (MergeVariableRefactoring) refactoring;
 
     ref.getMergedVariables().forEach(var ->
-        info.addMarking(var.codeRange(), ref.getNewVariable().codeRange(), true));
+        info.addMarking(new CodeRange(var.codeRange()), new CodeRange(ref.getNewVariable().codeRange()), true));
 
     if (ref.getNewVariable().isParameter()) {
       info.setGroup(Group.METHOD)
@@ -33,5 +36,12 @@ public class MergeVariableHandler extends Handler {
         .setElementAfter(ref.getNewVariable().getVariableDeclaration().toQualifiedString())
         .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()));
+  }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    //This kind of refactoring is not supported by kotlinRMiner yet.
+    return null;
   }
 }

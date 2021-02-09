@@ -4,6 +4,8 @@ import static org.jetbrains.research.refactorinsight.data.RefactoringLine.Markin
 
 import gr.uom.java.xmi.UMLAnnotation;
 import gr.uom.java.xmi.diff.AddMethodAnnotationRefactoring;
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
+import org.jetbrains.research.refactorinsight.adapters.LocationInfo;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
@@ -26,14 +28,21 @@ public class AddMethodAnnotationHandler extends Handler {
         .setElementBefore(annotation.toString())
         .setElementAfter(null)
         .addMarking(
-            ref.getOperationBefore().codeRange(),
-            annotation.codeRange(),
+            new CodeRange(ref.getOperationBefore().codeRange()),
+            new CodeRange(annotation.codeRange()),
             line -> line.addOffset(
-                annotation.getLocationInfo(),
+                new LocationInfo(annotation.getLocationInfo()),
                 ADD),
             ADD,
             false)
         .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
         .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()));
+  }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    //This kind of refactoring is not supported by kotlinRMiner yet.
+    return null;
   }
 }

@@ -4,6 +4,8 @@ import static org.jetbrains.research.refactorinsight.data.RefactoringLine.Markin
 
 import gr.uom.java.xmi.UMLAnnotation;
 import gr.uom.java.xmi.diff.RemoveAttributeAnnotationRefactoring;
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
+import org.jetbrains.research.refactorinsight.adapters.LocationInfo;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
@@ -27,10 +29,18 @@ public class RemoveAttributeAnnotationHandler extends Handler {
         .setElementBefore(ref.getAnnotation().toString())
         .setElementAfter(null)
         .addMarking(
-            annotation.codeRange(),
-            ref.getAttributeAfter().codeRange(),
-            line -> line.addOffset(annotation.getLocationInfo(), REMOVE),
+            new CodeRange(annotation.codeRange()),
+            new CodeRange(ref.getAttributeAfter().codeRange()),
+            line -> line.addOffset(new LocationInfo(annotation.getLocationInfo()), REMOVE),
             REMOVE,
             false);
+  }
+
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    //This kind of refactoring is not supported by kotlinRMiner yet.
+    return null;
   }
 }

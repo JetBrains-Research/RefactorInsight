@@ -5,7 +5,7 @@
 [![coverage report](https://codecov.io/gh/JetBrains-Research/refactorinsight/branch/master/graph/badge.svg)](https://codecov.io/gh/JetBrains-Research/refactorinsight)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/14704-refactorinsight.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/14704-refactorinsight)
 
-RefactorInsight is a plugin for IntelliJ IDEA that enables the IDE to visualize refactorings in the commit history of Java projects. RefactorInsight relies on [RefactoringMiner](https://github.com/tsantalis/RefactoringMiner) for retrieval of refactorings.
+RefactorInsight is a plugin for IntelliJ IDEA that enables the IDE to visualize refactorings in the commit history of Java and Kotlin projects. RefactorInsight relies on [RefactoringMiner](https://github.com/tsantalis/RefactoringMiner) and [kotlinRMiner](https://github.com/JetBrains-Research/kotlinRMiner) for retrieval of refactorings.
 
 ## Getting started
 RefactorInsight is сompatible with IntelliJ IDEA 2020.3 and is available for free in the Marketplace: [RefactorInsight](https://plugins.jetbrains.com/plugin/14704-refactorinsight).

@@ -4,21 +4,22 @@ import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.util.DiffUserDataKeysEx;
 import com.intellij.openapi.util.Pair;
-import gr.uom.java.xmi.diff.CodeRange;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.ui.windows.DiffWindow;
-import  org.jetbrains.research.refactorinsight.utils.StringUtils;
+import org.jetbrains.research.refactorinsight.utils.StringUtils;
 
 /**
  * Generates data for refactorings needing more than three editors to visualize.
- *
  */
 public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
 
@@ -62,17 +63,19 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
 
   @Override
   public SimpleDiffRequest generate(DiffContent[] contents, RefactoringInfo info) {
-    assert contents.length == lines.size() + 1;
-    for (int i = 0; i < lines.size(); i++) {
-      lines.get(i).content = contents[i + 1];
+    SimpleDiffRequest request = null;
+    if (contents != null && lines != null && contents.length == lines.size() + 1) {
+      for (int i = 0; i < lines.size(); i++) {
+        lines.get(i).content = contents[i + 1];
+      }
+      request = new SimpleDiffRequest(info.getName(),
+          contents[1], contents[0], "Subclasses", info.getRightPath());
+      request.putUserData(DiffWindow.REFACTORING, true);
+      request.putUserData(DiffWindow.MORESIDED_RANGES, lines);
+      request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
+          (text1, text2, policy, innerChanges, indicator)
+              -> new ArrayList<>());
     }
-    SimpleDiffRequest request = new SimpleDiffRequest(info.getName(),
-        contents[1], contents[0], "Subclasses", info.getRightPath());
-    request.putUserData(DiffWindow.REFACTORING, true);
-    request.putUserData(DiffWindow.MORESIDED_RANGES, lines);
-    request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
-        (text1, text2, policy, innerChanges, indicator)
-            -> new ArrayList<>());
     return request;
   }
 

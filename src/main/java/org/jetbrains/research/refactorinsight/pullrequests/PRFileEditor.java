@@ -19,7 +19,6 @@ import com.intellij.vcs.log.VcsLogProvider;
 import com.intellij.vcs.log.data.VcsLogData;
 import com.intellij.vcs.log.impl.VcsProjectLog;
 import com.intellij.vcs.log.util.VcsLogUtil;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
@@ -69,14 +68,15 @@ public class PRFileEditor extends FileEditorBase {
   }
 
   @Override
-  public @NotNull JComponent getComponent() {
+  public @NotNull
+  JComponent getComponent() {
     return loadingPanel;
   }
 
   private void collectCommitsDetails() {
     ProgressManager.getInstance().run(new Task.Modal(
         project, "", true) {
-      List<? extends VcsFullCommitDetails> details;
+      List<? extends VcsFullCommitDetails> details = new ArrayList<>();
 
       @Override
       public void run(@NotNull ProgressIndicator progressIndicator) {
@@ -169,7 +169,9 @@ public class PRFileEditor extends FileEditorBase {
                   node.getUserObjectPath()[1];
               final Collection<Change> changes = Optional.ofNullable(commitsDetails.get(info.getCommitId()))
                   .map(VcsFullCommitDetails::getChanges).orElse(new ArrayList<>());
-              DiffWindow.showDiff(changes, info, project, info.getEntry().getRefactorings());
+              if (changes.size() != 0) {
+                DiffWindow.showDiff(changes, info, project, info.getEntry().getRefactorings());
+              }
             }
           }
         }
@@ -182,17 +184,20 @@ public class PRFileEditor extends FileEditorBase {
   }
 
   @Override
-  public @Nullable JComponent getPreferredFocusedComponent() {
+  public @Nullable
+  JComponent getPreferredFocusedComponent() {
     return panel;
   }
 
   @Override
-  public @Nls(capitalization = Nls.Capitalization.Title) @NotNull String getName() {
+  public @NotNull
+  String getName() {
     return "RefactorInsight";
   }
 
   @Override
-  public @Nullable VirtualFile getFile() {
+  public @Nullable
+  VirtualFile getFile() {
     return file;
   }
 }

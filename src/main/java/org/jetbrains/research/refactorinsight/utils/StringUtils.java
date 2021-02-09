@@ -4,8 +4,12 @@ import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameterList;
 import gr.uom.java.xmi.UMLOperation;
+import gr.uom.java.xmi.UMLType;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StringUtils {
 
@@ -80,31 +84,56 @@ public class StringUtils {
   /**
    * Builder for a method's signature.
    *
-   * @param operation retrieved from RefactoringMiner
+   * @param operation retrieved from RefactoringMiner.
    * @return a String signature of the operation.
    */
   public static String calculateSignature(UMLOperation operation) {
     StringBuilder builder = new StringBuilder();
+    List<String> parameterTypeList = new ArrayList<>();
+    for (UMLType type : operation.getParameterTypeList()) {
+      parameterTypeList.add(type.toString());
+    }
+
     builder.append(operation.getClassName())
         .append(".")
-        .append(calculateSignatureWithoutClassName(operation));
+        .append(calculateSignatureWithoutClassName(operation.getName(), parameterTypeList));
     return builder.toString();
   }
 
   /**
    * Builder for a method's signature.
    *
-   * @param operation retrieved from RefactoringMiner
+   * @param operation retrieved from kotlinRMiner.
    * @return a String signature of the operation.
    */
-  public static String calculateSignatureWithoutClassName(UMLOperation operation) {
+  public static String calculateSignature(org.jetbrains.research.kotlinrminer.uml.UMLOperation operation) {
     StringBuilder builder = new StringBuilder();
-    builder.append(operation.getName())
-            .append("(");
+    List<String> parameterTypeList = new ArrayList<>();
+    for (org.jetbrains.research.kotlinrminer.uml.UMLType type : operation.getParameterTypeList()) {
+      parameterTypeList.add(type.toString());
+    }
 
-    operation.getParameterTypeList().forEach(x -> builder.append(x).append(", "));
+    builder.append(operation.getClassName())
+        .append(".")
+        .append(calculateSignatureWithoutClassName(operation.getName(), parameterTypeList));
+    return builder.toString();
+  }
 
-    if (operation.getParameterTypeList().size() > 0) {
+  /**
+   * Calculates the method's signature without class name.
+   *
+   * @param operationName     operation's name.
+   * @param parameterTypeList list of operation's parameters.
+   * @return a String signature of the operation.
+   */
+  public static String calculateSignatureWithoutClassName(String operationName, List<String> parameterTypeList) {
+    StringBuilder builder = new StringBuilder();
+    builder.append(operationName)
+        .append("(");
+
+    parameterTypeList.forEach(x -> builder.append(x).append(", "));
+
+    if (parameterTypeList.size() > 0) {
       builder.deleteCharAt(builder.length() - 1);
       builder.deleteCharAt(builder.length() - 1);
     }

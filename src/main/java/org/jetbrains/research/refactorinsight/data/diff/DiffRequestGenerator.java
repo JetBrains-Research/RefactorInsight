@@ -2,10 +2,11 @@ package org.jetbrains.research.refactorinsight.data.diff;
 
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
-import gr.uom.java.xmi.diff.CodeRange;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
 

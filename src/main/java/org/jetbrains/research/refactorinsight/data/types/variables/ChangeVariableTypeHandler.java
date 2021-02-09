@@ -2,6 +2,7 @@ package org.jetbrains.research.refactorinsight.data.types.variables;
 
 import gr.uom.java.xmi.UMLOperation;
 import gr.uom.java.xmi.diff.ChangeVariableTypeRefactoring;
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
@@ -36,8 +37,15 @@ public class ChangeVariableTypeHandler extends Handler {
         .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
         .setElementBefore(ref.getOriginalVariable().getVariableDeclaration().toQualifiedString())
         .setElementAfter(ref.getChangedTypeVariable().getVariableDeclaration().toQualifiedString())
-        .addMarking(ref.getOriginalVariable().getType().codeRange(),
-            ref.getChangedTypeVariable().getType().codeRange(), true);
+        .addMarking(new CodeRange(ref.getOriginalVariable().getType().codeRange()),
+            new CodeRange(ref.getChangedTypeVariable().getType().codeRange()), true);
 
+  }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    //This kind of refactoring is not supported by kotlinRMiner yet.
+    return null;
   }
 }

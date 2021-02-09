@@ -43,6 +43,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.panels.Wrapper;
 import com.intellij.util.ui.components.BorderLayoutPanel;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ContainerEvent;
@@ -51,15 +52,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.diff.MoreSidedDiffRequestGenerator.MoreSidedRange;
 import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedRange;
+
+import static org.jetbrains.research.refactorinsight.utils.Utils.fixPath;
 
 /**
  * Deals with refactoring diff requests.
@@ -90,6 +95,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
     List<DiffRequest> requests = refactoringInfos.stream()
         .filter(showable)
         .map(i -> i.generate(getDiffContents(changes, i, project)))
+        .filter(Objects::nonNull)
         .collect(Collectors.toList());
     DiffRequestChain chain = new SimpleDiffRequestChain(requests);
     final int index = refactoringInfos.stream()
@@ -132,7 +138,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
         for (Change change : changes) {
           ContentRevision revision = pathPair.second
               ? change.getAfterRevision() : change.getBeforeRevision();
-          if (revision != null && revision.getFile().getPath().contains(pathPair.first)) {
+          if (revision != null
+              && revision.getFile().getPath().contains(fixPath(pathPair.first))) {
             contentList.add(myDiffContentFactory
                 .create(project, revision.getContent(),
                     JavaClassFileType.INSTANCE));
@@ -140,7 +147,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
           }
         }
       }
-      return contentList.toArray(new DiffContent[contentList.size()]);
+      return contentList.toArray(new DiffContent[0]);
     } catch (VcsException ex) {
       ex.printStackTrace();
       return null;
@@ -369,6 +376,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
   /**
    * Hides diff settings which might crash the refactorings diff viewer.
    * Should be called onAfterRediff.
+   *
    * @param diffViewerComponent Component from diff viewer
    */
   public static void hideToolbarActions(Component diffViewerComponent) {

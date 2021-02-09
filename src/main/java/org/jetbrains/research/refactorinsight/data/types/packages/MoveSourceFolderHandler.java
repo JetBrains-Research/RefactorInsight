@@ -15,4 +15,14 @@ public class MoveSourceFolderHandler extends Handler {
         .setNameBefore(ref.getPattern().getBefore())
         .setNameAfter(ref.getPattern().getAfter());
   }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    org.jetbrains.research.kotlinrminer.diff.refactoring.MoveSourceFolderRefactoring ref =
+        (org.jetbrains.research.kotlinrminer.diff.refactoring.MoveSourceFolderRefactoring) refactoring;
+    return info.setGroup(Group.PACKAGE)
+        .setNameBefore(ref.getPattern().getBefore())
+        .setNameAfter(ref.getPattern().getAfter());
+  }
 }

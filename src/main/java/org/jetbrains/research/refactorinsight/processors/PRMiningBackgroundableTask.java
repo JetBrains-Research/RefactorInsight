@@ -19,7 +19,6 @@ import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.pullrequests.PRFileEditor;
 import org.jetbrains.research.refactorinsight.services.MiningService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -68,7 +67,7 @@ public class PRMiningBackgroundableTask extends Task.Backgroundable {
     for (VcsFullCommitDetails commit : commitDetails) {
       try {
         runWithCheckCanceled(
-            () -> CommitMiner.mineAtCommit(commit.getId().asString(), commit.getParents().get(0).asString(),
+            CommitMiner.mineAtCommit(commit.getId().asString(), commit.getParents().get(0).asString(),
                 commit.getTimestamp(), service.getState().refactoringsMap.map, project, myRepository),
             progressIndicator, commit, project
         );
@@ -134,8 +133,8 @@ public class PRMiningBackgroundableTask extends Task.Backgroundable {
     }
     if (timeout == 0) {
       RefactoringEntry refactoringEntry = RefactoringEntry
-          .convert(new ArrayList<>(), commit.getId().asString(), commit.getParents().get(0).asString(),
-              commit.getTimestamp(), project);
+          .createEmptyEntry(commit.getId().asString(), commit.getParents().get(0).asString(),
+              commit.getTimestamp());
       refactoringEntry.setTimeout(true);
       MiningService.getInstance(project).getState().refactoringsMap.map.put(
           commit.getId().asString(),

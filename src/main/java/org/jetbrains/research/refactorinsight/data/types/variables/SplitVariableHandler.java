@@ -2,7 +2,10 @@ package org.jetbrains.research.refactorinsight.data.types.variables;
 
 import gr.uom.java.xmi.decomposition.VariableDeclaration;
 import gr.uom.java.xmi.diff.SplitVariableRefactoring;
+
 import java.util.stream.Collectors;
+
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
@@ -16,7 +19,7 @@ public class SplitVariableHandler extends Handler {
     SplitVariableRefactoring ref = (SplitVariableRefactoring) refactoring;
 
     ref.getSplitVariables().forEach(var ->
-        info.addMarking(ref.getOldVariable().codeRange(), var.codeRange(), true));
+        info.addMarking(new CodeRange(ref.getOldVariable().codeRange()), new CodeRange(var.codeRange()), true));
 
     if (ref.getOldVariable().isParameter()) {
       info.setGroup(Group.METHOD)
@@ -33,5 +36,12 @@ public class SplitVariableHandler extends Handler {
         .setElementAfter(ref.getSplitVariables().stream()
             .map(VariableDeclaration::getVariableName)
             .collect(Collectors.joining()));
+  }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    //This kind of refactoring is not supported by kotlinRMiner yet.
+    return null;
   }
 }

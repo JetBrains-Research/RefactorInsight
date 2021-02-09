@@ -15,4 +15,14 @@ public class RenamePackageHandler extends Handler {
         .setNameBefore(ref.getPattern().getBefore())
         .setNameAfter(ref.getPattern().getAfter());
   }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    org.jetbrains.research.kotlinrminer.diff.refactoring.RenamePackageRefactoring ref =
+        (org.jetbrains.research.kotlinrminer.diff.refactoring.RenamePackageRefactoring) refactoring;
+    return info.setGroup(Group.PACKAGE)
+        .setNameBefore(ref.getPattern().getBefore())
+        .setNameAfter(ref.getPattern().getAfter());
+  }
 }

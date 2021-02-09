@@ -2,13 +2,29 @@
     <id>org.jetbrains.research.refactorinsight</id>
     <name>RefactorInsight</name>
     <vendor>JetBrains</vendor>
-    <version>2020.3-1.0</version>
+    <version>2020.3-2.1</version>
 
     <description><![CDATA[
-    Discovers refactorings in the commit history of the project, visualizes them, and provides the refactoring history for classes, methods, and fields.
+    <p>Discovers refactorings in code changes and visualizes them.</p>
+    <ul>
+        <li>Supports Java and Kotlin.</li>
+        <li>Detects refactorings in Pull Requests.</li>
+        <li>Detects refactorings at any specific commit selected in the Git Log tab.</li>
+        <li>Provides the refactoring history for classes, methods, and fields.</li>
+    </ul>
       ]]></description>
 
     <change-notes><![CDATA[
+        <h4>2020.3-2.1</h4>
+        <ul>
+            <li>Minor bug fixes</li>
+        </ul>
+
+        <h4>2020.3-2.0</h4>
+        <ul>
+            <li>Add the support of refactoring detection in Kotlin code</li>
+        </ul>
+
         <h4>2020.3-1.0</h4>
         <ul>
             <li>Add compatibility with IDEA 2020.3</li>
@@ -90,8 +106,8 @@
     </actions>
 
     <projectListeners>
-<!--        <listener class="org.jetbrains.research.refactorinsight.processors.CommitListener"
-                  topic="git4idea.repo.GitRepositoryChangeListener"/>-->
+        <!--        <listener class="org.jetbrains.research.refactorinsight.processors.CommitListener"
+                          topic="git4idea.repo.GitRepositoryChangeListener"/>-->
         <listener class="org.jetbrains.research.refactorinsight.processors.ProjectListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </projectListeners>

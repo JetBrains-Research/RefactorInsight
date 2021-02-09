@@ -1,6 +1,7 @@
 package org.jetbrains.research.refactorinsight.data.types.attributes;
 
 import gr.uom.java.xmi.diff.PushDownAttributeRefactoring;
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
@@ -20,7 +21,14 @@ public class PushDownAttributeHandler extends Handler {
         .setDetailsAfter(classNameAfter)
         .setNameBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())
         .setNameAfter(ref.getMovedAttribute().getVariableDeclaration().toQualifiedString())
-        .addMarking(ref.getSourceAttributeCodeRangeBeforeMove(),
-            ref.getTargetAttributeCodeRangeAfterMove(), true);
+        .addMarking(new CodeRange(ref.getSourceAttributeCodeRangeBeforeMove()),
+            new CodeRange(ref.getTargetAttributeCodeRangeAfterMove()), true);
+  }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    //This kind of refactoring is not supported by kotlinRMiner yet.
+    return null;
   }
 }

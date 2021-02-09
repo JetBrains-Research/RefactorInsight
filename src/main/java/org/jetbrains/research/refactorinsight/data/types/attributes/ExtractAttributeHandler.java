@@ -1,6 +1,7 @@
 package org.jetbrains.research.refactorinsight.data.types.attributes;
 
 import gr.uom.java.xmi.diff.ExtractAttributeRefactoring;
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
@@ -13,8 +14,8 @@ public class ExtractAttributeHandler extends Handler {
     ExtractAttributeRefactoring ref = (ExtractAttributeRefactoring) refactoring;
     ref.leftSide().forEach(extraction ->
         info.addMarking(
-            extraction,
-            ref.getExtractedVariableDeclarationCodeRange(),
+            new CodeRange(extraction),
+            new CodeRange(ref.getExtractedVariableDeclarationCodeRange()),
             true
         ));
     return info.setGroup(Group.ATTRIBUTE)
@@ -24,5 +25,12 @@ public class ExtractAttributeHandler extends Handler {
             ref.getVariableDeclaration().getName() + " : " + ref.getVariableDeclaration().getType())
         .setNameAfter(ref.getVariableDeclaration().getName() + " : "
             + ref.getVariableDeclaration().getType());
+  }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    //This kind of refactoring is not supported by kotlinRMiner yet.
+    return null;
   }
 }

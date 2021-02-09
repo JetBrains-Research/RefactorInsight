@@ -36,12 +36,14 @@ public class PRVirtualFile extends LightVirtualFileBase implements VirtualFileWi
   }
 
   @Override
-  public @NotNull OutputStream getOutputStream(Object requestor, long newModificationStamp, long newTimeStamp) {
+  public @NotNull
+  OutputStream getOutputStream(Object requestor, long newModificationStamp, long newTimeStamp) {
     return null;
   }
 
   @Override
-  public @NotNull byte[] contentsToByteArray() {
+  public @NotNull
+  byte[] contentsToByteArray() {
     return "RefactorInsight".getBytes();
   }
 
@@ -51,7 +53,8 @@ public class PRVirtualFile extends LightVirtualFileBase implements VirtualFileWi
   }
 
   @Override
-  public @NotNull String getPresentablePath() {
+  public @NotNull
+  String getPresentablePath() {
     return RefactorInsightBundle.message("discovered.refactorings.in.pr");
   }
 

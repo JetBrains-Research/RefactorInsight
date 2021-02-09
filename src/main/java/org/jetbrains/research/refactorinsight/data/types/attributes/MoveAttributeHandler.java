@@ -1,6 +1,7 @@
 package org.jetbrains.research.refactorinsight.data.types.attributes;
 
 import gr.uom.java.xmi.diff.MoveAttributeRefactoring;
+import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
@@ -20,7 +21,14 @@ public class MoveAttributeHandler extends Handler {
         .setDetailsAfter(classNameAfter)
         .setNameBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())
         .setNameAfter(ref.getMovedAttribute().getVariableDeclaration().toQualifiedString())
-        .addMarking(ref.getOriginalAttribute().codeRange(),
-            ref.getMovedAttribute().codeRange(), true);
+        .addMarking(new CodeRange(ref.getOriginalAttribute().codeRange()),
+            new CodeRange(ref.getMovedAttribute().codeRange()), true);
+  }
+
+  @Override
+  public RefactoringInfo specify(org.jetbrains.research.kotlinrminer.api.Refactoring refactoring,
+                                 RefactoringInfo info) {
+    //This kind of refactoring is not supported by kotlinRMiner yet.
+    return null;
   }
 }

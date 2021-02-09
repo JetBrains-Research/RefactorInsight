@@ -13,7 +13,6 @@ import com.intellij.util.ExceptionUtil;
 import com.intellij.vcs.log.TimedVcsCommit;
 import com.intellij.vcs.log.VcsCommitMetadata;
 
-import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -76,7 +75,7 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
   public void run(@NotNull ProgressIndicator progressIndicator) {
     try {
       runWithCheckCanceled(
-          () -> CommitMiner.mineAtCommit(commit.getId().asString(), commit.getParents().get(0).asString(),
+          CommitMiner.mineAtCommit(commit.getId().asString(), commit.getParents().get(0).asString(),
               commit.getTimestamp(), service.getState().refactoringsMap.map, project, myRepository),
           progressIndicator, commit, project
       );
@@ -139,9 +138,9 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
       timeout -= 1;
     }
     if (timeout == 0) {
-      RefactoringEntry refactoringEntry = RefactoringEntry
-          .convert(new ArrayList<>(), commit.getId().asString(), commit.getParents().get(0).asString(),
-              commit.getTimestamp(), project);
+      RefactoringEntry refactoringEntry =
+          RefactoringEntry.createEmptyEntry(commit.getId().asString(), commit.getParents().get(0).asString(),
+              commit.getTimestamp());
       refactoringEntry.setTimeout(true);
       MiningService.getInstance(project).getState().refactoringsMap.map.put(commit.getId().asString(),
           refactoringEntry);
