@@ -73,9 +73,9 @@ public class TreeUtils {
   /**
    * Creates a node based on the nameBefore & nameAfter attributes.
    */
-  public static DefaultMutableTreeNode makeNameNode(RefactoringInfo refactoringInfo) {
+  public static DefaultMutableTreeNode makeNameNode(RefactoringInfo info) {
     return new DefaultMutableTreeNode(
-        new Node(NodeType.NAME, StringUtils.getDisplayableName(refactoringInfo)));
+        new Node(NodeType.NAME, StringUtils.getDisplayableName(info)));
 
   }
 
@@ -98,9 +98,9 @@ public class TreeUtils {
    * Adds leaves for refactorings where the element
    * is not null.
    */
-  public static DefaultMutableTreeNode makeLeafNode(RefactoringInfo ref) {
+  public static DefaultMutableTreeNode makeLeafNode(RefactoringInfo info) {
     String displayableElement =
-        getDisplayableElement(ref.getElementBefore(), ref.getElementAfter());
+        getDisplayableElement(info.getElementBefore(), info.getElementAfter());
     if (displayableElement != null) {
       return new DefaultMutableTreeNode(new Node(NodeType.ELEMENTS, displayableElement));
     }
