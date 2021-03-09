@@ -75,7 +75,7 @@ public class TreeUtils {
    */
   public static DefaultMutableTreeNode makeNameNode(RefactoringInfo info) {
     return new DefaultMutableTreeNode(
-        new Node(NodeType.NAME, StringUtils.getDisplayableName(info)));
+        new Node(NodeType.NAME, StringUtils.getDisplayableName(info), info));
 
   }
 
@@ -88,7 +88,7 @@ public class TreeUtils {
     final String displayableDetails =
         getDisplayableDetails(info.getDetailsBefore(), info.getDetailsAfter());
     if (displayableDetails != null && displayableDetails.length() > 0) {
-      return new DefaultMutableTreeNode(new Node(NodeType.DETAILS, displayableDetails));
+      return new DefaultMutableTreeNode(new Node(NodeType.DETAILS, displayableDetails, info));
     } else {
       return null;
     }
@@ -102,7 +102,7 @@ public class TreeUtils {
     String displayableElement =
         getDisplayableElement(info.getElementBefore(), info.getElementAfter());
     if (displayableElement != null) {
-      return new DefaultMutableTreeNode(new Node(NodeType.ELEMENTS, displayableElement));
+      return new DefaultMutableTreeNode(new Node(NodeType.ELEMENTS, displayableElement, info));
     }
     return null;
   }
