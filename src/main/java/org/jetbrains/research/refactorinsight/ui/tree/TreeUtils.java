@@ -53,7 +53,7 @@ public class TreeUtils {
    * @return the node.
    */
   public static DefaultMutableTreeNode makeNode(RefactoringInfo info) {
-    DefaultMutableTreeNode node = new DefaultMutableTreeNode(info);
+    DefaultMutableTreeNode node = new DefaultMutableTreeNode(new Node(NodeType.TYPE, null, info));
 
     DefaultMutableTreeNode detailsNode = makeDetailsNode(info);
     DefaultMutableTreeNode nameNode = makeNameNode(info);

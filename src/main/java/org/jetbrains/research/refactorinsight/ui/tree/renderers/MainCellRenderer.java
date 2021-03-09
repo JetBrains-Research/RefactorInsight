@@ -9,6 +9,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.ui.tree.Node;
+import org.jetbrains.research.refactorinsight.ui.tree.NodeType;
 
 public class MainCellRenderer extends ColoredTreeCellRenderer {
 
@@ -27,15 +28,11 @@ public class MainCellRenderer extends ColoredTreeCellRenderer {
       return;
     }
 
-    RefactoringInfo info = (RefactoringInfo) node.getUserObjectPath()[1];
-    Icon icon = null;
-    Node object = null;
+    Node object = (Node) node.getUserObject();
+    RefactoringInfo info = object.getInfo();
+    Icon icon = factory.create(info, object);
 
-    if (node.getUserObject() instanceof Node) {
-      object = (Node) node.getUserObject();
-      icon = factory.create(info, object);
-    }
-    if (node.getUserObject() instanceof RefactoringInfo) {
+    if (object.getType() == NodeType.TYPE) {
       append(info.getName(), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
       int size = info.getIncludingRefactorings().size();
       if (size > 0) {
