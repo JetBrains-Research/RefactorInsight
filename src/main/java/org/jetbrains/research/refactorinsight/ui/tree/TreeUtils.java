@@ -1,8 +1,11 @@
 package org.jetbrains.research.refactorinsight.ui.tree;
 
 import com.intellij.ui.treeStructure.Tree;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.tree.DefaultMutableTreeNode;
+import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 
@@ -168,11 +171,17 @@ public class TreeUtils {
    * @return Swing Tree visualisation of refactorings in this entry.
    */
   public static Tree buildTree(List<RefactoringInfo> refactorings) {
+    Map<Group, DefaultMutableTreeNode> groups = new EnumMap<>(Group.class);
     DefaultMutableTreeNode root =
         new DefaultMutableTreeNode(refactorings.isEmpty() ? "" : refactorings.get(0).getCommitId());
-    refactorings.forEach(r -> {
-      if (!r.isHidden()) {
-        root.add(makeNode(r));
+    refactorings.forEach(info -> {
+      if (!info.isHidden()) {
+        groups.computeIfAbsent(info.getGroup(), group -> {
+          DefaultMutableTreeNode groupNode =
+              new DefaultMutableTreeNode(new Node(NodeType.GROUP, null, info));
+          root.add(groupNode);
+          return groupNode;
+        }).add(makeNode(info));
       }
     });
     Tree tree = new Tree(root);

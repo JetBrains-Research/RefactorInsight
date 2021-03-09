@@ -24,7 +24,7 @@ public class MainCellRenderer extends ColoredTreeCellRenderer {
                                     boolean expanded, boolean leaf, int row, boolean hasFocus) {
 
     DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-    if (node.equals(node.getRoot())) {
+    if (node.isRoot()) {
       return;
     }
 
@@ -32,7 +32,11 @@ public class MainCellRenderer extends ColoredTreeCellRenderer {
     RefactoringInfo info = object.getInfo();
     Icon icon = factory.create(info, object);
 
-    if (object.getType() == NodeType.TYPE) {
+    if (object.getType() == NodeType.GROUP) {
+      String groupName = info.getGroup().toString();
+      String capitalizedName = groupName.substring(0, 1).toUpperCase() + groupName.substring(1).toLowerCase();
+      append(capitalizedName, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
+    } else if (object.getType() == NodeType.TYPE) {
       append(info.getName(), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
       int size = info.getIncludingRefactorings().size();
       if (size > 0) {
