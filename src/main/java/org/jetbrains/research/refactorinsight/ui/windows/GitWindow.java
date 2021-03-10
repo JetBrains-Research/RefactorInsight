@@ -32,6 +32,7 @@ import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.services.MiningService;
 import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
+import org.jetbrains.research.refactorinsight.ui.tree.Node;
 import org.jetbrains.research.refactorinsight.ui.tree.TreeUtils;
 import org.jetbrains.research.refactorinsight.ui.tree.renderers.MainCellRenderer;
 
@@ -147,8 +148,7 @@ public class GitWindow {
           }
           DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
           if (node.isLeaf()) {
-            RefactoringInfo info = (RefactoringInfo)
-                node.getUserObjectPath()[1];
+            RefactoringInfo info = ((Node) node.getUserObject()).getInfo();
 
             DiffWindow.showDiff(table.getModel().getFullDetails(index)
                                     .getChanges(0), info, project, entry.getRefactorings());

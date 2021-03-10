@@ -24,16 +24,7 @@ public class HistoryToolbarRenderer extends ColoredTreeCellRenderer {
    * @return the refactoring info parent.
    */
   public static RefactoringInfo getRefactoringInfo(DefaultMutableTreeNode node) {
-    RefactoringInfo info = null;
-    if (node.getUserObjectPath()[1] instanceof RefactoringInfo) {
-      info = (RefactoringInfo) node.getUserObjectPath()[1];
-    } else {
-      if (node.getUserObjectPath().length > 3
-          && node.getUserObjectPath()[3] instanceof RefactoringInfo) {
-        info = (RefactoringInfo) node.getUserObjectPath()[3];
-      }
-    }
-    return info;
+    return ((Node) node.getUserObject()).getInfo();
   }
 
   @Override
