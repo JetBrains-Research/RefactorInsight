@@ -71,7 +71,7 @@ public class TreeUtils {
   }
 
   /**
-   * Creates a node based on the nameBefore & nameAfter attributes.
+   * Creates a node based on the nameBefore and nameAfter attributes.
    */
   public static DefaultMutableTreeNode makeNameNode(RefactoringInfo refactoringInfo) {
     return new DefaultMutableTreeNode(
@@ -80,7 +80,7 @@ public class TreeUtils {
   }
 
   /**
-   * Creates a node iff the detailsBefore & detailsAfter attributes are not null.
+   * Creates a node iff the detailsBefore and detailsAfter attributes are not null.
    *
    * @return the same root if no node was created.
    */
