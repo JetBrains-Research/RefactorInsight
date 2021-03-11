@@ -4,13 +4,13 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.text.JBDateFormat;
-import icons.RefactorInsightIcons;
 import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.ui.tree.Node;
+import org.jetbrains.research.refactorinsight.ui.tree.NodeType;
 
 public class HistoryToolbarRenderer extends ColoredTreeCellRenderer {
 
@@ -41,10 +41,11 @@ public class HistoryToolbarRenderer extends ColoredTreeCellRenderer {
     if (node.getUserObject() instanceof Node) {
       final Node object = (Node) node.getUserObject();
       icon = factory.create(info, object);
-      append(object.getContent());
-    } else if (node.getUserObject() instanceof RefactoringInfo) {
-      append(info.getName());
-      icon = RefactorInsightIcons.node;
+      if (object.getType() == NodeType.TYPE) {
+        append(info.getName());
+      } else {
+        append(object.getContent());
+      }
     } else if (node.getParent().equals(node.getRoot())) {
       append(node.toString(), SimpleTextAttributes.GRAY_ATTRIBUTES);
     } else {
