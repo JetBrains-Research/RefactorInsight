@@ -2,8 +2,6 @@ package org.jetbrains.research.refactorinsight.ui.tree.renderers;
 
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
-import icons.RefactorInsightIcons;
-import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +29,7 @@ public class MainCellRenderer extends ColoredTreeCellRenderer {
 
     Node object = (Node) node.getUserObject();
     RefactoringInfo info = object.getInfo();
-    Icon icon = factory.create(info, object);
+    setIcon(factory.create(info, object));
 
     if (object.getType() == NodeType.GROUP) {
       String groupName = DisplayedGroup.fromInternalGroup(info.getGroup()).toString();
@@ -45,7 +43,6 @@ public class MainCellRenderer extends ColoredTreeCellRenderer {
                 .toString().replace("[", "").replace("]", ""),
             SimpleTextAttributes.GRAY_ATTRIBUTES);
       }
-      icon = RefactorInsightIcons.node;
     } else if (leaf) {
       append((info.getLineMarkings().size() > 0
               ? ((info.getLineMarkings().get(0).getRightStart() + 1) + " ") : ""),
@@ -56,7 +53,6 @@ public class MainCellRenderer extends ColoredTreeCellRenderer {
     } else {
       append(object.getContent());
     }
-    setIcon(icon);
   }
 
 }

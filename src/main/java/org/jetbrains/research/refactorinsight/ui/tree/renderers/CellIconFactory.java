@@ -1,9 +1,13 @@
 package org.jetbrains.research.refactorinsight.ui.tree.renderers;
 
-import java.util.HashMap;
+import java.util.EnumMap;
+import java.util.Map;
 import javax.swing.Icon;
+import com.intellij.icons.AllIcons;
+import icons.RefactorInsightIcons;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
+import org.jetbrains.research.refactorinsight.ui.tree.DisplayedGroup;
 import org.jetbrains.research.refactorinsight.ui.tree.Node;
 import org.jetbrains.research.refactorinsight.ui.tree.renderers.handlers.AbstractClassHandler;
 import org.jetbrains.research.refactorinsight.ui.tree.renderers.handlers.AttributeHandler;
@@ -14,7 +18,7 @@ import org.jetbrains.research.refactorinsight.ui.tree.renderers.handlers.Package
 import org.jetbrains.research.refactorinsight.ui.tree.renderers.handlers.VariableHandler;
 
 public class CellIconFactory {
-  HashMap<Group, IconHandler> map = new HashMap<>();
+  private final Map<Group, IconHandler> map = new EnumMap<>(Group.class);
 
   /**
    * Fills map with all types of handlers.
@@ -30,7 +34,29 @@ public class CellIconFactory {
   }
 
   public Icon create(RefactoringInfo info, Node node) {
-    return map.get(info.getGroup()).getIcon(info, node);
+    switch (node.getType()) {
+      case GROUP:
+        return groupIcon(info);
+      case TYPE:
+        return RefactorInsightIcons.node;
+      default:
+        return map.get(info.getGroup()).getIcon(info, node);
+    }
+  }
 
+  private Icon groupIcon(RefactoringInfo info) {
+    switch (DisplayedGroup.fromInternalGroup(info.getGroup())) {
+      case METHOD:
+        return AllIcons.Nodes.Method;
+      case CLASS:
+        return AllIcons.Nodes.Class;
+      case VARIABLE:
+        return AllIcons.Nodes.Variable;
+      case PACKAGE:
+        return AllIcons.Nodes.Package;
+      default:
+        throw new IllegalStateException("Unexpected value: " +
+            DisplayedGroup.fromInternalGroup(info.getGroup()));
+    }
   }
 }
