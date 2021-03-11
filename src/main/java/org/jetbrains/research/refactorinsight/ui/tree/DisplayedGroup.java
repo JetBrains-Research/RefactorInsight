@@ -7,7 +7,6 @@ public enum DisplayedGroup {
   METHOD,
   CLASS,
   VARIABLE,
-  ABSTRACT,
   PACKAGE;
 
   @NotNull
@@ -18,11 +17,10 @@ public enum DisplayedGroup {
       case ATTRIBUTE:
       case VARIABLE:
         return VARIABLE;
+      case ABSTRACT:
       case INTERFACE:
       case CLASS:
         return CLASS;
-      case ABSTRACT:
-        return ABSTRACT;
       case PACKAGE:
         return PACKAGE;
       default:
