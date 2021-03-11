@@ -5,7 +5,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.tree.DefaultMutableTreeNode;
-import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 
@@ -171,14 +170,13 @@ public class TreeUtils {
    * @return Swing Tree visualisation of refactorings in this entry.
    */
   public static Tree buildTree(List<RefactoringInfo> refactorings) {
-    Map<Group, DefaultMutableTreeNode> groups = new EnumMap<>(Group.class);
+    Map<DisplayedGroup, DefaultMutableTreeNode> groups = new EnumMap<>(DisplayedGroup.class);
     DefaultMutableTreeNode root =
         new DefaultMutableTreeNode(refactorings.isEmpty() ? "" : refactorings.get(0).getCommitId());
     refactorings.forEach(info -> {
       if (!info.isHidden()) {
-        groups.computeIfAbsent(info.getGroup(), group -> {
-          DefaultMutableTreeNode groupNode =
-              new DefaultMutableTreeNode(new Node(NodeType.GROUP, null, info));
+        groups.computeIfAbsent(DisplayedGroup.fromInternalGroup(info.getGroup()), group -> {
+          DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(new Node(NodeType.GROUP, null, info));
           root.add(groupNode);
           return groupNode;
         }).add(makeNode(info));

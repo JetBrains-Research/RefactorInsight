@@ -8,6 +8,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
+import org.jetbrains.research.refactorinsight.ui.tree.DisplayedGroup;
 import org.jetbrains.research.refactorinsight.ui.tree.Node;
 import org.jetbrains.research.refactorinsight.ui.tree.NodeType;
 
@@ -33,7 +34,7 @@ public class MainCellRenderer extends ColoredTreeCellRenderer {
     Icon icon = factory.create(info, object);
 
     if (object.getType() == NodeType.GROUP) {
-      String groupName = info.getGroup().toString();
+      String groupName = DisplayedGroup.fromInternalGroup(info.getGroup()).toString();
       String capitalizedName = groupName.substring(0, 1).toUpperCase() + groupName.substring(1).toLowerCase();
       append(capitalizedName, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
     } else if (object.getType() == NodeType.TYPE) {
