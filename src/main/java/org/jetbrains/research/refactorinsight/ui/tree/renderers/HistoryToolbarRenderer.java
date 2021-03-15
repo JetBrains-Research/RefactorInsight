@@ -7,6 +7,7 @@ import com.intellij.util.text.JBDateFormat;
 import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import icons.RefactorInsightIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.ui.tree.Node;
@@ -24,7 +25,16 @@ public class HistoryToolbarRenderer extends ColoredTreeCellRenderer {
    * @return the refactoring info parent.
    */
   public static RefactoringInfo getRefactoringInfo(DefaultMutableTreeNode node) {
-    return ((Node) node.getUserObject()).getInfo();
+    RefactoringInfo info = null;
+    if (node.getUserObject() instanceof Node) {
+      info = ((Node) node.getUserObject()).getInfo();
+    } else if (node.getUserObjectPath()[1] instanceof RefactoringInfo) {
+      info = (RefactoringInfo) node.getUserObjectPath()[1];
+    } else if (node.getUserObjectPath().length > 3
+          && node.getUserObjectPath()[3] instanceof RefactoringInfo) {
+        info = (RefactoringInfo) node.getUserObjectPath()[3];
+    }
+    return info;
   }
 
   @Override
@@ -46,6 +56,9 @@ public class HistoryToolbarRenderer extends ColoredTreeCellRenderer {
       } else {
         append(object.getContent());
       }
+    } else if (node.getUserObject() instanceof RefactoringInfo) {
+      append(info.getName());
+      icon = RefactorInsightIcons.node;
     } else if (node.getParent().equals(node.getRoot())) {
       append(node.toString(), SimpleTextAttributes.GRAY_ATTRIBUTES);
     } else {
