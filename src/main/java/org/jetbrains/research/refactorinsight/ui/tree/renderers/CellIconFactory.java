@@ -33,6 +33,9 @@ public class CellIconFactory {
     map.put(Group.VARIABLE, new VariableHandler());
   }
 
+  /**
+   * Get icon from node type and info.
+   */
   public Icon create(RefactoringInfo info, Node node) {
     switch (node.getType()) {
       case GROUP:
@@ -55,8 +58,8 @@ public class CellIconFactory {
       case PACKAGE:
         return AllIcons.Nodes.Package;
       default:
-        throw new IllegalStateException("Unexpected value: " +
-            DisplayedGroup.fromInternalGroup(info.getGroup()));
+        throw new IllegalStateException("Unexpected value: "
+            + DisplayedGroup.fromInternalGroup(info.getGroup()));
     }
   }
 }

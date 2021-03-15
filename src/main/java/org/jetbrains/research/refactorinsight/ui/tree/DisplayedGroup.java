@@ -9,6 +9,9 @@ public enum DisplayedGroup {
   VARIABLE,
   PACKAGE;
 
+  /**
+   * Get displayed type of refactoring from internal representation.
+   */
   @NotNull
   public static DisplayedGroup fromInternalGroup(@NotNull Group group) {
     switch (group) {
