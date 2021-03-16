@@ -1,7 +1,9 @@
 package org.jetbrains.research.refactorinsight.ui.tree;
 
 import com.intellij.ui.treeStructure.Tree;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
@@ -53,7 +55,7 @@ public class TreeUtils {
    * @return the node.
    */
   public static DefaultMutableTreeNode makeNode(RefactoringInfo info) {
-    DefaultMutableTreeNode node = new DefaultMutableTreeNode(info);
+    DefaultMutableTreeNode node = new DefaultMutableTreeNode(new Node(NodeType.TYPE, null, info));
 
     DefaultMutableTreeNode detailsNode = makeDetailsNode(info);
     DefaultMutableTreeNode nameNode = makeNameNode(info);
@@ -73,9 +75,9 @@ public class TreeUtils {
   /**
    * Creates a node based on the nameBefore & nameAfter attributes.
    */
-  public static DefaultMutableTreeNode makeNameNode(RefactoringInfo refactoringInfo) {
+  public static DefaultMutableTreeNode makeNameNode(RefactoringInfo info) {
     return new DefaultMutableTreeNode(
-        new Node(NodeType.NAME, StringUtils.getDisplayableName(refactoringInfo)));
+        new Node(NodeType.NAME, StringUtils.getDisplayableName(info), info));
 
   }
 
@@ -88,7 +90,7 @@ public class TreeUtils {
     final String displayableDetails =
         getDisplayableDetails(info.getDetailsBefore(), info.getDetailsAfter());
     if (displayableDetails != null && displayableDetails.length() > 0) {
-      return new DefaultMutableTreeNode(new Node(NodeType.DETAILS, displayableDetails));
+      return new DefaultMutableTreeNode(new Node(NodeType.DETAILS, displayableDetails, info));
     } else {
       return null;
     }
@@ -98,11 +100,11 @@ public class TreeUtils {
    * Adds leaves for refactorings where the element
    * is not null.
    */
-  public static DefaultMutableTreeNode makeLeafNode(RefactoringInfo ref) {
+  public static DefaultMutableTreeNode makeLeafNode(RefactoringInfo info) {
     String displayableElement =
-        getDisplayableElement(ref.getElementBefore(), ref.getElementAfter());
+        getDisplayableElement(info.getElementBefore(), info.getElementAfter());
     if (displayableElement != null) {
-      return new DefaultMutableTreeNode(new Node(NodeType.ELEMENTS, displayableElement));
+      return new DefaultMutableTreeNode(new Node(NodeType.ELEMENTS, displayableElement, info));
     }
     return null;
   }
@@ -168,11 +170,16 @@ public class TreeUtils {
    * @return Swing Tree visualisation of refactorings in this entry.
    */
   public static Tree buildTree(List<RefactoringInfo> refactorings) {
+    Map<DisplayedGroup, DefaultMutableTreeNode> groups = new EnumMap<>(DisplayedGroup.class);
     DefaultMutableTreeNode root =
         new DefaultMutableTreeNode(refactorings.isEmpty() ? "" : refactorings.get(0).getCommitId());
-    refactorings.forEach(r -> {
-      if (!r.isHidden()) {
-        root.add(makeNode(r));
+    refactorings.forEach(info -> {
+      if (!info.isHidden()) {
+        groups.computeIfAbsent(DisplayedGroup.fromInternalGroup(info.getGroup()), group -> {
+          DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(new Node(NodeType.GROUP, null, info));
+          root.add(groupNode);
+          return groupNode;
+        }).add(makeNode(info));
       }
     });
     Tree tree = new Tree(root);

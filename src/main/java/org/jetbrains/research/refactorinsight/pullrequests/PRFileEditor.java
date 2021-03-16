@@ -25,6 +25,7 @@ import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.services.MiningService;
+import org.jetbrains.research.refactorinsight.ui.tree.Node;
 import org.jetbrains.research.refactorinsight.ui.tree.TreeUtils;
 import org.jetbrains.research.refactorinsight.ui.tree.renderers.MainCellRenderer;
 import org.jetbrains.research.refactorinsight.ui.windows.DiffWindow;
@@ -165,8 +166,7 @@ public class PRFileEditor extends FileEditorBase {
             }
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
             if (node.isLeaf()) {
-              RefactoringInfo info = (RefactoringInfo)
-                  node.getUserObjectPath()[1];
+              RefactoringInfo info = ((Node) node.getUserObject()).getInfo();
               final Collection<Change> changes = Optional.ofNullable(commitsDetails.get(info.getCommitId()))
                   .map(VcsFullCommitDetails::getChanges).orElse(new ArrayList<>());
               if (changes.size() != 0) {
