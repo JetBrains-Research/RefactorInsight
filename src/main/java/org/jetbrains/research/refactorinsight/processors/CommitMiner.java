@@ -93,10 +93,10 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
   private static Runnable getRunnableToDetectRefactorings(Map<String, RefactoringEntry> map, String commitHash,
                                                           String commitParentHash, long commitTimestamp,
                                                           Repository repository, Project project) {
-    GitHistoryKotlinRMiner kminer = new GitHistoryKotlinRMiner();
-    GitHistoryRefactoringMiner jminer = new GitHistoryRefactoringMinerImpl();
-
     return () -> {
+      GitHistoryKotlinRMiner kminer = new GitHistoryKotlinRMiner();
+      GitHistoryRefactoringMiner jminer = new GitHistoryRefactoringMinerImpl();
+
       try {
         jminer.detectAtCommit(repository, commitHash, new RefactoringHandler() {
           @Override
@@ -141,10 +141,15 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
           cancelProgress();
           return;
         }
-        detectRefactorings(getRunnableToDetectRefactorings(map, commitId,
-            gitCommit.getParents().get(0).asString(), gitCommit.getTimestamp(),
-            myRepository, myProject), gitCommit.getId().asString(),
-            gitCommit.getParents().get(0).asString(), gitCommit.getTimestamp());
+
+        String commitParentHash =
+            gitCommit.getParents().size() == 0 ? null : gitCommit.getParents().get(0).asString();
+        detectRefactorings(getRunnableToDetectRefactorings(map, commitId, commitParentHash,
+                                                           gitCommit.getTimestamp(),
+                                                           myRepository, myProject),
+                           gitCommit.getId().asString(),
+                           commitParentHash,
+                           gitCommit.getTimestamp());
         incrementProgress();
       });
     } else {
