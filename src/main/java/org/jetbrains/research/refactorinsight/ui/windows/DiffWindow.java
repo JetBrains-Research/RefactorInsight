@@ -24,6 +24,7 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.FoldRegion;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
@@ -39,11 +40,25 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ContentRevision;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.PsiMethod;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.panels.Wrapper;
 import com.intellij.util.ui.components.BorderLayoutPanel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
+import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
+import org.jetbrains.research.refactorinsight.data.diff.MoreSidedDiffRequestGenerator.MoreSidedRange;
+import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedRange;
+import org.jetbrains.research.refactorinsight.services.MiningService;
 
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ContainerEvent;
@@ -55,14 +70,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.data.diff.MoreSidedDiffRequestGenerator.MoreSidedRange;
-import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedRange;
 
 import static org.jetbrains.research.refactorinsight.utils.Utils.fixPath;
 
@@ -203,7 +210,12 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
                               @NotNull DiffContext context, @NotNull DiffRequest request) {
     //Check diff viewer type for refactoring
     Boolean isRefactoring = request.getUserData(REFACTORING);
+
+    //Fold Move Method refactorings in the base diff that contains the information about all changes in the file.
     if (isRefactoring == null) {
+      if (viewer instanceof SimpleDiffViewer) {
+        foldMoveMethodRefactorings((SimpleDiffViewer) viewer);
+      }
       return;
     }
 
@@ -282,6 +294,52 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
     //Asume diff viewer is two sided
     myViewer.getTextSettings().setExpandByDefault(false);
+  }
+
+  private void foldMoveMethodRefactorings(SimpleDiffViewer viewer) {
+    //TODO: Mine refactorings in the commit user clicked on.
+    RefactoringEntry refactoringEntry =
+        MiningService.getInstance(viewer.getContext().getProject()).get("");
+    List<RefactoringInfo> refactorings = refactoringEntry.getRefactorings();
+
+    //TODO: Add a filtration of refactorings by types, process only Move, Pull Up and Push Down Method.
+    refactorings.forEach(r -> {
+      String methodNameBefore = r.getNameBefore();
+      String text = viewer.getEditor1().getDocument().getText();
+      //TODO: Figure out a smarter way to find out method's start and end offsets.
+      PsiFile psiFileBeforeRevision =
+          PsiFileFactory.getInstance(viewer.getProject()).createFileFromText("tmp",
+                                                                        JavaFileType.INSTANCE,
+                                                                        text);
+      PsiElement[] children = psiFileBeforeRevision.getChildren();
+      for (PsiElement element : children) {
+        if (element instanceof PsiClass) {
+          PsiClass psiClass = (PsiClass) element;
+          PsiMethod[] methods = psiClass.getMethods();
+          for (PsiMethod psiMethod : methods) {
+            if (methodNameBefore.contains(psiMethod.getName())) {
+              //Adds a folding block to the left side of the diff window for the moved method.
+              viewer.getEditor1().getFoldingModel().runBatchFoldingOperation(
+                  () -> {
+                    //TODO: Customize the text based on refactoring type (method was Moved/Pulled Up/Pushed Down)
+                    FoldRegion value = viewer.getEditor1().getFoldingModel()
+                        .addFoldRegion(psiMethod.getTextRange().getStartOffset(),
+                                       psiMethod.getTextRange().getEndOffset(),
+                                       String.format("Method %s was moved to %s",
+                                                     psiMethod.getName(),
+                                                     r.getDetailsAfter()
+                                                         .substring(r.getDetailsAfter()
+                                                                        .lastIndexOf(".") + 1).trim() + " class."));
+                    if (value != null) {
+                      value.setExpanded(false);
+                      value.setInnerHighlightersMuted(true);
+                    }
+                  });
+            }
+          }
+        }
+      }
+    });
   }
 
   /**
