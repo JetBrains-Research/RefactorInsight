@@ -12,6 +12,7 @@ import com.intellij.diff.chains.SimpleDiffRequestChain;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.contents.DocumentContent;
 import com.intellij.diff.requests.DiffRequest;
+import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.tools.simple.SimpleDiffTool;
 import com.intellij.diff.tools.simple.SimpleDiffViewer;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
@@ -215,8 +216,10 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
     //Fold Move Method refactorings in the base diff that contains the information about all changes in the file.
     if (isRefactoring == null) {
-      if (viewer instanceof SimpleDiffViewer) {
-        foldMoveMethodRefactorings((SimpleDiffViewer) viewer);
+      if (viewer instanceof SimpleDiffViewer && request instanceof SimpleDiffRequest) {
+        SimpleDiffRequest diffRequest = (SimpleDiffRequest) request;
+        String commitId = diffRequest.getContentTitles().get(1);
+        foldMoveMethodRefactorings((SimpleDiffViewer) viewer, commitId);
       }
       return;
     }
@@ -298,10 +301,9 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
     myViewer.getTextSettings().setExpandByDefault(false);
   }
 
-  private void foldMoveMethodRefactorings(SimpleDiffViewer viewer) {
-    //TODO: Mine refactorings in the commit user clicked on.
+  private void foldMoveMethodRefactorings(SimpleDiffViewer viewer, String commitId) {
     RefactoringEntry refactoringEntry =
-        MiningService.getInstance(viewer.getContext().getProject()).get("");
+        MiningService.getInstance(viewer.getContext().getProject()).get(commitId);
     List<RefactoringInfo> refactorings = refactoringEntry.getRefactorings();
 
     //TODO: Add a filtration of refactorings by types, process only Move, Pull Up and Push Down Method.
@@ -326,7 +328,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
                     //TODO: Customize the text based on refactoring type (method was Moved/Pulled Up/Pushed Down)
                     //TODO: Check if method was changed or not and add information about it (with changes/no changes)
                     FoldRegion value = viewer.getEditor1().getFoldingModel()
-                        .addFoldRegion(psiMethod.getTextRange().getStartOffset(),
+                        .addFoldRegion(psiMethod.getBody().getTextRange().getStartOffset(),
                                        psiMethod.getTextRange().getEndOffset(),
                                        "");
                     if (value != null) {
