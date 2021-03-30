@@ -1,5 +1,7 @@
 package org.jetbrains.research.refactorinsight.ui.windows;
 
+import com.intellij.application.options.colors.highlighting.RendererWrapper;
+import com.intellij.codeInsight.daemon.impl.HintRenderer;
 import com.intellij.diff.DiffContentFactoryEx;
 import com.intellij.diff.DiffContext;
 import com.intellij.diff.DiffDialogHints;
@@ -111,7 +113,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       chain.setIndex(index);
       chain.putUserData(DiffUserDataKeysEx.FORCE_DIFF_TOOL, SimpleDiffTool.INSTANCE);
       DiffManager.getInstance().showDiff(project, chain,
-          new DiffDialogHints(WindowWrapper.Mode.FRAME));
+                                         new DiffDialogHints(WindowWrapper.Mode.FRAME));
     }
   }
 
@@ -136,8 +138,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
         if (change.getAfterRevision() != null
             && change.getAfterRevision().getFile().getPath().contains(info.getRightPath())) {
           contentList.add(myDiffContentFactory
-              .create(project, change.getAfterRevision().getContent(),
-                  JavaClassFileType.INSTANCE));
+                              .create(project, change.getAfterRevision().getContent(),
+                                      JavaClassFileType.INSTANCE));
           break;
         }
       }
@@ -148,8 +150,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
           if (revision != null
               && revision.getFile().getPath().contains(fixPath(pathPair.first))) {
             contentList.add(myDiffContentFactory
-                .create(project, revision.getContent(),
-                    JavaClassFileType.INSTANCE));
+                                .create(project, revision.getContent(),
+                                        JavaClassFileType.INSTANCE));
             break;
           }
         }
@@ -173,22 +175,22 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
         if (change.getBeforeRevision() != null) {
           if (change.getBeforeRevision().getFile().getPath().contains(info.getLeftPath())) {
             contents[0] = myDiffContentFactory.create(project,
-                change.getBeforeRevision().getContent(),
-                JavaClassFileType.INSTANCE);
+                                                      change.getBeforeRevision().getContent(),
+                                                      JavaClassFileType.INSTANCE);
           }
         }
         if (info.isThreeSided()
             && change.getAfterRevision() != null
             && change.getAfterRevision().getFile().getPath().contains(info.getMidPath())) {
           contents[1] = myDiffContentFactory.create(project,
-              change.getAfterRevision().getContent(),
-              JavaClassFileType.INSTANCE);
+                                                    change.getAfterRevision().getContent(),
+                                                    JavaClassFileType.INSTANCE);
         }
         if (change.getAfterRevision() != null
             && change.getAfterRevision().getFile().getPath().contains(info.getRightPath())) {
           contents[2] = myDiffContentFactory.create(project,
-              change.getAfterRevision().getContent(),
-              JavaClassFileType.INSTANCE);
+                                                    change.getAfterRevision().getContent(),
+                                                    JavaClassFileType.INSTANCE);
         }
       }
       return contents;
@@ -263,7 +265,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
           //  Highlight offsets
           myViewer.getEditor2().getMarkupModel()
               .addRangeHighlighter(moreSidedRange.startOffsetRight, moreSidedRange.endOffsetRight,
-                  3, offsetColors, HighlighterTargetArea.EXACT_RANGE);
+                                   3, offsetColors, HighlighterTargetArea.EXACT_RANGE);
         }
       });
 
@@ -309,8 +311,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       //TODO: Figure out a smarter way to find out method's start and end offsets.
       PsiFile psiFileBeforeRevision =
           PsiFileFactory.getInstance(viewer.getProject()).createFileFromText("tmp",
-                                                                        JavaFileType.INSTANCE,
-                                                                        text);
+                                                                             JavaFileType.INSTANCE,
+                                                                             text);
       PsiElement[] children = psiFileBeforeRevision.getChildren();
       for (PsiElement element : children) {
         if (element instanceof PsiClass) {
@@ -322,18 +324,25 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
               viewer.getEditor1().getFoldingModel().runBatchFoldingOperation(
                   () -> {
                     //TODO: Customize the text based on refactoring type (method was Moved/Pulled Up/Pushed Down)
+                    //TODO: Check if method was changed or not and add information about it (with changes/no changes)
                     FoldRegion value = viewer.getEditor1().getFoldingModel()
                         .addFoldRegion(psiMethod.getTextRange().getStartOffset(),
                                        psiMethod.getTextRange().getEndOffset(),
-                                       String.format("Method %s was moved to %s",
-                                                     psiMethod.getName(),
-                                                     r.getDetailsAfter()
-                                                         .substring(r.getDetailsAfter()
-                                                                        .lastIndexOf(".") + 1).trim() + " class."));
+                                       "");
                     if (value != null) {
                       value.setExpanded(false);
                       value.setInnerHighlightersMuted(true);
                     }
+
+                    String className = r.getDetailsAfter();
+                    String hintText = String.format("Moved to %s",
+                                                    className.substring(
+                                                        className.lastIndexOf(".") + 1).trim() + " class.");
+                    RendererWrapper renderer = new RendererWrapper(new HintRenderer(hintText), false);
+
+                    viewer.getEditor1().getInlayModel().addBlockElement(psiMethod.getTextRange().getStartOffset() - 3,
+                                                                        true, true, 1,
+                                                                        renderer);
                   });
             }
           }
@@ -387,7 +396,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       //Instantiate editor
       DocumentContent content = (DocumentContent) pair.first.content;
       Editor editor = EditorFactory.getInstance().createEditor(content.getDocument(),
-          pair.second, JavaFileType.INSTANCE, true);
+                                                               pair.second, JavaFileType.INSTANCE, true);
 
       //Get highlight colors corresponding with theme and revision
       EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
@@ -406,7 +415,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       }
       //  Highlight offsets
       editor.getMarkupModel().addRangeHighlighter(pair.first.startOffsetLeft,
-          pair.first.endOffsetLeft, 10, offsetColor, HighlighterTargetArea.EXACT_RANGE);
+                                                  pair.first.endOffsetLeft, 10, offsetColor,
+                                                  HighlighterTargetArea.EXACT_RANGE);
 
       //Set editor size to fit coderange
       int editorSize = editor.getLineHeight()
@@ -496,8 +506,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       oldMarkings.forEach(ThreesideDiffChangeBase::destroy);
       oldMarkings.clear();
       oldMarkings.addAll(ranges.stream()
-          .map(r -> r.getDiffChange(viewer))
-          .collect(Collectors.toList())
+                             .map(r -> r.getDiffChange(viewer))
+                             .collect(Collectors.toList())
       );
       hideToolbarActions(viewer.getComponent());
     }
