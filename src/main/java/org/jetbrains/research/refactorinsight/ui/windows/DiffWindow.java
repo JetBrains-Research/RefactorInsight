@@ -329,8 +329,11 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
                            //Adds a folding block to the left side of the diff window for the moved method.
                            viewer.getEditor1().getFoldingModel().runBatchFoldingOperation(
                                () -> {
-                                 //TODO: Customize the text based on refactoring type (method was Moved/Pulled Up/Pushed Down)
-                                 //TODO: Check if method was changed or not and add information about it (with changes/no changes)
+                                 //TODO: Customize the text based on refactoring type
+                                 // (method was Moved/Pulled Up/Pushed Down)
+
+                                 //TODO: Check if method was changed or not
+                                 // and add information about it (with changes/no changes)
                                  FoldRegion value = viewer.getEditor1().getFoldingModel()
                                      .addFoldRegion(psiMethod.getBody().getTextRange().getStartOffset(),
                                                     psiMethod.getTextRange().getEndOffset(),
@@ -341,9 +344,10 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
                                  }
 
                                  String className = r.getDetailsAfter();
-                                 String hintText = String.format("Moved to %s",
-                                                                 className.substring(
-                                                                     className.lastIndexOf(".") + 1).trim() + " class.");
+                                 String hintText =
+                                     String.format("Moved to %s",
+                                                   className.substring(
+                                                       className.lastIndexOf(".") + 1).trim() + " class.");
                                  RendererWrapper renderer = new RendererWrapper(new HintRenderer(hintText), false);
 
                                  viewer.getEditor1().getInlayModel().addBlockElement(
