@@ -26,7 +26,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-abstract public class RefactoringFolder {
+public abstract class RefactoringFolder {
+  /**
+   * TODO: Javadoc.
+   */
   public static void foldRefactorings(@NotNull FrameDiffTool.DiffViewer viewer, @NotNull DiffRequest request) {
     if (request instanceof SimpleDiffRequest) {
       SimpleDiffRequest diffRequest = (SimpleDiffRequest) request;
@@ -73,7 +76,9 @@ abstract public class RefactoringFolder {
     modifyEditor(editor.get(2), foldableRefactorings, true);
   }
 
-  private static void modifyEditor(@NotNull Editor editor, @NotNull List<RefactoringInfo> foldableRefactorings, boolean before) {
+  private static void modifyEditor(@NotNull Editor editor,
+                                   @NotNull List<RefactoringInfo> foldableRefactorings,
+                                   boolean before) {
     PsiFile psiFile = PsiDocumentManager
         .getInstance(editor.getProject())
         .getPsiFile(editor.getDocument());
@@ -118,8 +123,9 @@ abstract public class RefactoringFolder {
       case METHOD:
       case FIELD:
         return prefix + details.substring(details.lastIndexOf(".") + 1);
+      default:
+        throw new AssertionError();
     }
-    throw new AssertionError();
   }
 
   @NotNull
@@ -147,7 +153,10 @@ abstract public class RefactoringFolder {
   }
 
   @Nullable
-  private static Positions findPositions(@NotNull PsiFile psiFile, @NotNull Element element, String name, String details) {
+  private static Positions findPositions(@NotNull PsiFile psiFile,
+                                         @NotNull Element element,
+                                         String name,
+                                         String details) {
     switch (element) {
       case CLASS: {
         PsiClass psiClass = findClass(psiFile, name);
@@ -157,8 +166,9 @@ abstract public class RefactoringFolder {
               psiClass.getLBrace().getTextOffset(),
               psiClass.getRBrace().getTextOffset() + 1
           );
+        } else {
+          return null;
         }
-        break;
       }
       case FIELD: {
         PsiField psiField = findField(psiFile, name, details);
@@ -169,8 +179,9 @@ abstract public class RefactoringFolder {
               psiField.getTextRange().getEndOffset()
 
           );
+        } else {
+          return null;
         }
-        break;
       }
       case METHOD: {
         PsiMethod psiMethod = findMethod(psiFile, name);
@@ -179,11 +190,13 @@ abstract public class RefactoringFolder {
               psiMethod.getTextRange().getStartOffset() - 3,
               psiMethod.getBody().getTextRange().getStartOffset(),
               psiMethod.getTextRange().getEndOffset());
+        } else {
+          return null;
         }
-        break;
       }
+      default:
+        return null;
     }
-    return null;
   }
 
   @Nullable
@@ -244,9 +257,9 @@ abstract public class RefactoringFolder {
   }
 
   private static final class Positions {
-    final public int hintOffset;
-    final public int foldingStartOffset;
-    final public int foldingEndOffset;
+    public final int hintOffset;
+    public final int foldingStartOffset;
+    public final int foldingEndOffset;
 
     private Positions(int hintOffset, int foldingStartOffset, int foldingEndOffset) {
       this.hintOffset = hintOffset;
