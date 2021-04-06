@@ -1,7 +1,5 @@
 package org.jetbrains.research.refactorinsight.ui.windows;
 
-import com.intellij.application.options.colors.highlighting.RendererWrapper;
-import com.intellij.codeInsight.daemon.impl.HintRenderer;
 import com.intellij.diff.DiffContentFactoryEx;
 import com.intellij.diff.DiffContext;
 import com.intellij.diff.DiffDialogHints;
@@ -27,7 +25,6 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.FoldRegion;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
@@ -43,22 +40,15 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ContentRevision;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileFactory;
-import com.intellij.psi.PsiMethod;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.panels.Wrapper;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
-import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
+import org.jetbrains.research.refactorinsight.ui.RefactoringFolder;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.diff.MoreSidedDiffRequestGenerator.MoreSidedRange;
 import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedRange;
-import org.jetbrains.research.refactorinsight.services.MiningService;
 
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -220,7 +210,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       if (viewer instanceof SimpleDiffViewer && request instanceof SimpleDiffRequest) {
         SimpleDiffRequest diffRequest = (SimpleDiffRequest) request;
         String commitId = diffRequest.getContentTitles().get(1);
-        foldMoveMethodRefactorings((SimpleDiffViewer) viewer, commitId);
+        RefactoringFolder.foldRefactorings((SimpleDiffViewer) viewer, commitId);
       }
       return;
     }
@@ -300,67 +290,6 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
     //Asume diff viewer is two sided
     myViewer.getTextSettings().setExpandByDefault(false);
-  }
-
-  private void foldMoveMethodRefactorings(SimpleDiffViewer viewer, String commitId) {
-    RefactoringEntry refactoringEntry =
-        MiningService.getInstance(viewer.getContext().getProject()).get(commitId);
-    List<RefactoringInfo> refactorings = refactoringEntry.getRefactorings();
-
-    //TODO: Add a filtration of refactorings by types, process only Move, Pull Up and Push Down Method.
-    //TODO: Check why getType() always returns null
-    refactorings.stream()
-        .filter(r -> r.getName().equals(RefactoringType.MOVE_OPERATION.getName()))
-        .forEach(r -> {
-                   String methodNameBefore = r.getNameBefore();
-                   String text = viewer.getEditor1().getDocument().getText();
-                   //TODO: Figure out a smarter way to find out method's start and end offsets.
-                   PsiFile psiFileBeforeRevision =
-                       PsiFileFactory.getInstance(viewer.getProject()).createFileFromText("tmp",
-                                                                                          JavaFileType.INSTANCE,
-                                                                                          text);
-                   PsiElement[] children = psiFileBeforeRevision.getChildren();
-                   for (PsiElement element : children) {
-                     if (element instanceof PsiClass) {
-                       PsiClass psiClass = (PsiClass) element;
-                       PsiMethod[] methods = psiClass.getMethods();
-                       for (PsiMethod psiMethod : methods) {
-                         if (methodNameBefore.contains(psiMethod.getName())) {
-                           //Adds a folding block to the left side of the diff window for the moved method.
-                           viewer.getEditor1().getFoldingModel().runBatchFoldingOperation(
-                               () -> {
-                                 //TODO: Customize the text based on refactoring type
-                                 // (method was Moved/Pulled Up/Pushed Down)
-
-                                 //TODO: Check if method was changed or not
-                                 // and add information about it (with changes/no changes)
-                                 FoldRegion value = viewer.getEditor1().getFoldingModel()
-                                     .addFoldRegion(psiMethod.getBody().getTextRange().getStartOffset(),
-                                                    psiMethod.getTextRange().getEndOffset(),
-                                                    "");
-                                 if (value != null) {
-                                   value.setExpanded(false);
-                                   value.setInnerHighlightersMuted(true);
-                                 }
-
-                                 String className = r.getDetailsAfter();
-                                 String hintText =
-                                     String.format("Moved to %s",
-                                                   className.substring(
-                                                       className.lastIndexOf(".") + 1).trim() + " class.");
-                                 RendererWrapper renderer = new RendererWrapper(new HintRenderer(hintText), false);
-
-                                 viewer.getEditor1().getInlayModel().addBlockElement(
-                                     psiMethod.getTextRange().getStartOffset() - 3,
-                                     true, true, 1,
-                                     renderer);
-                               });
-                         }
-                       }
-                     }
-                   }
-                 }
-        );
   }
 
   /**
