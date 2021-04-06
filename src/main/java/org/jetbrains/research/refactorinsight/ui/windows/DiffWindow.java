@@ -10,7 +10,6 @@ import com.intellij.diff.chains.SimpleDiffRequestChain;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.contents.DocumentContent;
 import com.intellij.diff.requests.DiffRequest;
-import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.tools.simple.SimpleDiffTool;
 import com.intellij.diff.tools.simple.SimpleDiffViewer;
 import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
@@ -207,11 +206,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
 
     //Fold Move Method refactorings in the base diff that contains the information about all changes in the file.
     if (isRefactoring == null) {
-      if (viewer instanceof SimpleDiffViewer && request instanceof SimpleDiffRequest) {
-        SimpleDiffRequest diffRequest = (SimpleDiffRequest) request;
-        String commitId = diffRequest.getContentTitles().get(1);
-        RefactoringFolder.foldRefactorings((SimpleDiffViewer) viewer, commitId);
-      }
+      RefactoringFolder.foldRefactorings(viewer, request);
       return;
     }
 
