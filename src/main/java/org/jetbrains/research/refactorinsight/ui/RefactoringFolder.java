@@ -26,7 +26,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-public abstract class RefactoringFolder {
+public class RefactoringFolder {
+
+  // Suppresses default constructor, ensuring non-instantiability.
+  private RefactoringFolder() {
+  }
+
   /**
    * TODO: Javadoc.
    */
