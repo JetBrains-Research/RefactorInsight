@@ -17,11 +17,14 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.services.MiningService;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -206,16 +209,33 @@ public class RefactoringFolder {
 
   @Nullable
   private static PsiMethod findMethod(@NotNull PsiFile psiFile, @NotNull String qualifiedName) {
-    PsiClass psiClass = findClass(psiFile, qualifiedName.substring(0, qualifiedName.lastIndexOf(".")));
+    int classQualifiedNameEnd = qualifiedName.lastIndexOf('.');
+    int parametersListStart = qualifiedName.indexOf('(');
+    int parametersListEnd = qualifiedName.indexOf(')');
+    assert parametersListEnd + 1 == qualifiedName.length();
+
+    PsiClass psiClass = findClass(psiFile, qualifiedName.substring(0, classQualifiedNameEnd));
     if (psiClass != null) {
       PsiMethod[] psiMethods = psiClass.findMethodsByName(
-          qualifiedName.substring(qualifiedName.lastIndexOf(".") + 1, qualifiedName.indexOf("(")), false);
+          qualifiedName.substring(classQualifiedNameEnd + 1, parametersListStart), false);
       if (psiMethods.length > 0) {
-        if (psiMethods.length > 1) {
-          // TODO:
-          System.err.println("Multiple methods is not implemented");
+        String[] searchedMethodParameters =
+            parametersListStart + 1 < parametersListEnd
+                ? qualifiedName.substring(parametersListStart + 1, parametersListEnd).split(", ")
+                : new String[]{};
+        for (PsiMethod psiMethod : psiMethods) {
+          String[] methodParameters =
+              Arrays.stream(psiMethod.getParameterList().getParameters())
+                  .map(PsiParameter::getType)
+                  .map(PsiType::getPresentableText)
+                  .toArray(String[]::new);
+          if (Arrays.equals(methodParameters, searchedMethodParameters)) {
+            return psiMethod;
+          }
         }
-        return psiMethods[0];
+        throw new AssertionError("Can't find method by type");
+      } else {
+        throw new AssertionError("Can't find method by name");
       }
     }
     return null;
