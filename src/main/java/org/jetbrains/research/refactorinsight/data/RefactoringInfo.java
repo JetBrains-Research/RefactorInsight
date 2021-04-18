@@ -103,7 +103,6 @@ public class RefactoringInfo {
    * @return string value.
    */
   public String toString() {
-    getName();
     return String.join(delimiter(INFO),
         type.name(),
         Stream.concat(
@@ -157,10 +156,11 @@ public class RefactoringInfo {
         ((MoreSidedDiffRequestGenerator) requestGenerator).getClassNames()
             .forEach(name -> {
               Set<RefactoringInfo> infos = map.getOrDefault(name, new HashSet<>());
-              RefactoringInfo info = new RefactoringInfo().setGroup(group)
+              RefactoringInfo info = new RefactoringInfo()
+                  .setGroup(group)
                   .setNameBefore(getNameBefore())
                   .setNameAfter(getNameAfter())
-                  .setType(RefactoringType.valueOf(getName()))
+                  .setType(type)
                   .setIncludes(includes)
                   .setHidden(hidden)
                   .setRequestGenerator(requestGenerator)
