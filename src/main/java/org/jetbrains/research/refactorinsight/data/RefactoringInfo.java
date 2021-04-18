@@ -38,15 +38,14 @@ public class RefactoringInfo {
 
   private transient RefactoringEntry entry;
   private transient String groupId;
-  private transient RefactoringType type;
   private transient List<Pair<String, Boolean>> moreSidedLeftPaths = new ArrayList<>();
 
   private DiffRequestGenerator requestGenerator = new TwoSidedDiffRequestGenerator();
-  private String name;
 
   private final String[][] uiStrings = new String[3][2];
   private final String[] paths = new String[3];
 
+  private RefactoringType type;
   private Group group;
 
   private Set<String> includes = new HashSet<>();
@@ -65,7 +64,7 @@ public class RefactoringInfo {
     String regex = delimiter(INFO, true);
     String[] tokens = value.split(regex, 16);
     RefactoringInfo info = new RefactoringInfo()
-        .setName(tokens[0])
+        .setType(RefactoringType.valueOf(tokens[0]))
         .setNameBefore(StringUtils.deSanitize(tokens[1]))
         .setNameAfter(StringUtils.deSanitize(tokens[2]))
         .setElementBefore(StringUtils.deSanitize(tokens[3]))
@@ -104,8 +103,9 @@ public class RefactoringInfo {
    * @return string value.
    */
   public String toString() {
+    getName();
     return String.join(delimiter(INFO),
-        name,
+        type.name(),
         Stream.concat(
             Arrays.stream(uiStrings).flatMap(Arrays::stream),
             Arrays.stream(paths))
@@ -160,7 +160,7 @@ public class RefactoringInfo {
               RefactoringInfo info = new RefactoringInfo().setGroup(group)
                   .setNameBefore(getNameBefore())
                   .setNameAfter(getNameAfter())
-                  .setName(getName())
+                  .setType(RefactoringType.valueOf(getName()))
                   .setIncludes(includes)
                   .setHidden(hidden)
                   .setRequestGenerator(requestGenerator)
@@ -362,12 +362,7 @@ public class RefactoringInfo {
   }
 
   public String getName() {
-    return name;
-  }
-
-  public RefactoringInfo setName(String name) {
-    this.name = name;
-    return this;
+    return type.getName();
   }
 
   public boolean isHidden() {
@@ -484,7 +479,6 @@ public class RefactoringInfo {
         && Objects.equals(this.getDetailsAfter(), that.getDetailsAfter())
         && Objects.equals(this.getDetailsBefore(), that.getDetailsBefore())
         && Objects.equals(this.getElementBefore(), that.getElementBefore())
-        && this.name.equals(that.getName())
         && this.type == that.getType()
         && this.group == that.getGroup();
   }
@@ -508,12 +502,14 @@ public class RefactoringInfo {
   public void correctLines(String before, String mid, String after) {
     boolean skipAnnotationsLeft = true;
     boolean skipAnnotationsRight = true;
-    if (name.matches("Add\\s(\\w)*\\sAnnotation")) {
-      skipAnnotationsRight = false;
-    } else if (name.matches("Remove\\s(\\w)*\\sAnnotation")) {
-      skipAnnotationsLeft = false;
-    } else if (name.matches("Modify\\s(\\w)*\\sAnnotation")) {
-      skipAnnotationsLeft = skipAnnotationsRight = false;
+    if (getName().endsWith("Annotation")) {
+      if (getName().startsWith("Add")) {
+        skipAnnotationsRight = false;
+      } else if (getName().startsWith("Remove")) {
+        skipAnnotationsLeft = false;
+      } else if (getName().startsWith("Modify")) {
+        skipAnnotationsLeft = skipAnnotationsRight = false;
+      }
     }
     requestGenerator.correct(before, mid, after, skipAnnotationsLeft, true, skipAnnotationsRight);
   }

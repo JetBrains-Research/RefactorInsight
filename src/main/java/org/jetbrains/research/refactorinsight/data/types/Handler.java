@@ -20,7 +20,6 @@ public abstract class Handler {
   public RefactoringInfo handle(Refactoring refactoring, RefactoringEntry entry) {
     RefactoringInfo info = new RefactoringInfo()
         .setType(RefactoringType.valueOf(refactoring.getRefactoringType().name()))
-        .setName(refactoring.getName())
         .setEntry(entry);
     return specify(refactoring, info);
   }
@@ -36,7 +35,6 @@ public abstract class Handler {
                                 RefactoringEntry entry) {
     RefactoringInfo info = new RefactoringInfo()
         .setType(RefactoringType.valueOf(refactoring.getRefactoringType().name()))
-        .setName(refactoring.getName())
         .setEntry(entry);
     return specify(refactoring, info);
   }
