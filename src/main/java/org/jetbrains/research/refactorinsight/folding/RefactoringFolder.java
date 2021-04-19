@@ -1,4 +1,4 @@
-package org.jetbrains.research.refactorinsight.ui;
+package org.jetbrains.research.refactorinsight.folding;
 
 import com.intellij.application.options.colors.highlighting.RendererWrapper;
 import com.intellij.codeInsight.daemon.impl.HintRenderer;
@@ -175,7 +175,7 @@ public class RefactoringFolder {
                                          String details) {
     switch (element) {
       case CLASS: {
-        PsiClass psiClass = findClass(psiFile, name);
+        PsiClass psiClass = JavaFileFinder.findClass(psiFile, name);
         if (psiClass != null) {
           return new Positions(
               psiClass.getTextRange().getStartOffset(),
@@ -187,7 +187,7 @@ public class RefactoringFolder {
         }
       }
       case FIELD: {
-        PsiField psiField = findField(psiFile, name, details);
+        PsiField psiField = JavaFileFinder.findField(psiFile, details, name.substring(0, name.indexOf(' ')));
         if (psiField != null) {
           return new Positions(
               psiField.getTextRange().getStartOffset(),
@@ -200,7 +200,7 @@ public class RefactoringFolder {
         }
       }
       case METHOD: {
-        PsiMethod psiMethod = findMethod(psiFile, name);
+        PsiMethod psiMethod = JavaFileFinder.findMethod(psiFile, name);
         if (psiMethod != null) {
           return new Positions(
               psiMethod.getTextRange().getStartOffset() - 3,
@@ -213,74 +213,6 @@ public class RefactoringFolder {
       default:
         return null;
     }
-  }
-
-  @Nullable
-  private static PsiMethod findMethod(@NotNull PsiFile psiFile, @NotNull String qualifiedName) {
-    int classQualifiedNameEnd = qualifiedName.lastIndexOf('.');
-    int parametersListStart = qualifiedName.indexOf('(');
-    int parametersListEnd = qualifiedName.indexOf(')');
-    assert parametersListEnd + 1 == qualifiedName.length();
-
-    PsiClass psiClass = findClass(psiFile, qualifiedName.substring(0, classQualifiedNameEnd));
-    if (psiClass != null) {
-      PsiMethod[] psiMethods = psiClass.findMethodsByName(
-          qualifiedName.substring(classQualifiedNameEnd + 1, parametersListStart), false);
-      if (psiMethods.length > 0) {
-        String[] searchedMethodParameters =
-            parametersListStart + 1 < parametersListEnd
-                ? qualifiedName.substring(parametersListStart + 1, parametersListEnd).split(", ")
-                : new String[]{};
-        for (PsiMethod psiMethod : psiMethods) {
-          String[] methodParameters =
-              Arrays.stream(psiMethod.getParameterList().getParameters())
-                  .map(PsiParameter::getType)
-                  .map(PsiType::getPresentableText)
-                  .toArray(String[]::new);
-          if (Arrays.equals(methodParameters, searchedMethodParameters)) {
-            return psiMethod;
-          }
-        }
-        throw new AssertionError("Can't find method by type");
-      } else {
-        throw new AssertionError("Can't find method by name");
-      }
-    }
-    return null;
-  }
-
-  @Nullable
-  private static PsiField findField(@NotNull PsiFile psiFile, @NotNull String name, String details) {
-    PsiClass psiClass = findClass(psiFile, details);
-    if (psiClass != null) {
-      return psiClass.findFieldByName(name.substring(0, name.indexOf(" ")), false);
-    }
-    return null;
-  }
-
-  @Nullable
-  private static PsiClass findClass(@NotNull PsiFile psiFile, @NotNull String qualifiedName) {
-    PsiElement[] children = psiFile.getChildren();
-    for (PsiElement element : children) {
-      if (element instanceof PsiClass) {
-        PsiClass psiClass = (PsiClass) element;
-        String className = psiClass.getQualifiedName();
-        if (qualifiedName.startsWith(className)) {
-          if (qualifiedName.equals(className)) {
-            return psiClass;
-          }
-          String[] path = qualifiedName.substring(className.length() + 1).split("\\.");
-          for (String subclass : path) {
-            psiClass = psiClass.findInnerClassByName(subclass, false);
-            if (psiClass == null) {
-              throw new AssertionError("Can't find subclass");
-            }
-          }
-          return psiClass;
-        }
-      }
-    }
-    return null;
   }
 
   private static boolean foldable(@NotNull RefactoringInfo info) {
