@@ -52,7 +52,7 @@ dependencies {
 }
 
 intellij {
-    version = '2020.3'
+    version = '2021.1'
     plugins = ['java', 'git4idea', "github"]
     downloadSources true
     buildSearchableOptions.enabled false
