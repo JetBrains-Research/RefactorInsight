@@ -11,26 +11,31 @@ import com.intellij.diff.tools.util.side.TwosideTextDiffViewer;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.FoldRegion;
 import com.intellij.openapi.editor.ex.EditorEx;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiParameter;
-import com.intellij.psi.PsiType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
+import org.jetbrains.research.refactorinsight.folding.handlers.FoldingHandler;
+import org.jetbrains.research.refactorinsight.folding.handlers.MoveOperationHandler;
 import org.jetbrains.research.refactorinsight.services.MiningService;
 
-import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
 public class RefactoringFolder {
+  static Map<RefactoringType, FoldingHandler> foldingHandlers;
+
+  static {
+    foldingHandlers = new EnumMap<>(RefactoringType.class);
+    FoldingHandler moveOperationHandler = new MoveOperationHandler();
+    foldingHandlers.put(RefactoringType.MOVE_OPERATION, moveOperationHandler);
+    foldingHandlers.put(RefactoringType.PULL_UP_OPERATION, moveOperationHandler);
+    foldingHandlers.put(RefactoringType.PUSH_DOWN_OPERATION, moveOperationHandler);
+  }
 
   // Suppresses default constructor, ensuring non-instantiability.
   private RefactoringFolder() {
@@ -55,8 +60,9 @@ public class RefactoringFolder {
 
   private static void foldRefactorings(@NotNull OnesideTextDiffViewer viewer, String commitId) {
     List<RefactoringInfo> foldableRefactorings =
-        MiningService.getInstance(viewer.getProject()).get(commitId).getRefactorings()
-            .stream().filter(RefactoringFolder::foldable).collect(Collectors.toList());
+        MiningService.getInstance(viewer.getProject()).get(commitId).getRefactorings().stream()
+            .filter(info -> foldingHandlers.containsKey(info.getType()))
+            .collect(Collectors.toList());
 
     Editor editor = viewer.getEditor();
 
@@ -66,8 +72,9 @@ public class RefactoringFolder {
 
   private static void foldRefactorings(@NotNull TwosideTextDiffViewer viewer, String commitId) {
     List<RefactoringInfo> foldableRefactorings =
-        MiningService.getInstance(viewer.getProject()).get(commitId).getRefactorings()
-            .stream().filter(RefactoringFolder::foldable).collect(Collectors.toList());
+        MiningService.getInstance(viewer.getProject()).get(commitId).getRefactorings().stream()
+            .filter(info -> foldingHandlers.containsKey(info.getType()))
+            .collect(Collectors.toList());
 
     modifyEditor(viewer.getEditor1(), foldableRefactorings, true);
     modifyEditor(viewer.getEditor2(), foldableRefactorings, false);
@@ -75,8 +82,9 @@ public class RefactoringFolder {
 
   private static void foldRefactorings(@NotNull ThreesideTextDiffViewer viewer, String commitId) {
     List<RefactoringInfo> foldableRefactorings =
-        MiningService.getInstance(viewer.getProject()).get(commitId).getRefactorings()
-            .stream().filter(RefactoringFolder::foldable).collect(Collectors.toList());
+        MiningService.getInstance(viewer.getProject()).get(commitId).getRefactorings().stream()
+            .filter(info -> foldingHandlers.containsKey(info.getType()))
+            .collect(Collectors.toList());
 
     List<? extends EditorEx> editor = viewer.getEditors();
 
@@ -93,149 +101,27 @@ public class RefactoringFolder {
         .getPsiFile(editor.getDocument());
 
     foldableRefactorings.forEach(info -> {
-          Element elementType = getElementType(info);
-          Positions positions = findPositions(psiFile, elementType,
-              before ? info.getNameBefore() : info.getNameAfter(),
-              before ? info.getDetailsBefore() : info.getDetailsAfter());
-          String hintText = makeHintText(info, elementType, before);
-          if (positions != null) {
+          List<FoldingHandler.Folding> folds = foldingHandlers.get(info.getType()).getFolds(info, psiFile, before);
+          if (!folds.isEmpty()) {
             editor.getFoldingModel().runBatchFoldingOperation(
                 () -> {
-                  //TODO: Check if method was changed or not
-                  // and add information about it (with changes/no changes)
+                  for (FoldingHandler.Folding folding : folds) {
+                    FoldRegion value = editor.getFoldingModel()
+                        .addFoldRegion(folding.foldingStartOffset, folding.foldingEndOffset, "");
+                    if (value != null) {
+                      value.setExpanded(false);
+                      value.setInnerHighlightersMuted(true);
+                    }
 
-                  FoldRegion value = editor.getFoldingModel()
-                      .addFoldRegion(positions.foldingStartOffset, positions.foldingEndOffset, "");
-                  if (value != null) {
-                    value.setExpanded(false);
-                    value.setInnerHighlightersMuted(true);
+                    RendererWrapper renderer = new RendererWrapper(new HintRenderer(folding.hintText), false);
+                    editor.getInlayModel().addBlockElement(
+                        folding.hintOffset,
+                        true, true, 1,
+                        renderer);
                   }
-
-                  RendererWrapper renderer = new RendererWrapper(new HintRenderer(hintText), false);
-                  editor.getInlayModel().addBlockElement(
-                      positions.hintOffset,
-                      true, true, 1,
-                      renderer);
                 });
           }
         }
     );
-  }
-
-  @NotNull
-  private static String makeHintText(@NotNull RefactoringInfo info, @NotNull Element elementType, boolean before) {
-    StringBuilder hint = new StringBuilder();
-    hint.append(operationName(info)).append(before ? " to " : " from ");
-    String details = before ? info.getDetailsAfter() : info.getDetailsBefore();
-    switch (elementType) {
-      case CLASS:
-        hint.append(details);
-        break;
-      case METHOD:
-      case FIELD:
-        hint.append(details.substring(details.lastIndexOf(".") + 1));
-        break;
-      default:
-        throw new AssertionError();
-    }
-    if (info.getName().equals(RefactoringType.MOVE_OPERATION.getName())) {
-      hint.append(info.isChanged() ? ". With changes." : ". Without changes.");
-    }
-    return hint.toString();
-  }
-
-  @NotNull
-  private static String operationName(@NotNull RefactoringInfo info) {
-    if (info.getName().contains("Move")) {
-      return "Moved";
-    } else if (info.getName().contains("Pull Up")) {
-      return "Pulled Up";
-    } else if (info.getName().contains("Push Down")) {
-      return "Pushed Down";
-    }
-    throw new AssertionError("Unexpected operation");
-  }
-
-  @NotNull
-  private static Element getElementType(@NotNull RefactoringInfo info) {
-    if (info.getName().endsWith("Class")) {
-      return Element.CLASS;
-    } else if (info.getName().endsWith("Method")) {
-      return Element.METHOD;
-    } else if (info.getName().endsWith("Attribute")) {
-      return Element.FIELD;
-    }
-    throw new AssertionError("Unexpected element");
-  }
-
-  @Nullable
-  private static Positions findPositions(@NotNull PsiFile psiFile,
-                                         @NotNull Element element,
-                                         String name,
-                                         String details) {
-    switch (element) {
-      case CLASS: {
-        PsiClass psiClass = JavaFileFinder.findClass(psiFile, name);
-        if (psiClass != null) {
-          return new Positions(
-              psiClass.getTextRange().getStartOffset(),
-              psiClass.getLBrace().getTextOffset(),
-              psiClass.getRBrace().getTextOffset() + 1
-          );
-        } else {
-          return null;
-        }
-      }
-      case FIELD: {
-        PsiField psiField = JavaFileFinder.findField(psiFile, details, name.substring(0, name.indexOf(' ')));
-        if (psiField != null) {
-          return new Positions(
-              psiField.getTextRange().getStartOffset(),
-              psiField.getTextRange().getEndOffset(),
-              psiField.getTextRange().getEndOffset()
-
-          );
-        } else {
-          return null;
-        }
-      }
-      case METHOD: {
-        PsiMethod psiMethod = JavaFileFinder.findMethod(psiFile, name);
-        if (psiMethod != null) {
-          return new Positions(
-              psiMethod.getTextRange().getStartOffset() - 3,
-              psiMethod.getBody().getTextRange().getStartOffset(),
-              psiMethod.getTextRange().getEndOffset());
-        } else {
-          return null;
-        }
-      }
-      default:
-        return null;
-    }
-  }
-
-  private static boolean foldable(@NotNull RefactoringInfo info) {
-    return info.getName().contains("Move")
-        || info.getName().contains("Pull Up")
-        || info.getName().contains("Push Down");
-  }
-
-  private static final class Positions {
-    public final int hintOffset;
-    public final int foldingStartOffset;
-    public final int foldingEndOffset;
-
-    private Positions(int hintOffset, int foldingStartOffset, int foldingEndOffset) {
-      this.hintOffset = hintOffset;
-      this.foldingStartOffset = foldingStartOffset;
-      this.foldingEndOffset = foldingEndOffset;
-    }
-  }
-
-  private enum Element {
-    CLASS,
-    METHOD,
-    FIELD
   }
 }
