@@ -55,6 +55,7 @@ intellij {
     version = '2020.3'
     plugins = ['java', 'git4idea', "github"]
     downloadSources true
+    buildSearchableOptions.enabled false
 }
 
 checkstyle {
