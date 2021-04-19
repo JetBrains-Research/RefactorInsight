@@ -21,6 +21,7 @@ import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.services.MiningService;
 
@@ -123,17 +124,24 @@ public class RefactoringFolder {
 
   @NotNull
   private static String makeHintText(@NotNull RefactoringInfo info, @NotNull Element elementType, boolean before) {
+    StringBuilder hint = new StringBuilder();
+    hint.append(operationName(info)).append(before ? " to " : " from ");
     String details = before ? info.getDetailsAfter() : info.getDetailsBefore();
-    String prefix = operationName(info) + (before ? " to " : " from ");
     switch (elementType) {
       case CLASS:
-        return prefix + details;
+        hint.append(details);
+        break;
       case METHOD:
       case FIELD:
-        return prefix + details.substring(details.lastIndexOf(".") + 1);
+        hint.append(details.substring(details.lastIndexOf(".") + 1));
+        break;
       default:
         throw new AssertionError();
     }
+    if (info.getName().equals(RefactoringType.MOVE_OPERATION.getName())) {
+      hint.append(info.isChanged() ? ". With changes." : ". Without changes.");
+    }
+    return hint.toString();
   }
 
   @NotNull

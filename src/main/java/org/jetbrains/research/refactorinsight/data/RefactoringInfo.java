@@ -55,6 +55,9 @@ public class RefactoringInfo {
   private boolean threeSided = false;
   private boolean moreSided = false;
 
+  // Optional data for move refactorings
+  private boolean changed = true;
+
   /**
    * Deserializes an {@link RefactoringInfo} instance from string.
    *
@@ -63,7 +66,7 @@ public class RefactoringInfo {
    */
   public static RefactoringInfo fromString(String value) {
     String regex = delimiter(INFO, true);
-    String[] tokens = value.split(regex, 16);
+    String[] tokens = value.split(regex, 17);
     RefactoringInfo info = new RefactoringInfo()
         .setName(tokens[0])
         .setNameBefore(StringUtils.deSanitize(tokens[1]))
@@ -79,16 +82,17 @@ public class RefactoringInfo {
         .setThreeSided(tokens[11].equals("t"))
         .setHidden(tokens[12].equals("t"))
         .setMoreSided(tokens[13].equals("t"))
+        .setChanged(tokens[14].equals("t"))
         .setIncludes(new HashSet<>(
-            tokens[15].isEmpty() ? List.of() : Arrays.asList(tokens[15].split(regex))));
+            tokens[16].isEmpty() ? List.of() : Arrays.asList(tokens[16].split(regex))));
 
     DiffRequestGenerator diffGenerator;
     if (info.isMoreSided()) {
-      diffGenerator = MoreSidedDiffRequestGenerator.fromString(tokens[14]);
+      diffGenerator = MoreSidedDiffRequestGenerator.fromString(tokens[15]);
     } else if (info.isThreeSided()) {
-      diffGenerator = ThreeSidedDiffRequestGenerator.fromString(tokens[14]);
+      diffGenerator = ThreeSidedDiffRequestGenerator.fromString(tokens[15]);
     } else {
-      diffGenerator = TwoSidedDiffRequestGenerator.fromString(tokens[14]);
+      diffGenerator = TwoSidedDiffRequestGenerator.fromString(tokens[15]);
     }
 
     return info.setRequestGenerator(diffGenerator);
@@ -116,6 +120,7 @@ public class RefactoringInfo {
         threeSided ? "t" : "f",
         hidden ? "t" : "f",
         moreSided ? "t" : "f",
+        changed ? "t" : "f",
         requestGenerator.toString(),
         String.join(delimiter(INFO), includes)
     );
@@ -523,5 +528,13 @@ public class RefactoringInfo {
                                                                true, false, true);
   }
 
+  public boolean isChanged() {
+    return changed;
+  }
+
+  public RefactoringInfo setChanged(boolean changed) {
+    this.changed = changed;
+    return this;
+  }
 }
 
