@@ -502,14 +502,12 @@ public class RefactoringInfo {
   public void correctLines(String before, String mid, String after) {
     boolean skipAnnotationsLeft = true;
     boolean skipAnnotationsRight = true;
-    if (getName().endsWith("Annotation")) {
-      if (getName().startsWith("Add")) {
-        skipAnnotationsRight = false;
-      } else if (getName().startsWith("Remove")) {
-        skipAnnotationsLeft = false;
-      } else if (getName().startsWith("Modify")) {
-        skipAnnotationsLeft = skipAnnotationsRight = false;
-      }
+    if (type.getName().matches("Add\\s(\\w)*\\sAnnotation")) {
+      skipAnnotationsRight = false;
+    } else if (type.getName().matches("Remove\\s(\\w)*\\sAnnotation")) {
+      skipAnnotationsLeft = false;
+    } else if (type.getName().matches("Modify\\s(\\w)*\\sAnnotation")) {
+      skipAnnotationsLeft = skipAnnotationsRight = false;
     }
     requestGenerator.correct(before, mid, after, skipAnnotationsLeft, true, skipAnnotationsRight);
   }
