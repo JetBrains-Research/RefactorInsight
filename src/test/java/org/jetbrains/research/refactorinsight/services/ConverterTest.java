@@ -68,7 +68,7 @@ public class ConverterTest {
     String noMarkingsString = String.join(delimiter(INFO), "name",
                                           "nameBef", "nameAft", "elemBef", "elemAft", "detBef", "detAft",
                                           "left/path.java", "mid/path.java", "right/path.java",
-                                          "CLASS", "t", "f", "f", "", "");
+                                          "CLASS", "t", "f", "f", "t", "", "");
     RefactoringInfo noMarkingsInfo = new RefactoringInfo()
         .setName("name")
         .setNameBefore("nameBef")
@@ -90,9 +90,9 @@ public class ConverterTest {
     String oneMarkingString = String.join(delimiter(INFO), "name",
                                           "nameBef", "nameAft", "elemBef", "elemAft", "detBef", "detAft",
                                           "left/path.java", "mid/path.java", "right/path.java",
-                                          "CLASS", "f", "f", "f", String.join(delimiter(FRAG),
-                                                                              "1", "2", "3", "4", "0", "0", "0", "0",
-                                                                              ""), "");
+                                          "CLASS", "f", "f", "f", "f",
+                                          String.join(delimiter(FRAG), "1", "2", "3", "4", "0", "0", "0", "0", ""),
+                                          "");
     RefactoringInfo oneMarkingInfo = new RefactoringInfo()
         .setName("name")
         .setNameBefore("nameBef")
@@ -108,6 +108,7 @@ public class ConverterTest {
         .setThreeSided(false)
         .setHidden(false)
         .setMoreSided(false)
+        .setChanged(false)
         .setIncludes(new HashSet<>())
         .setRequestGenerator(new TwoSidedDiffRequestGenerator(Collections.singletonList(
             new LineFragmentImpl(1, 2, 3, 4, 0, 0, 0, 0))));
@@ -115,9 +116,10 @@ public class ConverterTest {
     String moreSidedString = String.join(delimiter(INFO), "name",
                                          "nameBef", "nameAft", "elemBef", "elemAft", "detBef", "detAft",
                                          "left/path.java", "mid/path.java", "right/path.java",
-                                         "CLASS", "f", "f", "t", String.join(delimiter(RANGE),
-                                                                             "1", "2", "3", "4", "0", "0", "0", "0",
-                                                                             "extraction/left/path.java"), "");
+                                         "CLASS", "f", "f", "t", "t",
+                                         String.join(delimiter(RANGE), "1", "2", "3", "4", "0", "0", "0", "0",
+                                                     "extraction/left/path.java"),
+                                         "");
     RefactoringInfo moreSidedInfo = new RefactoringInfo()
         .setName("name")
         .setNameBefore("nameBef")
@@ -133,6 +135,7 @@ public class ConverterTest {
         .setThreeSided(false)
         .setHidden(false)
         .setMoreSided(true)
+        .setChanged(true)
         .setIncludes(new HashSet<>())
         .setRequestGenerator(new MoreSidedDiffRequestGenerator(Collections.singletonList(
             new MoreSidedDiffRequestGenerator.MoreSidedRange(1, 2, 3, 4,
