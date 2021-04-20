@@ -47,32 +47,6 @@ public class WindowService {
   }
 
   /**
-   * Sets visibility of refactoring labels in VCSTable.
-   * @param e Event
-   * @param visible boolean
-   */
-  public void setLabelsVisible(@NotNull AnActionEvent e, boolean visible) {
-    if (e.getData(VcsLogInternalDataKeys.MAIN_UI) == null) {
-      return;
-    }
-    VcsLogGraphTable table = e.getData(VcsLogInternalDataKeys.MAIN_UI).getTable();
-    gitInfo.get(table).setLabelsVisible(visible);
-  }
-
-  /**
-   * Checks if the displayed table has the lables visible.
-   * @param e the action event
-   * @return true if the labels are visible, false otherwise
-   */
-  public boolean isLabelsVisible(@NotNull AnActionEvent e) {
-    if (e.getData(VcsLogInternalDataKeys.MAIN_UI) == null) {
-      return false;
-    }
-    VcsLogGraphTable table = e.getData(VcsLogInternalDataKeys.MAIN_UI).getTable();
-    return gitInfo.containsKey(table) && gitInfo.get(table).isLabelsVisible();
-  }
-
-  /**
    * Generates if needed a GitWindow (RefactorInsight) object.
    * @param e Event
    */
