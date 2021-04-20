@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'checkstyle'
     id 'jacoco'
-    id 'org.jetbrains.intellij' version '0.6.5'
+    id 'org.jetbrains.intellij' version '0.7.2'
 }
 
 group 'org.jetbrains.research.refactorinsight'
@@ -52,9 +52,10 @@ dependencies {
 }
 
 intellij {
-    version = '2020.3'
+    version = '2021.1'
     plugins = ['java', 'git4idea', "github"]
     downloadSources true
+    buildSearchableOptions.enabled false
 }
 
 checkstyle {

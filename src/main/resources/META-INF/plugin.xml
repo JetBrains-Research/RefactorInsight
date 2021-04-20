@@ -2,7 +2,7 @@
     <id>org.jetbrains.research.refactorinsight</id>
     <name>RefactorInsight</name>
     <vendor>JetBrains</vendor>
-    <version>2020.3-2.1</version>
+    <version>2021.1-1.0</version>
 
     <description><![CDATA[
     <p>Discovers refactorings in code changes and visualizes them.</p>
@@ -15,6 +15,13 @@
       ]]></description>
 
     <change-notes><![CDATA[
+        <h4>2021.1-1.0</h4>
+        <ul>
+            <li>Add compatibility with IDEA 2021.1</li>
+            <li>Group refactorings by their level (variable, method, class)</li>
+            <li>Minor bug fixes</li>
+        </ul>
+
         <h4>2020.3-2.1</h4>
         <ul>
             <li>Minor bug fixes</li>
