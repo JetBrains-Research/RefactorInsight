@@ -113,6 +113,9 @@ public class GitWindow {
     }
   }
 
+  /**
+   * Mine commit if not already. Need because entry must be ready when classical diff is called.
+   */
   private void mineIfAbsent() {
     int index = table.getSelectionModel().getAnchorSelectionIndex();
     if (index >= 0) {
