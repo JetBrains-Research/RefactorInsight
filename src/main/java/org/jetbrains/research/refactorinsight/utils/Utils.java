@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import gr.uom.java.xmi.decomposition.AbstractStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
@@ -346,5 +347,38 @@ public class Utils {
             Disposer.dispose(disposable);
           }
         });
+  }
+
+  /**
+   * Check if Java statements lists equal using equalFragment function.
+   */
+  public static boolean isStatementsEqualJava(@NotNull List<AbstractStatement> statementsBefore,
+                                              @NotNull List<AbstractStatement> statementsAfter) {
+    if (statementsBefore.size() == statementsAfter.size()) {
+      boolean equal = true;
+      for (int i = 0; i < statementsBefore.size() && equal; i++) {
+        equal = statementsBefore.get(i).equalFragment(statementsAfter.get(i));
+      }
+      return equal;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Check if Kotlin statements lists equal using equalFragment function.
+   */
+  public static boolean isStatementsEqualKotlin(
+      @NotNull List<org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement> statementsBefore,
+      @NotNull List<org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement> statementsAfter) {
+    if (statementsBefore.size() == statementsAfter.size()) {
+      boolean equal = true;
+      for (int i = 0; i < statementsBefore.size() && equal; i++) {
+        equal = statementsBefore.get(i).equalFragment(statementsAfter.get(i));
+      }
+      return equal;
+    } else {
+      return false;
+    }
   }
 }

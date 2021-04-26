@@ -138,7 +138,9 @@ public class RefactoringFolder {
       default:
         throw new AssertionError();
     }
-    if (info.getName().equals(RefactoringType.MOVE_OPERATION.getName())) {
+    if (info.getName().equals(RefactoringType.PULL_UP_OPERATION.getName())
+        || info.getName().equals(RefactoringType.PUSH_DOWN_OPERATION.getName())
+        || info.getName().equals(RefactoringType.MOVE_OPERATION.getName())) {
       hint.append(info.isChanged() ? ". With changes." : ". Without changes.");
     }
     return hint.toString();
