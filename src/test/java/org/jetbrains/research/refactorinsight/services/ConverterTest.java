@@ -5,6 +5,7 @@ import static junit.framework.TestCase.assertEquals;
 import static org.jetbrains.research.refactorinsight.utils.StringUtils.*;
 
 import com.intellij.diff.fragments.LineFragmentImpl;
+import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.*;
 
 import java.util.ArrayList;
@@ -65,12 +66,12 @@ public class ConverterTest {
   @Test
   public void infoConverterTest() {
     //Test case 1
-    String noMarkingsString = String.join(delimiter(INFO), "name",
+    String noMarkingsString = String.join(delimiter(INFO), RefactoringType.ADD_ATTRIBUTE_ANNOTATION.name(),
                                           "nameBef", "nameAft", "elemBef", "elemAft", "detBef", "detAft",
                                           "left/path.java", "mid/path.java", "right/path.java",
                                           "CLASS", "t", "f", "f", "t", "", "");
     RefactoringInfo noMarkingsInfo = new RefactoringInfo()
-        .setName("name")
+        .setType(RefactoringType.ADD_ATTRIBUTE_ANNOTATION)
         .setNameBefore("nameBef")
         .setNameAfter("nameAft")
         .setElementBefore("elemBef")
@@ -87,14 +88,14 @@ public class ConverterTest {
         .setIncludes(new HashSet<>())
         .setRequestGenerator(new ThreeSidedDiffRequestGenerator());
     //Test case 2
-    String oneMarkingString = String.join(delimiter(INFO), "name",
+    String oneMarkingString = String.join(delimiter(INFO), RefactoringType.ADD_PARAMETER.name(),
                                           "nameBef", "nameAft", "elemBef", "elemAft", "detBef", "detAft",
                                           "left/path.java", "mid/path.java", "right/path.java",
                                           "CLASS", "f", "f", "f", "f",
                                           String.join(delimiter(FRAG), "1", "2", "3", "4", "0", "0", "0", "0", ""),
                                           "");
     RefactoringInfo oneMarkingInfo = new RefactoringInfo()
-        .setName("name")
+        .setType(RefactoringType.ADD_PARAMETER)
         .setNameBefore("nameBef")
         .setNameAfter("nameAft")
         .setElementBefore("elemBef")
@@ -113,7 +114,7 @@ public class ConverterTest {
         .setRequestGenerator(new TwoSidedDiffRequestGenerator(Collections.singletonList(
             new LineFragmentImpl(1, 2, 3, 4, 0, 0, 0, 0))));
     //Test case 3
-    String moreSidedString = String.join(delimiter(INFO), "name",
+    String moreSidedString = String.join(delimiter(INFO), RefactoringType.EXTRACT_INTERFACE.name(),
                                          "nameBef", "nameAft", "elemBef", "elemAft", "detBef", "detAft",
                                          "left/path.java", "mid/path.java", "right/path.java",
                                          "CLASS", "f", "f", "t", "t",
@@ -121,7 +122,7 @@ public class ConverterTest {
                                                      "extraction/left/path.java"),
                                          "");
     RefactoringInfo moreSidedInfo = new RefactoringInfo()
-        .setName("name")
+        .setType(RefactoringType.EXTRACT_INTERFACE)
         .setNameBefore("nameBef")
         .setNameAfter("nameAft")
         .setElementBefore("elemBef")

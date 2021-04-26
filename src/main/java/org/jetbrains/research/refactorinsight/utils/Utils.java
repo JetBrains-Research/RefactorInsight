@@ -186,20 +186,18 @@ public class Utils {
     if (infos.stream().anyMatch(ofType(RENAME_ATTRIBUTE))
         && infos.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
       info = infos.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
-      info.setName(RefactorInsightBundle.message("change.rename.attribute"));
+      info.setType(RefactoringType.RENAME_AND_CHANGE_ATTRIBUTE_TYPE);
     } else if (infos.stream().anyMatch(ofType(RENAME_ATTRIBUTE))) {
       info = infos.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
-      info.setName(RefactorInsightBundle.message("rename.attribute"));
     } else if (infos.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
       info = infos.stream().filter(ofType(CHANGE_ATTRIBUTE_TYPE)).findFirst().get();
-      info.setName(RefactorInsightBundle.message("change.attribute"));
     } else if (infos.stream().anyMatch(ofType(CHANGE_VARIABLE_TYPE))) {
       info = infos.stream().filter(ofType(CHANGE_VARIABLE_TYPE)).findFirst().get();
-      info.setName(RefactorInsightBundle.message("change.rename.var"));
+      info.setType(RefactoringType.RENAME_AND_CHANGE_VARIABLE_TYPE);
     } else if (infos.stream().anyMatch(ofType(RENAME_PARAMETER))
         && infos.stream().anyMatch(ofType(CHANGE_PARAMETER_TYPE))) {
       info = infos.stream().filter(ofType(RENAME_PARAMETER)).findFirst().get();
-      info.setName(RefactorInsightBundle.message("change.rename.param"));
+      info.setType(RefactoringType.RENAME_AND_CHANGE_PARAMETER_TYPE);
     }
     return info;
   }
