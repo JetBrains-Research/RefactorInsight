@@ -21,8 +21,8 @@ public class InlineOperationFoldingHandler implements FoldingHandler {
     if (method == null) {
       return Collections.emptyList();
     }
-    String details = info.getDetailsAfter();
-    String hintText = "Inlined to " + details.substring(details.lastIndexOf('.') + 1);
+    String details = info.getNameAfter();
+    String hintText = "Inlined to " + details.substring(details.lastIndexOf('.') + 1, details.indexOf('('));
     PsiCodeBlock body = method.getBody();
     return Collections.singletonList(
         new Folding(

@@ -17,12 +17,13 @@ public class ExtractOperationFoldingHandler implements FoldingHandler {
     if (isBefore) {
       return Collections.emptyList();
     }
-    PsiMethod method = PsiUtils.findMethod(file, info.getNameAfter());
+    String nameAfter = info.getDetailsAfter() + '.' + info.getElementBefore();
+    PsiMethod method = PsiUtils.findMethod(file, nameAfter);
     if (method == null) {
       return Collections.emptyList();
     }
-    String details = info.getDetailsBefore();
-    String hintText = "Extracted from " + details.substring(details.lastIndexOf('.') + 1);
+    String details = info.getNameBefore();
+    String hintText = "Extracted from " + details.substring(details.lastIndexOf('.') + 1, details.indexOf('('));
     PsiCodeBlock body = method.getBody();
     return Collections.singletonList(
         new Folding(
