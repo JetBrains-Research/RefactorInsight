@@ -8,7 +8,7 @@ import org.jetbrains.research.refactorinsight.utils.PsiUtils;
 import java.util.Collections;
 import java.util.List;
 
-public class MoveOperationHandler implements FoldingHandler {
+public class MoveOperationFoldingHandler implements FoldingHandler {
   @Override
   public List<Folding> getFolds(RefactoringInfo info, PsiFile file, boolean isBefore) {
     PsiMethod method = PsiUtils.findMethod(file, isBefore ? info.getNameBefore() : info.getNameAfter());

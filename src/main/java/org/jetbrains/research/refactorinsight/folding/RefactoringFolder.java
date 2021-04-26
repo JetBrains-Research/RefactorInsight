@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.folding.handlers.FoldingHandler;
-import org.jetbrains.research.refactorinsight.folding.handlers.MoveOperationHandler;
+import org.jetbrains.research.refactorinsight.folding.handlers.MoveOperationFoldingHandler;
 import org.jetbrains.research.refactorinsight.services.MiningService;
 
 import java.util.EnumMap;
@@ -31,7 +31,7 @@ public class RefactoringFolder {
 
   static {
     foldingHandlers = new EnumMap<>(RefactoringType.class);
-    FoldingHandler moveOperationHandler = new MoveOperationHandler();
+    FoldingHandler moveOperationHandler = new MoveOperationFoldingHandler();
     foldingHandlers.put(RefactoringType.MOVE_OPERATION, moveOperationHandler);
     foldingHandlers.put(RefactoringType.PULL_UP_OPERATION, moveOperationHandler);
     foldingHandlers.put(RefactoringType.PUSH_DOWN_OPERATION, moveOperationHandler);
