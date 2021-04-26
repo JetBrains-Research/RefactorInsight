@@ -1,12 +1,14 @@
 package org.jetbrains.research.refactorinsight.folding.handlers;
 
 import com.intellij.psi.PsiFile;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 
 import java.util.List;
 
 public interface FoldingHandler {
-  List<Folding> getFolds(RefactoringInfo info, PsiFile file, boolean isBefore);
+  @NotNull
+  List<Folding> getFolds(@NotNull RefactoringInfo info, @NotNull PsiFile file, boolean isBefore);
 
   final class Folding {
     public final String hintText;

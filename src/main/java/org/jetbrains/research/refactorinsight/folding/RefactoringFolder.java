@@ -16,7 +16,9 @@ import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
+import org.jetbrains.research.refactorinsight.folding.handlers.ExtractOperationFoldingHandler;
 import org.jetbrains.research.refactorinsight.folding.handlers.FoldingHandler;
+import org.jetbrains.research.refactorinsight.folding.handlers.InlineOperationFoldingHandler;
 import org.jetbrains.research.refactorinsight.folding.handlers.MoveOperationFoldingHandler;
 import org.jetbrains.research.refactorinsight.services.MiningService;
 
@@ -35,6 +37,10 @@ public class RefactoringFolder {
     foldingHandlers.put(RefactoringType.MOVE_OPERATION, moveOperationHandler);
     foldingHandlers.put(RefactoringType.PULL_UP_OPERATION, moveOperationHandler);
     foldingHandlers.put(RefactoringType.PUSH_DOWN_OPERATION, moveOperationHandler);
+    foldingHandlers.put(RefactoringType.INLINE_OPERATION, new InlineOperationFoldingHandler());
+    FoldingHandler extractOperationHandler = new ExtractOperationFoldingHandler();
+    foldingHandlers.put(RefactoringType.EXTRACT_OPERATION, extractOperationHandler);
+    foldingHandlers.put(RefactoringType.EXTRACT_AND_MOVE_OPERATION, extractOperationHandler);
   }
 
   // Suppresses default constructor, ensuring non-instantiability.
