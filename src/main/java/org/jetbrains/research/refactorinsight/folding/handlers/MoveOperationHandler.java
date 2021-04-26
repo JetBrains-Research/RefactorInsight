@@ -3,7 +3,7 @@ package org.jetbrains.research.refactorinsight.folding.handlers;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.folding.JavaFileFinder;
+import org.jetbrains.research.refactorinsight.utils.PsiUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
 public class MoveOperationHandler implements FoldingHandler {
   @Override
   public List<Folding> getFolds(RefactoringInfo info, PsiFile file, boolean isBefore) {
-    PsiMethod method = JavaFileFinder.findMethod(file, isBefore ? info.getNameBefore() : info.getNameAfter());
+    PsiMethod method = PsiUtils.findMethod(file, isBefore ? info.getNameBefore() : info.getNameAfter());
     if (method == null) {
       return Collections.emptyList();
     }

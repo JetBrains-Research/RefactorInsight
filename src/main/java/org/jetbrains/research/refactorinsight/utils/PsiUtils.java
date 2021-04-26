@@ -1,18 +1,28 @@
-package org.jetbrains.research.refactorinsight.folding;
+package org.jetbrains.research.refactorinsight.utils;
 
+import com.intellij.lang.java.JavaLanguage;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
-public class JavaFileFinder {
+public class PsiUtils {
   // Suppresses default constructor, ensuring non-instantiability.
-  private JavaFileFinder() {
+  private PsiUtils() {
   }
 
   @Nullable
   public static PsiMethod findMethod(@NotNull PsiFile psiFile, @NotNull String qualifiedName) {
+    if (psiFile.getLanguage().is(JavaLanguage.INSTANCE)) {
+      return findMethodJava(psiFile, qualifiedName);
+    } else {
+      return null;
+    }
+  }
+
+  @Nullable
+  public static PsiMethod findMethodJava(@NotNull PsiFile psiFile, @NotNull String qualifiedName) {
     int classQualifiedNameEnd = qualifiedName.lastIndexOf('.');
     int parametersListStart = qualifiedName.indexOf('(');
     int parametersListEnd = qualifiedName.indexOf(')');
@@ -46,16 +56,16 @@ public class JavaFileFinder {
   }
 
   @Nullable
-  public static PsiField findField(@NotNull PsiFile psiFile, @NotNull String classQualifiedName, @NotNull String fieldName) {
-    PsiClass psiClass = findClass(psiFile, classQualifiedName);
-    if (psiClass != null) {
-      return psiClass.findFieldByName(fieldName, false);
+  public static PsiClass findClass(@NotNull PsiFile psiFile, @NotNull String qualifiedName) {
+    if (psiFile.getLanguage().is(JavaLanguage.INSTANCE)) {
+      return findClassJava(psiFile, qualifiedName);
+    } else {
+      return null;
     }
-    return null;
   }
 
   @Nullable
-  public static PsiClass findClass(@NotNull PsiFile psiFile, @NotNull String qualifiedName) {
+  public static PsiClass findClassJava(@NotNull PsiFile psiFile, @NotNull String qualifiedName) {
     PsiElement[] children = psiFile.getChildren();
     for (PsiElement element : children) {
       if (element instanceof PsiClass) {
