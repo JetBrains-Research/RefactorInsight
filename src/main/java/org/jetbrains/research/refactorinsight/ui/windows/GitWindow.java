@@ -64,10 +64,13 @@ public class GitWindow {
 
     table.setDefaultRenderer(String.class, new VcsTableRefactoringRenderer(p));
     table.getSelectionModel().addListSelectionListener(listSelectionEvent -> {
-      if (!state || listSelectionEvent.getValueIsAdjusting()) {
+      if (listSelectionEvent.getValueIsAdjusting()) {
         return;
       }
-      buildComponent();
+      mineIfAbsent();
+      if (state) {
+        buildComponent();
+      }
     });
   }
 
@@ -105,8 +108,23 @@ public class GitWindow {
    */
   public void refresh(String commitId) {
     int index = table.getSelectionModel().getAnchorSelectionIndex();
-    if (index >= 0 && table.getModel().getCommitId(index).getHash().asString().equals(commitId)) {
+    if (state && index >= 0 && table.getModel().getCommitId(index).getHash().asString().equals(commitId)) {
       buildComponent();
+    }
+  }
+
+  /**
+   * Mine commit if not already. Need because entry must be ready when classical diff is called.
+   */
+  private void mineIfAbsent() {
+    int index = table.getSelectionModel().getAnchorSelectionIndex();
+    if (index >= 0) {
+      String commitId = table.getModel().getCommitId(index).getHash().asString();
+
+      if (miner.get(commitId) == null) {
+        VcsCommitMetadata metadata = table.getModel().getCommitMetadata(index);
+        miner.mineAtCommit(metadata, project, this);
+      }
     }
   }
 
@@ -119,10 +137,10 @@ public class GitWindow {
     }
 
     String commitId = table.getModel().getCommitId(index).getHash().asString();
-    VcsCommitMetadata metadata = table.getModel().getCommitMetadata(index);
     RefactoringEntry entry = miner.get(commitId);
 
     if (entry == null) {
+      VcsCommitMetadata metadata = table.getModel().getCommitMetadata(index);
       miner.mineAtCommit(metadata, project, this);
       return;
     }
