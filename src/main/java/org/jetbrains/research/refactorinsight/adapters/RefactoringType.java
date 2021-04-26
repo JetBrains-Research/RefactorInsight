@@ -105,7 +105,10 @@ public enum RefactoringType {
   MODIFY_PARAMETER_ANNOTATION("Modify Parameter Annotation", new ModifyParameterAnnotationHandler()),
   ADD_PARAMETER("Add Parameter", new AddParameterHandler()),
   REMOVE_PARAMETER("Remove Parameter", new RemoveParameterHandler()),
-  REORDER_PARAMETER("Reorder Parameter", new ReorderParameterHandler());
+  REORDER_PARAMETER("Reorder Parameter", new ReorderParameterHandler()),
+  RENAME_AND_CHANGE_ATTRIBUTE_TYPE("Rename and Change Attribute Type", null),
+  RENAME_AND_CHANGE_PARAMETER_TYPE("Rename and Change Parameter Type", null),
+  RENAME_AND_CHANGE_VARIABLE_TYPE("Rename and Change Variable Type", null);
 
   String name;
   Handler handler;
