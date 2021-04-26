@@ -11,6 +11,7 @@ import com.intellij.diff.tools.util.side.TwosideTextDiffViewer;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.FoldRegion;
 import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
@@ -108,28 +109,37 @@ public class RefactoringFolder {
         .getInstance(editor.getProject())
         .getPsiFile(editor.getDocument());
 
-    foldableRefactorings.forEach(info -> {
-          List<FoldingHandler.Folding> folds = foldingHandlers.get(info.getType()).getFolds(info, psiFile, before);
-          if (!folds.isEmpty()) {
-            editor.getFoldingModel().runBatchFoldingOperation(
-                () -> {
-                  for (FoldingHandler.Folding folding : folds) {
-                    FoldRegion value = editor.getFoldingModel()
-                        .addFoldRegion(folding.foldingStartOffset, folding.foldingEndOffset, "");
-                    if (value != null) {
-                      value.setExpanded(false);
-                      value.setInnerHighlightersMuted(true);
-                    }
+    List<FoldingHandler.Folding> folds = foldableRefactorings.stream()
+        .flatMap(info ->
+            foldingHandlers.get(info.getType()).getFolds(info, psiFile, before).stream()
+                .map(folding -> new Pair<>(info.getType(), folding))
+        ).collect(
+            Collectors.groupingBy(pair -> pair.second.hintOffset,
+                Collectors.groupingBy(pair -> pair.first,
+                    Collectors.mapping(pair -> pair.second,
+                        Collectors.toList()))))
+        .values().stream()
+        .flatMap(map -> map.entrySet().stream())
+        .map(group -> group.getValue().size() > 1
+            ? foldingHandlers.get(group.getKey()).uniteFolds(group.getValue())
+            : group.getValue().get(0))
+        .collect(Collectors.toList());
 
-                    RendererWrapper renderer = new RendererWrapper(new HintRenderer(folding.hintText), false);
-                    editor.getInlayModel().addBlockElement(
-                        folding.hintOffset,
-                        true, true, 1,
-                        renderer);
-                  }
-                });
-          }
+    editor.getFoldingModel().runBatchFoldingOperation(() -> {
+      for (FoldingHandler.Folding folding : folds) {
+        FoldRegion value = editor.getFoldingModel()
+            .addFoldRegion(folding.foldingStartOffset, folding.foldingEndOffset, "");
+        if (value != null) {
+          value.setExpanded(false);
+          value.setInnerHighlightersMuted(true);
         }
-    );
+
+        RendererWrapper renderer = new RendererWrapper(new HintRenderer(folding.hintText), false);
+        editor.getInlayModel().addBlockElement(
+            folding.hintOffset,
+            true, true, 1,
+            renderer);
+      }
+    });
   }
 }

@@ -33,4 +33,15 @@ public class InlineOperationFoldingHandler implements FoldingHandler {
         )
     );
   }
+
+  @NotNull
+  @Override
+  public Folding uniteFolds(@NotNull List<Folding> folds) {
+    return new Folding(
+        "Inlined",
+        folds.get(0).hintOffset,
+        folds.get(0).foldingStartOffset,
+        folds.get(0).foldingEndOffset
+    );
+  }
 }

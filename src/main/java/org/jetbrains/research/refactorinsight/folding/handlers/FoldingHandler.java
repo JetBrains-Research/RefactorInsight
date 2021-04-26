@@ -10,6 +10,9 @@ public interface FoldingHandler {
   @NotNull
   List<Folding> getFolds(@NotNull RefactoringInfo info, @NotNull PsiFile file, boolean isBefore);
 
+  @NotNull
+  Folding uniteFolds(@NotNull List<Folding> folds);
+
   final class Folding {
     public final String hintText;
     public final int hintOffset;

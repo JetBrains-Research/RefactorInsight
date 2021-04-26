@@ -4,6 +4,7 @@ import com.intellij.psi.PsiCodeBlock;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.utils.PsiUtils;
 
@@ -19,8 +20,8 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
       return Collections.emptyList();
     }
     String details = isBefore ? info.getDetailsAfter() : info.getDetailsBefore();
-    String hintText = specificOperation(info)
-        + (info.isChanged() ? "with changes " : "without changes ")
+    String hintText = specificOperation(info.getType())
+        + (info.isChanged() ? " with changes " : " without changes ")
         + (isBefore ? "to " : "from ")
         + details.substring(details.lastIndexOf('.') + 1);
     PsiCodeBlock body = method.getBody();
@@ -34,14 +35,37 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
     );
   }
 
-  private String specificOperation(RefactoringInfo info) {
-    switch (info.getType()) {
+  @NotNull
+  @Override
+  public Folding uniteFolds(@NotNull List<Folding> folds) {
+    String operation;
+    if (folds.stream().allMatch(folding -> folding.hintText.startsWith("Moved"))) {
+      operation = "Moved";
+    } else if (folds.stream().allMatch(folding -> folding.hintText.startsWith("Pulled up"))) {
+      operation = "Pulled up";
+    } else if (folds.stream().allMatch(folding -> folding.hintText.startsWith("Pushed down"))) {
+      operation = "Pushed down";
+    } else {
+      throw new AssertionError("Folds of different types");
+    }
+    String hintText = folds.stream().allMatch(folding -> folding.hintText.contains("without changes"))
+        ? operation + " without changes" : operation;
+    return new Folding(
+        hintText,
+        folds.get(0).hintOffset,
+        folds.get(0).foldingStartOffset,
+        folds.get(0).foldingEndOffset
+    );
+  }
+
+  private String specificOperation(RefactoringType type) {
+    switch (type) {
       case MOVE_OPERATION:
-        return "Moved ";
+        return "Moved";
       case PULL_UP_OPERATION:
-        return "Pulled up ";
+        return "Pulled up";
       case PUSH_DOWN_OPERATION:
-        return "Pushed down ";
+        return "Pushed down";
       default:
         throw new AssertionError("Illegal refactoring type");
     }
