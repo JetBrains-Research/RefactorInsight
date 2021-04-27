@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 public class PsiUtils {
-  // Suppresses default constructor, ensuring non-instantiability.
   private PsiUtils() {
   }
 
