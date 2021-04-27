@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 public class PsiUtils {
   private PsiUtils() {
@@ -27,38 +28,51 @@ public class PsiUtils {
     }
   }
 
+  @NotNull
+  private static String[] methodSignature(@NotNull String qualifiedName) {
+    int parametersListStart = qualifiedName.indexOf('(');
+    int parametersListEnd = qualifiedName.length() - 1;
+    return parametersListStart + 1 < parametersListEnd
+        ? qualifiedName.substring(parametersListStart + 1, parametersListEnd).split(", ")
+        : new String[]{};
+  }
+
+  @NotNull
+  private static String[] methodSignature(@NotNull PsiMethod psiMethod) {
+    return Arrays.stream(psiMethod.getParameterList().getParameters())
+        .map(PsiParameter::getType)
+        .map(PsiType::getPresentableText)
+        .toArray(String[]::new);
+  }
+
+  @NotNull
+  private static String methodClassName(@NotNull String qualifiedName) {
+    return qualifiedName.substring(0, qualifiedName.lastIndexOf('.'));
+  }
+
+  @NotNull
+  private static String methodSimpleName(@NotNull String qualifiedName) {
+    return qualifiedName.substring(qualifiedName.lastIndexOf('.') + 1, qualifiedName.indexOf('('));
+  }
+
   @Nullable
   public static PsiMethod findMethodJava(@NotNull PsiFile psiFile, @NotNull String qualifiedName) {
-    int classQualifiedNameEnd = qualifiedName.lastIndexOf('.');
-    int parametersListStart = qualifiedName.indexOf('(');
-    int parametersListEnd = qualifiedName.indexOf(')');
-    assert parametersListEnd + 1 == qualifiedName.length();
-
-    PsiClass psiClass = findClassJava(psiFile, qualifiedName.substring(0, classQualifiedNameEnd));
-    if (psiClass != null) {
-      PsiMethod[] psiMethods = psiClass.findMethodsByName(
-          qualifiedName.substring(classQualifiedNameEnd + 1, parametersListStart), false);
-      if (psiMethods.length > 0) {
-        String[] searchedMethodParameters =
-            parametersListStart + 1 < parametersListEnd
-                ? qualifiedName.substring(parametersListStart + 1, parametersListEnd).split(", ")
-                : new String[]{};
-        for (PsiMethod psiMethod : psiMethods) {
-          String[] methodParameters =
-              Arrays.stream(psiMethod.getParameterList().getParameters())
-                  .map(PsiParameter::getType)
-                  .map(PsiType::getPresentableText)
-                  .toArray(String[]::new);
-          if (Arrays.equals(methodParameters, searchedMethodParameters)) {
-            return psiMethod;
-          }
-        }
-        throw new AssertionError("Can't find method by type");
-      } else {
-        throw new AssertionError("Can't find method by name");
-      }
+    PsiClass psiClass = findClassJava(psiFile, methodClassName(qualifiedName));
+    if (psiClass == null) {
+      return null;
     }
-    return null;
+    PsiMethod[] psiMethods = psiClass.findMethodsByName(methodSimpleName(qualifiedName), false);
+    if (psiMethods.length == 0) {
+      throw new AssertionError("Can't find method by name");
+    }
+    String[] searchedMethodSignature = methodSignature(qualifiedName);
+    Optional<PsiMethod> foundMethod = Arrays.stream(psiMethods)
+        .filter(psiMethod -> Arrays.equals(searchedMethodSignature, methodSignature(psiMethod)))
+        .findAny();
+    if (foundMethod.isEmpty()) {
+      throw new AssertionError("Can't find method by type");
+    }
+    return foundMethod.get();
   }
 
   @Nullable
