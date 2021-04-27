@@ -18,6 +18,9 @@ public class PsiUtils {
   private PsiUtils() {
   }
 
+  /**
+   * Find PsiClass in PsiFile by qualified name.
+   */
   @Nullable
   public static PsiClass findClass(@NotNull PsiFile psiFile, @NotNull String qualifiedName) {
     if (psiFile.getLanguage().is(JavaLanguage.INSTANCE)) {
@@ -27,6 +30,9 @@ public class PsiUtils {
     }
   }
 
+  /**
+   * Find PsiMethod in PsiFile by qualified name.
+   */
   @Nullable
   public static PsiMethod findMethod(@NotNull PsiFile psiFile, @NotNull String qualifiedName) {
     if (psiFile.getLanguage().is(JavaLanguage.INSTANCE)) {
@@ -36,6 +42,9 @@ public class PsiUtils {
     }
   }
 
+  /**
+   * Find PsiClass in Java PsiFile by qualified name.
+   */
   @Nullable
   public static PsiClass findClassJava(@NotNull PsiFile psiFile, @NotNull String qualifiedName) {
     PsiElementProcessor.FindElement<PsiElement> processor = new PsiElementProcessor.FindElement<>() {
@@ -54,6 +63,9 @@ public class PsiUtils {
     return (PsiClass) processor.getFoundElement();
   }
 
+  /**
+   * Find PsiMethod in Java PsiFile by qualified name.
+   */
   @Nullable
   public static PsiMethod findMethodJava(@NotNull PsiFile psiFile, @NotNull String qualifiedName) {
     PsiClass psiClass = findClassJava(psiFile, methodClassName(qualifiedName));

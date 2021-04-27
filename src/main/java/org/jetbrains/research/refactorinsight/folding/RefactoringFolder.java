@@ -47,8 +47,12 @@ public class RefactoringFolder {
   private RefactoringFolder() {
   }
 
+
   /**
-   * TODO: Javadoc.
+   * Fold refactorings in the viewer if supported.
+   *
+   * @param viewer Viewer of diff request.
+   * @param request Associated diff request.
    */
   public static void foldRefactorings(@NotNull FrameDiffTool.DiffViewer viewer, @NotNull DiffRequest request) {
     if (request instanceof SimpleDiffRequest) {
