@@ -3,7 +3,6 @@ package org.jetbrains.research.refactorinsight.folding.handlers;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
-
 import java.util.List;
 
 public interface FoldingHandler {

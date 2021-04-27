@@ -22,12 +22,10 @@ import org.jetbrains.research.refactorinsight.folding.handlers.FoldingHandler;
 import org.jetbrains.research.refactorinsight.folding.handlers.InlineOperationFoldingHandler;
 import org.jetbrains.research.refactorinsight.folding.handlers.MoveOperationFoldingHandler;
 import org.jetbrains.research.refactorinsight.services.MiningService;
-
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 
 public class RefactoringFolder {
   static Map<RefactoringType, FoldingHandler> foldingHandlers;
@@ -46,7 +44,6 @@ public class RefactoringFolder {
     foldingHandlers.put(RefactoringType.EXTRACT_AND_MOVE_OPERATION, extractOperationHandler);
   }
 
-  // Suppresses default constructor, ensuring non-instantiability.
   private RefactoringFolder() {
   }
 

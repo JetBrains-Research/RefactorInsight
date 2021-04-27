@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.utils.PsiUtils;
-
 import java.util.Collections;
 import java.util.List;
 
