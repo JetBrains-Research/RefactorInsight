@@ -80,12 +80,9 @@ public class PsiUtils {
           String eachQualifiedName = ((PsiClass) each).getQualifiedName();
           if (qualifiedName.equals(eachQualifiedName)) {
             return setFound(each);
-          } else {
-            return true;
           }
-        } else {
-          return true;
         }
+        return true;
       }
     };
     PsiTreeUtil.processElements(psiFile, processor);
