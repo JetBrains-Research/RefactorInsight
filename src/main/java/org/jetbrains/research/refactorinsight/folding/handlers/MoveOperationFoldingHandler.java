@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.utils.PsiUtils;
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,11 +19,11 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
     if (method == null) {
       return Collections.emptyList();
     }
-    String details = isBefore ? info.getDetailsAfter() : info.getDetailsBefore();
+    String details = isBefore ? info.getLeftPath() : info.getRightPath();
     String hintText = specificOperation(info.getType())
-        + (info.isChanged() ? " with changes " : " without changes ")
-        + (isBefore ? "to " : "from ")
-        + details.substring(details.lastIndexOf('.') + 1);
+        + (isBefore ? " to " : " from ")
+        + details.substring(details.lastIndexOf(File.separatorChar) + 1)
+        + (info.isChanged() ? ". With changes." : ". Without changes.");
     PsiCodeBlock body = method.getBody();
     return Collections.singletonList(
         new Folding(
