@@ -2,7 +2,9 @@ package org.jetbrains.research.refactorinsight.folding;
 
 import com.intellij.application.options.colors.highlighting.RendererWrapper;
 import com.intellij.codeInsight.daemon.impl.HintRenderer;
+import com.intellij.diff.DiffVcsDataKeys;
 import com.intellij.diff.FrameDiffTool;
+import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.DiffRequest;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.tools.util.side.OnesideTextDiffViewer;
@@ -12,9 +14,12 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.FoldRegion;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.vcs.FilePath;
+import com.intellij.openapi.vcs.history.VcsRevisionNumber;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.folding.handlers.ExtractOperationFoldingHandler;
@@ -44,30 +49,46 @@ public class RefactoringFolder {
     foldingHandlers.put(RefactoringType.EXTRACT_AND_MOVE_OPERATION, extractOperationHandler);
   }
 
-  private RefactoringFolder() {
-  }
-
+  private RefactoringFolder() {}
 
   /**
    * Fold refactorings in the viewer if supported.
    *
-   * @param viewer Viewer of diff request.
+   * @param viewer  Viewer of diff request.
    * @param request Associated diff request.
    */
   public static void foldRefactorings(@NotNull FrameDiffTool.DiffViewer viewer, @NotNull DiffRequest request) {
     if (request instanceof SimpleDiffRequest) {
       SimpleDiffRequest diffRequest = (SimpleDiffRequest) request;
-      String commitId = diffRequest.getContentTitles().get(1);
-      if (viewer instanceof OnesideTextDiffViewer) {
-        RefactoringFolder.foldRefactorings((OnesideTextDiffViewer) viewer, commitId);
-      } else if (viewer instanceof TwosideTextDiffViewer) {
-        RefactoringFolder.foldRefactorings((TwosideTextDiffViewer) viewer, commitId);
-      } else if (viewer instanceof ThreesideTextDiffViewer) {
-        RefactoringFolder.foldRefactorings((ThreesideTextDiffViewer) viewer, commitId);
+      String commitId = getRevisionAfter(diffRequest);
+      if (commitId != null) {
+        if (viewer instanceof OnesideTextDiffViewer) {
+          RefactoringFolder.foldRefactorings((OnesideTextDiffViewer) viewer, commitId);
+        } else if (viewer instanceof TwosideTextDiffViewer) {
+          RefactoringFolder.foldRefactorings((TwosideTextDiffViewer) viewer, commitId);
+        } else if (viewer instanceof ThreesideTextDiffViewer) {
+          RefactoringFolder.foldRefactorings((ThreesideTextDiffViewer) viewer, commitId);
+        }
       }
     }
   }
 
+  @Nullable
+  public static String getRevisionAfter(@NotNull SimpleDiffRequest request) {
+    List<DiffContent> contents = request.getContents();
+    if (contents.size() < 2) {
+      return null;
+    }
+    Pair<FilePath, VcsRevisionNumber> userDataAfter = contents.get(1).getUserData(DiffVcsDataKeys.REVISION_INFO);
+    if (userDataAfter == null) {
+      return null;
+    }
+    return userDataAfter.second.asString();
+  }
+
+  /**
+   * Fold only in added files.
+   */
   private static void foldRefactorings(@NotNull OnesideTextDiffViewer viewer, String commitId) {
     List<RefactoringInfo> foldableRefactorings =
         MiningService.getInstance(viewer.getProject()).get(commitId).getRefactorings().stream()
@@ -76,7 +97,6 @@ public class RefactoringFolder {
 
     Editor editor = viewer.getEditor();
 
-    modifyEditor(editor, foldableRefactorings, true);
     modifyEditor(editor, foldableRefactorings, false);
   }
 
