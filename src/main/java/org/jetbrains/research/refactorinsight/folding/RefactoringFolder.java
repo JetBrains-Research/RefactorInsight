@@ -73,19 +73,6 @@ public class RefactoringFolder {
     }
   }
 
-  @Nullable
-  public static String getRevisionAfter(@NotNull SimpleDiffRequest request) {
-    List<DiffContent> contents = request.getContents();
-    if (contents.size() < 2) {
-      return null;
-    }
-    Pair<FilePath, VcsRevisionNumber> userDataAfter = contents.get(1).getUserData(DiffVcsDataKeys.REVISION_INFO);
-    if (userDataAfter == null) {
-      return null;
-    }
-    return userDataAfter.second.asString();
-  }
-
   /**
    * Fold only in added files.
    */
@@ -162,5 +149,18 @@ public class RefactoringFolder {
             renderer);
       }
     });
+  }
+
+  @Nullable
+  private static String getRevisionAfter(@NotNull SimpleDiffRequest request) {
+    List<DiffContent> contents = request.getContents();
+    if (contents.size() < 2) {
+      return null;
+    }
+    Pair<FilePath, VcsRevisionNumber> userDataAfter = contents.get(1).getUserData(DiffVcsDataKeys.REVISION_INFO);
+    if (userDataAfter == null) {
+      return null;
+    }
+    return userDataAfter.second.asString();
   }
 }
