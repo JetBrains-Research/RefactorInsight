@@ -23,7 +23,7 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
     String hintText = specificOperation(info.getType())
         + (isBefore ? " to " : " from ")
         + details.substring(details.lastIndexOf(File.separatorChar) + 1)
-        + (info.isChanged() ? ". With changes." : ". Without changes.");
+        + (info.isChanged() ? " with changes" : " without changes");
     PsiCodeBlock body = method.getBody();
     return Collections.singletonList(
         new Folding(
