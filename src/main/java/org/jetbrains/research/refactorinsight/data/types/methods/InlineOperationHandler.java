@@ -6,6 +6,7 @@ import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
+import org.jetbrains.research.refactorinsight.folding.FoldingPositions;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 import org.refactoringminer.api.Refactoring;
 
@@ -14,6 +15,10 @@ public class InlineOperationHandler extends Handler {
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     InlineOperationRefactoring ref = (InlineOperationRefactoring) refactoring;
+
+    info.setFoldingPositionsBefore(FoldingPositions.fromMethod(ref.getTargetOperationBeforeInline()));
+    info.setFoldingPositionsMid(FoldingPositions.fromMethod(ref.getInlinedOperation()));
+    info.setFoldingPositionsAfter(FoldingPositions.fromMethod(ref.getTargetOperationAfterInline()));
 
     ref.getInlinedOperationInvocations().forEach(c ->
         info.addMarking(new CodeRange(c.codeRange()), new CodeRange(ref.getInlinedCodeRangeInTargetOperation()), true));
@@ -46,6 +51,10 @@ public class InlineOperationHandler extends Handler {
                                  RefactoringInfo info) {
     org.jetbrains.research.kotlinrminer.diff.refactoring.InlineOperationRefactoring ref =
         (org.jetbrains.research.kotlinrminer.diff.refactoring.InlineOperationRefactoring) refactoring;
+
+    info.setFoldingPositionsBefore(FoldingPositions.fromMethod(ref.getTargetOperationBeforeInline()));
+    info.setFoldingPositionsMid(FoldingPositions.fromMethod(ref.getInlinedOperation()));
+    info.setFoldingPositionsAfter(FoldingPositions.fromMethod(ref.getTargetOperationAfterInline()));
 
     ref.getInlinedOperationInvocations().forEach(c ->
         info.addMarking(new CodeRange(c.codeRange()), new CodeRange(ref.getInlinedCodeRangeInTargetOperation()), true));

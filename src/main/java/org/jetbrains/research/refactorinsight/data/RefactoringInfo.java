@@ -25,6 +25,7 @@ import org.jetbrains.research.refactorinsight.data.diff.DiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.data.diff.MoreSidedDiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedDiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.data.diff.TwoSidedDiffRequestGenerator;
+import org.jetbrains.research.refactorinsight.folding.FoldingPositions;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 
 /**
@@ -44,6 +45,8 @@ public class RefactoringInfo {
 
   private final String[][] uiStrings = new String[3][2];
   private final String[] paths = new String[3];
+  // Optional data for foldable refactorings
+  private final FoldingPositions[] foldingPositions = new FoldingPositions[3];
 
   private RefactoringType type;
   private Group group;
@@ -65,7 +68,7 @@ public class RefactoringInfo {
    */
   public static RefactoringInfo fromString(String value) {
     String regex = delimiter(INFO, true);
-    String[] tokens = value.split(regex, 17);
+    String[] tokens = value.split(regex, 20);
     RefactoringInfo info = new RefactoringInfo()
         .setType(RefactoringType.valueOf(tokens[0]))
         .setNameBefore(StringUtils.deSanitize(tokens[1]))
@@ -82,8 +85,11 @@ public class RefactoringInfo {
         .setHidden(tokens[12].equals("t"))
         .setMoreSided(tokens[13].equals("t"))
         .setChanged(tokens[14].equals("t"))
+        .setFoldingPositionsBefore(FoldingPositions.fromString(tokens[16]))
+        .setFoldingPositionsMid(FoldingPositions.fromString(tokens[17]))
+        .setFoldingPositionsAfter(FoldingPositions.fromString(tokens[18]))
         .setIncludes(new HashSet<>(
-            tokens[16].isEmpty() ? List.of() : Arrays.asList(tokens[16].split(regex))));
+            tokens[19].isEmpty() ? List.of() : Arrays.asList(tokens[19].split(regex))));
 
     DiffRequestGenerator diffGenerator;
     if (info.isMoreSided()) {
@@ -121,6 +127,9 @@ public class RefactoringInfo {
         moreSided ? "t" : "f",
         changed ? "t" : "f",
         requestGenerator.toString(),
+        Arrays.stream(foldingPositions)
+            .map(fp -> fp == null ? "" : fp.toString())
+            .collect(Collectors.joining(delimiter(INFO))),
         String.join(delimiter(INFO), includes)
     );
   }
@@ -528,6 +537,33 @@ public class RefactoringInfo {
 
   public RefactoringInfo setChanged(boolean changed) {
     this.changed = changed;
+    return this;
+  }
+
+  public FoldingPositions getFoldingPositionsBefore() {
+    return foldingPositions[0];
+  }
+
+  public RefactoringInfo setFoldingPositionsBefore(FoldingPositions positions) {
+    foldingPositions[0] = positions;
+    return this;
+  }
+
+  public FoldingPositions getFoldingPositionsMid() {
+    return foldingPositions[1];
+  }
+
+  public RefactoringInfo setFoldingPositionsMid(FoldingPositions positions) {
+    foldingPositions[1] = positions;
+    return this;
+  }
+
+  public FoldingPositions getFoldingPositionsAfter() {
+    return foldingPositions[2];
+  }
+
+  public RefactoringInfo setFoldingPositionsAfter(FoldingPositions positions) {
+    foldingPositions[2] = positions;
     return this;
   }
 }

@@ -6,6 +6,7 @@ import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
+import org.jetbrains.research.refactorinsight.folding.FoldingPositions;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 import org.jetbrains.research.refactorinsight.utils.Utils;
 import org.refactoringminer.api.Refactoring;
@@ -17,6 +18,9 @@ public class PullUpOperationHandler extends Handler {
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     PullUpOperationRefactoring ref = (PullUpOperationRefactoring) refactoring;
+
+    info.setFoldingPositionsBefore(FoldingPositions.fromMethod(ref.getOriginalOperation()));
+    info.setFoldingPositionsAfter(FoldingPositions.fromMethod(ref.getMovedOperation()));
 
     List<AbstractStatement> statementsBefore =
         ref.getOriginalOperation().getBody().getCompositeStatement().getStatements();
@@ -43,6 +47,9 @@ public class PullUpOperationHandler extends Handler {
                                  RefactoringInfo info) {
     org.jetbrains.research.kotlinrminer.diff.refactoring.PullUpOperationRefactoring ref =
         (org.jetbrains.research.kotlinrminer.diff.refactoring.PullUpOperationRefactoring) refactoring;
+
+    info.setFoldingPositionsBefore(FoldingPositions.fromMethod(ref.getOriginalOperation()));
+    info.setFoldingPositionsAfter(FoldingPositions.fromMethod(ref.getMovedOperation()));
 
     List<org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement> statementsBefore =
         ref.getOriginalOperation().getBody().getCompositeStatement().getStatements();
