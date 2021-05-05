@@ -7,5 +7,7 @@ public enum Group {
   VARIABLE,
   INTERFACE,
   ABSTRACT,
-  PACKAGE
+  PACKAGE;
+
+  public static final Group[] values = Group.values();
 }

@@ -70,7 +70,7 @@ public class RefactoringInfo {
     String regex = delimiter(INFO, true);
     String[] tokens = value.split(regex, 20);
     RefactoringInfo info = new RefactoringInfo()
-        .setType(RefactoringType.valueOf(tokens[0]))
+        .setType(RefactoringType.values[Integer.parseInt(tokens[0])])
         .setNameBefore(StringUtils.deSanitize(tokens[1]))
         .setNameAfter(StringUtils.deSanitize(tokens[2]))
         .setElementBefore(StringUtils.deSanitize(tokens[3]))
@@ -80,7 +80,7 @@ public class RefactoringInfo {
         .setLeftPath(StringUtils.deSanitize(tokens[7]))
         .setMidPath(StringUtils.deSanitize(tokens[8]))
         .setRightPath(StringUtils.deSanitize(tokens[9]))
-        .setGroup(Group.valueOf(tokens[10]))
+        .setGroup(Group.values[Integer.parseInt(tokens[10])])
         .setThreeSided(tokens[11].equals("t"))
         .setHidden(tokens[12].equals("t"))
         .setMoreSided(tokens[13].equals("t"))
@@ -114,18 +114,18 @@ public class RefactoringInfo {
    */
   public String toString() {
     return String.join(delimiter(INFO),
-        type.name(),
+        String.valueOf(type.ordinal()),
         Stream.concat(
             Arrays.stream(uiStrings).flatMap(Arrays::stream),
             Arrays.stream(paths))
             .map(s -> s == null ? "" : s)
             .map(StringUtils::sanitize)
             .collect(Collectors.joining(delimiter(INFO))),
-        group.toString(),
-        threeSided ? "t" : "f",
-        hidden ? "t" : "f",
-        moreSided ? "t" : "f",
-        changed ? "t" : "f",
+        String.valueOf(group.ordinal()),
+        threeSided ? "t" : "",
+        hidden ? "t" : "",
+        moreSided ? "t" : "",
+        changed ? "t" : "",
         requestGenerator.toString(),
         Arrays.stream(foldingPositions)
             .map(fp -> fp == null ? "" : fp.toString())
