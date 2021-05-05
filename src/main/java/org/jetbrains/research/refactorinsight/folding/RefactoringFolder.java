@@ -41,6 +41,7 @@ public class RefactoringFolder {
     foldingHandlers.put(RefactoringType.MOVE_OPERATION, moveOperationHandler);
     foldingHandlers.put(RefactoringType.PULL_UP_OPERATION, moveOperationHandler);
     foldingHandlers.put(RefactoringType.PUSH_DOWN_OPERATION, moveOperationHandler);
+    foldingHandlers.put(RefactoringType.MOVE_AND_RENAME_OPERATION, moveOperationHandler);
     FoldingHandler inlineOperationHandler = new InlineOperationFoldingHandler();
     foldingHandlers.put(RefactoringType.INLINE_OPERATION, inlineOperationHandler);
     foldingHandlers.put(RefactoringType.MOVE_AND_INLINE_OPERATION, inlineOperationHandler);
