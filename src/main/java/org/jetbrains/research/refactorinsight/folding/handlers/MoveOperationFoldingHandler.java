@@ -1,6 +1,7 @@
 package org.jetbrains.research.refactorinsight.folding.handlers;
 
 import com.intellij.psi.PsiFile;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
@@ -35,27 +36,31 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
   @NotNull
   @Override
   public Folding uniteFolds(@NotNull List<Folding> folds) {
-    String operation;
+    String hintText;
     if (folds.stream().allMatch(folding -> folding.hintText.startsWith("Moved with renaming"))) {
-      operation = "Moved with renaming";
+      hintText = "Moved with renaming";
     } else if (folds.stream().allMatch(folding -> folding.hintText.startsWith("Moved"))) {
-      operation = "Moved";
+      hintText = "Moved";
     } else if (folds.stream().allMatch(folding -> folding.hintText.startsWith("Pulled up"))) {
-      operation = "Pulled up";
+      hintText = "Pulled up";
     } else if (folds.stream().allMatch(folding -> folding.hintText.startsWith("Pushed down"))) {
-      operation = "Pushed down";
+      hintText = "Pushed down";
     } else {
       throw new AssertionError("Folds of different types");
     }
-    String hintText = folds.stream().allMatch(folding -> folding.hintText.contains("without changes"))
-        ? operation + " without changes" : operation;
+    boolean notChanged = folds.stream().allMatch(folding -> folding.hintText.contains("without changes"));
+    if (notChanged) {
+      hintText += " without changes";
+    }
     return new Folding(
         hintText,
         folds.get(0).positions
     );
   }
 
-  private String specificOperation(RefactoringType type) {
+  @NotNull
+  @Contract(pure = true)
+  private String specificOperation(@NotNull RefactoringType type) {
     switch (type) {
       case MOVE_OPERATION:
         return "Moved";
