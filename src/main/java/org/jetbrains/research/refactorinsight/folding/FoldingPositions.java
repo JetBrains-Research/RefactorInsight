@@ -9,12 +9,18 @@ public final class FoldingPositions {
   public final int foldingStartOffset;
   public final int foldingEndOffset;
 
+  /**
+   * Constructor of POJO.
+   */
   public FoldingPositions(int hintOffset, int foldingStartOffset, int foldingEndOffset) {
     this.hintOffset = hintOffset;
     this.foldingStartOffset = foldingStartOffset;
     this.foldingEndOffset = foldingEndOffset;
   }
 
+  /**
+   * Create default FoldingPositions from UMLOperation.
+   */
   @NotNull
   public static FoldingPositions fromMethod(@NotNull UMLOperation method) {
     int hintOffset = method.getLocationInfo().getStartOffset();
@@ -27,6 +33,9 @@ public final class FoldingPositions {
     );
   }
 
+  /**
+   * Create default FoldingPositions from UMLOperation.
+   */
   @NotNull
   public static FoldingPositions fromMethod(@NotNull org.jetbrains.research.kotlinrminer.uml.UMLOperation method) {
     int hintOffset = method.getLocationInfo().getStartOffset();
@@ -39,11 +48,17 @@ public final class FoldingPositions {
     );
   }
 
+  /**
+   * Serialize to String.
+   */
   @NotNull
   public String toString() {
     return hintOffset + "/" + foldingStartOffset + "/" + foldingEndOffset;
   }
 
+  /**
+   * Deserialize from String.
+   */
   @Nullable
   public static FoldingPositions fromString(@NotNull String value) {
     if (value.isEmpty()) {
