@@ -2,8 +2,10 @@ package org.jetbrains.research.refactorinsight.folding.handlers;
 
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.folding.Folding;
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,6 +19,9 @@ public class InlineOperationFoldingHandler implements FoldingHandler {
     }
     String details = info.getNameAfter();
     String hintText = "Inlined to " + details.substring(details.lastIndexOf('.') + 1, details.indexOf('('));
+    if (info.getType() == RefactoringType.MOVE_AND_INLINE_OPERATION) {
+      hintText += " in " + info.getRightPath().substring(info.getRightPath().lastIndexOf(File.separatorChar) + 1);
+    }
     return Collections.singletonList(
         new Folding(
             hintText,

@@ -2,8 +2,10 @@ package org.jetbrains.research.refactorinsight.folding.handlers;
 
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.folding.Folding;
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,6 +19,9 @@ public class ExtractOperationFoldingHandler implements FoldingHandler {
     }
     String details = info.getNameBefore();
     String hintText = "Extracted from " + details.substring(details.lastIndexOf('.') + 1, details.indexOf('('));
+    if (info.getType() == RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
+      hintText += " in " + info.getLeftPath().substring(info.getLeftPath().lastIndexOf(File.separatorChar) + 1);
+    }
     return Collections.singletonList(
         new Folding(
             hintText,
