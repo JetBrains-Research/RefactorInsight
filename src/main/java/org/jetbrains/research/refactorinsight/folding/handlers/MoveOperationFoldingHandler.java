@@ -20,7 +20,7 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
     if (!isBefore && !file.getVirtualFile().getPath().endsWith(info.getRightPath())) {
       return Collections.emptyList();
     }
-    String details = isBefore ? info.getLeftPath() : info.getRightPath();
+    String details = isBefore ? info.getRightPath() : info.getLeftPath();
     String hintText = specificOperation(info.getType())
         + (isBefore ? " to " : " from ")
         + details.substring(details.lastIndexOf(File.separatorChar) + 1)
