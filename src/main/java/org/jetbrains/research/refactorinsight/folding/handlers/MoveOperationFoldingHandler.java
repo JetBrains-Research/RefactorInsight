@@ -37,9 +37,7 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
   @Override
   public Folding uniteFolds(@NotNull List<Folding> folds) {
     String hintText;
-    if (folds.stream().allMatch(folding -> folding.hintText.startsWith("Moved with renaming"))) {
-      hintText = "Moved with renaming";
-    } else if (folds.stream().allMatch(folding -> folding.hintText.startsWith("Moved"))) {
+    if (folds.stream().allMatch(folding -> folding.hintText.startsWith("Moved"))) {
       hintText = "Moved";
     } else if (folds.stream().allMatch(folding -> folding.hintText.startsWith("Pulled up"))) {
       hintText = "Pulled up";
@@ -63,9 +61,8 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
   private String specificOperation(@NotNull RefactoringType type) {
     switch (type) {
       case MOVE_OPERATION:
-        return "Moved";
       case MOVE_AND_RENAME_OPERATION:
-        return "Moved with renaming";
+        return "Moved";
       case PULL_UP_OPERATION:
         return "Pulled up";
       case PUSH_DOWN_OPERATION:
