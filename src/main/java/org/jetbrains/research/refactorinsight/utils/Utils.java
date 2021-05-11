@@ -379,4 +379,15 @@ public class Utils {
       return false;
     }
   }
+
+  /**
+   * Skip packages in qualified name.
+   * Assumes the package name starts with a lowercase letter and the class name starts with an uppercase letter.
+   */
+  @NotNull
+  public static String skipPackages(@NotNull String qualifiedName) {
+    return Arrays.stream(qualifiedName.split("\\."))
+        .dropWhile(element -> element.isEmpty() || Character.isLowerCase(element.charAt(0)))
+        .collect(Collectors.joining("."));
+  }
 }

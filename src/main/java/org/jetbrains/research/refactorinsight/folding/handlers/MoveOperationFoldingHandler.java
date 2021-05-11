@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.folding.Folding;
+import org.jetbrains.research.refactorinsight.utils.Utils;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -20,10 +21,17 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
     if (!isBefore && !file.getVirtualFile().getPath().endsWith(info.getRightPath())) {
       return Collections.emptyList();
     }
-    String details = isBefore ? info.getRightPath() : info.getLeftPath();
+    String details = "";
+    if (info.getRightPath().equals(info.getLeftPath())) {
+      details = Utils.skipPackages(isBefore ? info.getDetailsAfter() : info.getDetailsBefore());
+    }
+    if (details.isEmpty()) {
+      details = isBefore ? info.getRightPath() : info.getLeftPath();
+      details = details.substring(details.lastIndexOf(File.separatorChar) + 1);
+    }
     String hintText = specificOperation(info.getType())
         + (isBefore ? " to " : " from ")
-        + details.substring(details.lastIndexOf(File.separatorChar) + 1)
+        + details
         + (info.isChanged() ? " with changes" : " without changes");
     return Collections.singletonList(
         new Folding(
