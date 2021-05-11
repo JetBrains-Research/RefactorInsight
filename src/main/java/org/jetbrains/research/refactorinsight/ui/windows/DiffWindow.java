@@ -44,7 +44,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.panels.Wrapper;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.research.refactorinsight.ui.RefactoringFolder;
+import org.jetbrains.research.refactorinsight.folding.RefactoringFolder;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.diff.MoreSidedDiffRequestGenerator.MoreSidedRange;
 import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedRange;

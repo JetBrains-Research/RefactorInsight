@@ -113,6 +113,9 @@ public enum RefactoringType {
   String name;
   Handler handler;
 
+  // Caching
+  public static final RefactoringType[] values = RefactoringType.values();
+
   RefactoringType(String name, Handler handler) {
     this.name = name;
     this.handler = handler;
