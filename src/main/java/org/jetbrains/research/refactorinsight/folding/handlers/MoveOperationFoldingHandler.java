@@ -16,10 +16,8 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
   @NotNull
   @Override
   public List<Folding> getFolds(@NotNull RefactoringInfo info, @NotNull PsiFile file, boolean isBefore) {
-    if (isBefore && !file.getVirtualFile().getPath().endsWith(info.getLeftPath())) {
-      return Collections.emptyList();
-    }
-    if (!isBefore && !file.getVirtualFile().getPath().endsWith(info.getRightPath())) {
+    String path = isBefore ? info.getLeftPath() : info.getRightPath();
+    if (!file.getVirtualFile().getPath().endsWith(path)) {
       return Collections.emptyList();
     }
     String details = "";

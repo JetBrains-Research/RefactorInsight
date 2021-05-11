@@ -89,11 +89,11 @@ public class RefactoringFolder {
             .collect(Collectors.toList());
 
     if (viewerBase instanceof OnesideTextDiffViewer) {
-      RefactoringFolder.foldRefactorings(foldableRefactorings, (OnesideTextDiffViewer) viewerBase, project);
+      foldRefactorings(foldableRefactorings, (OnesideTextDiffViewer) viewerBase, project);
     } else if (viewerBase instanceof TwosideTextDiffViewer) {
-      RefactoringFolder.foldRefactorings(foldableRefactorings, (TwosideTextDiffViewer) viewerBase, project);
+      foldRefactorings(foldableRefactorings, (TwosideTextDiffViewer) viewerBase, project);
     } else if (viewerBase instanceof ThreesideTextDiffViewer) {
-      RefactoringFolder.foldRefactorings(foldableRefactorings, (ThreesideTextDiffViewer) viewerBase, project);
+      foldRefactorings(foldableRefactorings, (ThreesideTextDiffViewer) viewerBase, project);
     }
   }
 
