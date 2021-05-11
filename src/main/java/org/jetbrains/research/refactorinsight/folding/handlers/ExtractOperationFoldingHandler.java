@@ -8,6 +8,7 @@ import org.jetbrains.research.refactorinsight.folding.Folding;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ExtractOperationFoldingHandler implements FoldingHandler {
   @NotNull
@@ -33,8 +34,17 @@ public class ExtractOperationFoldingHandler implements FoldingHandler {
   @NotNull
   @Override
   public Folding uniteFolds(@NotNull List<Folding> folds) {
+    List<String> destinations = folds.stream()
+        .map(folding -> folding.hintText.substring("Extracted from ".length()))
+        .collect(Collectors.toList());
+    String hintText = "Extracted from ";
+    if (destinations.size() < 4) {
+      hintText += String.join(", ", destinations);
+    } else {
+      hintText += destinations.size() + " methods";
+    }
     return new Folding(
-        "Extracted",
+        hintText,
         folds.get(0).positions
     );
   }

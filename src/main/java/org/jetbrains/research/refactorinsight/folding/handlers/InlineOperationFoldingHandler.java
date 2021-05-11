@@ -8,6 +8,7 @@ import org.jetbrains.research.refactorinsight.folding.Folding;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class InlineOperationFoldingHandler implements FoldingHandler {
   @NotNull
@@ -33,8 +34,17 @@ public class InlineOperationFoldingHandler implements FoldingHandler {
   @NotNull
   @Override
   public Folding uniteFolds(@NotNull List<Folding> folds) {
+    List<String> destinations = folds.stream()
+        .map(folding -> folding.hintText.substring("Inlined to ".length()))
+        .collect(Collectors.toList());
+    String hintText = "Inlined to ";
+    if (destinations.size() < 4) {
+      hintText += String.join(", ", destinations);
+    } else {
+      hintText += destinations.size() + " methods";
+    }
     return new Folding(
-        "Inlined",
+        hintText,
         folds.get(0).positions
     );
   }

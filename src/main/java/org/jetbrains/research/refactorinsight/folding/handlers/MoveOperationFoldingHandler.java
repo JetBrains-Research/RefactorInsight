@@ -10,6 +10,7 @@ import org.jetbrains.research.refactorinsight.utils.Utils;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MoveOperationFoldingHandler implements FoldingHandler {
   @NotNull
@@ -45,19 +46,57 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
   @Override
   public Folding uniteFolds(@NotNull List<Folding> folds) {
     String hintText;
-    if (folds.stream().allMatch(folding -> folding.hintText.startsWith("Moved"))) {
-      hintText = "Moved";
-    } else if (folds.stream().allMatch(folding -> folding.hintText.startsWith("Pulled up"))) {
-      hintText = "Pulled up";
-    } else if (folds.stream().allMatch(folding -> folding.hintText.startsWith("Pushed down"))) {
-      hintText = "Pushed down";
+    List<String> hints = folds.stream().map(folding -> folding.hintText).collect(Collectors.toList());
+
+    if (hints.stream().allMatch(hint -> hint.startsWith("Moved"))) {
+      hintText = "Moved ";
+      hints = hints.stream().map(hint -> hint.substring("Moved ".length())).collect(Collectors.toList());
+    } else if (hints.stream().allMatch(hint -> hint.startsWith("Pulled up"))) {
+      hintText = "Pulled up ";
+      hints = hints.stream().map(hint -> hint.substring("Pulled up ".length())).collect(Collectors.toList());
+    } else if (hints.stream().allMatch(hint -> hint.startsWith("Pushed down"))) {
+      hintText = "Pushed down ";
+      hints = hints.stream().map(hint -> hint.substring("Pushed down ".length())).collect(Collectors.toList());
     } else {
       throw new AssertionError("Folds of different types");
     }
-    boolean notChanged = folds.stream().allMatch(folding -> folding.hintText.contains("without changes"));
-    if (notChanged) {
+
+    if (hints.stream().allMatch(hint -> hint.startsWith("from"))) {
+      hintText += "from ";
+      hints = hints.stream().map(hint -> hint.substring("from ".length())).collect(Collectors.toList());
+    } else if (hints.stream().allMatch(hint -> hint.startsWith("to"))) {
+      hintText += "to ";
+      hints = hints.stream().map(hint -> hint.substring("to ".length())).collect(Collectors.toList());
+    } else {
+      throw new AssertionError("Folds of different types");
+    }
+
+    boolean isNotChanged = false;
+    if (hints.stream().allMatch(hint -> hint.endsWith("without changes"))) {
+      isNotChanged = true;
+      hints = hints.stream()
+          .map(hint -> hint.substring(0, hint.length() - " without changes".length()))
+          .distinct()
+          .collect(Collectors.toList());
+    } else {
+      hints = hints.stream()
+          .map(hint -> hint.endsWith("without changes")
+              ? hint.substring(0, hint.length() - " without changes".length())
+              : hint.substring(0, hint.length() - " with changes".length()))
+          .distinct()
+          .collect(Collectors.toList());
+    }
+
+    if (hints.size() < 4) {
+      hintText += String.join(", ", hints);
+    } else {
+      hintText += hints.size() + " places";
+    }
+
+    if (isNotChanged) {
       hintText += " without changes";
     }
+
     return new Folding(
         hintText,
         folds.get(0).positions
