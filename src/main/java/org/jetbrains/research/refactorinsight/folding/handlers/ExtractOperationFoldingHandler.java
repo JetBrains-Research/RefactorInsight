@@ -19,7 +19,8 @@ public class ExtractOperationFoldingHandler implements FoldingHandler {
       return Collections.emptyList();
     }
     String details = info.getNameBefore();
-    String hintText = "Extracted from " + details.substring(details.lastIndexOf('.') + 1, details.indexOf('('));
+    String hintText = "Extracted from "
+        + details.substring(details.lastIndexOf('.') + 1, details.indexOf('(') + 1) + ')';
     if (info.getType() == RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
       hintText += " in " + info.getLeftPath().substring(info.getLeftPath().lastIndexOf(File.separatorChar) + 1);
     }
