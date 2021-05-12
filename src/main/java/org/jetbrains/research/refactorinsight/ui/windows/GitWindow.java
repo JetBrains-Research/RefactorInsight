@@ -1,14 +1,11 @@
 package org.jetbrains.research.refactorinsight.ui.windows;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
-import com.intellij.ui.ColoredTableCellRenderer;
 import com.intellij.ui.Gray;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBViewport;
-import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.vcs.log.VcsCommitMetadata;
@@ -18,15 +15,10 @@ import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Objects;
-import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-import com.intellij.vcs.log.ui.table.column.Author;
-import com.intellij.vcs.log.ui.table.column.Commit;
-import com.intellij.vcs.log.ui.table.column.Date;
-import icons.RefactorInsightIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
@@ -47,7 +39,6 @@ public class GitWindow {
   private VcsLogGraphTable table;
   private MiningService miner;
   private boolean state = false;
-  private boolean labelsVisible = false;
 
   /**
    * Constructor for GitWindow.
@@ -62,7 +53,6 @@ public class GitWindow {
     table = vcsLogUi.getTable();
     miner = MiningService.getInstance(project);
 
-    table.setDefaultRenderer(String.class, new VcsTableRefactoringRenderer(p));
     table.getSelectionModel().addListSelectionListener(listSelectionEvent -> {
       if (listSelectionEvent.getValueIsAdjusting()) {
         return;
@@ -90,14 +80,6 @@ public class GitWindow {
       viewport.setView(changesTree);
     }
     this.state = state;
-  }
-
-  public boolean isLabelsVisible() {
-    return labelsVisible;
-  }
-
-  public void setLabelsVisible(boolean visible) {
-    labelsVisible = visible;
   }
 
   /**
@@ -175,46 +157,5 @@ public class GitWindow {
       }
     });
     viewport.setView(tree);
-  }
-
-  /**
-   * Custom {@link ColoredTableCellRenderer} for VCSTable.
-   * Enables labeling the commits that contain refactorings.
-   */
-  public class VcsTableRefactoringRenderer extends ColoredTableCellRenderer {
-
-    private MiningService miner;
-
-    public VcsTableRefactoringRenderer(Project project) {
-      miner = ServiceManager.getService(project, MiningService.class);
-    }
-
-    @Override
-    protected void customizeCellRenderer(JTable table, Object value, boolean selected,
-                                         boolean hasFocus, int row, int column) {
-      setBorder(null);
-      if (value == null) {
-        return;
-      }
-
-      VcsLogGraphTable graphTable = (VcsLogGraphTable) table;
-      if (labelsVisible && column == graphTable.getColumnViewIndex(Date.INSTANCE)) {
-        String commitHash = graphTable.getModel().getCommitId(row).getHash().asString();
-        if (miner.containsRefactoring(commitHash)) {
-          setIcon(RefactorInsightIcons.node);
-          setTransparentIconBackground(true);
-        } else {
-          append("      ",
-                 graphTable.applyHighlighters(this, row, column, hasFocus, selected));
-        }
-      }
-
-      append(value.toString(),
-             graphTable.applyHighlighters(this, row, column, hasFocus, selected));
-      if (column == graphTable.getColumnViewIndex(Commit.INSTANCE)
-          || column == graphTable.getColumnViewIndex(Author.INSTANCE)) {
-        SpeedSearchUtil.applySpeedSearchHighlighting(table, this, false, selected);
-      }
-    }
   }
 }
