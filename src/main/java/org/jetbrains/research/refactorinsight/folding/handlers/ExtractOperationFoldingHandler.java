@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.folding.Folding;
+import org.jetbrains.research.refactorinsight.utils.Utils;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -18,9 +19,7 @@ public class ExtractOperationFoldingHandler implements FoldingHandler {
     if (isBefore || !file.getVirtualFile().getPath().endsWith(path)) {
       return Collections.emptyList();
     }
-    String details = info.getNameBefore();
-    String hintText = "Extracted from "
-        + details.substring(details.lastIndexOf('.') + 1, details.indexOf('(') + 1) + ')';
+    String hintText = "Extracted from " + Utils.functionSimpleName(info.getNameBefore());
     if (info.getType() == RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
       hintText += " in " + info.getLeftPath().substring(info.getLeftPath().lastIndexOf(File.separatorChar) + 1);
     }

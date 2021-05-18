@@ -390,4 +390,14 @@ public class Utils {
         .dropWhile(element -> element.isEmpty() || Character.isLowerCase(element.charAt(0)))
         .collect(Collectors.joining("."));
   }
+
+  /**
+   * Get function simple name with empty parenthesis.
+   */
+  @NotNull
+  public static String functionSimpleName(@NotNull String qualifiedName) {
+    int nameBegin = qualifiedName.lastIndexOf('.') + 1;
+    int nameEnd = qualifiedName.indexOf('(', nameBegin);
+    return qualifiedName.substring(nameBegin, nameEnd) + "()";
+  }
 }

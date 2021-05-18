@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.folding.Folding;
+import org.jetbrains.research.refactorinsight.utils.Utils;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -18,9 +19,7 @@ public class InlineOperationFoldingHandler implements FoldingHandler {
     if (!isBefore || !file.getVirtualFile().getPath().endsWith(path)) {
       return Collections.emptyList();
     }
-    String details = info.getNameAfter();
-    String hintText = "Inlined to "
-        + details.substring(details.lastIndexOf('.') + 1, details.indexOf('(') + 1) + ')';
+    String hintText = "Inlined to " + Utils.functionSimpleName(info.getNameAfter());
     if (info.getType() == RefactoringType.MOVE_AND_INLINE_OPERATION) {
       hintText += " in " + info.getRightPath().substring(info.getRightPath().lastIndexOf(File.separatorChar) + 1);
     }
