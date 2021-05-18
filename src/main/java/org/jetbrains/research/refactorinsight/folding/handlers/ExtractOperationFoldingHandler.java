@@ -36,6 +36,7 @@ public class ExtractOperationFoldingHandler implements FoldingHandler {
   public Folding uniteFolds(@NotNull List<Folding> folds) {
     List<String> destinations = folds.stream()
         .map(folding -> folding.hintText.substring("Extracted from ".length()))
+        .distinct()
         .collect(Collectors.toList());
     String hintText = "Extracted from ";
     if (destinations.size() < 4) {
