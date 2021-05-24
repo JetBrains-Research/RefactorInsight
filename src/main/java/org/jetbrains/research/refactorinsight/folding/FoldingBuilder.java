@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 public final class FoldingBuilder {
 
   /**
-   * Creates {@link FoldingDescriptor} instance for Kotlin method.
+   * Creates {@link FoldingDescriptor} instance for Java method.
    */
   @NotNull
   public static FoldingDescriptor fromMethod(@NotNull UMLOperation method) {
@@ -21,7 +21,7 @@ public final class FoldingBuilder {
   }
 
   /**
-   * Creates {@link FoldingDescriptor} instance for Java method.
+   * Creates {@link FoldingDescriptor} instance for Kotlin method.
    */
   @NotNull
   public static FoldingDescriptor fromMethod(@NotNull org.jetbrains.research.kotlinrminer.uml.UMLOperation method) {
