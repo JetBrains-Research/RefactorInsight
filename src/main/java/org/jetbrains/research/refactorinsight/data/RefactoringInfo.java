@@ -25,7 +25,7 @@ import org.jetbrains.research.refactorinsight.data.diff.DiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.data.diff.MoreSidedDiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedDiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.data.diff.TwoSidedDiffRequestGenerator;
-import org.jetbrains.research.refactorinsight.folding.FoldingPositions;
+import org.jetbrains.research.refactorinsight.folding.FoldingDescriptor;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 
 /**
@@ -46,7 +46,7 @@ public class RefactoringInfo {
   private final String[][] uiStrings = new String[3][2];
   private final String[] paths = new String[3];
   // Optional data for foldable refactorings
-  private final FoldingPositions[] foldingPositions = new FoldingPositions[3];
+  private final FoldingDescriptor[] foldingPositions = new FoldingDescriptor[3];
 
   private RefactoringType type;
   private Group group;
@@ -85,9 +85,9 @@ public class RefactoringInfo {
         .setHidden(tokens[12].equals("t"))
         .setMoreSided(tokens[13].equals("t"))
         .setChanged(tokens[14].equals("t"))
-        .setFoldingPositionsBefore(FoldingPositions.fromString(tokens[16]))
-        .setFoldingPositionsMid(FoldingPositions.fromString(tokens[17]))
-        .setFoldingPositionsAfter(FoldingPositions.fromString(tokens[18]))
+        .setFoldingPositionsBefore(FoldingDescriptor.fromString(tokens[16]))
+        .setFoldingPositionsMid(FoldingDescriptor.fromString(tokens[17]))
+        .setFoldingPositionsAfter(FoldingDescriptor.fromString(tokens[18]))
         .setIncludes(new HashSet<>(
             tokens[19].isEmpty() ? List.of() : Arrays.asList(tokens[19].split(regex))));
 
@@ -540,29 +540,29 @@ public class RefactoringInfo {
     return this;
   }
 
-  public FoldingPositions getFoldingPositionsBefore() {
+  public FoldingDescriptor getFoldingPositionsBefore() {
     return foldingPositions[0];
   }
 
-  public RefactoringInfo setFoldingPositionsBefore(FoldingPositions positions) {
+  public RefactoringInfo setFoldingPositionsBefore(FoldingDescriptor positions) {
     foldingPositions[0] = positions;
     return this;
   }
 
-  public FoldingPositions getFoldingPositionsMid() {
+  public FoldingDescriptor getFoldingPositionsMid() {
     return foldingPositions[1];
   }
 
-  public RefactoringInfo setFoldingPositionsMid(FoldingPositions positions) {
+  public RefactoringInfo setFoldingPositionsMid(FoldingDescriptor positions) {
     foldingPositions[1] = positions;
     return this;
   }
 
-  public FoldingPositions getFoldingPositionsAfter() {
+  public FoldingDescriptor getFoldingPositionsAfter() {
     return foldingPositions[2];
   }
 
-  public RefactoringInfo setFoldingPositionsAfter(FoldingPositions positions) {
+  public RefactoringInfo setFoldingPositionsAfter(FoldingDescriptor positions) {
     foldingPositions[2] = positions;
     return this;
   }

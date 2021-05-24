@@ -35,6 +35,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Folds discovered refactorings in code diffs.
+ */
 public class RefactoringFolder {
   static Map<RefactoringType, FoldingHandler> foldingHandlers;
 
@@ -56,7 +59,7 @@ public class RefactoringFolder {
   private RefactoringFolder() {}
 
   /**
-   * Fold refactorings in the viewer if supported.
+   * Folds refactorings in the viewer if supported.
    *
    * @param viewer  Viewer of diff request.
    * @param request Associated diff request.
@@ -98,7 +101,7 @@ public class RefactoringFolder {
   }
 
   /**
-   * Fold only in added files.
+   * Folds only in the added files.
    */
   private static void foldRefactorings(@NotNull List<RefactoringInfo> foldableRefactorings,
                                        @NotNull OnesideTextDiffViewer viewer,
@@ -132,12 +135,12 @@ public class RefactoringFolder {
       return;
     }
 
-    List<Folding> folds = foldableRefactorings.stream()
+    List<FoldingDescriptor> folds = foldableRefactorings.stream()
         .flatMap(info ->
             foldingHandlers.get(info.getType()).getFolds(info, psiFile, before).stream()
                 .map(folding -> new Pair<>(info.getType(), folding))
         ).collect(
-            Collectors.groupingBy(pair -> pair.second.positions.hintOffset,
+            Collectors.groupingBy(pair -> pair.second.hintOffset,
                 Collectors.groupingBy(pair -> pair.first,
                     Collectors.mapping(pair -> pair.second,
                         Collectors.toList()))))
@@ -149,17 +152,17 @@ public class RefactoringFolder {
         .collect(Collectors.toList());
 
     editor.getFoldingModel().runBatchFoldingOperation(() -> {
-      for (Folding folding : folds) {
+      for (FoldingDescriptor foldingDescriptor : folds) {
         FoldRegion value = editor.getFoldingModel()
-            .addFoldRegion(folding.positions.foldingStartOffset, folding.positions.foldingEndOffset, "");
+            .addFoldRegion(foldingDescriptor.foldingStartOffset, foldingDescriptor.foldingEndOffset, "");
         if (value != null) {
           value.setExpanded(false);
           value.setInnerHighlightersMuted(true);
         }
 
-        RendererWrapper renderer = new RendererWrapper(new HintRenderer(folding.hintText), false);
+        RendererWrapper renderer = new RendererWrapper(new HintRenderer(foldingDescriptor.hintText), false);
         editor.getInlayModel().addBlockElement(
-            folding.positions.hintOffset,
+            foldingDescriptor.hintOffset,
             true, true, 1,
             renderer);
       }

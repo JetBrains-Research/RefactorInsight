@@ -5,8 +5,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.folding.Folding;
+import org.jetbrains.research.refactorinsight.folding.FoldingDescriptor;
 import org.jetbrains.research.refactorinsight.utils.Utils;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 public class MoveOperationFoldingHandler implements FoldingHandler {
   @NotNull
   @Override
-  public List<Folding> getFolds(@NotNull RefactoringInfo info, @NotNull PsiFile file, boolean isBefore) {
+  public List<FoldingDescriptor> getFolds(@NotNull RefactoringInfo info, @NotNull PsiFile file, boolean isBefore) {
     String path = isBefore ? info.getLeftPath() : info.getRightPath();
     if (!file.getVirtualFile().getPath().endsWith(path)) {
       return Collections.emptyList();
@@ -32,17 +33,14 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
         + (isBefore ? " to " : " from ")
         + details
         + (info.isChanged() ? " with changes" : " without changes");
-    return Collections.singletonList(
-        new Folding(
-            hintText,
-            isBefore ? info.getFoldingPositionsBefore() : info.getFoldingPositionsAfter()
-        )
-    );
+    FoldingDescriptor descriptor = isBefore ? info.getFoldingPositionsBefore() : info.getFoldingPositionsAfter();
+    descriptor.addHintText(hintText);
+    return Collections.singletonList(descriptor);
   }
 
   @NotNull
   @Override
-  public Folding uniteFolds(@NotNull List<Folding> folds) {
+  public FoldingDescriptor uniteFolds(@NotNull List<FoldingDescriptor> folds) {
     String hintText;
     List<String> hints = folds.stream().map(folding -> folding.hintText).collect(Collectors.toList());
 
@@ -94,11 +92,9 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
     if (isNotChanged) {
       hintText += " without changes";
     }
-
-    return new Folding(
-        hintText,
-        folds.get(0).positions
-    );
+    FoldingDescriptor descriptor = folds.get(0);
+    descriptor.addHintText(hintText);
+    return descriptor;
   }
 
   @NotNull

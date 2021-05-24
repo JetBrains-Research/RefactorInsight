@@ -7,7 +7,7 @@ import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
-import org.jetbrains.research.refactorinsight.folding.FoldingPositions;
+import org.jetbrains.research.refactorinsight.folding.FoldingBuilder;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 import org.jetbrains.research.refactorinsight.utils.Utils;
 import org.refactoringminer.api.Refactoring;
@@ -20,8 +20,8 @@ public class PushDownOperationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     PushDownOperationRefactoring ref = (PushDownOperationRefactoring) refactoring;
 
-    info.setFoldingPositionsBefore(FoldingPositions.fromMethod(ref.getOriginalOperation()));
-    info.setFoldingPositionsAfter(FoldingPositions.fromMethod(ref.getMovedOperation()));
+    info.setFoldingPositionsBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
+    info.setFoldingPositionsAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
 
     List<AbstractStatement> statementsBefore =
         ref.getOriginalOperation().getBody().getCompositeStatement().getStatements();
@@ -56,8 +56,8 @@ public class PushDownOperationHandler extends Handler {
     org.jetbrains.research.kotlinrminer.diff.refactoring.PushDownOperationRefactoring ref =
         (org.jetbrains.research.kotlinrminer.diff.refactoring.PushDownOperationRefactoring) refactoring;
 
-    info.setFoldingPositionsBefore(FoldingPositions.fromMethod(ref.getOriginalOperation()));
-    info.setFoldingPositionsAfter(FoldingPositions.fromMethod(ref.getMovedOperation()));
+    info.setFoldingPositionsBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
+    info.setFoldingPositionsAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
 
     List<org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement> statementsBefore =
         ref.getOriginalOperation().getBody().getCompositeStatement().getStatements();

@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.research.refactorinsight.data.diff.MoreSidedDiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedDiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.data.diff.TwoSidedDiffRequestGenerator;
-import org.jetbrains.research.refactorinsight.folding.FoldingPositions;
+import org.jetbrains.research.refactorinsight.folding.FoldingDescriptor;
 import org.junit.Test;
 
 public class ConverterTest {
@@ -120,7 +120,7 @@ public class ConverterTest {
         .setMoreSided(false)
         .setChanged(false)
         .setIncludes(new HashSet<>())
-        .setFoldingPositionsMid(new FoldingPositions(1, 2, 3))
+        .setFoldingPositionsMid(new FoldingDescriptor(1, 2, 3))
         .setRequestGenerator(new TwoSidedDiffRequestGenerator(Collections.singletonList(
             new LineFragmentImpl(1, 2, 3, 4, 0, 0, 0, 0))));
     //Test case 3
@@ -150,8 +150,8 @@ public class ConverterTest {
         .setMoreSided(true)
         .setChanged(true)
         .setIncludes(new HashSet<>())
-        .setFoldingPositionsBefore(new FoldingPositions(12, 13, 14))
-        .setFoldingPositionsAfter(new FoldingPositions(15, 16, 17))
+        .setFoldingPositionsBefore(new FoldingDescriptor(12, 13, 14))
+        .setFoldingPositionsAfter(new FoldingDescriptor(15, 16, 17))
         .setRequestGenerator(new MoreSidedDiffRequestGenerator(Collections.singletonList(
             new MoreSidedDiffRequestGenerator.MoreSidedRange(1, 2, 3, 4,
                 0, 0, 0, 0, "extraction/left/path.java"))));

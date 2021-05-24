@@ -8,7 +8,7 @@ import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
-import org.jetbrains.research.refactorinsight.folding.FoldingPositions;
+import org.jetbrains.research.refactorinsight.folding.FoldingBuilder;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 import org.jetbrains.research.refactorinsight.utils.Utils;
 import org.refactoringminer.api.Refactoring;
@@ -21,8 +21,8 @@ public class MoveOperationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     final MoveOperationRefactoring ref = (MoveOperationRefactoring) refactoring;
 
-    info.setFoldingPositionsBefore(FoldingPositions.fromMethod(ref.getOriginalOperation()));
-    info.setFoldingPositionsAfter(FoldingPositions.fromMethod(ref.getMovedOperation()));
+    info.setFoldingPositionsBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
+    info.setFoldingPositionsAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
 
     if (info.getType() != RefactoringType.MOVE_AND_RENAME_OPERATION) {
       List<AbstractStatement> statementsBefore =
@@ -58,8 +58,8 @@ public class MoveOperationHandler extends Handler {
     final org.jetbrains.research.kotlinrminer.diff.refactoring.MoveOperationRefactoring ref =
         (org.jetbrains.research.kotlinrminer.diff.refactoring.MoveOperationRefactoring) refactoring;
 
-    info.setFoldingPositionsBefore(FoldingPositions.fromMethod(ref.getOriginalOperation()));
-    info.setFoldingPositionsAfter(FoldingPositions.fromMethod(ref.getMovedOperation()));
+    info.setFoldingPositionsBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
+    info.setFoldingPositionsAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
 
     if (info.getType() != RefactoringType.MOVE_AND_RENAME_OPERATION) {
       List<org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement> statementsBefore =
