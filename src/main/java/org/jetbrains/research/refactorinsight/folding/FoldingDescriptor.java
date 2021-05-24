@@ -5,7 +5,8 @@ import org.jetbrains.annotations.Nullable;
 
 public final class FoldingDescriptor {
   @Nullable
-  private String hintText = null;
+  private transient String hintText = null;
+  private transient boolean isHintTextUnited = false;
 
   public final int hintOffset;
   public final int foldingStartOffset;
@@ -27,7 +28,6 @@ public final class FoldingDescriptor {
   @NotNull
   public String hintText() {
     assert hasHintText() : "Hint text was not added";
-
     return hintText;
   }
 
@@ -35,7 +35,16 @@ public final class FoldingDescriptor {
     return hintText != null;
   }
 
+  public boolean isHintTextUnited() {
+    return isHintTextUnited;
+  }
+
   public void addHintText(String text) {
+    this.hintText = text;
+  }
+
+  public void addUnitedHintText(String text) {
+    isHintTextUnited = true;
     this.hintText = text;
   }
 

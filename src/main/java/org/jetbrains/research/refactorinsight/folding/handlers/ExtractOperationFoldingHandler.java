@@ -19,32 +19,37 @@ public class ExtractOperationFoldingHandler implements FoldingHandler {
     if (isBefore || !file.getVirtualFile().getPath().endsWith(path)) {
       return Collections.emptyList();
     }
-    String hintText = "Extracted from " + Utils.functionSimpleName(info.getNameBefore());
-    if (info.getType() == RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
-      hintText += " in " + info.getLeftPath().substring(info.getLeftPath().lastIndexOf(File.separatorChar) + 1);
-    }
     FoldingDescriptor descriptor = info.getFoldingDescriptorMid();
-    descriptor.addHintText(hintText);
-    return Collections.singletonList(
-            descriptor
-    );
+    if (!descriptor.hasHintText()) {
+      String hintText = "Extracted from " + Utils.functionSimpleName(info.getNameBefore());
+      if (info.getType() == RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
+        hintText += " in " + info.getLeftPath().substring(info.getLeftPath().lastIndexOf(File.separatorChar) + 1);
+      }
+      descriptor.addHintText(hintText);
+    }
+    return Collections.singletonList(descriptor);
   }
 
   @NotNull
   @Override
   public FoldingDescriptor uniteFolds(@NotNull List<FoldingDescriptor> folds) {
-    List<String> destinations = folds.stream()
-        .map(folding -> folding.hintText().substring("Extracted from ".length()))
-        .distinct()
-        .collect(Collectors.toList());
-    String hintText = "Extracted from ";
-    if (destinations.size() < 4) {
-      hintText += String.join(", ", destinations);
-    } else {
-      hintText += destinations.size() + " methods";
-    }
     FoldingDescriptor descriptor = folds.get(0);
-    descriptor.addHintText(hintText);
+    if (!descriptor.isHintTextUnited()) {
+      List<String> destinations = folds.stream()
+          .map(folding -> folding.hintText().substring("Extracted from ".length()))
+          .distinct()
+          .collect(Collectors.toList());
+      String hintText = "Extracted from ";
+      if (destinations.size() < 4) {
+        hintText += String.join(", ", destinations);
+      } else {
+        hintText += destinations.size() + " methods";
+      }
+      descriptor.addHintText(hintText);
+
+      String finalHintText = hintText;
+      folds.forEach(eachDescriptor -> eachDescriptor.addUnitedHintText(finalHintText));
+    }
     return descriptor;
   }
 }

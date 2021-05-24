@@ -19,30 +19,36 @@ public class InlineOperationFoldingHandler implements FoldingHandler {
     if (!isBefore || !file.getVirtualFile().getPath().endsWith(path)) {
       return Collections.emptyList();
     }
-    String hintText = "Inlined to " + Utils.functionSimpleName(info.getNameAfter());
-    if (info.getType() == RefactoringType.MOVE_AND_INLINE_OPERATION) {
-      hintText += " in " + info.getRightPath().substring(info.getRightPath().lastIndexOf(File.separatorChar) + 1);
-    }
     FoldingDescriptor descriptor = info.getFoldingDescriptorMid();
-    descriptor.addHintText(hintText);
+    if (!descriptor.hasHintText()) {
+      String hintText = "Inlined to " + Utils.functionSimpleName(info.getNameAfter());
+      if (info.getType() == RefactoringType.MOVE_AND_INLINE_OPERATION) {
+        hintText += " in " + info.getRightPath().substring(info.getRightPath().lastIndexOf(File.separatorChar) + 1);
+      }
+      descriptor.addHintText(hintText);
+    }
     return Collections.singletonList(descriptor);
   }
 
   @NotNull
   @Override
   public FoldingDescriptor uniteFolds(@NotNull List<FoldingDescriptor> folds) {
-    List<String> destinations = folds.stream()
-        .map(folding -> folding.hintText().substring("Inlined to ".length()))
-        .distinct()
-        .collect(Collectors.toList());
-    String hintText = "Inlined to ";
-    if (destinations.size() < 4) {
-      hintText += String.join(", ", destinations);
-    } else {
-      hintText += destinations.size() + " methods";
-    }
     FoldingDescriptor descriptor = folds.get(0);
-    descriptor.addHintText(hintText);
+    if (!descriptor.isHintTextUnited()) {
+      List<String> destinations = folds.stream()
+          .map(folding -> folding.hintText().substring("Inlined to ".length()))
+          .distinct()
+          .collect(Collectors.toList());
+      String hintText = "Inlined to ";
+      if (destinations.size() < 4) {
+        hintText += String.join(", ", destinations);
+      } else {
+        hintText += destinations.size() + " methods";
+      }
+
+      String finalHintText = hintText;
+      folds.forEach(eachDescriptor -> eachDescriptor.addUnitedHintText(finalHintText));
+    }
     return descriptor;
   }
 }
