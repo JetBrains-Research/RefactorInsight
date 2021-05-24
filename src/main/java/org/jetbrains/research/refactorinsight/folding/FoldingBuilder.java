@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 
 public final class FoldingBuilder {
 
+  private FoldingBuilder() {}
+
   /**
    * Creates {@link FoldingDescriptor} instance for Java method.
    */
