@@ -160,7 +160,7 @@ public class RefactoringFolder {
           value.setInnerHighlightersMuted(true);
         }
 
-        RendererWrapper renderer = new RendererWrapper(new HintRenderer(foldingDescriptor.hintText), false);
+        RendererWrapper renderer = new RendererWrapper(new HintRenderer(foldingDescriptor.hintText()), false);
         editor.getInlayModel().addBlockElement(
             foldingDescriptor.hintOffset,
             true, true, 1,

@@ -32,7 +32,7 @@ public class InlineOperationFoldingHandler implements FoldingHandler {
   @Override
   public FoldingDescriptor uniteFolds(@NotNull List<FoldingDescriptor> folds) {
     List<String> destinations = folds.stream()
-        .map(folding -> folding.hintText.substring("Inlined to ".length()))
+        .map(folding -> folding.hintText().substring("Inlined to ".length()))
         .distinct()
         .collect(Collectors.toList());
     String hintText = "Inlined to ";
