@@ -16,7 +16,7 @@ public class InlineOperationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     InlineOperationRefactoring ref = (InlineOperationRefactoring) refactoring;
 
-    info.setFoldingPositionsMid(FoldingBuilder.fromMethod(ref.getInlinedOperation()));
+    info.setFoldingDescriptorMid(FoldingBuilder.fromMethod(ref.getInlinedOperation()));
 
     ref.getInlinedOperationInvocations().forEach(c ->
         info.addMarking(new CodeRange(c.codeRange()), new CodeRange(ref.getInlinedCodeRangeInTargetOperation()), true));
@@ -50,7 +50,7 @@ public class InlineOperationHandler extends Handler {
     org.jetbrains.research.kotlinrminer.diff.refactoring.InlineOperationRefactoring ref =
         (org.jetbrains.research.kotlinrminer.diff.refactoring.InlineOperationRefactoring) refactoring;
 
-    info.setFoldingPositionsMid(FoldingBuilder.fromMethod(ref.getInlinedOperation()));
+    info.setFoldingDescriptorMid(FoldingBuilder.fromMethod(ref.getInlinedOperation()));
 
     ref.getInlinedOperationInvocations().forEach(c ->
         info.addMarking(new CodeRange(c.codeRange()), new CodeRange(ref.getInlinedCodeRangeInTargetOperation()), true));

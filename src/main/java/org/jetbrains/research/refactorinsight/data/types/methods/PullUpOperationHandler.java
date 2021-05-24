@@ -19,8 +19,8 @@ public class PullUpOperationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     PullUpOperationRefactoring ref = (PullUpOperationRefactoring) refactoring;
 
-    info.setFoldingPositionsBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
-    info.setFoldingPositionsAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
+    info.setFoldingDescriptorBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
+    info.setFoldingDescriptorAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
 
     List<AbstractStatement> statementsBefore =
         ref.getOriginalOperation().getBody().getCompositeStatement().getStatements();
@@ -48,8 +48,8 @@ public class PullUpOperationHandler extends Handler {
     org.jetbrains.research.kotlinrminer.diff.refactoring.PullUpOperationRefactoring ref =
         (org.jetbrains.research.kotlinrminer.diff.refactoring.PullUpOperationRefactoring) refactoring;
 
-    info.setFoldingPositionsBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
-    info.setFoldingPositionsAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
+    info.setFoldingDescriptorBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
+    info.setFoldingDescriptorAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
 
     List<org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement> statementsBefore =
         ref.getOriginalOperation().getBody().getCompositeStatement().getStatements();

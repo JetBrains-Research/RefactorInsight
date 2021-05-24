@@ -20,8 +20,8 @@ public class PushDownOperationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     PushDownOperationRefactoring ref = (PushDownOperationRefactoring) refactoring;
 
-    info.setFoldingPositionsBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
-    info.setFoldingPositionsAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
+    info.setFoldingDescriptorBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
+    info.setFoldingDescriptorAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
 
     List<AbstractStatement> statementsBefore =
         ref.getOriginalOperation().getBody().getCompositeStatement().getStatements();
@@ -56,8 +56,8 @@ public class PushDownOperationHandler extends Handler {
     org.jetbrains.research.kotlinrminer.diff.refactoring.PushDownOperationRefactoring ref =
         (org.jetbrains.research.kotlinrminer.diff.refactoring.PushDownOperationRefactoring) refactoring;
 
-    info.setFoldingPositionsBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
-    info.setFoldingPositionsAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
+    info.setFoldingDescriptorBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
+    info.setFoldingDescriptorAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
 
     List<org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement> statementsBefore =
         ref.getOriginalOperation().getBody().getCompositeStatement().getStatements();

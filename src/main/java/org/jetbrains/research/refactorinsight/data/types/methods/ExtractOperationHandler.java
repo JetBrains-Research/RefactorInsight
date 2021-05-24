@@ -21,7 +21,7 @@ public class ExtractOperationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ExtractOperationRefactoring ref = (ExtractOperationRefactoring) refactoring;
 
-    info.setFoldingPositionsMid(FoldingBuilder.fromMethod(ref.getExtractedOperation()));
+    info.setFoldingDescriptorMid(FoldingBuilder.fromMethod(ref.getExtractedOperation()));
 
     String classNameBefore = ref.getSourceOperationBeforeExtraction().getClassName();
     String classNameAfter = ref.getExtractedOperation().getClassName();
@@ -97,7 +97,7 @@ public class ExtractOperationHandler extends Handler {
     org.jetbrains.research.kotlinrminer.diff.refactoring.ExtractOperationRefactoring ref =
         (org.jetbrains.research.kotlinrminer.diff.refactoring.ExtractOperationRefactoring) refactoring;
 
-    info.setFoldingPositionsMid(FoldingBuilder.fromMethod(ref.getExtractedOperation()));
+    info.setFoldingDescriptorMid(FoldingBuilder.fromMethod(ref.getExtractedOperation()));
 
     String classNameBefore = ref.getSourceOperationBeforeExtraction().getClassName();
     String classNameAfter = ref.getExtractedOperation().getClassName();

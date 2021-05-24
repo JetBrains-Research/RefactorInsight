@@ -23,7 +23,7 @@ public class InlineOperationFoldingHandler implements FoldingHandler {
     if (info.getType() == RefactoringType.MOVE_AND_INLINE_OPERATION) {
       hintText += " in " + info.getRightPath().substring(info.getRightPath().lastIndexOf(File.separatorChar) + 1);
     }
-    FoldingDescriptor descriptor = info.getFoldingPositionsMid();
+    FoldingDescriptor descriptor = info.getFoldingDescriptorMid();
     descriptor.addHintText(hintText);
     return Collections.singletonList(descriptor);
   }

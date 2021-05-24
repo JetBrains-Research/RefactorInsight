@@ -21,8 +21,8 @@ public class MoveOperationHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     final MoveOperationRefactoring ref = (MoveOperationRefactoring) refactoring;
 
-    info.setFoldingPositionsBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
-    info.setFoldingPositionsAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
+    info.setFoldingDescriptorBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
+    info.setFoldingDescriptorAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
 
     if (info.getType() != RefactoringType.MOVE_AND_RENAME_OPERATION) {
       List<AbstractStatement> statementsBefore =
@@ -58,8 +58,8 @@ public class MoveOperationHandler extends Handler {
     final org.jetbrains.research.kotlinrminer.diff.refactoring.MoveOperationRefactoring ref =
         (org.jetbrains.research.kotlinrminer.diff.refactoring.MoveOperationRefactoring) refactoring;
 
-    info.setFoldingPositionsBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
-    info.setFoldingPositionsAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
+    info.setFoldingDescriptorBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
+    info.setFoldingDescriptorAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
 
     if (info.getType() != RefactoringType.MOVE_AND_RENAME_OPERATION) {
       List<org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement> statementsBefore =

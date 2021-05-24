@@ -33,7 +33,7 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
         + (isBefore ? " to " : " from ")
         + details
         + (info.isChanged() ? " with changes" : " without changes");
-    FoldingDescriptor descriptor = isBefore ? info.getFoldingPositionsBefore() : info.getFoldingPositionsAfter();
+    FoldingDescriptor descriptor = isBefore ? info.getFoldingDescriptorBefore() : info.getFoldingDescriptorAfter();
     descriptor.addHintText(hintText);
     return Collections.singletonList(descriptor);
   }

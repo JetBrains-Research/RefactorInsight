@@ -85,9 +85,9 @@ public class RefactoringInfo {
         .setHidden(tokens[12].equals("t"))
         .setMoreSided(tokens[13].equals("t"))
         .setChanged(tokens[14].equals("t"))
-        .setFoldingPositionsBefore(FoldingDescriptor.fromString(tokens[16]))
-        .setFoldingPositionsMid(FoldingDescriptor.fromString(tokens[17]))
-        .setFoldingPositionsAfter(FoldingDescriptor.fromString(tokens[18]))
+        .setFoldingDescriptorBefore(FoldingDescriptor.fromString(tokens[16]))
+        .setFoldingDescriptorMid(FoldingDescriptor.fromString(tokens[17]))
+        .setFoldingDescriptorAfter(FoldingDescriptor.fromString(tokens[18]))
         .setIncludes(new HashSet<>(
             tokens[19].isEmpty() ? List.of() : Arrays.asList(tokens[19].split(regex))));
 
@@ -540,29 +540,29 @@ public class RefactoringInfo {
     return this;
   }
 
-  public FoldingDescriptor getFoldingPositionsBefore() {
+  public FoldingDescriptor getFoldingDescriptorBefore() {
     return foldingPositions[0];
   }
 
-  public RefactoringInfo setFoldingPositionsBefore(FoldingDescriptor positions) {
+  public RefactoringInfo setFoldingDescriptorBefore(FoldingDescriptor positions) {
     foldingPositions[0] = positions;
     return this;
   }
 
-  public FoldingDescriptor getFoldingPositionsMid() {
+  public FoldingDescriptor getFoldingDescriptorMid() {
     return foldingPositions[1];
   }
 
-  public RefactoringInfo setFoldingPositionsMid(FoldingDescriptor positions) {
+  public RefactoringInfo setFoldingDescriptorMid(FoldingDescriptor positions) {
     foldingPositions[1] = positions;
     return this;
   }
 
-  public FoldingDescriptor getFoldingPositionsAfter() {
+  public FoldingDescriptor getFoldingDescriptorAfter() {
     return foldingPositions[2];
   }
 
-  public RefactoringInfo setFoldingPositionsAfter(FoldingDescriptor positions) {
+  public RefactoringInfo setFoldingDescriptorAfter(FoldingDescriptor positions) {
     foldingPositions[2] = positions;
     return this;
   }

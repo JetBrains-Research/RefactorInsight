@@ -23,7 +23,7 @@ public class ExtractOperationFoldingHandler implements FoldingHandler {
     if (info.getType() == RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
       hintText += " in " + info.getLeftPath().substring(info.getLeftPath().lastIndexOf(File.separatorChar) + 1);
     }
-    FoldingDescriptor descriptor = info.getFoldingPositionsMid();
+    FoldingDescriptor descriptor = info.getFoldingDescriptorMid();
     descriptor.addHintText(hintText);
     return Collections.singletonList(
             descriptor
