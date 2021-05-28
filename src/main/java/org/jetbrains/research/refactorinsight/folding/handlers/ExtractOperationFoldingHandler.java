@@ -36,7 +36,7 @@ public class ExtractOperationFoldingHandler implements FoldingHandler {
     FoldingDescriptor descriptor = folds.get(0);
     if (!descriptor.isHintTextUnited()) {
       List<String> destinations = folds.stream()
-          .map(folding -> folding.hintText().substring("Extracted from ".length()))
+          .map(folding -> folding.getHintText().substring("Extracted from ".length()))
           .distinct()
           .collect(Collectors.toList());
       String hintText = "Extracted from ";

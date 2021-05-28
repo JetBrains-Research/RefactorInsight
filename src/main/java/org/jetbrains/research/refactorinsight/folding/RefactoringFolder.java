@@ -141,7 +141,7 @@ public class RefactoringFolder {
             foldingHandlers.get(info.getType()).getFolds(info, psiFile, before).stream()
                 .map(folding -> new Pair<>(info.getType(), folding))
         ).collect(
-            Collectors.groupingBy(pair -> pair.second.hintOffset,
+            Collectors.groupingBy(pair -> pair.second.getHintOffset(),
                 Collectors.groupingBy(pair -> pair.first,
                     Collectors.mapping(pair -> pair.second,
                         Collectors.toList()))))
@@ -155,15 +155,15 @@ public class RefactoringFolder {
     editor.getFoldingModel().runBatchFoldingOperation(() -> {
       for (FoldingDescriptor foldingDescriptor : folds) {
         FoldRegion value = editor.getFoldingModel()
-            .addFoldRegion(foldingDescriptor.foldingStartOffset, foldingDescriptor.foldingEndOffset, "");
+            .addFoldRegion(foldingDescriptor.getFoldingStartOffset(), foldingDescriptor.getFoldingEndOffset(), "");
         if (value != null) {
           value.setExpanded(false);
           value.setInnerHighlightersMuted(true);
         }
 
-        RendererWrapper renderer = new RendererWrapper(new HintRenderer(foldingDescriptor.hintText()), false);
+        RendererWrapper renderer = new RendererWrapper(new HintRenderer(foldingDescriptor.getHintText()), false);
         editor.getInlayModel().addBlockElement(
-            foldingDescriptor.hintOffset,
+            foldingDescriptor.getHintOffset(),
             true, true, 1,
             renderer);
       }

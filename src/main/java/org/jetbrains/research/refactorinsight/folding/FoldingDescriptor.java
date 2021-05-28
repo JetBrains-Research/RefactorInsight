@@ -8,9 +8,9 @@ public final class FoldingDescriptor {
   private transient String hintText = null;
   private transient boolean isHintTextUnited = false;
 
-  public final int hintOffset;
-  public final int foldingStartOffset;
-  public final int foldingEndOffset;
+  private final int hintOffset;
+  private final int foldingStartOffset;
+  private final int foldingEndOffset;
 
   /**
    * Creates a folding descriptor.
@@ -23,12 +23,6 @@ public final class FoldingDescriptor {
     this.hintOffset = hintOffset;
     this.foldingStartOffset = startOffset;
     this.foldingEndOffset = endOffset;
-  }
-
-  @NotNull
-  public String hintText() {
-    assert hasHintText() : "Hint text was not added";
-    return hintText;
   }
 
   public boolean hasHintText() {
@@ -46,6 +40,24 @@ public final class FoldingDescriptor {
   public void addUnitedHintText(String text) {
     isHintTextUnited = true;
     this.hintText = text;
+  }
+
+  @NotNull
+  public String getHintText() {
+    assert hasHintText() : "Hint text was not added";
+    return hintText;
+  }
+
+  public int getHintOffset() {
+    return hintOffset;
+  }
+
+  public int getFoldingStartOffset() {
+    return foldingStartOffset;
+  }
+
+  public int getFoldingEndOffset() {
+    return foldingEndOffset;
   }
 
   /**

@@ -36,7 +36,7 @@ public class InlineOperationFoldingHandler implements FoldingHandler {
     FoldingDescriptor descriptor = folds.get(0);
     if (!descriptor.isHintTextUnited()) {
       List<String> destinations = folds.stream()
-          .map(folding -> folding.hintText().substring("Inlined to ".length()))
+          .map(folding -> folding.getHintText().substring("Inlined to ".length()))
           .distinct()
           .collect(Collectors.toList());
       String hintText = "Inlined to ";

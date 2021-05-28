@@ -46,7 +46,7 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
     FoldingDescriptor descriptor = folds.get(0);
     if (!descriptor.isHintTextUnited()) {
       String hintText;
-      List<String> hints = folds.stream().map(FoldingDescriptor::hintText).collect(Collectors.toList());
+      List<String> hints = folds.stream().map(FoldingDescriptor::getHintText).collect(Collectors.toList());
 
       if (hints.stream().allMatch(hint -> hint.startsWith("Moved"))) {
         hintText = "Moved ";
