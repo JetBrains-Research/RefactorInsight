@@ -7,6 +7,7 @@ import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.data.types.Handler;
+import org.jetbrains.research.refactorinsight.folding.FoldingBuilder;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
@@ -19,6 +20,8 @@ public class ExtractOperationHandler extends Handler {
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ExtractOperationRefactoring ref = (ExtractOperationRefactoring) refactoring;
+
+    info.setFoldingDescriptorMid(FoldingBuilder.fromMethod(ref.getExtractedOperation()));
 
     String classNameBefore = ref.getSourceOperationBeforeExtraction().getClassName();
     String classNameAfter = ref.getExtractedOperation().getClassName();
@@ -94,12 +97,15 @@ public class ExtractOperationHandler extends Handler {
     org.jetbrains.research.kotlinrminer.diff.refactoring.ExtractOperationRefactoring ref =
         (org.jetbrains.research.kotlinrminer.diff.refactoring.ExtractOperationRefactoring) refactoring;
 
+    info.setFoldingDescriptorMid(FoldingBuilder.fromMethod(ref.getExtractedOperation()));
+
     String classNameBefore = ref.getSourceOperationBeforeExtraction().getClassName();
     String classNameAfter = ref.getExtractedOperation().getClassName();
     List<String> parameterTypeList = new ArrayList<>();
     for (UMLType type : ref.getExtractedOperation().getParameterTypeList()) {
       parameterTypeList.add(type.toString());
     }
+
     String extractedMethod = StringUtils
         .calculateSignatureWithoutClassName(ref.getExtractedOperation().getName(), parameterTypeList);
 

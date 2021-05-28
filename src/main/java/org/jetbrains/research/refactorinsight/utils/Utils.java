@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import gr.uom.java.xmi.decomposition.AbstractStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
@@ -185,20 +186,18 @@ public class Utils {
     if (infos.stream().anyMatch(ofType(RENAME_ATTRIBUTE))
         && infos.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
       info = infos.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
-      info.setName(RefactorInsightBundle.message("change.rename.attribute"));
+      info.setType(RefactoringType.RENAME_AND_CHANGE_ATTRIBUTE_TYPE);
     } else if (infos.stream().anyMatch(ofType(RENAME_ATTRIBUTE))) {
       info = infos.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
-      info.setName(RefactorInsightBundle.message("rename.attribute"));
     } else if (infos.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
       info = infos.stream().filter(ofType(CHANGE_ATTRIBUTE_TYPE)).findFirst().get();
-      info.setName(RefactorInsightBundle.message("change.attribute"));
     } else if (infos.stream().anyMatch(ofType(CHANGE_VARIABLE_TYPE))) {
       info = infos.stream().filter(ofType(CHANGE_VARIABLE_TYPE)).findFirst().get();
-      info.setName(RefactorInsightBundle.message("change.rename.var"));
+      info.setType(RefactoringType.RENAME_AND_CHANGE_VARIABLE_TYPE);
     } else if (infos.stream().anyMatch(ofType(RENAME_PARAMETER))
         && infos.stream().anyMatch(ofType(CHANGE_PARAMETER_TYPE))) {
       info = infos.stream().filter(ofType(RENAME_PARAMETER)).findFirst().get();
-      info.setName(RefactorInsightBundle.message("change.rename.param"));
+      info.setType(RefactoringType.RENAME_AND_CHANGE_PARAMETER_TYPE);
     }
     return info;
   }
@@ -346,5 +345,59 @@ public class Utils {
             Disposer.dispose(disposable);
           }
         });
+  }
+
+  /**
+   * Check if Java statements lists equal using equalFragment function.
+   */
+  public static boolean isStatementsEqualJava(@NotNull List<AbstractStatement> statementsBefore,
+                                              @NotNull List<AbstractStatement> statementsAfter) {
+    if (statementsBefore.size() == statementsAfter.size()) {
+      boolean equal = true;
+      for (int i = 0; i < statementsBefore.size() && equal; i++) {
+        equal = statementsBefore.get(i).equalFragment(statementsAfter.get(i));
+      }
+      return equal;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Check if Kotlin statements lists equal using equalFragment function.
+   */
+  public static boolean isStatementsEqualKotlin(
+      @NotNull List<org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement> statementsBefore,
+      @NotNull List<org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement> statementsAfter) {
+    if (statementsBefore.size() == statementsAfter.size()) {
+      boolean equal = true;
+      for (int i = 0; i < statementsBefore.size() && equal; i++) {
+        equal = statementsBefore.get(i).equalFragment(statementsAfter.get(i));
+      }
+      return equal;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Skip packages in qualified name.
+   * Assumes the package name starts with a lowercase letter and the class name starts with an uppercase letter.
+   */
+  @NotNull
+  public static String skipPackages(@NotNull String qualifiedName) {
+    return Arrays.stream(qualifiedName.split("\\."))
+        .dropWhile(element -> element.isEmpty() || Character.isLowerCase(element.charAt(0)))
+        .collect(Collectors.joining("."));
+  }
+
+  /**
+   * Get function simple name with empty parenthesis.
+   */
+  @NotNull
+  public static String functionSimpleName(@NotNull String qualifiedName) {
+    int nameBegin = qualifiedName.lastIndexOf('.') + 1;
+    int nameEnd = qualifiedName.indexOf('(', nameBegin);
+    return qualifiedName.substring(nameBegin, nameEnd) + "()";
   }
 }

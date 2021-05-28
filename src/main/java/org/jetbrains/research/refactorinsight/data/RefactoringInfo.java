@@ -25,6 +25,7 @@ import org.jetbrains.research.refactorinsight.data.diff.DiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.data.diff.MoreSidedDiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedDiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.data.diff.TwoSidedDiffRequestGenerator;
+import org.jetbrains.research.refactorinsight.folding.FoldingDescriptor;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 
 /**
@@ -38,15 +39,16 @@ public class RefactoringInfo {
 
   private transient RefactoringEntry entry;
   private transient String groupId;
-  private transient RefactoringType type;
   private transient List<Pair<String, Boolean>> moreSidedLeftPaths = new ArrayList<>();
 
   private DiffRequestGenerator requestGenerator = new TwoSidedDiffRequestGenerator();
-  private String name;
 
   private final String[][] uiStrings = new String[3][2];
   private final String[] paths = new String[3];
+  // Optional data for foldable refactorings
+  private final FoldingDescriptor[] foldingPositions = new FoldingDescriptor[3];
 
+  private RefactoringType type;
   private Group group;
 
   private Set<String> includes = new HashSet<>();
@@ -54,6 +56,9 @@ public class RefactoringInfo {
   private boolean hidden = false;
   private boolean threeSided = false;
   private boolean moreSided = false;
+
+  // Optional data for move refactorings
+  private boolean changed = true;
 
   /**
    * Deserializes an {@link RefactoringInfo} instance from string.
@@ -63,9 +68,9 @@ public class RefactoringInfo {
    */
   public static RefactoringInfo fromString(String value) {
     String regex = delimiter(INFO, true);
-    String[] tokens = value.split(regex, 16);
+    String[] tokens = value.split(regex, 20);
     RefactoringInfo info = new RefactoringInfo()
-        .setName(tokens[0])
+        .setType(RefactoringType.values[Integer.parseInt(tokens[0])])
         .setNameBefore(StringUtils.deSanitize(tokens[1]))
         .setNameAfter(StringUtils.deSanitize(tokens[2]))
         .setElementBefore(StringUtils.deSanitize(tokens[3]))
@@ -75,20 +80,24 @@ public class RefactoringInfo {
         .setLeftPath(StringUtils.deSanitize(tokens[7]))
         .setMidPath(StringUtils.deSanitize(tokens[8]))
         .setRightPath(StringUtils.deSanitize(tokens[9]))
-        .setGroup(Group.valueOf(tokens[10]))
+        .setGroup(Group.values[Integer.parseInt(tokens[10])])
         .setThreeSided(tokens[11].equals("t"))
         .setHidden(tokens[12].equals("t"))
         .setMoreSided(tokens[13].equals("t"))
+        .setChanged(tokens[14].equals("t"))
+        .setFoldingDescriptorBefore(FoldingDescriptor.fromString(tokens[16]))
+        .setFoldingDescriptorMid(FoldingDescriptor.fromString(tokens[17]))
+        .setFoldingDescriptorAfter(FoldingDescriptor.fromString(tokens[18]))
         .setIncludes(new HashSet<>(
-            tokens[15].isEmpty() ? List.of() : Arrays.asList(tokens[15].split(regex))));
+            tokens[19].isEmpty() ? List.of() : Arrays.asList(tokens[19].split(regex))));
 
     DiffRequestGenerator diffGenerator;
     if (info.isMoreSided()) {
-      diffGenerator = MoreSidedDiffRequestGenerator.fromString(tokens[14]);
+      diffGenerator = MoreSidedDiffRequestGenerator.fromString(tokens[15]);
     } else if (info.isThreeSided()) {
-      diffGenerator = ThreeSidedDiffRequestGenerator.fromString(tokens[14]);
+      diffGenerator = ThreeSidedDiffRequestGenerator.fromString(tokens[15]);
     } else {
-      diffGenerator = TwoSidedDiffRequestGenerator.fromString(tokens[14]);
+      diffGenerator = TwoSidedDiffRequestGenerator.fromString(tokens[15]);
     }
 
     return info.setRequestGenerator(diffGenerator);
@@ -105,18 +114,22 @@ public class RefactoringInfo {
    */
   public String toString() {
     return String.join(delimiter(INFO),
-        name,
+        String.valueOf(type.ordinal()),
         Stream.concat(
             Arrays.stream(uiStrings).flatMap(Arrays::stream),
             Arrays.stream(paths))
             .map(s -> s == null ? "" : s)
             .map(StringUtils::sanitize)
             .collect(Collectors.joining(delimiter(INFO))),
-        group.toString(),
-        threeSided ? "t" : "f",
-        hidden ? "t" : "f",
-        moreSided ? "t" : "f",
+        String.valueOf(group.ordinal()),
+        threeSided ? "t" : "",
+        hidden ? "t" : "",
+        moreSided ? "t" : "",
+        changed ? "t" : "",
         requestGenerator.toString(),
+        Arrays.stream(foldingPositions)
+            .map(fp -> fp == null ? "" : fp.toString())
+            .collect(Collectors.joining(delimiter(INFO))),
         String.join(delimiter(INFO), includes)
     );
   }
@@ -157,10 +170,11 @@ public class RefactoringInfo {
         ((MoreSidedDiffRequestGenerator) requestGenerator).getClassNames()
             .forEach(name -> {
               Set<RefactoringInfo> infos = map.getOrDefault(name, new HashSet<>());
-              RefactoringInfo info = new RefactoringInfo().setGroup(group)
+              RefactoringInfo info = new RefactoringInfo()
+                  .setGroup(group)
                   .setNameBefore(getNameBefore())
                   .setNameAfter(getNameAfter())
-                  .setName(getName())
+                  .setType(type)
                   .setIncludes(includes)
                   .setHidden(hidden)
                   .setRequestGenerator(requestGenerator)
@@ -362,12 +376,7 @@ public class RefactoringInfo {
   }
 
   public String getName() {
-    return name;
-  }
-
-  public RefactoringInfo setName(String name) {
-    this.name = name;
-    return this;
+    return type.getName();
   }
 
   public boolean isHidden() {
@@ -484,7 +493,6 @@ public class RefactoringInfo {
         && Objects.equals(this.getDetailsAfter(), that.getDetailsAfter())
         && Objects.equals(this.getDetailsBefore(), that.getDetailsBefore())
         && Objects.equals(this.getElementBefore(), that.getElementBefore())
-        && this.name.equals(that.getName())
         && this.type == that.getType()
         && this.group == that.getGroup();
   }
@@ -508,11 +516,11 @@ public class RefactoringInfo {
   public void correctLines(String before, String mid, String after) {
     boolean skipAnnotationsLeft = true;
     boolean skipAnnotationsRight = true;
-    if (name.matches("Add\\s(\\w)*\\sAnnotation")) {
+    if (type.getName().matches("Add\\s(\\w)*\\sAnnotation")) {
       skipAnnotationsRight = false;
-    } else if (name.matches("Remove\\s(\\w)*\\sAnnotation")) {
+    } else if (type.getName().matches("Remove\\s(\\w)*\\sAnnotation")) {
       skipAnnotationsLeft = false;
-    } else if (name.matches("Modify\\s(\\w)*\\sAnnotation")) {
+    } else if (type.getName().matches("Modify\\s(\\w)*\\sAnnotation")) {
       skipAnnotationsLeft = skipAnnotationsRight = false;
     }
     requestGenerator.correct(before, mid, after, skipAnnotationsLeft, true, skipAnnotationsRight);
@@ -523,5 +531,40 @@ public class RefactoringInfo {
                                                                true, false, true);
   }
 
+  public boolean isChanged() {
+    return changed;
+  }
+
+  public RefactoringInfo setChanged(boolean changed) {
+    this.changed = changed;
+    return this;
+  }
+
+  public FoldingDescriptor getFoldingDescriptorBefore() {
+    return foldingPositions[0];
+  }
+
+  public RefactoringInfo setFoldingDescriptorBefore(FoldingDescriptor positions) {
+    foldingPositions[0] = positions;
+    return this;
+  }
+
+  public FoldingDescriptor getFoldingDescriptorMid() {
+    return foldingPositions[1];
+  }
+
+  public RefactoringInfo setFoldingDescriptorMid(FoldingDescriptor positions) {
+    foldingPositions[1] = positions;
+    return this;
+  }
+
+  public FoldingDescriptor getFoldingDescriptorAfter() {
+    return foldingPositions[2];
+  }
+
+  public RefactoringInfo setFoldingDescriptorAfter(FoldingDescriptor positions) {
+    foldingPositions[2] = positions;
+    return this;
+  }
 }
 

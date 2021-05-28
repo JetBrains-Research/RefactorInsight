@@ -43,7 +43,15 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.panels.Wrapper;
 import com.intellij.util.ui.components.BorderLayoutPanel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.research.refactorinsight.folding.RefactoringFolder;
+import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
+import org.jetbrains.research.refactorinsight.data.diff.MoreSidedDiffRequestGenerator.MoreSidedRange;
+import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedRange;
 
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ContainerEvent;
@@ -55,14 +63,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.data.diff.MoreSidedDiffRequestGenerator.MoreSidedRange;
-import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedRange;
 
 import static org.jetbrains.research.refactorinsight.utils.Utils.fixPath;
 
@@ -104,7 +104,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       chain.setIndex(index);
       chain.putUserData(DiffUserDataKeysEx.FORCE_DIFF_TOOL, SimpleDiffTool.INSTANCE);
       DiffManager.getInstance().showDiff(project, chain,
-          new DiffDialogHints(WindowWrapper.Mode.FRAME));
+                                         new DiffDialogHints(WindowWrapper.Mode.FRAME));
     }
   }
 
@@ -129,8 +129,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
         if (change.getAfterRevision() != null
             && change.getAfterRevision().getFile().getPath().contains(info.getRightPath())) {
           contentList.add(myDiffContentFactory
-              .create(project, change.getAfterRevision().getContent(),
-                  JavaClassFileType.INSTANCE));
+                              .create(project, change.getAfterRevision().getContent(),
+                                      JavaClassFileType.INSTANCE));
           break;
         }
       }
@@ -141,8 +141,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
           if (revision != null
               && revision.getFile().getPath().contains(fixPath(pathPair.first))) {
             contentList.add(myDiffContentFactory
-                .create(project, revision.getContent(),
-                    JavaClassFileType.INSTANCE));
+                                .create(project, revision.getContent(),
+                                        JavaClassFileType.INSTANCE));
             break;
           }
         }
@@ -166,22 +166,22 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
         if (change.getBeforeRevision() != null) {
           if (change.getBeforeRevision().getFile().getPath().contains(info.getLeftPath())) {
             contents[0] = myDiffContentFactory.create(project,
-                change.getBeforeRevision().getContent(),
-                JavaClassFileType.INSTANCE);
+                                                      change.getBeforeRevision().getContent(),
+                                                      JavaClassFileType.INSTANCE);
           }
         }
         if (info.isThreeSided()
             && change.getAfterRevision() != null
             && change.getAfterRevision().getFile().getPath().contains(info.getMidPath())) {
           contents[1] = myDiffContentFactory.create(project,
-              change.getAfterRevision().getContent(),
-              JavaClassFileType.INSTANCE);
+                                                    change.getAfterRevision().getContent(),
+                                                    JavaClassFileType.INSTANCE);
         }
         if (change.getAfterRevision() != null
             && change.getAfterRevision().getFile().getPath().contains(info.getRightPath())) {
           contents[2] = myDiffContentFactory.create(project,
-              change.getAfterRevision().getContent(),
-              JavaClassFileType.INSTANCE);
+                                                    change.getAfterRevision().getContent(),
+                                                    JavaClassFileType.INSTANCE);
         }
       }
       return contents;
@@ -203,7 +203,10 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
                               @NotNull DiffContext context, @NotNull DiffRequest request) {
     //Check diff viewer type for refactoring
     Boolean isRefactoring = request.getUserData(REFACTORING);
+
+    //Fold Move Method refactorings in the base diff that contains the information about all changes in the file.
     if (isRefactoring == null) {
+      RefactoringFolder.foldRefactorings(viewer, request);
       return;
     }
 
@@ -251,7 +254,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
           //  Highlight offsets
           myViewer.getEditor2().getMarkupModel()
               .addRangeHighlighter(moreSidedRange.startOffsetRight, moreSidedRange.endOffsetRight,
-                  3, offsetColors, HighlighterTargetArea.EXACT_RANGE);
+                                   3, offsetColors, HighlighterTargetArea.EXACT_RANGE);
         }
       });
 
@@ -329,7 +332,7 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       //Instantiate editor
       DocumentContent content = (DocumentContent) pair.first.content;
       Editor editor = EditorFactory.getInstance().createEditor(content.getDocument(),
-          pair.second, JavaFileType.INSTANCE, true);
+                                                               pair.second, JavaFileType.INSTANCE, true);
 
       //Get highlight colors corresponding with theme and revision
       EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
@@ -348,7 +351,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       }
       //  Highlight offsets
       editor.getMarkupModel().addRangeHighlighter(pair.first.startOffsetLeft,
-          pair.first.endOffsetLeft, 10, offsetColor, HighlighterTargetArea.EXACT_RANGE);
+                                                  pair.first.endOffsetLeft, 10, offsetColor,
+                                                  HighlighterTargetArea.EXACT_RANGE);
 
       //Set editor size to fit coderange
       int editorSize = editor.getLineHeight()
@@ -438,8 +442,8 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
       oldMarkings.forEach(ThreesideDiffChangeBase::destroy);
       oldMarkings.clear();
       oldMarkings.addAll(ranges.stream()
-          .map(r -> r.getDiffChange(viewer))
-          .collect(Collectors.toList())
+                             .map(r -> r.getDiffChange(viewer))
+                             .collect(Collectors.toList())
       );
       hideToolbarActions(viewer.getComponent());
     }
