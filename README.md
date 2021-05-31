@@ -16,14 +16,14 @@ Currently, it works for the following refactoring types: `Move Method`, `Pull Up
 <img src="assets/img/refactorinsight_hint.png" alt="Example" width="600">
 
 ### Refactorings in commits
-To see refactorings in your Git repository, go to the **Git** tab in IntelliJ IDEA. On the right side, you will see a toggle button ![](assets/img/refactorinsight_toggle.svg).
+To see refactorings in your Git repository, go to the **Git** tab in IntelliJ IDEA and click the toggle button ![](assets/img/refactorinsight_toggle.svg) on the right.
 
 Click a commit and then the ![](assets/img/refactorinsight_toggle.svg) to see the refactorings detected in that commit. It looks like this:
 
 <img src="assets/img/refactorinsight_main.png" alt="Example" width="900">
 
 ### Refactorings in pull requests
-To see the refactorings in a specific pull request, go to the **Pull Requests** tab in IntelliJ IDEA, select any pull request and click the ![](assets/img/refactorinsight_toggle.svg).
+To see the refactorings in a specific pull request, go to the **Pull Requests** tab in IntelliJ IDEA, select any pull request and click ![](assets/img/refactorinsight_toggle.svg).
 
 <img src="assets/img/refactorinsight_pull_requests.png" alt="PullRequests" width="600">
 
