@@ -1,3 +1,7 @@
 /.idea/
 /.gradle/
 /build/
+/plugin/build/
+/common/build
+/java-impl/build/
+/kotlin-impl/build/
