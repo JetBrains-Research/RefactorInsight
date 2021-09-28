@@ -6,3 +6,9 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+rootProject.name = "refactorinsight"
+include('plugin',
+        'common',
+        'java-impl',
+        'kotlin-impl')

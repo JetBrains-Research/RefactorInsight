@@ -1,0 +1,32 @@
+plugins {
+    id 'org.jetbrains.intellij' version '0.7.2'
+}
+
+group = rootProject.group
+version = rootProject.version
+
+intellij {
+    version = '2021.2'
+    plugins = ['java', 'git4idea', "github"]
+    downloadSources true
+    buildSearchableOptions.enabled false
+}
+
+dependencies {
+    implementation(project(":common"))
+    implementation(project(":java-impl"))
+    implementation(project(":kotlin-impl"))
+    implementation 'com.github.JetBrains-Research:kotlinRMiner:v1.2'
+    compile group: 'com.github.tsantalis', name: 'refactoring-miner', version: '2.0'
+    testImplementation('junit:junit:4.13')
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+runIde {
+    maxHeapSize = "4g"
+}
