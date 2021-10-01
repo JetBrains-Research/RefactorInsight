@@ -6,10 +6,9 @@ import org.jetbrains.research.refactorinsight.data.types.classes.*;
 import org.jetbrains.research.refactorinsight.data.types.methods.*;
 import org.jetbrains.research.refactorinsight.data.types.packages.MoveSourceFolderJavaHandler;
 import org.jetbrains.research.refactorinsight.data.types.packages.MoveSourceFolderKotlinHandler;
-import org.jetbrains.research.refactorinsight.data.types.variables.ChangeVariableTypeJavaHandler;
-import org.jetbrains.research.refactorinsight.data.types.variables.ExtractVariableJavaHandler;
-import org.jetbrains.research.refactorinsight.data.types.variables.InlineVariableJavaHandler;
-import org.jetbrains.research.refactorinsight.data.types.variables.RenameVariableJavaHandler;
+import org.jetbrains.research.refactorinsight.data.types.packages.RenamePackageJavaHandler;
+import org.jetbrains.research.refactorinsight.data.types.packages.RenamePackageKotlinHandler;
+import org.jetbrains.research.refactorinsight.data.types.variables.*;
 
 public enum RefactoringType {
   EXTRACT_OPERATION("Extract Method", new ExtractOperationJavaHandler(), new ExtractOperationKotlinHandler()),
@@ -35,18 +34,18 @@ public enum RefactoringType {
   MERGE_OPERATION("Merge Method", null, null),
   EXTRACT_AND_MOVE_OPERATION("Extract And Move Method", new ExtractOperationJavaHandler(), new ExtractOperationKotlinHandler()),
   MOVE_AND_INLINE_OPERATION("Move And Inline Method", new InlineOperationJavaHandler(), new InlineOperationKotlinHandler()),
-  RENAME_PACKAGE("Change Package", new MoveOperationJavaHandler(), new MoveOperationKotlinHandler()),
+  RENAME_PACKAGE("Change Package", new RenamePackageJavaHandler(), new RenamePackageKotlinHandler()),
   EXTRACT_VARIABLE("Extract Variable", new ExtractVariableJavaHandler(), null),
   EXTRACT_ATTRIBUTE("Extract Attribute", new ExtractAttributeJavaHandler(), null),
   INLINE_VARIABLE("Inline Variable", new InlineVariableJavaHandler(), null),
   RENAME_VARIABLE("Rename Variable", new RenameVariableJavaHandler(), null),
   RENAME_PARAMETER("Rename Parameter", new RenameVariableJavaHandler(), null),
   RENAME_ATTRIBUTE("Rename Attribute", new RenameAttributeJavaHandler(), null),
-  MERGE_VARIABLE("Merge Variable", new MoveOperationJavaHandler(), null),
-  MERGE_PARAMETER("Merge Parameter", new MoveOperationJavaHandler(), null),
+  MERGE_VARIABLE("Merge Variable", new MergeVariableJavaHandler(), null),
+  MERGE_PARAMETER("Merge Parameter", new MergeVariableJavaHandler(), null),
   MERGE_ATTRIBUTE("Merge Attribute", new MergeAttributeJavaHandler(), null),
-  SPLIT_VARIABLE("Split Variable", new MoveOperationJavaHandler(), null),
-  SPLIT_PARAMETER("Split Parameter", new MoveOperationJavaHandler(), null),
+  SPLIT_VARIABLE("Split Variable", new SplitVariableJavaHandler(), null),
+  SPLIT_PARAMETER("Split Parameter", new SplitVariableJavaHandler(), null),
   SPLIT_ATTRIBUTE("Split Attribute", new SplitAttributeJavaHandler(), null),
   REPLACE_VARIABLE_WITH_ATTRIBUTE("Replace Variable With Attribute", new RenameVariableJavaHandler(), null),
   PARAMETERIZE_VARIABLE("Parameterize Variable", new RenameVariableJavaHandler(), null),

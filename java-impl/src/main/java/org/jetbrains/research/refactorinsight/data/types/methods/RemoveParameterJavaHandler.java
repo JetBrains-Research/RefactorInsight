@@ -8,11 +8,6 @@ import org.jetbrains.research.refactorinsight.common.data.Group;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.common.utils.StringUtils;
-import org.jetbrains.research.refactorinsight.data.Group;
-import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.data.RefactoringLine;
-import org.jetbrains.research.refactorinsight.data.common.Handler;
-import org.jetbrains.research.refactorinsight.utils.StringUtils;
 import org.refactoringminer.api.Refactoring;
 
 public class RemoveParameterJavaHandler extends Handler {
