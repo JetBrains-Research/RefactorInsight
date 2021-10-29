@@ -12,27 +12,27 @@ import org.refactoringminer.api.Refactoring;
 
 public class RemoveAttributeAnnotationJavaHandler extends Handler {
 
-  @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
-    RemoveAttributeAnnotationRefactoring ref = (RemoveAttributeAnnotationRefactoring) refactoring;
-    UMLAnnotation annotation = ref.getAnnotation();
+    @Override
+    public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+        RemoveAttributeAnnotationRefactoring ref = (RemoveAttributeAnnotationRefactoring) refactoring;
+        UMLAnnotation annotation = ref.getAnnotation();
 
-    String classNameBefore = ref.getAttributeBefore().getClassName();
-    String classNameAfter = ref.getAttributeAfter().getClassName();
+        String classNameBefore = ref.getAttributeBefore().getClassName();
+        String classNameAfter = ref.getAttributeAfter().getClassName();
 
-    return info.setGroup(Group.ATTRIBUTE)
-        .setDetailsBefore(classNameBefore)
-        .setDetailsAfter(classNameAfter)
-        .setNameBefore(ref.getAttributeBefore().getVariableDeclaration().toQualifiedString())
-        .setNameAfter(ref.getAttributeAfter().getVariableDeclaration().toQualifiedString())
-        .setElementBefore(ref.getAnnotation().toString())
-        .setElementAfter(null)
-        .addMarking(
-            new CodeRange(annotation.codeRange()),
-            new CodeRange(ref.getAttributeAfter().codeRange()),
-            line -> line.addOffset(new LocationInfo(annotation.getLocationInfo()), RefactoringLine.MarkingOption.REMOVE),
-            RefactoringLine.MarkingOption.REMOVE,
-            false);
-  }
+        return info.setGroup(Group.ATTRIBUTE)
+                .setDetailsBefore(classNameBefore)
+                .setDetailsAfter(classNameAfter)
+                .setNameBefore(ref.getAttributeBefore().getVariableDeclaration().toQualifiedString())
+                .setNameAfter(ref.getAttributeAfter().getVariableDeclaration().toQualifiedString())
+                .setElementBefore(ref.getAnnotation().toString())
+                .setElementAfter(null)
+                .addMarking(CodeRange.createCodeRangeFromJava(annotation.codeRange()),
+                        CodeRange.createCodeRangeFromJava(ref.getAttributeAfter().codeRange()),
+                        line -> line.addOffset(LocationInfo.createLocationInfoFromJava(annotation.getLocationInfo()),
+                                RefactoringLine.MarkingOption.REMOVE),
+                        RefactoringLine.MarkingOption.REMOVE,
+                        false);
+    }
 
 }

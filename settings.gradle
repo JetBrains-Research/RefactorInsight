@@ -8,7 +8,6 @@ pluginManagement {
 }
 
 rootProject.name = "refactorinsight"
-include('plugin',
-        'common',
+include('common',
         'java-impl',
         'kotlin-impl')

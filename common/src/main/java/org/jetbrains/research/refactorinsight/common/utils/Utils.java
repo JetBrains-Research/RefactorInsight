@@ -2,51 +2,26 @@ package org.jetbrains.research.refactorinsight.common.utils;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.vcs.LocalFilePath;
 import com.intellij.openapi.vcs.VcsException;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.vcs.log.impl.VcsLogManager;
-import com.intellij.vcs.log.impl.VcsProjectLog;
 import git4idea.GitContentRevision;
 import git4idea.GitRevisionNumber;
-import git4idea.repo.GitRepository;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import gr.uom.java.xmi.decomposition.AbstractStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+
 public class Utils {
 
-    public static ToolWindowManager manager;
     /**
      * Used for storing and disposing the MainVcsLogs used for method history action.
      */
     private static final ArrayList<Disposable> logs = new ArrayList<>();
-
-    /**
-     * Method used for disposing the logs that were created and shown for the method history action.
-     * Called when the project is closing.
-     * Avoids memory leaks.
-     */
-    public static void dispose() {
-        for (Disposable log : logs) {
-            Disposer.dispose(log);
-        }
-    }
 
     /**
      * Adds a Disposable object to the list.
@@ -55,15 +30,6 @@ public class Utils {
      */
     public static void add(Disposable log) {
         logs.add(log);
-    }
-
-    /**
-     * Sorts the info list for a better displaying.
-     *
-     * @param infos to be sorted.
-     */
-    public static void chronologicalOrder(List<RefactoringInfo> infos) {
-        infos.sort(Comparator.comparingLong(o -> o.getEntry().getTimeStamp()));
     }
 
     /**
@@ -170,27 +136,27 @@ public class Utils {
      */
     public static RefactoringInfo getMainRefactoringInfo(List<RefactoringInfo> infos) {
         RefactoringInfo info = null;
-        if (infos.stream().anyMatch(ofType(RENAME_ATTRIBUTE))
-                && infos.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
-            info = infos.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
-            //TODO info.setType(RefactoringType.RENAME_AND_CHANGE_ATTRIBUTE_TYPE);
-        } else if (infos.stream().anyMatch(ofType(RENAME_ATTRIBUTE))) {
-            info = infos.stream().filter(ofType(RENAME_ATTRIBUTE)).findFirst().get();
-        } else if (infos.stream().anyMatch(ofType(CHANGE_ATTRIBUTE_TYPE))) {
-            info = infos.stream().filter(ofType(CHANGE_ATTRIBUTE_TYPE)).findFirst().get();
-        } else if (infos.stream().anyMatch(ofType(CHANGE_VARIABLE_TYPE))) {
-            info = infos.stream().filter(ofType(CHANGE_VARIABLE_TYPE)).findFirst().get();
-          //TODO  info.setType(RefactoringType.RENAME_AND_CHANGE_VARIABLE_TYPE);
-        } else if (infos.stream().anyMatch(ofType(RENAME_PARAMETER))
-                && infos.stream().anyMatch(ofType(CHANGE_PARAMETER_TYPE))) {
-            info = infos.stream().filter(ofType(RENAME_PARAMETER)).findFirst().get();
-         //TODO   info.setType(RefactoringType.RENAME_AND_CHANGE_PARAMETER_TYPE);
+        if (infos.stream().anyMatch(ofType("Rename Attribute"))
+                && infos.stream().anyMatch(ofType("Change Attribute Type"))) {
+            info = infos.stream().filter(ofType("Rename Attribute")).findFirst().get();
+            info.setType("Rename and Change Attribute Type");
+        } else if (infos.stream().anyMatch(ofType("Rename Attribute"))) {
+            info = infos.stream().filter(ofType("Rename Attribute")).findFirst().get();
+        } else if (infos.stream().anyMatch(ofType("Change Attribute Type"))) {
+            info = infos.stream().filter(ofType("Change Attribute Type")).findFirst().get();
+        } else if (infos.stream().anyMatch(ofType("Change Variable Type"))) {
+            info = infos.stream().filter(ofType("Change Variable Type")).findFirst().get();
+            info.setType("Rename and Change Variable Type");
+        } else if (infos.stream().anyMatch(ofType("Rename Parameter"))
+                && infos.stream().anyMatch(ofType("Change Parameter Type"))) {
+            info = infos.stream().filter(ofType("Rename Parameter")).findFirst().get();
+            info.setType("Rename and Change Parameter Type");
         }
         return info;
     }
 
-    private static Predicate<RefactoringInfo> ofType(RefactoringType type) {
-        return (r) -> r.getType().name().equals(type.name());
+    private static Predicate<RefactoringInfo> ofType(String type) {
+        return (r) -> r.getType().equals(type);
     }
 
     /**
@@ -282,40 +248,6 @@ public class Utils {
     }
 
     /**
-     * Get the total amount of commits in a repository.
-     *
-     * @param repository GitRepository
-     * @return the amount of commits
-     * @throws IOException in case of a problem
-     */
-    public static int getCommitCount(GitRepository repository) throws IOException {
-        Process process = Runtime.getRuntime().exec("git rev-list --all --count", null,
-                new File(repository.getRoot().getCanonicalPath()));
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String output = reader.readLine();
-        return Integer.parseInt(output);
-    }
-
-    /**
-     * Disposes the Vcs Log panel.
-     */
-    public static void disposeWithVcsLogManager(@NotNull Project project, @NotNull Disposable disposable) {
-        Disposable connectionDisposable = Disposer.newDisposable();
-        project.getMessageBus().connect(connectionDisposable)
-                .subscribe(VcsProjectLog.VCS_PROJECT_LOG_CHANGED, new VcsProjectLog.ProjectLogListener() {
-                    @Override
-                    public void logCreated(@NotNull VcsLogManager manager) {
-                    }
-
-                    @Override
-                    public void logDisposed(@NotNull VcsLogManager manager) {
-                        Disposer.dispose(connectionDisposable);
-                        Disposer.dispose(disposable);
-                    }
-                });
-    }
-
-    /**
      * Check if Java statements lists equal using equalFragment function.
      */
     public static boolean isStatementsEqualJava(@NotNull List<AbstractStatement> statementsBefore,
@@ -348,24 +280,4 @@ public class Utils {
         }
     }
 
-    /**
-     * Skip packages in qualified name.
-     * Assumes the package name starts with a lowercase letter and the class name starts with an uppercase letter.
-     */
-    @NotNull
-    public static String skipPackages(@NotNull String qualifiedName) {
-        return Arrays.stream(qualifiedName.split("\\."))
-                .dropWhile(element -> element.isEmpty() || Character.isLowerCase(element.charAt(0)))
-                .collect(Collectors.joining("."));
-    }
-
-    /**
-     * Get function simple name with empty parenthesis.
-     */
-    @NotNull
-    public static String functionSimpleName(@NotNull String qualifiedName) {
-        int nameBegin = qualifiedName.lastIndexOf('.') + 1;
-        int nameEnd = qualifiedName.indexOf('(', nameBegin);
-        return qualifiedName.substring(nameBegin, nameEnd) + "()";
-    }
 }

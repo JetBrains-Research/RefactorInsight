@@ -1,55 +1,49 @@
 package org.jetbrains.research.refactorinsight.common.adapters;
 
 public class CodeRange {
-  private final int startLine;
-  private final int endLine;
-  private final int startColumn;
-  private final int endColumn;
-  private final String filePath;
+    private final int startLine;
+    private final int endLine;
+    private final int startColumn;
+    private final int endColumn;
+    private final String filePath;
 
-  /**
-   * Creates a wrapper for CodeRange instance provided by RefactoringMiner.
-   *
-   * @param codeRange from RefactoringMiner.
-   */
-  public CodeRange(gr.uom.java.xmi.diff.CodeRange codeRange) {
-    this.startLine = codeRange.getStartLine();
-    this.endLine = codeRange.getEndLine();
-    this.startColumn = codeRange.getStartColumn();
-    this.endColumn = codeRange.getEndColumn();
-    this.filePath = codeRange.getFilePath();
-  }
+    public CodeRange(int startLine, int endLine, int startColumn, int endColumn, String filePath) {
+        this.startLine = startLine;
+        this.endLine = endLine;
+        this.startColumn = startColumn;
+        this.endColumn = endColumn;
+        this.filePath = filePath;
+    }
 
-  /**
-   * Creates a wrapper for CodeRange instance provided by kotlinRMiner.
-   *
-   * @param codeRange from kotlinRMiner.
-   */
-  public CodeRange(org.jetbrains.research.kotlinrminer.diff.CodeRange codeRange) {
-    this.startLine = codeRange.getStartLine();
-    this.endLine = codeRange.getEndLine();
-    this.startColumn = codeRange.getStartColumn();
-    this.endColumn = codeRange.getEndColumn();
-    this.filePath = codeRange.getFilePath();
-  }
+    public static CodeRange createCodeRangeFromJava(gr.uom.java.xmi.diff.CodeRange codeRange) {
+        return new CodeRange(codeRange.getStartLine(), codeRange.getEndLine(),
+                codeRange.getStartColumn(), codeRange.getEndColumn(),
+                codeRange.getFilePath());
+    }
 
-  public int getStartLine() {
-    return startLine;
-  }
+    public static CodeRange createCodeRangeFromKotlin(org.jetbrains.research.kotlinrminer.diff.CodeRange codeRange) {
+        return new CodeRange(codeRange.getStartLine(), codeRange.getEndLine(),
+                codeRange.getStartColumn(), codeRange.getEndColumn(),
+                codeRange.getFilePath());
+    }
 
-  public int getEndLine() {
-    return endLine;
-  }
+    public int getStartLine() {
+        return startLine;
+    }
 
-  public int getStartColumn() {
-    return startColumn;
-  }
+    public int getEndLine() {
+        return endLine;
+    }
 
-  public int getEndColumn() {
-    return endColumn;
-  }
+    public int getStartColumn() {
+        return startColumn;
+    }
 
-  public String getFilePath() {
-    return filePath;
-  }
+    public int getEndColumn() {
+        return endColumn;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
 }

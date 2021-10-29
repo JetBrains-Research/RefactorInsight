@@ -13,29 +13,28 @@ import org.refactoringminer.api.Refactoring;
 
 public class AddMethodAnnotationJavaHandler extends Handler {
 
-  @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
-    AddMethodAnnotationRefactoring ref = (AddMethodAnnotationRefactoring) refactoring;
-    UMLAnnotation annotation = ref.getAnnotation();
+    @Override
+    public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+        AddMethodAnnotationRefactoring ref = (AddMethodAnnotationRefactoring) refactoring;
+        UMLAnnotation annotation = ref.getAnnotation();
 
-    String classNameBefore = ref.getOperationBefore().getClassName();
-    String classNameAfter = ref.getOperationAfter().getClassName();
+        String classNameBefore = ref.getOperationBefore().getClassName();
+        String classNameAfter = ref.getOperationAfter().getClassName();
 
-    return info.setGroup(Group.METHOD)
-        .setDetailsBefore(classNameBefore)
-        .setDetailsAfter(classNameAfter)
-        .setElementBefore(annotation.toString())
-        .setElementAfter(null)
-        .addMarking(
-            new CodeRange(ref.getOperationBefore().codeRange()),
-            new CodeRange(annotation.codeRange()),
-            line -> line.addOffset(
-                new LocationInfo(annotation.getLocationInfo()),
-                RefactoringLine.MarkingOption.ADD),
-            RefactoringLine.MarkingOption.ADD,
-            false)
-        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()));
-  }
+        return info.setGroup(Group.METHOD)
+                .setDetailsBefore(classNameBefore)
+                .setDetailsAfter(classNameAfter)
+                .setElementBefore(annotation.toString())
+                .setElementAfter(null)
+                .addMarking(CodeRange.createCodeRangeFromJava(ref.getOperationBefore().codeRange()),
+                        CodeRange.createCodeRangeFromJava(annotation.codeRange()),
+                        line -> line.addOffset(
+                                LocationInfo.createLocationInfoFromJava(annotation.getLocationInfo()),
+                                RefactoringLine.MarkingOption.ADD),
+                        RefactoringLine.MarkingOption.ADD,
+                        false)
+                .setNameBefore(StringUtils.calculateSignatureForJavaMethod(ref.getOperationBefore()))
+                .setNameAfter(StringUtils.calculateSignatureForJavaMethod(ref.getOperationAfter()));
+    }
 
 }

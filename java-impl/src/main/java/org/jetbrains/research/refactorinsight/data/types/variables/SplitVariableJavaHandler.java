@@ -13,28 +13,29 @@ import java.util.stream.Collectors;
 
 public class SplitVariableJavaHandler extends Handler {
 
-  @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
-    SplitVariableRefactoring ref = (SplitVariableRefactoring) refactoring;
+    @Override
+    public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+        SplitVariableRefactoring ref = (SplitVariableRefactoring) refactoring;
 
-    ref.getSplitVariables().forEach(var ->
-        info.addMarking(new CodeRange(ref.getOldVariable().codeRange()), new CodeRange(var.codeRange()), true));
+        ref.getSplitVariables().forEach(var ->
+                info.addMarking(CodeRange.createCodeRangeFromJava(ref.getOldVariable().codeRange()),
+                        CodeRange.createCodeRangeFromJava(var.codeRange()),
+                        true));
 
-    if (ref.getOldVariable().isParameter()) {
-      info.setGroup(Group.METHOD)
-          .setDetailsBefore(ref.getOperationBefore().getClassName())
-          .setDetailsAfter(ref.getOperationAfter().getClassName());
-    } else {
-      info.setGroup(Group.VARIABLE);
+        if (ref.getOldVariable().isParameter()) {
+            info.setGroup(Group.METHOD)
+                    .setDetailsBefore(ref.getOperationBefore().getClassName())
+                    .setDetailsAfter(ref.getOperationAfter().getClassName());
+        } else {
+            info.setGroup(Group.VARIABLE);
+        }
+
+        return info.setNameBefore(StringUtils.calculateSignatureForJavaMethod(ref.getOperationBefore()))
+                .setNameAfter(StringUtils.calculateSignatureForJavaMethod(ref.getOperationAfter()))
+                .setElementBefore(ref.getOldVariable().getVariableDeclaration().toQualifiedString())
+                .setElementAfter(ref.getSplitVariables().stream()
+                        .map(VariableDeclaration::getVariableName)
+                        .collect(Collectors.joining()));
     }
-
-    return info
-        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
-        .setElementBefore(ref.getOldVariable().getVariableDeclaration().toQualifiedString())
-        .setElementAfter(ref.getSplitVariables().stream()
-            .map(VariableDeclaration::getVariableName)
-            .collect(Collectors.joining()));
-  }
 
 }

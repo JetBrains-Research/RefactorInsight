@@ -11,26 +11,24 @@ import org.refactoringminer.api.Refactoring;
 
 public class RenameAttributeJavaHandler extends Handler {
 
-  @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
-    RenameAttributeRefactoring ref = (RenameAttributeRefactoring) refactoring;
+    @Override
+    public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+        RenameAttributeRefactoring ref = (RenameAttributeRefactoring) refactoring;
 
-    String classNameBefore = ref.getClassNameBefore();
-    String classNameAfter = ref.getClassNameAfter();
+        String classNameBefore = ref.getClassNameBefore();
+        String classNameAfter = ref.getClassNameAfter();
 
-    return info.setGroup(Group.ATTRIBUTE)
-        .setGroupId(ref.getClassNameAfter() + "." + ref.getRenamedAttribute().getVariableDeclaration().getVariableName())
-        .addMarking(new CodeRange(ref.getOriginalAttribute().codeRange()),
-            new CodeRange(ref.getRenamedAttribute().codeRange()),
-            line -> line.addOffset(new LocationInfo(ref.getOriginalAttribute().getLocationInfo()),
-
-                new LocationInfo(ref.getRenamedAttribute().getLocationInfo())),
-            RefactoringLine.MarkingOption.NONE, true)
-        .setNameBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())
-        .setNameAfter(ref.getRenamedAttribute().getVariableDeclaration().toQualifiedString())
-        .setDetailsBefore(classNameBefore)
-        .setDetailsAfter(classNameAfter);
-
-  }
+        return info.setGroup(Group.ATTRIBUTE)
+                .setGroupId(ref.getClassNameAfter() + "." + ref.getRenamedAttribute().getVariableName())
+                .addMarking(CodeRange.createCodeRangeFromJava(ref.getOriginalAttribute().codeRange()),
+                        CodeRange.createCodeRangeFromJava(ref.getRenamedAttribute().codeRange()),
+                        line -> line.addOffset(LocationInfo.createLocationInfoFromJava(ref.getOriginalAttribute().getLocationInfo()),
+                                LocationInfo.createLocationInfoFromJava(ref.getRenamedAttribute().getLocationInfo())),
+                        RefactoringLine.MarkingOption.NONE, true)
+                .setNameBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())
+                .setNameAfter(ref.getRenamedAttribute().getVariableDeclaration().toQualifiedString())
+                .setDetailsBefore(classNameBefore)
+                .setDetailsAfter(classNameAfter);
+    }
 
 }

@@ -13,28 +13,28 @@ import java.util.stream.Collectors;
 
 public class MergeVariableJavaHandler extends Handler {
 
-  @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
-    MergeVariableRefactoring ref = (MergeVariableRefactoring) refactoring;
+    @Override
+    public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+        MergeVariableRefactoring ref = (MergeVariableRefactoring) refactoring;
 
-    ref.getMergedVariables().forEach(var ->
-        info.addMarking(new CodeRange(var.codeRange()), new CodeRange(ref.getNewVariable().codeRange()), true));
+        ref.getMergedVariables().forEach(var ->
+                info.addMarking(CodeRange.createCodeRangeFromJava(var.codeRange()),
+                        CodeRange.createCodeRangeFromJava(ref.getNewVariable().codeRange()),
+                        true));
 
-    if (ref.getNewVariable().isParameter()) {
-      info.setGroup(Group.METHOD)
-          .setDetailsBefore(ref.getOperationBefore().getClassName())
-          .setDetailsAfter(ref.getOperationAfter().getClassName());
-    } else {
-      info.setGroup(Group.VARIABLE);
+        if (ref.getNewVariable().isParameter()) {
+            info.setGroup(Group.METHOD)
+                    .setDetailsBefore(ref.getOperationBefore().getClassName())
+                    .setDetailsAfter(ref.getOperationAfter().getClassName());
+        } else {
+            info.setGroup(Group.VARIABLE);
+        }
+
+        return info.setElementBefore(ref.getMergedVariables().stream().map(
+                        VariableDeclaration::getVariableName).collect(Collectors.joining()))
+                .setElementAfter(ref.getNewVariable().getVariableDeclaration().toQualifiedString())
+                .setNameBefore(StringUtils.calculateSignatureForJavaMethod(ref.getOperationBefore()))
+                .setNameAfter(StringUtils.calculateSignatureForJavaMethod(ref.getOperationAfter()));
     }
-
-    return info
-        .setElementBefore(ref.getMergedVariables().stream().map(
-            VariableDeclaration::getVariableName).collect(
-            Collectors.joining()))
-        .setElementAfter(ref.getNewVariable().getVariableDeclaration().toQualifiedString())
-        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()));
-  }
 
 }

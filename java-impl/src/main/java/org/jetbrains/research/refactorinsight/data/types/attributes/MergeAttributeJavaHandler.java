@@ -1,6 +1,5 @@
 package org.jetbrains.research.refactorinsight.data.types.attributes;
 
-import gr.uom.java.xmi.UMLAttribute;
 import gr.uom.java.xmi.decomposition.VariableDeclaration;
 import gr.uom.java.xmi.diff.MergeAttributeRefactoring;
 import org.jetbrains.research.refactorinsight.common.Handler;
@@ -13,25 +12,26 @@ import java.util.stream.Collectors;
 
 public class MergeAttributeJavaHandler extends Handler {
 
-  @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
-    MergeAttributeRefactoring ref = (MergeAttributeRefactoring) refactoring;
+    @Override
+    public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+        MergeAttributeRefactoring ref = (MergeAttributeRefactoring) refactoring;
 
-    String classNameAfter = ref.getClassNameAfter();
-    String classNameBefore = ref.getClassNameBefore();
+        String classNameAfter = ref.getClassNameAfter();
+        String classNameBefore = ref.getClassNameBefore();
 
-    ref.getMergedAttributes().forEach(attr ->
-        info.addMarking(new CodeRange(attr.codeRange()), new CodeRange(ref.getNewAttribute().codeRange()), true));
+        ref.getMergedAttributes().forEach(attr ->
+                info.addMarking(CodeRange.createCodeRangeFromJava(attr.codeRange()),
+                        CodeRange.createCodeRangeFromJava(ref.getNewAttribute().codeRange()),
+                        true));
 
-    return info.setGroup(Group.ATTRIBUTE)
-        .setDetailsBefore(classNameBefore)
-        .setDetailsAfter(classNameAfter)
-        .setNameBefore(ref.getMergedAttributes().stream()
-                .map(UMLAttribute::getVariableDeclaration)
-                .map(VariableDeclaration::getVariableName)
-                .collect(Collectors.joining()))
-        .setNameAfter(ref.getNewAttribute().getVariableDeclaration().getVariableName());
+        return info.setGroup(Group.ATTRIBUTE)
+                .setDetailsBefore(classNameBefore)
+                .setDetailsAfter(classNameAfter)
+                .setNameBefore(ref.getMergedAttributes().stream()
+                        .map(VariableDeclaration::getVariableName)
+                        .collect(Collectors.joining()))
+                .setNameAfter(ref.getNewAttribute().getVariableDeclaration().getVariableName());
 
-  }
+    }
 
 }
