@@ -12,29 +12,28 @@ import org.jetbrains.research.refactorinsight.common.utils.StringUtils;
 
 public class RemoveParameterKotlinHandler extends Handler {
 
-  @Override
-  public RefactoringInfo specify(Refactoring refactoring,
-                                 RefactoringInfo info) {
-    RemoveParameterRefactoring ref =
-        (RemoveParameterRefactoring) refactoring;
+    @Override
+    public RefactoringInfo specify(Refactoring refactoring,
+                                   RefactoringInfo info) {
+        RemoveParameterRefactoring ref =
+                (RemoveParameterRefactoring) refactoring;
 
-    String classNameBefore = ref.getOperationBefore().getClassName();
-    String classNameAfter = ref.getOperationAfter().getClassName();
+        String classNameBefore = ref.getOperationBefore().getClassName();
+        String classNameAfter = ref.getOperationAfter().getClassName();
 
-    return info.setGroup(Group.METHOD)
-        .setDetailsBefore(classNameBefore)
-        .setDetailsAfter(classNameAfter)
-        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
-        .setElementBefore(ref.getParameter().getVariableDeclaration().toQualifiedString())
-        .setElementAfter(null)
-        .addMarking(new CodeRange(ref.getOperationBefore().codeRange()),
-            new CodeRange(ref.getOperationAfter().codeRange()),
-            line -> line.addOffset(
-                new LocationInfo(ref.getParameter().getVariableDeclaration().getLocationInfo()),
-                RefactoringLine.MarkingOption.REMOVE)
-                .setHasColumns(false),
-            RefactoringLine.MarkingOption.NONE, true);
-  }
+        return info.setGroup(Group.METHOD)
+                .setDetailsBefore(classNameBefore)
+                .setDetailsAfter(classNameAfter)
+                .setNameBefore(StringUtils.calculateSignatureForKotlinMethod(ref.getOperationBefore()))
+                .setNameAfter(StringUtils.calculateSignatureForKotlinMethod(ref.getOperationAfter()))
+                .setElementBefore(ref.getParameter().getVariableDeclaration().toQualifiedString())
+                .setElementAfter(null)
+                .addMarking(CodeRange.createCodeRangeFromKotlin(ref.getOperationBefore().codeRange()),
+                        CodeRange.createCodeRangeFromKotlin(ref.getOperationAfter().codeRange()),
+                        line -> line.addOffset(
+                                LocationInfo.createLocationInfoFromKotlin(ref.getParameter().getVariableDeclaration().getLocationInfo()),
+                                RefactoringLine.MarkingOption.REMOVE).setHasColumns(false),
+                        RefactoringLine.MarkingOption.NONE, true);
+    }
 
 }

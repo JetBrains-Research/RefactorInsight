@@ -10,23 +10,23 @@ import org.refactoringminer.api.Refactoring;
 
 public class ModifyMethodAnnotationJavaHandler extends Handler {
 
-  @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
-    ModifyMethodAnnotationRefactoring ref = (ModifyMethodAnnotationRefactoring) refactoring;
+    @Override
+    public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+        ModifyMethodAnnotationRefactoring ref = (ModifyMethodAnnotationRefactoring) refactoring;
 
-    String classNameBefore = ref.getOperationBefore().getClassName();
-    String classNameAfter = ref.getOperationAfter().getClassName();
+        String classNameBefore = ref.getOperationBefore().getClassName();
+        String classNameAfter = ref.getOperationAfter().getClassName();
 
-    return info.setGroup(Group.METHOD)
-        .setDetailsBefore(classNameBefore)
-        .setDetailsAfter(classNameAfter)
-        .setElementBefore(ref.getAnnotationBefore().toString())
-        .setElementAfter(ref.getAnnotationAfter().toString())
-        .addMarking(new CodeRange(ref.getAnnotationBefore().codeRange()),
-            new CodeRange(ref.getAnnotationAfter().codeRange()),
-            true)
-        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()));
-  }
+        return info.setGroup(Group.METHOD)
+                .setDetailsBefore(classNameBefore)
+                .setDetailsAfter(classNameAfter)
+                .setElementBefore(ref.getAnnotationBefore().toString())
+                .setElementAfter(ref.getAnnotationAfter().toString())
+                .addMarking(CodeRange.createCodeRangeFromJava(ref.getAnnotationBefore().codeRange()),
+                        CodeRange.createCodeRangeFromJava(ref.getAnnotationAfter().codeRange()),
+                        true)
+                .setNameBefore(StringUtils.calculateSignatureForJavaMethod(ref.getOperationBefore()))
+                .setNameAfter(StringUtils.calculateSignatureForJavaMethod(ref.getOperationAfter()));
+    }
 
 }

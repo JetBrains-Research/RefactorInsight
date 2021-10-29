@@ -10,22 +10,23 @@ import org.refactoringminer.api.Refactoring;
 
 public class ModifyParameterAnnotationJavaHandler extends Handler {
 
-  @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
-    ModifyVariableAnnotationRefactoring ref = (ModifyVariableAnnotationRefactoring) refactoring;
-    String classNameBefore = ref.getOperationBefore().getClassName();
-    String classNameAfter = ref.getOperationAfter().getClassName();
+    @Override
+    public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+        ModifyVariableAnnotationRefactoring ref = (ModifyVariableAnnotationRefactoring) refactoring;
+        String classNameBefore = ref.getOperationBefore().getClassName();
+        String classNameAfter = ref.getOperationAfter().getClassName();
 
-    return info.setGroup(Group.METHOD)
-        .setDetailsBefore(classNameBefore)
-        .setDetailsAfter(classNameAfter)
-        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
-        .setElementAfter(ref.getAnnotationAfter().toString() + " for parameter "
-            + ref.getVariableAfter().getVariableName())
-        .setElementBefore(ref.getAnnotationBefore().toString())
-        .addMarking(new CodeRange(ref.getAnnotationBefore().codeRange()),
-            new CodeRange(ref.getAnnotationAfter().codeRange()), true);
-  }
+        return info.setGroup(Group.METHOD)
+                .setDetailsBefore(classNameBefore)
+                .setDetailsAfter(classNameAfter)
+                .setNameBefore(StringUtils.calculateSignatureForJavaMethod(ref.getOperationBefore()))
+                .setNameAfter(StringUtils.calculateSignatureForJavaMethod(ref.getOperationAfter()))
+                .setElementAfter(ref.getAnnotationAfter().toString() + " for parameter "
+                        + ref.getVariableAfter().getVariableName())
+                .setElementBefore(ref.getAnnotationBefore().toString())
+                .addMarking(CodeRange.createCodeRangeFromJava(ref.getAnnotationBefore().codeRange()),
+                        CodeRange.createCodeRangeFromJava(ref.getAnnotationAfter().codeRange()),
+                        true);
+    }
 
 }

@@ -15,38 +15,34 @@ import java.util.List;
 
 public class PushDownOperationJavaHandler extends Handler {
 
-  @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
-    PushDownOperationRefactoring ref = (PushDownOperationRefactoring) refactoring;
+    @Override
+    public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+        PushDownOperationRefactoring ref = (PushDownOperationRefactoring) refactoring;
 
-    info.setFoldingDescriptorBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
-    info.setFoldingDescriptorAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
+        List<AbstractStatement> statementsBefore =
+                ref.getOriginalOperation().getBody().getCompositeStatement().getStatements();
+        List<AbstractStatement> statementsAfter =
+                ref.getMovedOperation().getBody().getCompositeStatement().getStatements();
+        info.setChanged(!Utils.isStatementsEqualJava(statementsBefore, statementsAfter));
 
-    List<AbstractStatement> statementsBefore =
-        ref.getOriginalOperation().getBody().getCompositeStatement().getStatements();
-    List<AbstractStatement> statementsAfter =
-        ref.getMovedOperation().getBody().getCompositeStatement().getStatements();
-    info.setChanged(!Utils.isStatementsEqualJava(statementsBefore, statementsAfter));
+        String classBefore = ref.getOriginalOperation().getClassName();
+        String classAfter = ref.getMovedOperation().getClassName();
 
-    String classBefore = ref.getOriginalOperation().getClassName();
-    String classAfter = ref.getMovedOperation().getClassName();
-
-    return info.setGroup(Group.METHOD)
-        .setDetailsBefore(classBefore)
-        .setDetailsAfter(classAfter)
-        .addMarking(
-            new CodeRange(ref.getOriginalOperation().codeRange()),
-            new CodeRange(ref.getMovedOperation().codeRange()),
-            refactoringLine -> refactoringLine.setWord(new String[]{
-                ref.getOriginalOperation().getName(),
-                null,
-                ref.getMovedOperation().getName()
-            }),
-            RefactoringLine.MarkingOption.COLLAPSE,
-            true)
-        .setNameBefore(StringUtils.calculateSignature(ref.getOriginalOperation()))
-        .setNameAfter(StringUtils.calculateSignature(ref.getMovedOperation()));
-
-  }
+        return info.setGroup(Group.METHOD)
+                .setDetailsBefore(classBefore)
+                .setDetailsAfter(classAfter)
+                .addMarking(
+                        CodeRange.createCodeRangeFromJava(ref.getOriginalOperation().codeRange()),
+                        CodeRange.createCodeRangeFromJava(ref.getMovedOperation().codeRange()),
+                        refactoringLine -> refactoringLine.setWord(new String[]{
+                                ref.getOriginalOperation().getName(),
+                                null,
+                                ref.getMovedOperation().getName()
+                        }),
+                        RefactoringLine.MarkingOption.COLLAPSE,
+                        true)
+                .setNameBefore(StringUtils.calculateSignatureForJavaMethod(ref.getOriginalOperation()))
+                .setNameAfter(StringUtils.calculateSignatureForJavaMethod(ref.getMovedOperation()));
+    }
 
 }

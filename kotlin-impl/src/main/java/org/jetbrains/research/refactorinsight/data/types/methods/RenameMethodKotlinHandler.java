@@ -13,42 +13,41 @@ import java.util.List;
 
 public class RenameMethodKotlinHandler extends Handler {
 
-  @Override
-  public RefactoringInfo specify(Refactoring refactoring,
-                                 RefactoringInfo info) {
-    RenameOperationRefactoring ref =
-        (RenameOperationRefactoring) refactoring;
+    @Override
+    public RefactoringInfo specify(Refactoring refactoring,
+                                   RefactoringInfo info) {
+        RenameOperationRefactoring ref =
+                (RenameOperationRefactoring) refactoring;
+        String id = ref.getRenamedOperation().getClassName() + ".";
 
-    String id = ref.getRenamedOperation().getClassName() + ".";
-    if (ref.getRenamedOperation().isGetter()) {
-      List<String> variables = ref.getRenamedOperation().getBody().getAllVariables();
-      if (!variables.isEmpty()) {
-        id += variables.get(0);
-        info.setGroupId(id);
-      }
+        if (ref.getRenamedOperation().isGetter()) {
+            List<String> variables = ref.getRenamedOperation().getBody().getAllVariables();
+            if (!variables.isEmpty()) {
+                id += variables.get(0);
+                info.setGroupId(id);
+            }
+        }
+
+        String classNameBefore = ref.getOriginalOperation().getClassName();
+        String classNameAfter = ref.getRenamedOperation().getClassName();
+
+        info.setGroup(Group.METHOD)
+                .setDetailsBefore(classNameBefore)
+                .setDetailsAfter(classNameAfter)
+                .setElementBefore(null)
+                .setElementAfter(null)
+                .setNameBefore(StringUtils.calculateSignatureForKotlinMethod(ref.getOriginalOperation()))
+                .setNameAfter(StringUtils.calculateSignatureForKotlinMethod(ref.getRenamedOperation()));
+
+        return info.addMarking(
+                CodeRange.createCodeRangeFromKotlin(ref.getOriginalOperation().codeRange()),
+                CodeRange.createCodeRangeFromKotlin(ref.getRenamedOperation().codeRange()),
+                refactoringLine -> refactoringLine.setWord(new String[]{ref.getOriginalOperation().getName(),
+                        null,
+                        ref.getRenamedOperation().getName()
+                }),
+                RefactoringLine.MarkingOption.COLLAPSE,
+                true);
     }
-
-    String classNameBefore = ref.getOriginalOperation().getClassName();
-    String classNameAfter = ref.getRenamedOperation().getClassName();
-
-    info.setGroup(Group.METHOD)
-        .setDetailsBefore(classNameBefore)
-        .setDetailsAfter(classNameAfter)
-        .setElementBefore(null)
-        .setElementAfter(null)
-        .setNameBefore(StringUtils.calculateSignature(ref.getOriginalOperation()))
-        .setNameAfter(StringUtils.calculateSignature(ref.getRenamedOperation()));
-
-    return info.addMarking(
-        new CodeRange(ref.getOriginalOperation().codeRange()),
-        new CodeRange(ref.getRenamedOperation().codeRange()),
-        refactoringLine -> refactoringLine.setWord(new String[]{
-            ref.getOriginalOperation().getName(),
-            null,
-            ref.getRenamedOperation().getName()
-        }),
-        RefactoringLine.MarkingOption.COLLAPSE,
-        true);
-  }
 
 }

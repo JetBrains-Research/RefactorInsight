@@ -16,79 +16,78 @@ import java.util.List;
 
 public class ExtractOperationKotlinHandler extends Handler {
 
-  @Override
-  public RefactoringInfo specify(Refactoring refactoring,
-                                 RefactoringInfo info) {
-    ExtractOperationRefactoring ref =
-        (ExtractOperationRefactoring) refactoring;
+    @Override
+    public RefactoringInfo specify(Refactoring refactoring,
+                                   RefactoringInfo info) {
+        ExtractOperationRefactoring ref =
+                (ExtractOperationRefactoring) refactoring;
 
-    //TODO info.setFoldingDescriptorMid(FoldingBuilder.fromMethod(ref.getExtractedOperation()));
+        String classNameBefore = ref.getSourceOperationBeforeExtraction().getClassName();
+        String classNameAfter = ref.getExtractedOperation().getClassName();
 
-    String classNameBefore = ref.getSourceOperationBeforeExtraction().getClassName();
-    String classNameAfter = ref.getExtractedOperation().getClassName();
-    List<String> parameterTypeList = new ArrayList<>();
-    for (UMLType type : ref.getExtractedOperation().getParameterTypeList()) {
-      parameterTypeList.add(type.toString());
+        List<String> parameterTypeList = new ArrayList<>();
+        for (UMLType type : ref.getExtractedOperation().getParameterTypeList()) {
+            parameterTypeList.add(type.toString());
+        }
+
+        String extractedMethod = StringUtils
+                .calculateSignatureWithoutClassName(ref.getExtractedOperation().getName(), parameterTypeList);
+
+        if (ref.getRefactoringType()
+                == org.jetbrains.research.kotlinrminer.api.RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
+            info.setGroup(Group.METHOD)
+                    .setThreeSided(true)
+                    .setDetailsBefore(classNameBefore)
+                    .setDetailsAfter(classNameAfter)
+                    .setElementBefore(extractedMethod)
+                    .setElementAfter(null)
+                    .setNameBefore(StringUtils.calculateSignatureForKotlinMethod(ref.getSourceOperationBeforeExtraction()))
+                    .setNameAfter(StringUtils.calculateSignatureForKotlinMethod(ref.getSourceOperationAfterExtraction()))
+                    .addMarking(CodeRange.createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation()),
+                            CodeRange.createCodeRangeFromKotlin(ref.getExtractedCodeRangeToExtractedOperation()),
+                            CodeRange.createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation()),
+                            VisualizationType.LEFT,
+                            null,
+                            RefactoringLine.MarkingOption.NONE,
+                            true);
+
+            ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
+                    info.addMarking(
+                            CodeRange.createCodeRangeFromKotlin(ref.getSourceOperationCodeRangeBeforeExtraction()),
+                            CodeRange.createCodeRangeFromKotlin(ref.getExtractedOperation().getBody().getCompositeStatement().codeRange()),
+                            CodeRange.createCodeRangeFromKotlin(invocation),
+                            VisualizationType.RIGHT,
+                            refactoringLine -> refactoringLine.setWord(new String[]{
+                                    null,
+                                    ref.getExtractedOperation().getName(),
+                                    null
+                            }),
+                            RefactoringLine.MarkingOption.EXTRACT,
+                            true));
+        } else {
+            info.setGroup(Group.METHOD)
+                    .setDetailsBefore(classNameBefore)
+                    .setDetailsAfter(classNameAfter)
+                    .setElementBefore(extractedMethod)
+                    .setElementAfter(null)
+                    .setNameBefore(StringUtils.calculateSignatureForKotlinMethod(ref.getSourceOperationBeforeExtraction()))
+                    .setNameAfter(StringUtils.calculateSignatureForKotlinMethod(ref.getSourceOperationAfterExtraction()))
+                    .addMarking(CodeRange.createCodeRangeFromKotlin(ref.getSourceOperationCodeRangeBeforeExtraction()),
+                            CodeRange.createCodeRangeFromKotlin(ref.getSourceOperationCodeRangeAfterExtraction()),
+                            false)
+                    .addMarking(CodeRange.createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation()),
+                            CodeRange.createCodeRangeFromKotlin(ref.getExtractedCodeRangeToExtractedOperation()),
+                            true);
+
+            ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
+                    info.addMarking(
+                            CodeRange.createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation()),
+                            CodeRange.createCodeRangeFromKotlin(invocation),
+                            null,
+                            RefactoringLine.MarkingOption.ADD,
+                            true)
+            );
+        }
+        return info;
     }
-
-    String extractedMethod = StringUtils
-        .calculateSignatureWithoutClassName(ref.getExtractedOperation().getName(), parameterTypeList);
-
-    if (ref.getRefactoringType()
-        == org.jetbrains.research.kotlinrminer.api.RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
-      info.setGroup(Group.METHOD)
-          .setThreeSided(true)
-          .setDetailsBefore(classNameBefore)
-          .setDetailsAfter(classNameAfter)
-          .setElementBefore(extractedMethod)
-          .setElementAfter(null)
-          .setNameBefore(StringUtils.calculateSignature(ref.getSourceOperationBeforeExtraction()))
-          .setNameAfter(StringUtils.calculateSignature(ref.getSourceOperationAfterExtraction()))
-          .addMarking(new CodeRange(ref.getExtractedCodeRangeFromSourceOperation()),
-              new CodeRange(ref.getExtractedCodeRangeToExtractedOperation()),
-              new CodeRange(ref.getExtractedCodeRangeFromSourceOperation()),
-              VisualizationType.LEFT,
-              null,
-              RefactoringLine.MarkingOption.NONE,
-              true);
-
-      ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
-          info.addMarking(
-              new CodeRange(ref.getSourceOperationCodeRangeBeforeExtraction()),
-              new CodeRange(ref.getExtractedOperation().getBody().getCompositeStatement().codeRange()),
-              new CodeRange(invocation),
-              VisualizationType.RIGHT,
-              refactoringLine -> refactoringLine.setWord(new String[]{
-                  null,
-                  ref.getExtractedOperation().getName(),
-                  null
-              }),
-              RefactoringLine.MarkingOption.EXTRACT,
-              true));
-    } else {
-      info.setGroup(Group.METHOD)
-          .setDetailsBefore(classNameBefore)
-          .setDetailsAfter(classNameAfter)
-          .setElementBefore(extractedMethod)
-          .setElementAfter(null)
-          .setNameBefore(StringUtils.calculateSignature(ref.getSourceOperationBeforeExtraction()))
-          .setNameAfter(StringUtils.calculateSignature(ref.getSourceOperationAfterExtraction()))
-          .addMarking(new CodeRange(ref.getSourceOperationCodeRangeBeforeExtraction()),
-              new CodeRange(ref.getSourceOperationCodeRangeAfterExtraction()),
-              false)
-          .addMarking(new CodeRange(ref.getExtractedCodeRangeFromSourceOperation()),
-              new CodeRange(ref.getExtractedCodeRangeToExtractedOperation()),
-              true);
-
-      ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
-          info.addMarking(
-              new CodeRange(ref.getExtractedCodeRangeFromSourceOperation()),
-              new CodeRange(invocation),
-              null,
-              RefactoringLine.MarkingOption.ADD,
-              true)
-      );
-    }
-    return info;
-  }
 }

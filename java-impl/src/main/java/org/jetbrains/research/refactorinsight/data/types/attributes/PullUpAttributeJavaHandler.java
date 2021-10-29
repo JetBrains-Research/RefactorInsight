@@ -9,20 +9,21 @@ import org.refactoringminer.api.Refactoring;
 
 public class PullUpAttributeJavaHandler extends Handler {
 
-  @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
-    PullUpAttributeRefactoring ref = (PullUpAttributeRefactoring) refactoring;
+    @Override
+    public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+        PullUpAttributeRefactoring ref = (PullUpAttributeRefactoring) refactoring;
 
-    String classNameBefore = ref.getSourceClassName();
-    String classNameAfter = ref.getTargetClassName();
+        String classNameBefore = ref.getSourceClassName();
+        String classNameAfter = ref.getTargetClassName();
 
-    return info.setGroup(Group.ATTRIBUTE)
-        .setDetailsBefore(classNameBefore)
-        .setDetailsAfter(classNameAfter)
-        .setNameBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())
-        .setNameAfter(ref.getMovedAttribute().getVariableDeclaration().toQualifiedString())
-        .addMarking(new CodeRange(ref.getSourceAttributeCodeRangeBeforeMove()),
-            new CodeRange(ref.getTargetAttributeCodeRangeAfterMove()), true);
-  }
+        return info.setGroup(Group.ATTRIBUTE)
+                .setDetailsBefore(classNameBefore)
+                .setDetailsAfter(classNameAfter)
+                .setNameBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())
+                .setNameAfter(ref.getMovedAttribute().getVariableDeclaration().toQualifiedString())
+                .addMarking(CodeRange.createCodeRangeFromJava(ref.getSourceAttributeCodeRangeBeforeMove()),
+                        CodeRange.createCodeRangeFromJava(ref.getTargetAttributeCodeRangeAfterMove()),
+                        true);
+    }
 
 }

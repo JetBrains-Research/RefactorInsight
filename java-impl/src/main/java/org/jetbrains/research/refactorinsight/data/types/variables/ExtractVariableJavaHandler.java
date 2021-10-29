@@ -10,17 +10,17 @@ import org.refactoringminer.api.Refactoring;
 
 public class ExtractVariableJavaHandler extends Handler {
 
-  @Override
-  public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
-    ExtractVariableRefactoring ref = (ExtractVariableRefactoring) refactoring;
+    @Override
+    public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
+        ExtractVariableRefactoring ref = (ExtractVariableRefactoring) refactoring;
 
-    return info.setGroup(Group.VARIABLE)
-        .setNameBefore(StringUtils.calculateSignature(ref.getOperationBefore()))
-        .setNameAfter(StringUtils.calculateSignature(ref.getOperationAfter()))
-        .setElementBefore(ref.getVariableDeclaration().getVariableDeclaration().toQualifiedString())
-        .setElementAfter(null)
-        .addMarking(new CodeRange(ref.getOperationBefore().getBody().getCompositeStatement().codeRange()),
-            new CodeRange(ref.getExtractedVariableDeclarationCodeRange()), true);
-  }
+        return info.setGroup(Group.VARIABLE)
+                .setNameBefore(StringUtils.calculateSignatureForJavaMethod(ref.getOperationBefore()))
+                .setNameAfter(StringUtils.calculateSignatureForJavaMethod(ref.getOperationAfter()))
+                .setElementBefore(ref.getVariableDeclaration().getVariableDeclaration().toQualifiedString())
+                .setElementAfter(null)
+                .addMarking(CodeRange.createCodeRangeFromJava(ref.getOperationBefore().getBody().getCompositeStatement().codeRange()),
+                        CodeRange.createCodeRangeFromJava(ref.getExtractedVariableDeclarationCodeRange()), true);
+    }
 
 }
