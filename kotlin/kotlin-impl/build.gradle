@@ -1,0 +1,13 @@
+group = rootProject.group
+version = rootProject.version
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation(project(":common"))
+    implementation(project(":kotlin:kotlin-api"))
+    implementation 'com.github.JetBrains-Research:kotlinRMiner:v1.2'
+}

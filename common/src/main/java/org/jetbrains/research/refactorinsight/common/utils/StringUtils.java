@@ -1,9 +1,5 @@
 package org.jetbrains.research.refactorinsight.common.utils;
 
-import gr.uom.java.xmi.UMLOperation;
-import gr.uom.java.xmi.UMLType;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class StringUtils {
@@ -21,32 +17,6 @@ public class StringUtils {
 
     public static String delimiter(int option) {
         return delimiter(option, false);
-    }
-
-    public static String calculateSignatureForJavaMethod(UMLOperation operation) {
-        StringBuilder builder = new StringBuilder();
-        List<String> parameterTypeList = new ArrayList<>();
-        for (UMLType type : operation.getParameterTypeList()) {
-            parameterTypeList.add(type.toString());
-        }
-
-        builder.append(operation.getClassName())
-                .append(".")
-                .append(calculateSignatureWithoutClassName(operation.getName(), parameterTypeList));
-        return builder.toString();
-    }
-
-    public static String calculateSignatureForKotlinMethod(org.jetbrains.research.kotlinrminer.uml.UMLOperation operation) {
-        StringBuilder builder = new StringBuilder();
-        List<String> parameterTypeList = new ArrayList<>();
-        for (org.jetbrains.research.kotlinrminer.uml.UMLType type : operation.getParameterTypeList()) {
-            parameterTypeList.add(type.toString());
-        }
-
-        builder.append(operation.getClassName())
-                .append(".")
-                .append(calculateSignatureWithoutClassName(operation.getName(), parameterTypeList));
-        return builder.toString();
     }
 
     /**

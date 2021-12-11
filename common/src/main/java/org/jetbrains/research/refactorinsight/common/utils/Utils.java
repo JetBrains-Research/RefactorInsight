@@ -8,8 +8,7 @@ import com.intellij.openapi.vcs.LocalFilePath;
 import com.intellij.openapi.vcs.VcsException;
 import git4idea.GitContentRevision;
 import git4idea.GitRevisionNumber;
-import gr.uom.java.xmi.decomposition.AbstractStatement;
-import org.jetbrains.annotations.NotNull;
+//TODO import gr.uom.java.xmi.decomposition.AbstractStatement;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
 
 import java.util.ArrayList;
@@ -245,39 +244,6 @@ public class Utils {
             }
         }
         return 0;
-    }
-
-    /**
-     * Check if Java statements lists equal using equalFragment function.
-     */
-    public static boolean isStatementsEqualJava(@NotNull List<AbstractStatement> statementsBefore,
-                                                @NotNull List<AbstractStatement> statementsAfter) {
-        if (statementsBefore.size() == statementsAfter.size()) {
-            boolean equal = true;
-            for (int i = 0; i < statementsBefore.size() && equal; i++) {
-                equal = statementsBefore.get(i).equalFragment(statementsAfter.get(i));
-            }
-            return equal;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Check if Kotlin statements lists equal using equalFragment function.
-     */
-    public static boolean isStatementsEqualKotlin(
-            @NotNull List<org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement> statementsBefore,
-            @NotNull List<org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement> statementsAfter) {
-        if (statementsBefore.size() == statementsAfter.size()) {
-            boolean equal = true;
-            for (int i = 0; i < statementsBefore.size() && equal; i++) {
-                equal = statementsBefore.get(i).equalFragment(statementsAfter.get(i));
-            }
-            return equal;
-        } else {
-            return false;
-        }
     }
 
 }

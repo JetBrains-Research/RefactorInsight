@@ -17,13 +17,6 @@ intellij {
     buildSearchableOptions.enabled false
 }
 
-dependencies {
-    compile group: 'com.github.tsantalis', name: 'refactoring-miner', version: '2.0'
-    implementation 'com.github.JetBrains-Research:kotlinRMiner:v1.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-}
-
 test {
     useJUnitPlatform()
 }

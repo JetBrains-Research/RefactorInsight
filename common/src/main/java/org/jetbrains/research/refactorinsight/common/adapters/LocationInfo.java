@@ -22,20 +22,6 @@ public class LocationInfo {
         this.length = length;
     }
 
-    public static LocationInfo createLocationInfoFromJava(gr.uom.java.xmi.LocationInfo locationInfo) {
-        return new LocationInfo(locationInfo.getFilePath(), locationInfo.getStartOffset(),
-                locationInfo.getEndOffset(), locationInfo.getStartLine(),
-                locationInfo.getEndLine(), locationInfo.getStartColumn(),
-                locationInfo.getEndColumn(), locationInfo.getLength());
-    }
-
-    public static LocationInfo createLocationInfoFromKotlin(org.jetbrains.research.kotlinrminer.decomposition.LocationInfo locationInfo) {
-        return new LocationInfo(locationInfo.getFilePath(), locationInfo.getStartOffset(),
-                locationInfo.getEndOffset(), locationInfo.getStartLine(),
-                locationInfo.getEndLine(), locationInfo.getStartColumn(),
-                locationInfo.getEndColumn(), locationInfo.getLength());
-    }
-
     public String getFilePath() {
         return filePath;
     }

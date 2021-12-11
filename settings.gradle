@@ -10,5 +10,7 @@ pluginManagement {
 rootProject.name = "refactorinsight"
 include('runner',
         'common',
-        'java-impl',
-        'kotlin-impl')
+        'java:java-api',
+        'java:java-impl',
+        'kotlin:kotlin-api',
+        'kotlin:kotlin-impl')

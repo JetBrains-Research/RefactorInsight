@@ -15,18 +15,6 @@ public class CodeRange {
         this.filePath = filePath;
     }
 
-    public static CodeRange createCodeRangeFromJava(gr.uom.java.xmi.diff.CodeRange codeRange) {
-        return new CodeRange(codeRange.getStartLine(), codeRange.getEndLine(),
-                codeRange.getStartColumn(), codeRange.getEndColumn(),
-                codeRange.getFilePath());
-    }
-
-    public static CodeRange createCodeRangeFromKotlin(org.jetbrains.research.kotlinrminer.diff.CodeRange codeRange) {
-        return new CodeRange(codeRange.getStartLine(), codeRange.getEndLine(),
-                codeRange.getStartColumn(), codeRange.getEndColumn(),
-                codeRange.getFilePath());
-    }
-
     public int getStartLine() {
         return startLine;
     }
