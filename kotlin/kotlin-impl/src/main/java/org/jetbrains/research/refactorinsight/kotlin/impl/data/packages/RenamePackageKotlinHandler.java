@@ -4,7 +4,7 @@ import org.jetbrains.research.kotlinrminer.api.Refactoring;
 import org.jetbrains.research.kotlinrminer.diff.refactoring.RenamePackageRefactoring;
 import org.jetbrains.research.refactorinsight.common.data.Group;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.kotlin.api.KotlinRefactoringHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoringHandler;
 
 public class RenamePackageKotlinHandler extends KotlinRefactoringHandler {
 

@@ -4,12 +4,12 @@ import gr.uom.java.xmi.decomposition.VariableDeclaration;
 import gr.uom.java.xmi.diff.SplitAttributeRefactoring;
 import org.jetbrains.research.refactorinsight.common.data.Group;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.java.api.JavaRefactoringHandler;
+import org.jetbrains.research.refactorinsight.java.impl.data.JavaRefactoringHandler;
 import org.refactoringminer.api.Refactoring;
 
 import java.util.stream.Collectors;
 
-import static org.jetbrains.research.refactorinsight.java.api.util.Utils.createCodeRangeFromJava;
+import static org.jetbrains.research.refactorinsight.java.impl.data.util.Utils.createCodeRangeFromJava;
 
 public class SplitAttributeJavaHandler extends JavaRefactoringHandler {
 

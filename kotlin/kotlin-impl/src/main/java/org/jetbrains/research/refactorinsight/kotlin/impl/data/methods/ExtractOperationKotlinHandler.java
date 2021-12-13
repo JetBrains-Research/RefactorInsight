@@ -8,13 +8,13 @@ import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.common.diff.VisualizationType;
 import org.jetbrains.research.refactorinsight.common.utils.StringUtils;
-import org.jetbrains.research.refactorinsight.kotlin.api.KotlinRefactoringHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoringHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.jetbrains.research.refactorinsight.kotlin.api.util.Utils.calculateSignatureForKotlinMethod;
-import static org.jetbrains.research.refactorinsight.kotlin.api.util.Utils.createCodeRangeFromKotlin;
+import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.Utils.calculateSignatureForKotlinMethod;
+import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.Utils.createCodeRangeFromKotlin;
 
 public class ExtractOperationKotlinHandler extends KotlinRefactoringHandler {
 

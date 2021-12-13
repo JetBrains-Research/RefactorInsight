@@ -3,7 +3,7 @@ package org.jetbrains.research.refactorinsight.java.impl.data.packages;
 import gr.uom.java.xmi.diff.MoveSourceFolderRefactoring;
 import org.jetbrains.research.refactorinsight.common.data.Group;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.java.api.JavaRefactoringHandler;
+import org.jetbrains.research.refactorinsight.java.impl.data.JavaRefactoringHandler;
 import org.refactoringminer.api.Refactoring;
 
 public class MoveSourceFolderJavaHandler extends JavaRefactoringHandler {

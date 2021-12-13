@@ -4,11 +4,11 @@ import org.jetbrains.research.kotlinrminer.api.Refactoring;
 import org.jetbrains.research.kotlinrminer.diff.refactoring.PullUpOperationRefactoring;
 import org.jetbrains.research.refactorinsight.common.data.Group;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.kotlin.api.KotlinRefactoringHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoringHandler;
 
 import java.util.List;
 
-import static org.jetbrains.research.refactorinsight.kotlin.api.util.Utils.*;
+import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.Utils.*;
 
 public class PullUpOperationKotlinHandler extends KotlinRefactoringHandler {
 

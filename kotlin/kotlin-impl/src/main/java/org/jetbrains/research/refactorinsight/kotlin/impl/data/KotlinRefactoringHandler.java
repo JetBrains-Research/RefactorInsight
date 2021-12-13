@@ -1,13 +1,13 @@
-package org.jetbrains.research.refactorinsight.java.api;
+package org.jetbrains.research.refactorinsight.kotlin.impl.data;
 
+import org.jetbrains.research.kotlinrminer.api.Refactoring;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
-import org.refactoringminer.api.Refactoring;
 
-public class JavaRefactoringHandler {
+public class KotlinRefactoringHandler {
     /**
      * Creates an {@link RefactoringInfo} instance from {@link Refactoring}.
      *
-     * @param refactoring from RefactoringMiner.
+     * @param refactoring refactoring from kotlinRMiner.
      * @return RefactoringInfo.
      */
     public RefactoringInfo handle(Refactoring refactoring) {
@@ -15,7 +15,7 @@ public class JavaRefactoringHandler {
         return specify(refactoring, info);
     }
 
-    // Should be overrided in the specific Java refactoring handler
+    // Should be overrided in the specific Kotlin refactoring handler
     public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
         return null;
     }
