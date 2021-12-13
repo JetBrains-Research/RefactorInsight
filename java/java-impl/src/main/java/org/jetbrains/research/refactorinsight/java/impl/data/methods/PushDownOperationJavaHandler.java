@@ -10,7 +10,7 @@ import org.refactoringminer.api.Refactoring;
 
 import java.util.List;
 
-import static org.jetbrains.research.refactorinsight.java.impl.data.util.Utils.*;
+import static org.jetbrains.research.refactorinsight.java.impl.data.util.JavaUtils.*;
 
 public class PushDownOperationJavaHandler extends JavaRefactoringHandler {
 

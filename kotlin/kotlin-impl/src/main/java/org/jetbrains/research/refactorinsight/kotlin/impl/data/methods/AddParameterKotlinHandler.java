@@ -7,7 +7,7 @@ import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoringHandler;
 
-import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.Utils.*;
+import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.KotlinUtils.*;
 
 public class AddParameterKotlinHandler extends KotlinRefactoringHandler {
 

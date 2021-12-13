@@ -10,8 +10,8 @@ import org.refactoringminer.api.Refactoring;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static org.jetbrains.research.refactorinsight.java.impl.data.util.Utils.calculateSignatureForJavaMethod;
-import static org.jetbrains.research.refactorinsight.java.impl.data.util.Utils.createCodeRangeFromJava;
+import static org.jetbrains.research.refactorinsight.java.impl.data.util.JavaUtils.calculateSignatureForJavaMethod;
+import static org.jetbrains.research.refactorinsight.java.impl.data.util.JavaUtils.createCodeRangeFromJava;
 
 public class ReorderParameterJavaHandler extends JavaRefactoringHandler {
 

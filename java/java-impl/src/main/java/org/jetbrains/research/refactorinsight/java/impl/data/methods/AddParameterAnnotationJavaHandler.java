@@ -7,7 +7,7 @@ import org.jetbrains.research.refactorinsight.common.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.java.impl.data.JavaRefactoringHandler;
 import org.refactoringminer.api.Refactoring;
 
-import static org.jetbrains.research.refactorinsight.java.impl.data.util.Utils.*;
+import static org.jetbrains.research.refactorinsight.java.impl.data.util.JavaUtils.*;
 
 public class AddParameterAnnotationJavaHandler extends JavaRefactoringHandler {
 

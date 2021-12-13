@@ -9,8 +9,8 @@ import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoring
 
 import java.util.List;
 
-import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.Utils.calculateSignatureForKotlinMethod;
-import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.Utils.createCodeRangeFromKotlin;
+import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.KotlinUtils.calculateSignatureForKotlinMethod;
+import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.KotlinUtils.createCodeRangeFromKotlin;
 
 public class RenameMethodKotlinHandler extends KotlinRefactoringHandler {
 

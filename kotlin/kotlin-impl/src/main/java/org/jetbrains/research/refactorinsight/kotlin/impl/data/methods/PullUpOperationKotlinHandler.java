@@ -8,7 +8,7 @@ import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoring
 
 import java.util.List;
 
-import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.Utils.*;
+import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.KotlinUtils.*;
 
 public class PullUpOperationKotlinHandler extends KotlinRefactoringHandler {
 
