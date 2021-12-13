@@ -1,9 +1,9 @@
-package org.jetbrains.research.refactorinsight.java.impl.data.util;
+package org.jetbrains.research.refactorinsight.kotlin.impl.data.util;
 
-import gr.uom.java.xmi.UMLOperation;
-import gr.uom.java.xmi.UMLType;
-import gr.uom.java.xmi.decomposition.AbstractStatement;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement;
+import org.jetbrains.research.kotlinrminer.uml.UMLOperation;
+import org.jetbrains.research.kotlinrminer.uml.UMLType;
 import org.jetbrains.research.refactorinsight.common.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.common.adapters.LocationInfo;
 
@@ -12,9 +12,9 @@ import java.util.List;
 
 import static org.jetbrains.research.refactorinsight.common.utils.StringUtils.calculateSignatureWithoutClassName;
 
-public class Utils {
+public class KotlinUtils {
 
-    public static String calculateSignatureForJavaMethod(UMLOperation operation) {
+    public static String calculateSignatureForKotlinMethod(UMLOperation operation) {
         StringBuilder builder = new StringBuilder();
         List<String> parameterTypeList = new ArrayList<>();
         for (UMLType type : operation.getParameterTypeList()) {
@@ -27,21 +27,21 @@ public class Utils {
         return builder.toString();
     }
 
-    public static CodeRange createCodeRangeFromJava(gr.uom.java.xmi.diff.CodeRange codeRange) {
+    public static CodeRange createCodeRangeFromKotlin(org.jetbrains.research.kotlinrminer.diff.CodeRange codeRange) {
         return new CodeRange(codeRange.getStartLine(), codeRange.getEndLine(),
                 codeRange.getStartColumn(), codeRange.getEndColumn(),
                 codeRange.getFilePath());
     }
 
-    public static LocationInfo createLocationInfoFromJava(gr.uom.java.xmi.LocationInfo locationInfo) {
+    public static LocationInfo createLocationInfoFromKotlin(org.jetbrains.research.kotlinrminer.decomposition.LocationInfo locationInfo) {
         return new LocationInfo(locationInfo.getFilePath(), locationInfo.getStartOffset(),
                 locationInfo.getEndOffset(), locationInfo.getStartLine(),
                 locationInfo.getEndLine(), locationInfo.getStartColumn(),
                 locationInfo.getEndColumn(), locationInfo.getLength());
     }
 
-    public static boolean isStatementsEqualJava(@NotNull List<AbstractStatement> statementsBefore,
-                                                @NotNull List<AbstractStatement> statementsAfter) {
+    public static boolean isStatementsEqualKotlin(@NotNull List<AbstractStatement> statementsBefore,
+                                                  @NotNull List<AbstractStatement> statementsAfter) {
         if (statementsBefore.size() == statementsAfter.size()) {
             boolean equal = true;
             for (int i = 0; i < statementsBefore.size() && equal; i++) {

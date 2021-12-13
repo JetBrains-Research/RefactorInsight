@@ -12,7 +12,7 @@ import org.refactoringminer.api.RefactoringType;
 import java.util.List;
 import java.util.Objects;
 
-import static org.jetbrains.research.refactorinsight.java.impl.data.util.Utils.*;
+import static org.jetbrains.research.refactorinsight.java.impl.data.util.JavaUtils.*;
 
 public class MoveOperationJavaHandler extends JavaRefactoringHandler {
 

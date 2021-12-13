@@ -9,8 +9,8 @@ import org.refactoringminer.api.Refactoring;
 
 import java.util.stream.Collectors;
 
-import static org.jetbrains.research.refactorinsight.java.impl.data.util.Utils.calculateSignatureForJavaMethod;
-import static org.jetbrains.research.refactorinsight.java.impl.data.util.Utils.createCodeRangeFromJava;
+import static org.jetbrains.research.refactorinsight.java.impl.data.util.JavaUtils.calculateSignatureForJavaMethod;
+import static org.jetbrains.research.refactorinsight.java.impl.data.util.JavaUtils.createCodeRangeFromJava;
 
 public class MergeVariableJavaHandler extends JavaRefactoringHandler {
 

@@ -9,8 +9,8 @@ import org.refactoringminer.api.Refactoring;
 
 import java.util.List;
 
-import static org.jetbrains.research.refactorinsight.java.impl.data.util.Utils.calculateSignatureForJavaMethod;
-import static org.jetbrains.research.refactorinsight.java.impl.data.util.Utils.createCodeRangeFromJava;
+import static org.jetbrains.research.refactorinsight.java.impl.data.util.JavaUtils.calculateSignatureForJavaMethod;
+import static org.jetbrains.research.refactorinsight.java.impl.data.util.JavaUtils.createCodeRangeFromJava;
 
 public class RenameMethodJavaHandler extends JavaRefactoringHandler {
 
