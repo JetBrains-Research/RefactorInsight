@@ -8,6 +8,5 @@ repositories {
 
 dependencies {
     implementation(project(":common"))
-    implementation(project(":kotlin:kotlin-api"))
     implementation 'com.github.JetBrains-Research:kotlinRMiner:v1.2'
 }

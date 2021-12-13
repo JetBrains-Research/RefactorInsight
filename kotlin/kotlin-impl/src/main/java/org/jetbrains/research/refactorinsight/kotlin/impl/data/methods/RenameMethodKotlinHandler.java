@@ -5,12 +5,12 @@ import org.jetbrains.research.kotlinrminer.diff.refactoring.RenameOperationRefac
 import org.jetbrains.research.refactorinsight.common.data.Group;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringLine;
-import org.jetbrains.research.refactorinsight.kotlin.api.KotlinRefactoringHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoringHandler;
 
 import java.util.List;
 
-import static org.jetbrains.research.refactorinsight.kotlin.api.util.Utils.calculateSignatureForKotlinMethod;
-import static org.jetbrains.research.refactorinsight.kotlin.api.util.Utils.createCodeRangeFromKotlin;
+import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.Utils.calculateSignatureForKotlinMethod;
+import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.Utils.createCodeRangeFromKotlin;
 
 public class RenameMethodKotlinHandler extends KotlinRefactoringHandler {
 

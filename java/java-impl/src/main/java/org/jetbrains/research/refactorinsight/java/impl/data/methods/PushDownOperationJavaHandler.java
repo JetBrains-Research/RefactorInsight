@@ -5,12 +5,12 @@ import gr.uom.java.xmi.diff.PushDownOperationRefactoring;
 import org.jetbrains.research.refactorinsight.common.data.Group;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringLine;
-import org.jetbrains.research.refactorinsight.java.api.JavaRefactoringHandler;
+import org.jetbrains.research.refactorinsight.java.impl.data.JavaRefactoringHandler;
 import org.refactoringminer.api.Refactoring;
 
 import java.util.List;
 
-import static org.jetbrains.research.refactorinsight.java.api.util.Utils.*;
+import static org.jetbrains.research.refactorinsight.java.impl.data.util.Utils.*;
 
 public class PushDownOperationJavaHandler extends JavaRefactoringHandler {
 
