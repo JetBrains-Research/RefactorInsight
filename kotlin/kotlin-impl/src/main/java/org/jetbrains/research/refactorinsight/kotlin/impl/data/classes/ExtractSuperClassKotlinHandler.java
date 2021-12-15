@@ -1,7 +1,7 @@
 package org.jetbrains.research.refactorinsight.kotlin.impl.data.classes;
 
-import org.jetbrains.research.kotlinrminer.api.Refactoring;
-import org.jetbrains.research.kotlinrminer.diff.refactoring.ExtractSuperClassRefactoring;
+import org.jetbrains.research.kotlinrminer.ide.Refactoring;
+import org.jetbrains.research.kotlinrminer.ide.diff.refactoring.ExtractSuperClassRefactoring;
 import org.jetbrains.research.refactorinsight.common.data.Group;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringLine;

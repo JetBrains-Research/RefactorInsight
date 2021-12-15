@@ -1,7 +1,8 @@
 package org.jetbrains.research.refactorinsight.kotlin.impl.data.methods;
 
-import org.jetbrains.research.kotlinrminer.api.Refactoring;
-import org.jetbrains.research.kotlinrminer.diff.refactoring.PullUpOperationRefactoring;
+import org.jetbrains.research.kotlinrminer.ide.Refactoring;
+import org.jetbrains.research.kotlinrminer.ide.decomposition.AbstractStatement;
+import org.jetbrains.research.kotlinrminer.ide.diff.refactoring.PullUpOperationRefactoring;
 import org.jetbrains.research.refactorinsight.common.data.Group;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoringHandler;
@@ -18,9 +19,9 @@ public class PullUpOperationKotlinHandler extends KotlinRefactoringHandler {
         PullUpOperationRefactoring ref =
                 (PullUpOperationRefactoring) refactoring;
 
-        List<org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement> statementsBefore =
+        List<AbstractStatement> statementsBefore =
                 ref.getOriginalOperation().getBody().getCompositeStatement().getStatements();
-        List<org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement> statementsAfter =
+        List<AbstractStatement> statementsAfter =
                 ref.getMovedOperation().getBody().getCompositeStatement().getStatements();
         info.setChanged(!isStatementsEqualKotlin(statementsBefore, statementsAfter));
 

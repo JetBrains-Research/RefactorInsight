@@ -1,6 +1,6 @@
 package org.jetbrains.research.refactorinsight.kotlin.impl.data;
 
-import org.jetbrains.research.kotlinrminer.api.Refactoring;
+import org.jetbrains.research.kotlinrminer.ide.Refactoring;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
 
 public class KotlinRefactoringHandler {
