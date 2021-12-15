@@ -1,8 +1,8 @@
 package org.jetbrains.research.refactorinsight.kotlin.impl.data.methods;
 
-import org.jetbrains.research.kotlinrminer.api.Refactoring;
-import org.jetbrains.research.kotlinrminer.decomposition.VariableDeclaration;
-import org.jetbrains.research.kotlinrminer.diff.refactoring.ReorderParameterRefactoring;
+import org.jetbrains.research.kotlinrminer.ide.Refactoring;
+import org.jetbrains.research.kotlinrminer.ide.decomposition.VariableDeclaration;
+import org.jetbrains.research.kotlinrminer.ide.diff.refactoring.ReorderParameterRefactoring;
 import org.jetbrains.research.refactorinsight.common.data.Group;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoringHandler;
@@ -23,8 +23,8 @@ public class ReorderParameterKotlinHandler extends KotlinRefactoringHandler {
 
         String classNameBefore = ref.getOperationBefore().getClassName();
         String classNameAfter = ref.getOperationAfter().getClassName();
-        List<org.jetbrains.research.kotlinrminer.decomposition.VariableDeclaration> befores = ref.getParametersBefore();
-        List<org.jetbrains.research.kotlinrminer.decomposition.VariableDeclaration> afters = ref.getParametersAfter();
+        List<VariableDeclaration> befores = ref.getParametersBefore();
+        List<VariableDeclaration> afters = ref.getParametersAfter();
 
         IntStream.range(0, Math.min(befores.size(), afters.size()))
                 .mapToObj(i -> new Pair(befores.get(i), afters.get(i)))

@@ -4,9 +4,11 @@ version = rootProject.version
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
+    maven { url 'https://cache-redirector.jetbrains.com/intellij-dependencies' }
 }
 
 dependencies {
     implementation(project(":common"))
-    implementation 'com.github.JetBrains-Research:kotlinRMiner:v1.2'
+    implementation 'org.jetbrains.research.kotlinrminer:kotlinRMiner-ide:1.2.1'
+    compileOnly 'org.jetbrains:annotations:22.0.0'
 }

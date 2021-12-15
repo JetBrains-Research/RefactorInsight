@@ -1,8 +1,8 @@
 package org.jetbrains.research.refactorinsight.kotlin.impl.data.methods;
 
-import org.jetbrains.research.kotlinrminer.api.Refactoring;
-import org.jetbrains.research.kotlinrminer.diff.refactoring.ExtractOperationRefactoring;
-import org.jetbrains.research.kotlinrminer.uml.UMLType;
+import org.jetbrains.research.kotlinrminer.ide.Refactoring;
+import org.jetbrains.research.kotlinrminer.ide.diff.refactoring.ExtractOperationRefactoring;
+import org.jetbrains.research.kotlinrminer.ide.uml.UMLType;
 import org.jetbrains.research.refactorinsight.common.data.Group;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringLine;
@@ -36,7 +36,7 @@ public class ExtractOperationKotlinHandler extends KotlinRefactoringHandler {
                 .calculateSignatureWithoutClassName(ref.getExtractedOperation().getName(), parameterTypeList);
 
         if (ref.getRefactoringType()
-                == org.jetbrains.research.kotlinrminer.api.RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
+                == org.jetbrains.research.kotlinrminer.common.RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
             info.setGroup(Group.METHOD)
                     .setThreeSided(true)
                     .setDetailsBefore(classNameBefore)

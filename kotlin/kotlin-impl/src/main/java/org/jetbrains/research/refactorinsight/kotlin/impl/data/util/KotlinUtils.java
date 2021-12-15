@@ -1,9 +1,9 @@
 package org.jetbrains.research.refactorinsight.kotlin.impl.data.util;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.research.kotlinrminer.decomposition.AbstractStatement;
-import org.jetbrains.research.kotlinrminer.uml.UMLOperation;
-import org.jetbrains.research.kotlinrminer.uml.UMLType;
+import org.jetbrains.research.kotlinrminer.ide.decomposition.AbstractStatement;
+import org.jetbrains.research.kotlinrminer.ide.uml.UMLOperation;
+import org.jetbrains.research.kotlinrminer.ide.uml.UMLType;
 import org.jetbrains.research.refactorinsight.common.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.common.adapters.LocationInfo;
 
@@ -27,13 +27,13 @@ public class KotlinUtils {
         return builder.toString();
     }
 
-    public static CodeRange createCodeRangeFromKotlin(org.jetbrains.research.kotlinrminer.diff.CodeRange codeRange) {
+    public static CodeRange createCodeRangeFromKotlin(org.jetbrains.research.kotlinrminer.ide.diff.CodeRange codeRange) {
         return new CodeRange(codeRange.getStartLine(), codeRange.getEndLine(),
                 codeRange.getStartColumn(), codeRange.getEndColumn(),
                 codeRange.getFilePath());
     }
 
-    public static LocationInfo createLocationInfoFromKotlin(org.jetbrains.research.kotlinrminer.decomposition.LocationInfo locationInfo) {
+    public static LocationInfo createLocationInfoFromKotlin(org.jetbrains.research.kotlinrminer.ide.decomposition.LocationInfo locationInfo) {
         return new LocationInfo(locationInfo.getFilePath(), locationInfo.getStartOffset(),
                 locationInfo.getEndOffset(), locationInfo.getStartLine(),
                 locationInfo.getEndLine(), locationInfo.getStartColumn(),

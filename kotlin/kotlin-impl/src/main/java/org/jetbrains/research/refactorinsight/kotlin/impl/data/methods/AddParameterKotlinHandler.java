@@ -1,7 +1,7 @@
 package org.jetbrains.research.refactorinsight.kotlin.impl.data.methods;
 
-import org.jetbrains.research.kotlinrminer.api.Refactoring;
-import org.jetbrains.research.kotlinrminer.diff.refactoring.AddParameterRefactoring;
+import org.jetbrains.research.kotlinrminer.ide.Refactoring;
+import org.jetbrains.research.kotlinrminer.ide.diff.refactoring.AddParameterRefactoring;
 import org.jetbrains.research.refactorinsight.common.data.Group;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.common.data.RefactoringLine;
@@ -14,7 +14,7 @@ public class AddParameterKotlinHandler extends KotlinRefactoringHandler {
     @Override
     public RefactoringInfo specify(Refactoring refactoring,
                                    RefactoringInfo info) {
-        org.jetbrains.research.kotlinrminer.diff.refactoring.AddParameterRefactoring ref =
+        AddParameterRefactoring ref =
                 (AddParameterRefactoring) refactoring;
 
         String classNameBefore = ref.getOperationBefore().getClassName();
