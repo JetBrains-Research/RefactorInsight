@@ -3,7 +3,6 @@ image: gradle:6.0-jdk11
 stages:
   - build
   - validate
-  - coverage
 
 variables:
   # Disable the Gradle daemon to ensure isolated runs of the CI pipeline.
@@ -26,16 +25,6 @@ build:
     paths:
       - build/distributions
 
-checkStyle:
-  stage: validate
-  script: gradle --build-cache checkstyleMain
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull-push
-    paths:
-      - build/
-      - .gradle/
-
 test:
   stage: validate
   cache:
@@ -44,22 +33,6 @@ test:
     paths:
       - build/
       - .gradle/
-  artifacts:
-    paths:
-     - build/reports/jacoco/test
-     - build/jacocoHtml
   script:
     - gradle --build-cache test
-
-coverage:
-  stage: coverage
-  dependencies:
-    - test
-  script:
-    - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/",
-      instructions, "instructions covered"; print 100*covered/instructions, "%
-      covered" }' build/reports/jacoco/test/jacocoTestReport.csv
-    # - aggregate=$(awk -F"," '{ branches += $6 + $7; covered += $7 } END { print "\nAGGREGATE COVERAGE REPORT"; print covered, "/", branches, "branches covered"; print int(100*covered/branches), "%% covered\n---------------------------\n" }' target/site/jacoco-aggregate/jacoco.csv)
-#    - printf "$coverage"
-  coverage: '/\d+.\d+ \% covered/'
 
