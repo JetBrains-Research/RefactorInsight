@@ -25,6 +25,6 @@ dependencies {
 
 intellij {
     version.set("2021.3")
-    plugins.set(listOf("java", "git4idea", "github"))
+    plugins.set(listOf("com.intellij.java", "git4idea", "github"))
     downloadSources.set(true)
 }
