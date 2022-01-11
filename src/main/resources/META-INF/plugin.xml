@@ -116,11 +116,19 @@
             <keyboard-shortcut first-keystroke="control alt R" keymap="$default"/>
         </action>
 
+        <action id="actions.ChangeHistoryAction"
+                class="org.jetbrains.research.refactorinsight.actions.ChangeHistoryAction"
+                text="Show Change History"
+                description="Retrieve change history for the element">
+            <add-to-group group-id="EditorPopupMenu1" anchor="first"/>
+        </action>
+
         <action id="actions.PRToggleRefactoringViewAction"
                 class="org.jetbrains.research.refactorinsight.actions.PRToggleRefactoringViewAction"
                 icon="RefactorInsightIcons.toggle"
                 text="Show Refactorings" description="actions.PRToggleRefactoringViewAction">
-            <add-to-group group-id="Github.PullRequest.Changes.Toolbar" anchor="after" relative-to-action="ChangesView.GroupBy"/>
+            <add-to-group group-id="Github.PullRequest.Changes.Toolbar" anchor="after"
+                          relative-to-action="ChangesView.GroupBy"/>
         </action>
     </actions>
 

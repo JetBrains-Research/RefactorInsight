@@ -88,7 +88,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     return myRepository;
   }
 
-  private static Repository openRepository(final String path) {
+  public static Repository openRepository(final String path) {
     try {
       return new GitServiceImpl().openRepository(path);
     } catch (Exception e) {

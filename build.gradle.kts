@@ -19,6 +19,8 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.6")
     implementation("org.kohsuke:github-api:1.95")
     implementation(group = "com.github.tsantalis", name = "refactoring-miner", version = "2.0")
+    // CodeTracker library is not published yet
+    // implementation(group = "org.codetracker", name = "code-tracker", version = "1.1-SNAPSHOT")
     testImplementation("junit:junit:4.13")
     testImplementation(group = "org.mockito", name = "mockito-core", version = "3.3.3")
 }
