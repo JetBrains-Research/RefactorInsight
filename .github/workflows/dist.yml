@@ -29,7 +29,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew --build-cache assemble
     - name: Zip Distribution
-      uses: papeloto/action-zip@v1
+      uses: vimtor/action-zip@v1
       with:
         files: build/distributions
         dest: refactorinsight.zip
