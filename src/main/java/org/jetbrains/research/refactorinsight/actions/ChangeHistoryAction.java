@@ -11,6 +11,11 @@ import com.intellij.usages.UsageTarget;
 import com.intellij.usages.UsageView;
 import git4idea.repo.GitRepositoryManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.research.refactorinsight.services.ChangeHistoryService;
+
+import java.util.List;
+
+import static org.jetbrains.research.refactorinsight.utils.Utils.getNumberOfMethodStartLine;
 
 /**
  * Represents the `Show Change History` action.
@@ -42,7 +47,15 @@ public class ChangeHistoryAction extends AnAction {
     }
 
     private void showChangeHistoryMethod(Project project, DataContext dataContext, PsiMethod method) {
-        //TODO: implement
+        ChangeHistoryService changeHistoryService = new ChangeHistoryService();
+        //TODO: fins a way to not get this ending in the path
+        String projectPath = project.getBasePath().replace(".idea/misc.xml", "");
+        String filePath = method.getContainingFile().getVirtualFile().getPath().replace(projectPath + "/", "");
+        List<String> methodChangeHistory = changeHistoryService.getHistoryForMethod(
+                projectPath, filePath, method.getName(),
+                //TODO: find a way to get id of the latest commit
+                "4d1c2ab6630f7c4285f8bfe80c48fa817fbb8225",
+                getNumberOfMethodStartLine(method.getContainingFile(), method.getTextOffset()));
     }
 
 }

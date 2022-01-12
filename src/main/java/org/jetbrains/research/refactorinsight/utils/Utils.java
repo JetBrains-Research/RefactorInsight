@@ -1,6 +1,7 @@
 package org.jetbrains.research.refactorinsight.utils;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Pair;
@@ -8,6 +9,8 @@ import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.vcs.LocalFilePath;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.psi.FileViewProvider;
+import com.intellij.psi.PsiFile;
 import com.intellij.vcs.log.impl.VcsLogManager;
 import com.intellij.vcs.log.impl.VcsProjectLog;
 import git4idea.GitContentRevision;
@@ -400,4 +403,14 @@ public class Utils {
     int nameEnd = qualifiedName.indexOf('(', nameBegin);
     return qualifiedName.substring(nameBegin, nameEnd) + "()";
   }
+
+    /**
+     * Get the number of line the method starts at.
+     */
+  public static int getNumberOfMethodStartLine(PsiFile file, int offset) {
+    FileViewProvider fileViewProvider = file.getViewProvider();
+    Document document = fileViewProvider.getDocument();
+    return document != null ? document.getLineNumber(offset) + 1 : 0;
+  }
+
 }

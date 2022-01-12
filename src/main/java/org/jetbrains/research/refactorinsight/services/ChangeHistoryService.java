@@ -1,18 +1,23 @@
 package org.jetbrains.research.refactorinsight.services;
 
-//import org.codetracker.api.MethodTracker;
-
+import com.google.common.graph.EndpointPair;
+import org.codetracker.api.CodeTracker;
+import org.codetracker.api.Edge;
+import org.codetracker.api.History;
+import org.codetracker.api.MethodTracker;
+import org.codetracker.change.Change;
+import org.codetracker.element.Method;
 import org.eclipse.jgit.lib.Repository;
-import org.refactoringminer.api.GitService;
-import org.refactoringminer.util.GitServiceImpl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChangeHistoryService {
-    public void getHistoryForMethod(String projectPath, String filePath, String methodName,
-                                    String startCommitId, int methodDeclarationLine) {
-        GitService gitService = new GitServiceImpl();
+    public List<String> getHistoryForMethod(String projectPath, String filePath, String methodName,
+                                            String startCommitId, int methodDeclarationLine) {
+        List<String> changeHistory = new ArrayList<>();
         try (Repository repository = MiningService.openRepository(projectPath)) {
-            //TODO: build CodeTracker jar and use it or wait until it is published in the maven repository
-/*            MethodTracker methodTracker = ChangeHistoryService.methodTracker()
+            MethodTracker methodTracker = CodeTracker.methodTracker()
                     .repository(repository)
                     .filePath(filePath)
                     .startCommitId(startCommitId)
@@ -27,12 +32,13 @@ public class ChangeHistoryService {
                 for (Change change : edgeValue.getChangeList()) {
                     if (Change.Type.NO_CHANGE.equals(change.getType()))
                         continue;
-                    String commitId = edge.target().getVersion().getId();
-                    String changeType = change.getType().getTitle();
                     String changeDescription = change.toString();
-                    System.out.printf("%s,%s,%s%n", commitId, changeType, change);
+                    changeHistory.add(changeDescription);
                 }
-            }*/
+            }
+        } catch (Exception e) {
+            //TODO handle the exception
         }
+        return changeHistory;
     }
 }
