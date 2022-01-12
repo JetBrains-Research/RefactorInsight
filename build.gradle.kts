@@ -8,6 +8,7 @@ version = "2021.3-1.0"
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven(url = "https://jitpack.io")
 }
 
@@ -18,9 +19,9 @@ dependencies {
     implementation("org.eclipse.jdt:org.eclipse.jdt.core:3.16.0")
     implementation("org.apache.commons:commons-text:1.6")
     implementation("org.kohsuke:github-api:1.95")
-    implementation(group = "com.github.tsantalis", name = "refactoring-miner", version = "2.0")
-    // CodeTracker library is not published yet
-    // implementation(group = "org.codetracker", name = "code-tracker", version = "1.1-SNAPSHOT")
+    implementation(group = "com.github.tsantalis", name = "refactoring-miner", version = "2.2.0")
+    // CodeTracker library is not published yet, so here's a usage of the library from local maven repository
+    implementation(group = "org.codetracker", name = "code-tracker", version = "1.1-SNAPSHOT")
     testImplementation("junit:junit:4.13")
     testImplementation(group = "org.mockito", name = "mockito-core", version = "3.3.3")
 }

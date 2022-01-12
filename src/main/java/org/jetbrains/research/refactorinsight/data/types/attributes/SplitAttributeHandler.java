@@ -1,6 +1,6 @@
 package org.jetbrains.research.refactorinsight.data.types.attributes;
 
-import gr.uom.java.xmi.decomposition.VariableDeclaration;
+import gr.uom.java.xmi.UMLAttribute;
 import gr.uom.java.xmi.diff.SplitAttributeRefactoring;
 
 import java.util.stream.Collectors;
@@ -25,8 +25,8 @@ public class SplitAttributeHandler extends Handler {
     return info.setGroup(Group.ATTRIBUTE)
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
-        .setNameBefore(ref.getOldAttribute().getVariableName())
-        .setNameAfter(ref.getSplitAttributes().stream().map(VariableDeclaration::getVariableName)
+        .setNameBefore(ref.getOldAttribute().getName())
+        .setNameAfter(ref.getSplitAttributes().stream().map(UMLAttribute::getName)
             .collect(Collectors.joining()));
   }
 

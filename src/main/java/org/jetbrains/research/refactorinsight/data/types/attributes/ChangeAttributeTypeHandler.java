@@ -17,7 +17,7 @@ public class ChangeAttributeTypeHandler extends Handler {
     String classNameAfter = ref.getClassNameAfter();
 
     return info.setGroup(Group.ATTRIBUTE)
-        .setGroupId(ref.getClassNameAfter() + "." + ref.getChangedTypeAttribute().getVariableName())
+        .setGroupId(ref.getClassNameAfter() + "." + ref.getChangedTypeAttribute().getName())
         .setDetailsBefore(classNameBefore)
         .setDetailsAfter(classNameAfter)
         .setNameBefore(ref.getOriginalAttribute().getVariableDeclaration().toQualifiedString())

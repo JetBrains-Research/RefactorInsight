@@ -19,7 +19,7 @@ public class RenameAttributeHandler extends Handler {
     String classNameAfter = ref.getClassNameAfter();
 
     return info.setGroup(Group.ATTRIBUTE)
-        .setGroupId(ref.getClassNameAfter() + "." + ref.getRenamedAttribute().getVariableName())
+        .setGroupId(ref.getClassNameAfter() + "." + ref.getRenamedAttribute().getName())
         .addMarking(new CodeRange(ref.getOriginalAttribute().codeRange()),
             new CodeRange(ref.getRenamedAttribute().codeRange()),
             line -> line.addOffset(new LocationInfo(ref.getOriginalAttribute().getLocationInfo()),
