@@ -4,6 +4,8 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.usages.PsiElementUsageTarget;
@@ -48,12 +50,15 @@ public class ChangeHistoryAction extends AnAction {
 
     private void showChangeHistoryMethod(Project project, DataContext dataContext, PsiMethod method) {
         ChangeHistoryService changeHistoryService = new ChangeHistoryService();
-        //TODO: find a way to not get this ending in the path
-        String projectPath = project.getBasePath().replace(".idea/misc.xml", "");
-        String filePath = method.getContainingFile().getVirtualFile().getPath().replace(projectPath + "/", "");
-        List<String> methodChangeHistory =
-                changeHistoryService.getHistoryForMethod(projectPath, filePath, method.getName(),
-                        getNumberOfMethodStartLine(method.getContainingFile(), method.getTextOffset()));
+        VirtualFile virtualFile = method.getContainingFile().getVirtualFile();
+        VirtualFile contentRootForFile = ProjectFileIndex.getInstance(project).getContentRootForFile(virtualFile);
+        if (contentRootForFile != null) {
+            String projectPath = contentRootForFile.getPath();
+            String filePath = virtualFile.getPath().replace(projectPath + "/", "");
+            List<String> methodChangeHistory =
+                    changeHistoryService.getHistoryForMethod(projectPath, filePath, method.getName(),
+                            getNumberOfMethodStartLine(method.getContainingFile(), method.getTextOffset()));
+        }
     }
 
 }
