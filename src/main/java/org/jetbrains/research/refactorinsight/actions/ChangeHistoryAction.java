@@ -48,14 +48,12 @@ public class ChangeHistoryAction extends AnAction {
 
     private void showChangeHistoryMethod(Project project, DataContext dataContext, PsiMethod method) {
         ChangeHistoryService changeHistoryService = new ChangeHistoryService();
-        //TODO: fins a way to not get this ending in the path
+        //TODO: find a way to not get this ending in the path
         String projectPath = project.getBasePath().replace(".idea/misc.xml", "");
         String filePath = method.getContainingFile().getVirtualFile().getPath().replace(projectPath + "/", "");
-        List<String> methodChangeHistory = changeHistoryService.getHistoryForMethod(
-                projectPath, filePath, method.getName(),
-                //TODO: find a way to get id of the latest commit
-                "4d1c2ab6630f7c4285f8bfe80c48fa817fbb8225",
-                getNumberOfMethodStartLine(method.getContainingFile(), method.getTextOffset()));
+        List<String> methodChangeHistory =
+                changeHistoryService.getHistoryForMethod(projectPath, filePath, method.getName(),
+                        getNumberOfMethodStartLine(method.getContainingFile(), method.getTextOffset()));
     }
 
 }
