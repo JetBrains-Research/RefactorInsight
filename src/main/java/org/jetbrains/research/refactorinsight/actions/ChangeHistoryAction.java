@@ -10,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiVariable;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.usages.PsiElementUsageTarget;
 import com.intellij.usages.UsageTarget;
 import com.intellij.usages.UsageView;
@@ -23,7 +24,7 @@ import org.jetbrains.research.refactorinsight.utils.Utils;
 
 import java.util.List;
 
-import static org.jetbrains.research.refactorinsight.utils.Utils.getNumberOfMethodStartLine;
+import static org.jetbrains.research.refactorinsight.utils.Utils.getNumberOfElementStartLine;
 
 /**
  * Represents the `Show Change History` action.
@@ -50,7 +51,9 @@ public class ChangeHistoryAction extends AnAction implements DumbAware {
                 PsiElementUsageTarget elementUsageTarget = (PsiElementUsageTarget) target;
                 PsiElement targetElement = elementUsageTarget.getElement();
                 if (targetElement instanceof PsiMethod) {
-                    showChangeHistoryMethod(project, dataContext, (PsiMethod) targetElement);
+                    showChangeHistoryForMethod(project, (PsiMethod) targetElement);
+                } else if (targetElement instanceof PsiVariable) {
+                    showChangeHistoryForVariable(project, (PsiVariable) targetElement);
                 }
             }
         }
@@ -73,7 +76,7 @@ public class ChangeHistoryAction extends AnAction implements DumbAware {
         return false;
     }
 
-    private void showChangeHistoryMethod(Project project, DataContext dataContext, PsiMethod method) {
+    private void showChangeHistoryForMethod(Project project, PsiMethod method) {
         ChangeHistoryService changeHistoryService = new ChangeHistoryService();
         VirtualFile virtualFile = method.getContainingFile().getVirtualFile();
         VirtualFile contentRootForFile = ProjectFileIndex.getInstance(project).getContentRootForFile(virtualFile);
@@ -82,9 +85,36 @@ public class ChangeHistoryAction extends AnAction implements DumbAware {
             String filePath = virtualFile.getPath().replace(projectPath + "/", "");
             List<CodeChange> methodChangeHistory =
                     changeHistoryService.getHistoryForMethod(projectPath, filePath, method.getName(),
-                            getNumberOfMethodStartLine(method.getContainingFile(), method.getTextOffset()));
+                            getNumberOfElementStartLine(method.getContainingFile(), method.getTextOffset()));
             getToolbarWindow(project)
                     .showToolbar(method.getName(), HistoryType.METHOD, methodChangeHistory);
+        }
+    }
+
+    private void showChangeHistoryForVariable(Project project, PsiVariable variable) {
+        ChangeHistoryService changeHistoryService = new ChangeHistoryService();
+        PsiElement firstParent = PsiTreeUtil.findFirstParent(variable, p -> p instanceof PsiMethod);
+        if (firstParent instanceof PsiMethod) {
+            PsiMethod enclosingMethod = (PsiMethod) firstParent;
+            VirtualFile virtualFile = enclosingMethod.getContainingFile().getVirtualFile();
+            VirtualFile contentRootForFile = ProjectFileIndex.getInstance(project).getContentRootForFile(virtualFile);
+            if (contentRootForFile != null) {
+                String projectPath = contentRootForFile.getPath();
+                String filePath = virtualFile.getPath().replace(projectPath + "/", "");
+                int numberOfMethodStartLine = getNumberOfElementStartLine(enclosingMethod.getContainingFile(), enclosingMethod.getTextOffset());
+                int numberOfVariableStartLine = getNumberOfElementStartLine(variable.getContainingFile(), variable.getTextOffset());
+
+                List<CodeChange> variableChangeHistory =
+                        changeHistoryService.getHistoryForVariable(
+                                projectPath, filePath,
+                                enclosingMethod.getName(),
+                                numberOfMethodStartLine,
+                                variable.getName(),
+                                numberOfVariableStartLine);
+
+                getToolbarWindow(project)
+                        .showToolbar(variable.getName(), HistoryType.ATTRIBUTE, variableChangeHistory);
+            }
         }
     }
 

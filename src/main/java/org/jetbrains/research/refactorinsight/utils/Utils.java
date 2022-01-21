@@ -405,9 +405,9 @@ public class Utils {
   }
 
     /**
-     * Get the number of line the method starts at.
+     * Get the number of line the element starts at.
      */
-  public static int getNumberOfMethodStartLine(PsiFile file, int offset) {
+  public static int getNumberOfElementStartLine(PsiFile file, int offset) {
     FileViewProvider fileViewProvider = file.getViewProvider();
     Document document = fileViewProvider.getDocument();
     return document != null ? document.getLineNumber(offset) + 1 : 0;
