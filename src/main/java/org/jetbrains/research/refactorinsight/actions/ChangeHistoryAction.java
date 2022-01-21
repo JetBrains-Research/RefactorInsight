@@ -9,6 +9,7 @@ import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiVariable;
 import com.intellij.usages.PsiElementUsageTarget;
 import com.intellij.usages.UsageTarget;
 import com.intellij.usages.UsageView;
@@ -53,6 +54,23 @@ public class ChangeHistoryAction extends AnAction implements DumbAware {
                 }
             }
         }
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        // Show the action in the pop-up menu only if a user selected a method or variable.
+        e.getPresentation().setEnabledAndVisible(isMethodOrVariable(e.getDataContext()));
+        super.update(e);
+    }
+
+    private boolean isMethodOrVariable(DataContext dataContext) {
+        UsageTarget[] usageTarget = dataContext.getData(UsageView.USAGE_TARGETS_KEY);
+        UsageTarget target = usageTarget != null ? usageTarget[0] : null;
+        if (target != null) {
+            PsiElement element = ((PsiElementUsageTarget) target).getElement();
+            return element instanceof PsiMethod || element instanceof PsiVariable;
+        }
+        return false;
     }
 
     private void showChangeHistoryMethod(Project project, DataContext dataContext, PsiMethod method) {
