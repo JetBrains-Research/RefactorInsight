@@ -46,3 +46,16 @@ Pull requests are also welcome and encouraged.
 
 
 For more information about the tool on which RefactorInsight relies to identify refactorings, read [RefactoringMiner 2.0](https://users.encs.concordia.ca/~nikolaos/publications/TSE_2020.pdf).
+
+## Citing RefactorInsight
+A [paper](https://arxiv.org/abs/2108.11202) about RefactorInsight was presented at [ASE'21](https://conf.researchr.org/home/ase-2021). 
+If you use RefactorInsight in your academic work, please cite it.
+```
+@article{kurbatova2021refactorinsight,
+  title={Refactorinsight: Enhancing ide representation of changes in git with refactorings information},
+  author={Kurbatova, Zarina and Kovalenko, Vladimir and Savu, Ioana and Brockbernd, Bob and Andreescu, Dan 
+  and Anton, Matei and Venediktov, Roman and Tikhomirova, Elena and Bryksin, Timofey},
+  journal={arXiv preprint arXiv:2108.11202},
+  year={2021}
+}
+```
