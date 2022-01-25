@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiVariable;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -52,6 +53,8 @@ public class ChangeHistoryAction extends AnAction implements DumbAware {
                 PsiElement targetElement = elementUsageTarget.getElement();
                 if (targetElement instanceof PsiMethod) {
                     showChangeHistoryForMethod(project, (PsiMethod) targetElement);
+                } else if (targetElement instanceof PsiField) {
+                    showChangeHistoryForAttribute(project, (PsiField) targetElement);
                 } else if (targetElement instanceof PsiVariable) {
                     showChangeHistoryForVariable(project, (PsiVariable) targetElement);
                 }
@@ -113,8 +116,28 @@ public class ChangeHistoryAction extends AnAction implements DumbAware {
                                 numberOfVariableStartLine);
 
                 getToolbarWindow(project)
-                        .showToolbar(variable.getName(), HistoryType.ATTRIBUTE, variableChangeHistory);
+                        .showToolbar(variable.getName(), HistoryType.VARIABLE, variableChangeHistory);
             }
+        }
+    }
+
+    private void showChangeHistoryForAttribute(Project project, PsiField attribute) {
+        ChangeHistoryService changeHistoryService = new ChangeHistoryService();
+        VirtualFile virtualFile = attribute.getContainingFile().getVirtualFile();
+        VirtualFile contentRootForFile = ProjectFileIndex.getInstance(project).getContentRootForFile(virtualFile);
+        if (contentRootForFile != null) {
+            String projectPath = contentRootForFile.getPath();
+            String filePath = virtualFile.getPath().replace(projectPath + "/", "");
+            int numberOfVariableStartLine = getNumberOfElementStartLine(attribute.getContainingFile(), attribute.getTextOffset());
+
+            List<CodeChange> variableChangeHistory =
+                    changeHistoryService.getHistoryForAttribute(
+                            projectPath, filePath,
+                            attribute.getName(),
+                            numberOfVariableStartLine);
+
+            getToolbarWindow(project)
+                    .showToolbar(attribute.getName(), HistoryType.ATTRIBUTE, variableChangeHistory);
         }
     }
 
