@@ -3,6 +3,7 @@ package org.jetbrains.research.refactorinsight.services;
 import com.google.common.graph.EndpointPair;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Computable;
+import gr.uom.java.xmi.LocationInfo;
 import org.codetracker.api.*;
 import org.codetracker.change.Change;
 import org.codetracker.element.Attribute;
@@ -40,6 +41,7 @@ public class ChangeHistoryService {
                             try {
                                 history = methodTracker.track();
                             } catch (Exception e) {
+                                //TODO handle the exception
                                 e.printStackTrace();
                             }
                             return history;
@@ -54,7 +56,9 @@ public class ChangeHistoryService {
                         String commitId = edge.target().getVersion().getId();
                         String changeType = change.getType().getTitle();
                         String changeDescription = change.toString();
-                        changeHistory.add(new CodeChange(commitId, changeType, changeDescription));
+                        LocationInfo sourceLocation = edge.source().getLocation();
+                        LocationInfo targetLocation = edge.target().getLocation();
+                        changeHistory.add(new CodeChange(commitId, changeType, changeDescription, sourceLocation, targetLocation));
                     }
                 }
             }
@@ -92,7 +96,9 @@ public class ChangeHistoryService {
                         String commitId = historyInfo.getCommitId();
                         String changeType = change.getType().getTitle();
                         String changeDescription = change.toString();
-                        changeHistory.add(new CodeChange(commitId, changeType, changeDescription));
+                        LocationInfo sourceLocation = historyInfo.getElementBefore().getLocation();
+                        LocationInfo targetLocation = historyInfo.getElementAfter().getLocation();
+                        changeHistory.add(new CodeChange(commitId, changeType, changeDescription, sourceLocation, targetLocation));
                     }
                 }
             }
@@ -126,7 +132,9 @@ public class ChangeHistoryService {
                         String commitId = historyInfo.getCommitId();
                         String changeType = change.getType().getTitle();
                         String changeDescription = change.toString();
-                        changeHistory.add(new CodeChange(commitId, changeType, changeDescription));
+                        LocationInfo sourceLocation = historyInfo.getElementBefore().getLocation();
+                        LocationInfo targetLocation = historyInfo.getElementAfter().getLocation();
+                        changeHistory.add(new CodeChange(commitId, changeType, changeDescription, sourceLocation, targetLocation));
                     }
                 }
             }
