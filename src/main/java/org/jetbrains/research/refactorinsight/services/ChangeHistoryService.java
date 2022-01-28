@@ -48,17 +48,15 @@ public class ChangeHistoryService {
                         }
                 );
 
-                for (EndpointPair<Method> edge : methodHistory.getGraph().getEdges()) {
-                    Edge edgeValue = methodHistory.getGraph().getEdgeValue(edge).get();
-                    for (Change change : edgeValue.getChangeList()) {
-                        if (Change.Type.NO_CHANGE.equals(change.getType()))
-                            continue;
-                        String commitId = edge.target().getVersion().getId();
+                for (History.HistoryInfo<Method> historyInfo : methodHistory.getHistoryInfoList()) {
+                    String commitId = historyInfo.getCommitId();
+                    LocationInfo locationBefore = historyInfo.getElementBefore().getLocation();
+                    LocationInfo locationAfter = historyInfo.getElementAfter().getLocation();
+
+                    for (Change change : historyInfo.getChangeList()) {
                         String changeType = change.getType().getTitle();
                         String changeDescription = change.toString();
-                        LocationInfo sourceLocation = edge.source().getLocation();
-                        LocationInfo targetLocation = edge.target().getLocation();
-                        changeHistory.add(new CodeChange(commitId, changeType, changeDescription, sourceLocation, targetLocation));
+                        changeHistory.add(new CodeChange(commitId, changeType, changeDescription, locationBefore, locationAfter));
                     }
                 }
             }
