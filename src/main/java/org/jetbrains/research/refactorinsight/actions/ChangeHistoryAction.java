@@ -86,11 +86,14 @@ public class ChangeHistoryAction extends AnAction implements DumbAware {
         if (contentRootForFile != null) {
             String projectPath = contentRootForFile.getPath();
             String filePath = virtualFile.getPath().replace(projectPath + "/", "");
-            List<CodeChange> methodChangeHistory =
-                    changeHistoryService.getHistoryForMethod(projectPath, filePath, method.getName(),
-                            getNumberOfElementStartLine(method.getContainingFile(), method.getTextOffset()));
-            getToolbarWindow(project)
-                    .showToolbar(method.getName(), HistoryType.METHOD, methodChangeHistory);
+            List<CodeChange> methodChangeHistory = changeHistoryService.getHistoryForMethod(
+                    project,
+                    projectPath,
+                    filePath,
+                    method.getName(),
+                    getNumberOfElementStartLine(method.getContainingFile(), method.getTextOffset()));
+
+            getToolbarWindow(project).showToolbar(method.getName(), HistoryType.METHOD, methodChangeHistory);
         }
     }
 
@@ -107,16 +110,16 @@ public class ChangeHistoryAction extends AnAction implements DumbAware {
                 int numberOfMethodStartLine = getNumberOfElementStartLine(enclosingMethod.getContainingFile(), enclosingMethod.getTextOffset());
                 int numberOfVariableStartLine = getNumberOfElementStartLine(variable.getContainingFile(), variable.getTextOffset());
 
-                List<CodeChange> variableChangeHistory =
-                        changeHistoryService.getHistoryForVariable(
-                                projectPath, filePath,
-                                enclosingMethod.getName(),
-                                numberOfMethodStartLine,
-                                variable.getName(),
-                                numberOfVariableStartLine);
+                List<CodeChange> variableChangeHistory = changeHistoryService.getHistoryForVariable(
+                        project,
+                        projectPath,
+                        filePath,
+                        enclosingMethod.getName(),
+                        numberOfMethodStartLine,
+                        variable.getName(),
+                        numberOfVariableStartLine);
 
-                getToolbarWindow(project)
-                        .showToolbar(variable.getName(), HistoryType.VARIABLE, variableChangeHistory);
+                getToolbarWindow(project).showToolbar(variable.getName(), HistoryType.VARIABLE, variableChangeHistory);
             }
         }
     }
@@ -132,12 +135,13 @@ public class ChangeHistoryAction extends AnAction implements DumbAware {
 
             List<CodeChange> variableChangeHistory =
                     changeHistoryService.getHistoryForAttribute(
-                            projectPath, filePath,
+                            project,
+                            projectPath,
+                            filePath,
                             attribute.getName(),
                             numberOfVariableStartLine);
 
-            getToolbarWindow(project)
-                    .showToolbar(attribute.getName(), HistoryType.ATTRIBUTE, variableChangeHistory);
+            getToolbarWindow(project).showToolbar(attribute.getName(), HistoryType.ATTRIBUTE, variableChangeHistory);
         }
     }
 

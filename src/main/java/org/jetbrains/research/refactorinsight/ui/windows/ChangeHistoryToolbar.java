@@ -111,7 +111,6 @@ public class ChangeHistoryToolbar implements Disposable {
         splitter.setSecondComponent(component);
     }
 
-    //TODO: handle a case with Introduced change type
     private @NotNull
     SimpleDiffRequest createSimpleRequest(@Nullable Project project,
                                           @NotNull Change change, ProgressIndicator indicator) throws DiffRequestProducerException {

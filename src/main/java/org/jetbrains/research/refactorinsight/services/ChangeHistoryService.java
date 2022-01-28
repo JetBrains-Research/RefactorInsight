@@ -1,7 +1,10 @@
 package org.jetbrains.research.refactorinsight.services;
 
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.util.Computable;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import gr.uom.java.xmi.LocationInfo;
 import org.codetracker.api.*;
 import org.codetracker.change.Change;
@@ -9,11 +12,11 @@ import org.codetracker.element.Attribute;
 import org.codetracker.element.Method;
 import org.codetracker.element.Variable;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.CodeChange;
-import com.intellij.openapi.diagnostic.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,15 +24,15 @@ import java.util.List;
 public class ChangeHistoryService {
     private static final Logger LOG = Logger.getInstance(ChangeHistoryService.class);
 
-    public List<CodeChange> getHistoryForMethod(@NotNull String projectPath,
+    public List<CodeChange> getHistoryForMethod(@NotNull Project project,
+                                                @NotNull String projectPath,
                                                 @NotNull String filePath,
                                                 @NotNull String methodName,
                                                 int methodDeclarationLine) {
         List<CodeChange> changeHistory = new ArrayList<>();
         try (Repository repository = MiningService.openRepository(projectPath)) {
             if (repository != null) {
-                RevCommit latestCommit = new Git(repository).log().setMaxCount(1).call().iterator().next();
-                String latestCommitHash = latestCommit.getName();
+                String latestCommitHash = getLatestCommitHash(repository);
                 MethodTracker methodTracker = CodeTracker.methodTracker()
                         .repository(repository)
                         .filePath(filePath)
@@ -38,40 +41,39 @@ public class ChangeHistoryService {
                         .methodDeclarationLineNumber(methodDeclarationLine)
                         .build();
 
-                History<Method> methodHistory = ApplicationManager.getApplication().runReadAction(
-                        (Computable<? extends History<Method>>) () -> {
-                            History<Method> history = null;
-                            try {
-                                LOG.info("[RefactorInsight]: Start tracking method's history using CodeTracker.");
-                                history = methodTracker.track();
-                            } catch (Exception e) {
-                                LOG.error(String.format("[RefactorInsight]: Error occurred while tracking method's" +
-                                        " history using CodeTracker. Details: %s", e.getMessage()), e);
-                            }
-                            return history;
+                ProgressManager.getInstance().run(new Task.Modal(project, "Mining the change history for a method", true) {
+                    @Override
+                    public void run(@NotNull ProgressIndicator indicator) {
+                        History<Method> methodHistory = null;
+                        try {
+                            LOG.info("[RefactorInsight]: Start tracking method's history using CodeTracker.");
+                            methodHistory = methodTracker.track();
+                        } catch (Exception e) {
+                            LOG.error(String.format("[RefactorInsight]: Error occurred while tracking method's"
+                                    + " history using CodeTracker. Details: %s", e.getMessage()), e);
                         }
-                );
 
-                for (History.HistoryInfo<Method> historyInfo : methodHistory.getHistoryInfoList()) {
-                    String commitId = historyInfo.getCommitId();
-                    LocationInfo locationBefore = historyInfo.getElementBefore().getLocation();
-                    LocationInfo locationAfter = historyInfo.getElementAfter().getLocation();
+                        for (History.HistoryInfo<Method> historyInfo : methodHistory.getHistoryInfoList()) {
+                            String commitId = historyInfo.getCommitId();
+                            LocationInfo locationBefore = historyInfo.getElementBefore().getLocation();
+                            LocationInfo locationAfter = historyInfo.getElementAfter().getLocation();
 
-                    for (Change change : historyInfo.getChangeList()) {
-                        String changeType = change.getType().getTitle();
-                        String changeDescription = change.toString();
-                        changeHistory.add(new CodeChange(commitId, changeType, changeDescription, locationBefore, locationAfter));
+                            for (Change change : historyInfo.getChangeList()) {
+                                String changeType = change.getType().getTitle();
+                                String changeDescription = change.toString();
+                                changeHistory.add(new CodeChange(commitId, changeType, changeDescription, locationBefore, locationAfter));
+                            }
+                        }
                     }
-                }
+                });
             }
-        } catch (Exception e) {
-            LOG.error(String.format("[RefactorInsight]: Error occurred while tracking method's" +
-                    " history using CodeTracker. Details: %s", e.getMessage()), e);
+
+            return changeHistory;
         }
-        return changeHistory;
     }
 
-    public List<CodeChange> getHistoryForVariable(@NotNull String projectPath,
+    public List<CodeChange> getHistoryForVariable(@NotNull Project project,
+                                                  @NotNull String projectPath,
                                                   @NotNull String filePath,
                                                   @NotNull String methodName,
                                                   int methodDeclarationLine,
@@ -80,9 +82,7 @@ public class ChangeHistoryService {
         List<CodeChange> changeHistory = new ArrayList<>();
         try (Repository repository = MiningService.openRepository(projectPath)) {
             if (repository != null) {
-                RevCommit latestCommit = new Git(repository).log().setMaxCount(1).call().iterator().next();
-                String latestCommitHash = latestCommit.getName();
-
+                String latestCommitHash = getLatestCommitHash(repository);
                 VariableTracker variableTracker = CodeTracker.variableTracker()
                         .repository(repository)
                         .filePath(filePath)
@@ -93,37 +93,44 @@ public class ChangeHistoryService {
                         .variableDeclarationLineNumber(variableDeclarationLine)
                         .build();
 
-                LOG.info("[RefactorInsight]: Start tracking variable's history using CodeTracker.");
+                ProgressManager.getInstance().run(new Task.Modal(project, "Mining the change history for a variable", true) {
+                    @Override
+                    public void run(@NotNull ProgressIndicator indicator) {
+                        History<Variable> variableHistory = null;
+                        try {
+                            LOG.info("[RefactorInsight]: Start tracking variable's history using CodeTracker.");
+                            variableHistory = variableTracker.track();
+                        } catch (Exception ex) {
+                            LOG.error(String.format("[RefactorInsight]: Error occurred while tracking variable's" +
+                                    " history using CodeTracker. Details: %s", ex.getMessage()), ex);
+                        }
+                        for (History.HistoryInfo<Variable> historyInfo : variableHistory.getHistoryInfoList()) {
+                            for (Change change : historyInfo.getChangeList()) {
+                                String commitId = historyInfo.getCommitId();
+                                String changeType = change.getType().getTitle();
+                                String changeDescription = change.toString();
+                                LocationInfo sourceLocation = historyInfo.getElementBefore().getLocation();
+                                LocationInfo targetLocation = historyInfo.getElementAfter().getLocation();
+                                changeHistory.add(new CodeChange(commitId, changeType, changeDescription, sourceLocation, targetLocation));
+                            }
+                        }
 
-                History<Variable> variableHistory = variableTracker.track();
-                for (History.HistoryInfo<Variable> historyInfo : variableHistory.getHistoryInfoList()) {
-                    for (Change change : historyInfo.getChangeList()) {
-                        String commitId = historyInfo.getCommitId();
-                        String changeType = change.getType().getTitle();
-                        String changeDescription = change.toString();
-                        LocationInfo sourceLocation = historyInfo.getElementBefore().getLocation();
-                        LocationInfo targetLocation = historyInfo.getElementAfter().getLocation();
-                        changeHistory.add(new CodeChange(commitId, changeType, changeDescription, sourceLocation, targetLocation));
                     }
-                }
+                });
             }
-        } catch (Exception e) {
-            LOG.error(String.format("[RefactorInsight]: Error occurred while tracking variable's" +
-                    " history using CodeTracker. Details: %s", e.getMessage()), e);
         }
         return changeHistory;
     }
 
-    public List<CodeChange> getHistoryForAttribute(@NotNull String projectPath,
+    public List<CodeChange> getHistoryForAttribute(@NotNull Project project,
+                                                   @NotNull String projectPath,
                                                    @NotNull String filePath,
                                                    @NotNull String attributeName,
                                                    int attributeDeclarationLine) {
         List<CodeChange> changeHistory = new ArrayList<>();
         try (Repository repository = MiningService.openRepository(projectPath)) {
             if (repository != null) {
-                RevCommit latestCommit = new Git(repository).log().setMaxCount(1).call().iterator().next();
-                String latestCommitHash = latestCommit.getName();
-
+                String latestCommitHash = getLatestCommitHash(repository);
                 AttributeTracker attributeTracker = CodeTracker.attributeTracker()
                         .repository(repository)
                         .filePath(filePath)
@@ -132,24 +139,43 @@ public class ChangeHistoryService {
                         .attributeDeclarationLineNumber(attributeDeclarationLine)
                         .build();
 
-                LOG.info("[RefactorInsight]: Start tracking field's history using CodeTracker.");
 
-                History<Attribute> attributeHistory = attributeTracker.track();
-                for (History.HistoryInfo<Attribute> historyInfo : attributeHistory.getHistoryInfoList()) {
-                    for (Change change : historyInfo.getChangeList()) {
-                        String commitId = historyInfo.getCommitId();
-                        String changeType = change.getType().getTitle();
-                        String changeDescription = change.toString();
-                        LocationInfo sourceLocation = historyInfo.getElementBefore().getLocation();
-                        LocationInfo targetLocation = historyInfo.getElementAfter().getLocation();
-                        changeHistory.add(new CodeChange(commitId, changeType, changeDescription, sourceLocation, targetLocation));
+                ProgressManager.getInstance().run(new Task.Modal(project, "Mining the change history for a field", true) {
+                    @Override
+                    public void run(@NotNull ProgressIndicator indicator) {
+                        History<Attribute> attributeHistory = null;
+                        try {
+                            LOG.info("[RefactorInsight]: Start tracking field's history using CodeTracker.");
+                            attributeHistory = attributeTracker.track();
+                        } catch (Exception e) {
+                            LOG.error(String.format("[RefactorInsight]: Error occurred while tracking field's" +
+                                    " history using CodeTracker. Details: %s", e.getMessage()), e);
+                        }
+                        for (History.HistoryInfo<Attribute> historyInfo : attributeHistory.getHistoryInfoList()) {
+                            for (Change change : historyInfo.getChangeList()) {
+                                String commitId = historyInfo.getCommitId();
+                                String changeType = change.getType().getTitle();
+                                String changeDescription = change.toString();
+                                LocationInfo sourceLocation = historyInfo.getElementBefore().getLocation();
+                                LocationInfo targetLocation = historyInfo.getElementAfter().getLocation();
+                                changeHistory.add(new CodeChange(commitId, changeType, changeDescription, sourceLocation, targetLocation));
+                            }
+                        }
                     }
-                }
+                });
             }
-        } catch (Exception e) {
-            LOG.error(String.format("[RefactorInsight]: Error occurred while tracking field's" +
-                    " history using CodeTracker. Details: %s", e.getMessage()), e);
         }
         return changeHistory;
+    }
+
+    @NotNull
+    private String getLatestCommitHash(Repository repository) {
+        RevCommit latestCommit = null;
+        try {
+            latestCommit = new Git(repository).log().setMaxCount(1).call().iterator().next();
+        } catch (GitAPIException e) {
+            LOG.error(String.format("[RefactorInsight]: Error occurred while getting the latest commit. Details: %s", e.getMessage()), e);
+        }
+        return latestCommit.getName();
     }
 }
