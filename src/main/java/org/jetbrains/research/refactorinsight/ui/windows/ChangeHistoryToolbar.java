@@ -10,6 +10,7 @@ import com.intellij.diff.util.DiffUserDataKeys;
 import com.intellij.diff.util.Side;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.diff.DiffBundle;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -47,7 +48,10 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.intellij.openapi.vcs.changes.actions.diff.ChangeDiffRequestProducer.*;
@@ -62,6 +66,7 @@ public class ChangeHistoryToolbar implements Disposable {
     private HistoryType type;
     private DiffRequestPanel myDiffPanel;
     private ConcurrentHashMap<String, VcsFullCommitDetails> commitsDetails = new ConcurrentHashMap<>();
+    private static final Logger LOG = Logger.getInstance(ChangeHistoryToolbar.class);
 
     public ChangeHistoryToolbar(Project project) {
         this.project = project;
@@ -148,11 +153,7 @@ public class ChangeHistoryToolbar implements Disposable {
                     if (selectedChange == null) {
                         return;
                     }
-                    try {
-                        showDiffForChange(selectedChange, splitter);
-                    } catch (VcsException ex) {
-                        ex.printStackTrace();
-                    }
+                    showDiffForChange(selectedChange, splitter);
                 }
             }
         });
@@ -163,7 +164,7 @@ public class ChangeHistoryToolbar implements Disposable {
         return (CodeChange) table.getModel().getValueAt(row, column);
     }
 
-    private void showDiffForChange(CodeChange change, JBSplitter splitter) throws VcsException {
+    private void showDiffForChange(CodeChange change, JBSplitter splitter) {
         VcsLogManager logManager = VcsProjectLog.getInstance(project).getLogManager();
         if (logManager == null) {
             return;
@@ -182,8 +183,7 @@ public class ChangeHistoryToolbar implements Disposable {
                             .map(VcsFullCommitDetails::getChanges).orElse(new ArrayList<>());
                     myDiffPanel.setRequest(createSimpleRequest(project, getVcsChangeForSelectedChange(changes, change, project), indicator));
                 } catch (VcsException | DiffRequestProducerException e) {
-                    //TODO: handle exceptions
-                    e.printStackTrace();
+                    LOG.error(String.format("[RefactorInsight]: Failed to compute diff. Details: %s", e.getMessage()), e);
                 }
             }
 
@@ -220,8 +220,8 @@ public class ChangeHistoryToolbar implements Disposable {
                 }
             }
         } catch (VcsException ex) {
-            //TODO: handle exception
-            ex.printStackTrace();
+            LOG.error(String.format("[RefactorInsight]: Failed to get the corresponding VCS change." +
+                    " Details: %s", ex.getMessage()), ex);
         }
         return null;
     }

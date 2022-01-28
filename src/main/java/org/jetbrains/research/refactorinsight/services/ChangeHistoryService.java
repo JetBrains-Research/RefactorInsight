@@ -1,6 +1,5 @@
 package org.jetbrains.research.refactorinsight.services;
 
-import com.google.common.graph.EndpointPair;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Computable;
 import gr.uom.java.xmi.LocationInfo;
@@ -12,15 +11,19 @@ import org.codetracker.element.Variable;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.CodeChange;
+import com.intellij.openapi.diagnostic.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChangeHistoryService {
-    public List<CodeChange> getHistoryForMethod(String projectPath,
-                                                String filePath,
-                                                String methodName,
+    private static final Logger LOG = Logger.getInstance(ChangeHistoryService.class);
+
+    public List<CodeChange> getHistoryForMethod(@NotNull String projectPath,
+                                                @NotNull String filePath,
+                                                @NotNull String methodName,
                                                 int methodDeclarationLine) {
         List<CodeChange> changeHistory = new ArrayList<>();
         try (Repository repository = MiningService.openRepository(projectPath)) {
@@ -39,10 +42,11 @@ public class ChangeHistoryService {
                         (Computable<? extends History<Method>>) () -> {
                             History<Method> history = null;
                             try {
+                                LOG.info("[RefactorInsight]: Start tracking method's history using CodeTracker.");
                                 history = methodTracker.track();
                             } catch (Exception e) {
-                                //TODO handle the exception
-                                e.printStackTrace();
+                                LOG.error(String.format("[RefactorInsight]: Error occurred while tracking method's" +
+                                        " history using CodeTracker. Details: %s", e.getMessage()), e);
                             }
                             return history;
                         }
@@ -61,16 +65,17 @@ public class ChangeHistoryService {
                 }
             }
         } catch (Exception e) {
-            //TODO handle the exception
+            LOG.error(String.format("[RefactorInsight]: Error occurred while tracking method's" +
+                    " history using CodeTracker. Details: %s", e.getMessage()), e);
         }
         return changeHistory;
     }
 
-    public List<CodeChange> getHistoryForVariable(String projectPath,
-                                                  String filePath,
-                                                  String methodName,
+    public List<CodeChange> getHistoryForVariable(@NotNull String projectPath,
+                                                  @NotNull String filePath,
+                                                  @NotNull String methodName,
                                                   int methodDeclarationLine,
-                                                  String variableName,
+                                                  @NotNull String variableName,
                                                   int variableDeclarationLine) {
         List<CodeChange> changeHistory = new ArrayList<>();
         try (Repository repository = MiningService.openRepository(projectPath)) {
@@ -88,6 +93,8 @@ public class ChangeHistoryService {
                         .variableDeclarationLineNumber(variableDeclarationLine)
                         .build();
 
+                LOG.info("[RefactorInsight]: Start tracking variable's history using CodeTracker.");
+
                 History<Variable> variableHistory = variableTracker.track();
                 for (History.HistoryInfo<Variable> historyInfo : variableHistory.getHistoryInfoList()) {
                     for (Change change : historyInfo.getChangeList()) {
@@ -101,14 +108,15 @@ public class ChangeHistoryService {
                 }
             }
         } catch (Exception e) {
-            //TODO handle the exception
+            LOG.error(String.format("[RefactorInsight]: Error occurred while tracking variable's" +
+                    " history using CodeTracker. Details: %s", e.getMessage()), e);
         }
         return changeHistory;
     }
 
-    public List<CodeChange> getHistoryForAttribute(String projectPath,
-                                                   String filePath,
-                                                   String attributeName,
+    public List<CodeChange> getHistoryForAttribute(@NotNull String projectPath,
+                                                   @NotNull String filePath,
+                                                   @NotNull String attributeName,
                                                    int attributeDeclarationLine) {
         List<CodeChange> changeHistory = new ArrayList<>();
         try (Repository repository = MiningService.openRepository(projectPath)) {
@@ -124,6 +132,8 @@ public class ChangeHistoryService {
                         .attributeDeclarationLineNumber(attributeDeclarationLine)
                         .build();
 
+                LOG.info("[RefactorInsight]: Start tracking field's history using CodeTracker.");
+
                 History<Attribute> attributeHistory = attributeTracker.track();
                 for (History.HistoryInfo<Attribute> historyInfo : attributeHistory.getHistoryInfoList()) {
                     for (Change change : historyInfo.getChangeList()) {
@@ -137,7 +147,8 @@ public class ChangeHistoryService {
                 }
             }
         } catch (Exception e) {
-            //TODO handle the exception
+            LOG.error(String.format("[RefactorInsight]: Error occurred while tracking field's" +
+                    " history using CodeTracker. Details: %s", e.getMessage()), e);
         }
         return changeHistory;
     }
