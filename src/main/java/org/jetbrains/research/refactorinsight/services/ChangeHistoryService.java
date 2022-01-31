@@ -18,6 +18,9 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.CodeChange;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,13 +58,16 @@ public class ChangeHistoryService {
 
                         for (History.HistoryInfo<Method> historyInfo : methodHistory.getHistoryInfoList()) {
                             String commitId = historyInfo.getCommitId();
+                            String changeDate = formatDate(historyInfo.getCommitTime());
+                            String changeAuthor = historyInfo.getCommitterName();
                             LocationInfo locationBefore = historyInfo.getElementBefore().getLocation();
                             LocationInfo locationAfter = historyInfo.getElementAfter().getLocation();
 
                             for (Change change : historyInfo.getChangeList()) {
                                 String changeType = change.getType().getTitle();
                                 String changeDescription = change.toString();
-                                changeHistory.add(new CodeChange(commitId, changeType, changeDescription, locationBefore, locationAfter));
+                                changeHistory.add(new CodeChange(commitId, changeType, changeDescription, changeDate,
+                                        changeAuthor, locationBefore, locationAfter));
                             }
                         }
                     }
@@ -107,11 +113,14 @@ public class ChangeHistoryService {
                         for (History.HistoryInfo<Variable> historyInfo : variableHistory.getHistoryInfoList()) {
                             for (Change change : historyInfo.getChangeList()) {
                                 String commitId = historyInfo.getCommitId();
+                                String changeDate = formatDate(historyInfo.getCommitTime());
+                                String changeAuthor = historyInfo.getCommitterName();
                                 String changeType = change.getType().getTitle();
                                 String changeDescription = change.toString();
                                 LocationInfo sourceLocation = historyInfo.getElementBefore().getLocation();
                                 LocationInfo targetLocation = historyInfo.getElementAfter().getLocation();
-                                changeHistory.add(new CodeChange(commitId, changeType, changeDescription, sourceLocation, targetLocation));
+                                changeHistory.add(new CodeChange(commitId, changeType, changeDescription,
+                                        changeDate, changeAuthor, sourceLocation, targetLocation));
                             }
                         }
 
@@ -154,11 +163,14 @@ public class ChangeHistoryService {
                         for (History.HistoryInfo<Attribute> historyInfo : attributeHistory.getHistoryInfoList()) {
                             for (Change change : historyInfo.getChangeList()) {
                                 String commitId = historyInfo.getCommitId();
+                                String changeDate = formatDate(historyInfo.getCommitTime());
+                                String changeAuthor = historyInfo.getCommitterName();
                                 String changeType = change.getType().getTitle();
                                 String changeDescription = change.toString();
                                 LocationInfo sourceLocation = historyInfo.getElementBefore().getLocation();
                                 LocationInfo targetLocation = historyInfo.getElementAfter().getLocation();
-                                changeHistory.add(new CodeChange(commitId, changeType, changeDescription, sourceLocation, targetLocation));
+                                changeHistory.add(new CodeChange(commitId, changeType, changeDescription,
+                                        changeDate, changeAuthor, sourceLocation, targetLocation));
                             }
                         }
                     }
@@ -177,5 +189,10 @@ public class ChangeHistoryService {
             LOG.error(String.format("[RefactorInsight]: Error occurred while getting the latest commit. Details: %s", e.getMessage()), e);
         }
         return latestCommit.getName();
+    }
+
+    private String formatDate(long time) {
+        return LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC)
+                .format(DateTimeFormatter.ofPattern("d/M/yy, h:mm a"));
     }
 }

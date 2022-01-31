@@ -85,9 +85,10 @@ public class ChangeHistoryToolbar implements Disposable {
         JBTable table = new JBTable();
         table.setDefaultEditor(Object.class, null);
         DefaultTableModel model = (DefaultTableModel) table.getModel();
-        //TODO: add columns with author and date
         model.addColumn(RefactorInsightBundle.message("change.type.column.name"));
-        methodsHistory.forEach(i -> model.addRow(new Object[]{i}));
+        model.addColumn(RefactorInsightBundle.message("change.date.column.name"));
+        model.addColumn(RefactorInsightBundle.message("change.author.column.name"));
+        methodsHistory.forEach(i -> model.addRow(new Object[]{i, i.getChangeDate(), i.getChangeAuthor()}));
         addMouseListener(splitter, table);
         setFirstComponent(methodsHistory.size(), splitter, table);
         setSecondComponent(splitter);

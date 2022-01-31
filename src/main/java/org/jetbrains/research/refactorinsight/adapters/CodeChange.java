@@ -9,17 +9,23 @@ public class CodeChange {
     private final String commitId;
     private final String changeType;
     private final String description;
+    private final String changeDate;
+    private final String changeAuthor;
     private final gr.uom.java.xmi.LocationInfo locationInfoBefore;
     private final gr.uom.java.xmi.LocationInfo locationInfoAfter;
 
     public CodeChange(String commitId,
                       String changeType,
                       String description,
+                      String changeDate,
+                      String changeAuthor,
                       gr.uom.java.xmi.LocationInfo locationInfo,
                       gr.uom.java.xmi.LocationInfo locationInfoAfter) {
         this.commitId = commitId;
         this.changeType = changeType;
         this.description = description;
+        this.changeDate = changeDate;
+        this.changeAuthor = changeAuthor;
         this.locationInfoBefore = locationInfo;
         this.locationInfoAfter = locationInfoAfter;
     }
@@ -34,6 +40,14 @@ public class CodeChange {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getChangeDate() {
+        return changeDate;
+    }
+
+    public String getChangeAuthor() {
+        return changeAuthor;
     }
 
     public LocationInfo getLocationInfoBefore() {
