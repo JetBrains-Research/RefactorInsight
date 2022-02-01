@@ -4,10 +4,14 @@ import com.intellij.diff.DiffContentFactoryEx;
 import com.intellij.diff.DiffManager;
 import com.intellij.diff.DiffRequestPanel;
 import com.intellij.diff.chains.DiffRequestProducerException;
+import com.intellij.diff.comparison.ComparisonManagerImpl;
+import com.intellij.diff.comparison.InnerFragmentsPolicy;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
-import com.intellij.diff.util.DiffUserDataKeys;
-import com.intellij.diff.util.Side;
+import com.intellij.diff.tools.util.text.LineOffsets;
+import com.intellij.diff.tools.util.text.LineOffsetsUtil;
+import com.intellij.diff.util.DiffUserDataKeysEx;
+import com.intellij.diff.util.Range;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.diagnostic.Logger;
@@ -20,7 +24,6 @@ import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ContentRevision;
-import com.intellij.openapi.vcs.changes.CurrentContentRevision;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
@@ -114,18 +117,21 @@ public class ChangeHistoryToolbar implements Disposable {
 
     private @NotNull
     SimpleDiffRequest createSimpleRequest(@Nullable Project project,
-                                          @NotNull Change change, ProgressIndicator indicator) throws DiffRequestProducerException {
-        ContentRevision beforeRevision = change.getBeforeRevision();
-        ContentRevision afterRevision = change.getAfterRevision();
+                                          CodeChange entityChange,
+                                          @NotNull Change fileChange,
+                                          ProgressIndicator indicator) throws DiffRequestProducerException {
+        ContentRevision beforeRevision = fileChange.getBeforeRevision();
+        ContentRevision afterRevision = fileChange.getAfterRevision();
         UserDataHolderBase context = new UserDataHolderBase();
 
         if (beforeRevision == null && afterRevision == null) {
             throw new DiffRequestProducerException(DiffBundle.message("error.cant.show.diff.content.not.found"));
         }
+
         if (beforeRevision != null) checkContentRevision(project, beforeRevision, context, indicator);
         if (afterRevision != null) checkContentRevision(project, afterRevision, context, indicator);
 
-        String title = getRequestTitle(change);
+        String title = getRequestTitle(fileChange);
 
         indicator.setIndeterminate(true);
         DiffContent content1 = createContent(project, beforeRevision, context, indicator);
@@ -136,11 +142,21 @@ public class ChangeHistoryToolbar implements Disposable {
 
         SimpleDiffRequest request = new SimpleDiffRequest(title, content1, content2, beforeRevisionTitle, afterRevisionTitle);
 
-        boolean bRevCurrent = beforeRevision instanceof CurrentContentRevision;
-        boolean aRevCurrent = afterRevision instanceof CurrentContentRevision;
-        if (bRevCurrent && !aRevCurrent) request.putUserData(DiffUserDataKeys.MASTER_SIDE, Side.LEFT);
-        if (!bRevCurrent && aRevCurrent) request.putUserData(DiffUserDataKeys.MASTER_SIDE, Side.RIGHT);
+        request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
+                (text1, text2, policy, innerChanges, i)
+                        -> {
+                    InnerFragmentsPolicy fragmentsPolicy = innerChanges ? InnerFragmentsPolicy.WORDS : InnerFragmentsPolicy.NONE;
+                    LineOffsets offsets1 = LineOffsetsUtil.create(text1);
+                    LineOffsets offsets2 = LineOffsetsUtil.create(text2);
 
+                    ComparisonManagerImpl comparisonManager = ComparisonManagerImpl.getInstanceImpl();
+                    return new ArrayList<>(comparisonManager.compareLinesInner(
+                            new Range(entityChange.getLocationInfoBefore().getStartLine(),
+                                    entityChange.getLocationInfoBefore().getEndLine(),
+                                    entityChange.getLocationInfoAfter().getStartLine(),
+                                    entityChange.getLocationInfoAfter().getEndLine()),
+                            text1, text2, offsets1, offsets2, policy, fragmentsPolicy, indicator));
+                });
         return request;
     }
 
@@ -181,7 +197,7 @@ public class ChangeHistoryToolbar implements Disposable {
                     commitsDetails.put(change.getCommitId(), getFirstItem(getDetails(vcsLogProvider, root, singletonList(change.getCommitId()))));
                     final Collection<Change> changes = Optional.ofNullable(commitsDetails.get(change.getCommitId()))
                             .map(VcsFullCommitDetails::getChanges).orElse(new ArrayList<>());
-                    myDiffPanel.setRequest(createSimpleRequest(project, getVcsChangeForSelectedChange(changes, change, project), indicator));
+                    myDiffPanel.setRequest(createSimpleRequest(project, change, getVcsChangeForSelectedChange(changes, change, project), indicator));
                 } catch (VcsException | DiffRequestProducerException e) {
                     LOG.error(String.format("[RefactorInsight]: Failed to compute diff. Details: %s", e.getMessage()), e);
                 }
