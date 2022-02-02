@@ -17,6 +17,7 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.CodeChange;
+import org.jetbrains.research.refactorinsight.ui.windows.ElementType;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -64,10 +65,10 @@ public class ChangeHistoryService {
                             LocationInfo locationAfter = historyInfo.getElementAfter().getLocation();
 
                             for (Change change : historyInfo.getChangeList()) {
-                                String changeType = change.getType().getTitle();
+                                Change.Type changeType = change.getType();
                                 String changeDescription = change.toString();
                                 changeHistory.add(new CodeChange(commitId, changeType, changeDescription, changeDate,
-                                        changeAuthor, locationBefore, locationAfter));
+                                        changeAuthor, locationBefore, locationAfter, ElementType.METHOD));
                             }
                         }
                     }
@@ -115,12 +116,12 @@ public class ChangeHistoryService {
                                 String commitId = historyInfo.getCommitId();
                                 String changeDate = formatDate(historyInfo.getCommitTime());
                                 String changeAuthor = historyInfo.getCommitterName();
-                                String changeType = change.getType().getTitle();
+                                Change.Type changeType = change.getType();
                                 String changeDescription = change.toString();
                                 LocationInfo sourceLocation = historyInfo.getElementBefore().getLocation();
                                 LocationInfo targetLocation = historyInfo.getElementAfter().getLocation();
                                 changeHistory.add(new CodeChange(commitId, changeType, changeDescription,
-                                        changeDate, changeAuthor, sourceLocation, targetLocation));
+                                        changeDate, changeAuthor, sourceLocation, targetLocation, ElementType.VARIABLE));
                             }
                         }
 
@@ -165,12 +166,12 @@ public class ChangeHistoryService {
                                 String commitId = historyInfo.getCommitId();
                                 String changeDate = formatDate(historyInfo.getCommitTime());
                                 String changeAuthor = historyInfo.getCommitterName();
-                                String changeType = change.getType().getTitle();
+                                Change.Type changeType = change.getType();
                                 String changeDescription = change.toString();
                                 LocationInfo sourceLocation = historyInfo.getElementBefore().getLocation();
                                 LocationInfo targetLocation = historyInfo.getElementAfter().getLocation();
                                 changeHistory.add(new CodeChange(commitId, changeType, changeDescription,
-                                        changeDate, changeAuthor, sourceLocation, targetLocation));
+                                        changeDate, changeAuthor, sourceLocation, targetLocation, ElementType.ATTRIBUTE));
                             }
                         }
                     }

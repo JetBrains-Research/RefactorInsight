@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.CodeChange;
 import org.jetbrains.research.refactorinsight.services.ChangeHistoryService;
 import org.jetbrains.research.refactorinsight.ui.windows.ChangeHistoryToolbar;
-import org.jetbrains.research.refactorinsight.ui.windows.HistoryType;
+import org.jetbrains.research.refactorinsight.ui.windows.ElementType;
 import org.jetbrains.research.refactorinsight.utils.Utils;
 
 import java.util.List;
@@ -93,7 +93,7 @@ public class ChangeHistoryAction extends AnAction implements DumbAware {
                     method.getName(),
                     getNumberOfElementStartLine(method.getContainingFile(), method.getTextOffset()));
 
-            getToolbarWindow(project).showToolbar(method.getName(), HistoryType.METHOD, methodChangeHistory);
+            getToolbarWindow(project).showToolbar(method.getName(), ElementType.METHOD, methodChangeHistory);
         }
     }
 
@@ -119,7 +119,7 @@ public class ChangeHistoryAction extends AnAction implements DumbAware {
                         variable.getName(),
                         numberOfVariableStartLine);
 
-                getToolbarWindow(project).showToolbar(variable.getName(), HistoryType.VARIABLE, variableChangeHistory);
+                getToolbarWindow(project).showToolbar(variable.getName(), ElementType.VARIABLE, variableChangeHistory);
             }
         }
     }
@@ -141,7 +141,7 @@ public class ChangeHistoryAction extends AnAction implements DumbAware {
                             attribute.getName(),
                             numberOfVariableStartLine);
 
-            getToolbarWindow(project).showToolbar(attribute.getName(), HistoryType.ATTRIBUTE, variableChangeHistory);
+            getToolbarWindow(project).showToolbar(attribute.getName(), ElementType.ATTRIBUTE, variableChangeHistory);
         }
     }
 

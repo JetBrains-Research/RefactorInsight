@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.services.MiningService;
-import org.jetbrains.research.refactorinsight.ui.windows.HistoryType;
+import org.jetbrains.research.refactorinsight.ui.windows.ElementType;
 import org.jetbrains.research.refactorinsight.ui.windows.RefactoringHistoryToolbar;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 import org.jetbrains.research.refactorinsight.utils.Utils;
@@ -87,7 +87,7 @@ public class RefactoringHistoryAction extends AnAction {
     String signature = StringUtils.getFieldSignature(target);
     getToolbarWindow(project)
         .showToolbar(map.getOrDefault(signature, new HashSet<>()),
-                     target.getName(), dataContext, HistoryType.ATTRIBUTE, null, null);
+                     target.getName(), dataContext, ElementType.ATTRIBUTE, null, null);
   }
 
   private void showHistoryClass(Project project, DataContext dataContext, PsiClass psiClass) {
@@ -104,14 +104,14 @@ public class RefactoringHistoryAction extends AnAction {
 
     getToolbarWindow(project)
         .showToolbar(map.getOrDefault(signature, new HashSet<>()),
-                     psiClass.getName(), dataContext, HistoryType.CLASS, methodsHistory, fieldsHistory);
+                     psiClass.getName(), dataContext, ElementType.CLASS, methodsHistory, fieldsHistory);
   }
 
   private void showHistoryMethod(Project project, DataContext dataContext, PsiMethod method) {
     String signature = StringUtils.calculateSignature(method);
     getToolbarWindow(project)
         .showToolbar(map.getOrDefault(signature, new HashSet<>()),
-                     method.getName(), dataContext, HistoryType.METHOD, null, null);
+                     method.getName(), dataContext, ElementType.METHOD, null, null);
   }
 
   @Override

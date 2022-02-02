@@ -55,7 +55,7 @@ public class RefactoringHistoryToolbar {
   private ToolWindowManager toolWindowManager;
   private ToolWindow toolWindow;
   private Project project;
-  private HistoryType type;
+  private ElementType type;
 
   /**
    * Constructor for the toolbar.
@@ -79,7 +79,7 @@ public class RefactoringHistoryToolbar {
    * @param objectsName  name of the method
    */
   public void showToolbar(Set<RefactoringInfo> refactorings,
-                          String objectsName, DataContext datacontext, HistoryType type,
+                          String objectsName, DataContext datacontext, ElementType type,
                           @Nullable HashMap<String, Set<RefactoringInfo>> methodsHistory,
                           @Nullable HashMap<String, Set<RefactoringInfo>> attributesHistory) {
 

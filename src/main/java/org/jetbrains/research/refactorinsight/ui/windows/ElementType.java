@@ -1,6 +1,6 @@
 package org.jetbrains.research.refactorinsight.ui.windows;
 
-public enum HistoryType {
+public enum ElementType {
   ATTRIBUTE,
   VARIABLE,
   METHOD,

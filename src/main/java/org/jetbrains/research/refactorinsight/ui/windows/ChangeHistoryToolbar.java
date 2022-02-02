@@ -10,8 +10,10 @@ import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.tools.util.text.LineOffsets;
 import com.intellij.diff.tools.util.text.LineOffsetsUtil;
+import com.intellij.diff.util.DiffUserDataKeys;
 import com.intellij.diff.util.DiffUserDataKeysEx;
 import com.intellij.diff.util.Range;
+import com.intellij.diff.util.Side;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.diagnostic.Logger;
@@ -24,6 +26,7 @@ import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ContentRevision;
+import com.intellij.openapi.vcs.changes.CurrentContentRevision;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
@@ -61,12 +64,13 @@ import static com.intellij.openapi.vcs.changes.actions.diff.ChangeDiffRequestPro
 import static com.intellij.util.containers.ContainerUtil.getFirstItem;
 import static com.intellij.vcs.log.util.VcsLogUtil.getDetails;
 import static java.util.Collections.singletonList;
+import static org.codetracker.change.Change.Type.CONTAINER_CHANGE;
 
 public class ChangeHistoryToolbar implements Disposable {
     private ToolWindowManager toolWindowManager;
     private ToolWindow toolWindow;
     private Project project;
-    private HistoryType type;
+    private ElementType type;
     private DiffRequestPanel myDiffPanel;
     private ConcurrentHashMap<String, VcsFullCommitDetails> commitsDetails = new ConcurrentHashMap<>();
     private static final Logger LOG = Logger.getInstance(ChangeHistoryToolbar.class);
@@ -81,7 +85,7 @@ public class ChangeHistoryToolbar implements Disposable {
         myDiffPanel = DiffManager.getInstance().createRequestPanel(project, this, null);
     }
 
-    public void showToolbar(String objectName, HistoryType type, List<CodeChange> methodsHistory) {
+    public void showToolbar(String objectName, ElementType type, List<CodeChange> methodsHistory) {
         this.type = type;
         //TODO: split the panels vertically?
         JBSplitter splitter = new JBSplitter(false, "file.history.selection.diff.splitter.proportion", 0.5f);
@@ -141,22 +145,37 @@ public class ChangeHistoryToolbar implements Disposable {
         final String afterRevisionTitle = "Right side";
 
         SimpleDiffRequest request = new SimpleDiffRequest(title, content1, content2, beforeRevisionTitle, afterRevisionTitle);
+        ElementType type = entityChange.getType();
 
-        request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
-                (text1, text2, policy, innerChanges, i)
-                        -> {
-                    InnerFragmentsPolicy fragmentsPolicy = innerChanges ? InnerFragmentsPolicy.WORDS : InnerFragmentsPolicy.NONE;
-                    LineOffsets offsets1 = LineOffsetsUtil.create(text1);
-                    LineOffsets offsets2 = LineOffsetsUtil.create(text2);
+        if (entityChange.getChangeType().equals(CONTAINER_CHANGE)) {
+            //highlight all changes in the file
+            boolean bRevCurrent = beforeRevision instanceof CurrentContentRevision;
+            boolean aRevCurrent = afterRevision instanceof CurrentContentRevision;
+            if (bRevCurrent && !aRevCurrent) request.putUserData(DiffUserDataKeys.MASTER_SIDE, Side.LEFT);
+            if (!bRevCurrent && aRevCurrent) request.putUserData(DiffUserDataKeys.MASTER_SIDE, Side.RIGHT);
+        } else {
+            boolean isVariableOrAttribute = type.equals(ElementType.ATTRIBUTE) || type.equals(ElementType.VARIABLE);
+            //correct lines for fields and variable to highlight only the lines that contains the corresponding change
+            int startLineBefore = isVariableOrAttribute ?
+                    entityChange.getLocationInfoBefore().getStartLine() - 1 : entityChange.getLocationInfoBefore().getStartLine();
+            int endLineBefore = entityChange.getLocationInfoBefore().getEndLine();
+            int startLineAfter = isVariableOrAttribute ?
+                    entityChange.getLocationInfoAfter().getStartLine() - 1 : entityChange.getLocationInfoAfter().getStartLine();
+            int endLineAfter = entityChange.getLocationInfoAfter().getEndLine();
 
-                    ComparisonManagerImpl comparisonManager = ComparisonManagerImpl.getInstanceImpl();
-                    return new ArrayList<>(comparisonManager.compareLinesInner(
-                            new Range(entityChange.getLocationInfoBefore().getStartLine(),
-                                    entityChange.getLocationInfoBefore().getEndLine(),
-                                    entityChange.getLocationInfoAfter().getStartLine(),
-                                    entityChange.getLocationInfoAfter().getEndLine()),
-                            text1, text2, offsets1, offsets2, policy, fragmentsPolicy, indicator));
-                });
+            request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
+                    (text1, text2, policy, innerChanges, i)
+                            -> {
+                        InnerFragmentsPolicy fragmentsPolicy = innerChanges ? InnerFragmentsPolicy.WORDS : InnerFragmentsPolicy.NONE;
+                        LineOffsets offsets1 = LineOffsetsUtil.create(text1);
+                        LineOffsets offsets2 = LineOffsetsUtil.create(text2);
+
+                        ComparisonManagerImpl comparisonManager = ComparisonManagerImpl.getInstanceImpl();
+                        return new ArrayList<>(comparisonManager.compareLinesInner(
+                                new Range(startLineBefore, endLineBefore, startLineAfter, endLineAfter),
+                                text1, text2, offsets1, offsets2, policy, fragmentsPolicy, indicator));
+                    });
+        }
         return request;
     }
 
