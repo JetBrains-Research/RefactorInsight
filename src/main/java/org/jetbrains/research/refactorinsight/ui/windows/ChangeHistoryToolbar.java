@@ -1,5 +1,6 @@
 package org.jetbrains.research.refactorinsight.ui.windows;
 
+import com.intellij.diff.DiffContentFactory;
 import com.intellij.diff.DiffContentFactoryEx;
 import com.intellij.diff.DiffManager;
 import com.intellij.diff.DiffRequestPanel;
@@ -7,6 +8,7 @@ import com.intellij.diff.chains.DiffRequestProducerException;
 import com.intellij.diff.comparison.ComparisonManagerImpl;
 import com.intellij.diff.comparison.InnerFragmentsPolicy;
 import com.intellij.diff.contents.DiffContent;
+import com.intellij.diff.fragments.LineFragmentImpl;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.tools.util.text.LineOffsets;
 import com.intellij.diff.tools.util.text.LineOffsetsUtil;
@@ -17,16 +19,12 @@ import com.intellij.diff.util.Side;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.diff.DiffBundle;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
-import com.intellij.openapi.vcs.changes.ContentRevision;
-import com.intellij.openapi.vcs.changes.CurrentContentRevision;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
@@ -54,17 +52,13 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.intellij.openapi.vcs.changes.actions.diff.ChangeDiffRequestProducer.*;
 import static com.intellij.util.containers.ContainerUtil.getFirstItem;
 import static com.intellij.vcs.log.util.VcsLogUtil.getDetails;
 import static java.util.Collections.singletonList;
-import static org.codetracker.change.Change.Type.CONTAINER_CHANGE;
+import static org.codetracker.change.Change.Type.*;
 
 public class ChangeHistoryToolbar implements Disposable {
     private ToolWindowManager toolWindowManager;
@@ -121,45 +115,52 @@ public class ChangeHistoryToolbar implements Disposable {
 
     private @NotNull
     SimpleDiffRequest createSimpleRequest(@Nullable Project project,
+                                          Collection<Change> vcsChanges,
                                           CodeChange entityChange,
-                                          @NotNull Change fileChange,
                                           ProgressIndicator indicator) throws DiffRequestProducerException {
-        ContentRevision beforeRevision = fileChange.getBeforeRevision();
-        ContentRevision afterRevision = fileChange.getAfterRevision();
-        UserDataHolderBase context = new UserDataHolderBase();
-
-        if (beforeRevision == null && afterRevision == null) {
-            throw new DiffRequestProducerException(DiffBundle.message("error.cant.show.diff.content.not.found"));
-        }
-
-        if (beforeRevision != null) checkContentRevision(project, beforeRevision, context, indicator);
-        if (afterRevision != null) checkContentRevision(project, afterRevision, context, indicator);
-
-        String title = getRequestTitle(fileChange);
-
         indicator.setIndeterminate(true);
-        DiffContent content1 = createContent(project, beforeRevision, context, indicator);
-        DiffContent content2 = createContent(project, afterRevision, context, indicator);
+        DiffContent[] contents = getVcsChangeForSelectedChange(vcsChanges, entityChange, project);
+        assert contents != null;
 
-        String beforeRevisionTitle = "Left side";
-        final String afterRevisionTitle = "Right side";
+        DiffContent beforeContent = contents[0] == null ? DiffContentFactory.getInstance().createEmpty() : contents[0];
+        DiffContent afterContent = contents[1] == null ? DiffContentFactory.getInstance().createEmpty() : contents[1];
 
-        SimpleDiffRequest request = new SimpleDiffRequest(title, content1, content2, beforeRevisionTitle, afterRevisionTitle);
+        SimpleDiffRequest request = new SimpleDiffRequest(entityChange.getChangeType().getTitle(),
+                beforeContent, afterContent, entityChange.getLocationInfoBefore().getFilePath(),
+                entityChange.getLocationInfoAfter().getFilePath());
         ElementType type = entityChange.getType();
 
-        if (entityChange.getChangeType().equals(CONTAINER_CHANGE)) {
+        if (entityChange.getChangeType().equals(INTRODUCED) || entityChange.getChangeType().equals(CONTAINER_CHANGE)) {
             //highlight all changes in the file
-            boolean bRevCurrent = beforeRevision instanceof CurrentContentRevision;
-            boolean aRevCurrent = afterRevision instanceof CurrentContentRevision;
-            if (bRevCurrent && !aRevCurrent) request.putUserData(DiffUserDataKeys.MASTER_SIDE, Side.LEFT);
-            if (!bRevCurrent && aRevCurrent) request.putUserData(DiffUserDataKeys.MASTER_SIDE, Side.RIGHT);
+            request.putUserData(DiffUserDataKeys.MASTER_SIDE, Side.RIGHT);
+        } else if (entityChange.getChangeType().equals(MOVED) ||
+                entityChange.getDescription().contains("Move") ||
+                !entityChange.getLocationInfoBefore().getFilePath().equals(entityChange.getLocationInfoAfter().getFilePath())) {
+            //show an entity in the original file and in the target file the entity was move to
+            //in case of composite refactorings such as Rename and Move the type might be equal RENAME, so we need to check if description contains Move
+            //the plugin only highlights the entity in both files because it doesn't seem possible to calculate a diff between two different files
+            request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
+                    (text1, text2, policy, innerChanges, i)
+                            -> Collections.singletonList(
+                            new LineFragmentImpl(
+                                    entityChange.getLocationInfoBefore().getStartLine() - 1,
+                                    entityChange.getLocationInfoBefore().getEndLine(),
+                                    entityChange.getLocationInfoAfter().getStartLine() - 1,
+                                    entityChange.getLocationInfoAfter().getEndLine(),
+                                    entityChange.getLocationInfoBefore().getStartOffset(),
+                                    entityChange.getLocationInfoBefore().getEndOffset(),
+                                    entityChange.getLocationInfoAfter().getStartOffset(),
+                                    entityChange.getLocationInfoAfter().getEndOffset()
+                            )));
         } else {
-            boolean isVariableOrAttribute = type.equals(ElementType.ATTRIBUTE) || type.equals(ElementType.VARIABLE);
-            //correct lines for fields and variable to highlight only the lines that contains the corresponding change
-            int startLineBefore = isVariableOrAttribute ?
+            boolean isVariableOrAttributeOrAnnotation = type.equals(ElementType.ATTRIBUTE) || type.equals(ElementType.VARIABLE) ||
+                    entityChange.getChangeType().equals(ANNOTATION_CHANGE);
+            //correct lines for fields and variable to highlight only the lines that contain the corresponding change
+            //calculate the diff only for the entity changes
+            int startLineBefore = isVariableOrAttributeOrAnnotation ?
                     entityChange.getLocationInfoBefore().getStartLine() - 1 : entityChange.getLocationInfoBefore().getStartLine();
             int endLineBefore = entityChange.getLocationInfoBefore().getEndLine();
-            int startLineAfter = isVariableOrAttribute ?
+            int startLineAfter = isVariableOrAttributeOrAnnotation ?
                     entityChange.getLocationInfoAfter().getStartLine() - 1 : entityChange.getLocationInfoAfter().getStartLine();
             int endLineAfter = entityChange.getLocationInfoAfter().getEndLine();
 
@@ -199,7 +200,7 @@ public class ChangeHistoryToolbar implements Disposable {
         return (CodeChange) table.getModel().getValueAt(row, column);
     }
 
-    private void showDiffForChange(CodeChange change, JBSplitter splitter) {
+    private void showDiffForChange(CodeChange entityChange, JBSplitter splitter) {
         VcsLogManager logManager = VcsProjectLog.getInstance(project).getLogManager();
         if (logManager == null) {
             return;
@@ -213,10 +214,10 @@ public class ChangeHistoryToolbar implements Disposable {
                 VirtualFile root = vcsLogData.getRoots().iterator().next();
                 VcsLogProvider vcsLogProvider = VcsProjectLog.getInstance(project).getDataManager().getLogProvider(root);
                 try {
-                    commitsDetails.put(change.getCommitId(), getFirstItem(getDetails(vcsLogProvider, root, singletonList(change.getCommitId()))));
-                    final Collection<Change> changes = Optional.ofNullable(commitsDetails.get(change.getCommitId()))
+                    commitsDetails.put(entityChange.getCommitId(), getFirstItem(getDetails(vcsLogProvider, root, singletonList(entityChange.getCommitId()))));
+                    final Collection<Change> vcsChanges = Optional.ofNullable(commitsDetails.get(entityChange.getCommitId()))
                             .map(VcsFullCommitDetails::getChanges).orElse(new ArrayList<>());
-                    myDiffPanel.setRequest(createSimpleRequest(project, change, getVcsChangeForSelectedChange(changes, change, project), indicator));
+                    myDiffPanel.setRequest(createSimpleRequest(project, vcsChanges, entityChange, indicator));
                 } catch (VcsException | DiffRequestProducerException e) {
                     LOG.error(String.format("[RefactorInsight]: Failed to compute diff. Details: %s", e.getMessage()), e);
                 }
@@ -230,9 +231,9 @@ public class ChangeHistoryToolbar implements Disposable {
         });
     }
 
-    public static Change getVcsChangeForSelectedChange(Collection<Change> changes,
-                                                       CodeChange entityChange,
-                                                       Project project) {
+    public static DiffContent[] getVcsChangeForSelectedChange(Collection<Change> changes,
+                                                              CodeChange entityChange,
+                                                              Project project) {
         try {
             DiffContentFactoryEx myDiffContentFactory = DiffContentFactoryEx.getInstanceEx();
             DiffContent[] contents = {null, null, null};
@@ -250,9 +251,9 @@ public class ChangeHistoryToolbar implements Disposable {
                             change.getAfterRevision().getContent(),
                             JavaClassFileType.INSTANCE);
                 }
-                if (contents[0] != null || contents[2] != null) {
-                    return change;
-                }
+            }
+            if (contents[0] != null || contents[2] != null) {
+                return contents;
             }
         } catch (VcsException ex) {
             LOG.error(String.format("[RefactorInsight]: Failed to get the corresponding VCS change." +

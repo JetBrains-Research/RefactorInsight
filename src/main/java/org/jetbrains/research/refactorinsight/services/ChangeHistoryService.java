@@ -57,18 +57,20 @@ public class ChangeHistoryService {
                                     + " history using CodeTracker. Details: %s", e.getMessage()), e);
                         }
 
-                        for (History.HistoryInfo<Method> historyInfo : methodHistory.getHistoryInfoList()) {
-                            String commitId = historyInfo.getCommitId();
-                            String changeDate = formatDate(historyInfo.getCommitTime());
-                            String changeAuthor = historyInfo.getCommitterName();
-                            LocationInfo locationBefore = historyInfo.getElementBefore().getLocation();
-                            LocationInfo locationAfter = historyInfo.getElementAfter().getLocation();
+                        if (methodHistory != null) {
+                            for (History.HistoryInfo<Method> historyInfo : methodHistory.getHistoryInfoList()) {
+                                String commitId = historyInfo.getCommitId();
+                                String changeDate = formatDate(historyInfo.getCommitTime());
+                                String changeAuthor = historyInfo.getCommitterName();
+                                LocationInfo locationBefore = historyInfo.getElementBefore().getLocation();
+                                LocationInfo locationAfter = historyInfo.getElementAfter().getLocation();
 
-                            for (Change change : historyInfo.getChangeList()) {
-                                Change.Type changeType = change.getType();
-                                String changeDescription = change.toString();
-                                changeHistory.add(new CodeChange(commitId, changeType, changeDescription, changeDate,
-                                        changeAuthor, locationBefore, locationAfter, ElementType.METHOD));
+                                for (Change change : historyInfo.getChangeList()) {
+                                    Change.Type changeType = change.getType();
+                                    String changeDescription = change.toString();
+                                    changeHistory.add(new CodeChange(commitId, changeType, changeDescription, changeDate,
+                                            changeAuthor, locationBefore, locationAfter, ElementType.METHOD));
+                                }
                             }
                         }
                     }
@@ -111,20 +113,22 @@ public class ChangeHistoryService {
                             LOG.error(String.format("[RefactorInsight]: Error occurred while tracking variable's" +
                                     " history using CodeTracker. Details: %s", ex.getMessage()), ex);
                         }
-                        for (History.HistoryInfo<Variable> historyInfo : variableHistory.getHistoryInfoList()) {
-                            for (Change change : historyInfo.getChangeList()) {
-                                String commitId = historyInfo.getCommitId();
-                                String changeDate = formatDate(historyInfo.getCommitTime());
-                                String changeAuthor = historyInfo.getCommitterName();
-                                Change.Type changeType = change.getType();
-                                String changeDescription = change.toString();
-                                LocationInfo sourceLocation = historyInfo.getElementBefore().getLocation();
-                                LocationInfo targetLocation = historyInfo.getElementAfter().getLocation();
-                                changeHistory.add(new CodeChange(commitId, changeType, changeDescription,
-                                        changeDate, changeAuthor, sourceLocation, targetLocation, ElementType.VARIABLE));
+
+                        if (variableHistory != null) {
+                            for (History.HistoryInfo<Variable> historyInfo : variableHistory.getHistoryInfoList()) {
+                                for (Change change : historyInfo.getChangeList()) {
+                                    String commitId = historyInfo.getCommitId();
+                                    String changeDate = formatDate(historyInfo.getCommitTime());
+                                    String changeAuthor = historyInfo.getCommitterName();
+                                    Change.Type changeType = change.getType();
+                                    String changeDescription = change.toString();
+                                    LocationInfo sourceLocation = historyInfo.getElementBefore().getLocation();
+                                    LocationInfo targetLocation = historyInfo.getElementAfter().getLocation();
+                                    changeHistory.add(new CodeChange(commitId, changeType, changeDescription,
+                                            changeDate, changeAuthor, sourceLocation, targetLocation, ElementType.VARIABLE));
+                                }
                             }
                         }
-
                     }
                 });
             }
@@ -161,17 +165,19 @@ public class ChangeHistoryService {
                             LOG.error(String.format("[RefactorInsight]: Error occurred while tracking field's" +
                                     " history using CodeTracker. Details: %s", e.getMessage()), e);
                         }
-                        for (History.HistoryInfo<Attribute> historyInfo : attributeHistory.getHistoryInfoList()) {
-                            for (Change change : historyInfo.getChangeList()) {
-                                String commitId = historyInfo.getCommitId();
-                                String changeDate = formatDate(historyInfo.getCommitTime());
-                                String changeAuthor = historyInfo.getCommitterName();
-                                Change.Type changeType = change.getType();
-                                String changeDescription = change.toString();
-                                LocationInfo sourceLocation = historyInfo.getElementBefore().getLocation();
-                                LocationInfo targetLocation = historyInfo.getElementAfter().getLocation();
-                                changeHistory.add(new CodeChange(commitId, changeType, changeDescription,
-                                        changeDate, changeAuthor, sourceLocation, targetLocation, ElementType.ATTRIBUTE));
+                        if (attributeHistory != null) {
+                            for (History.HistoryInfo<Attribute> historyInfo : attributeHistory.getHistoryInfoList()) {
+                                for (Change change : historyInfo.getChangeList()) {
+                                    String commitId = historyInfo.getCommitId();
+                                    String changeDate = formatDate(historyInfo.getCommitTime());
+                                    String changeAuthor = historyInfo.getCommitterName();
+                                    Change.Type changeType = change.getType();
+                                    String changeDescription = change.toString();
+                                    LocationInfo sourceLocation = historyInfo.getElementBefore().getLocation();
+                                    LocationInfo targetLocation = historyInfo.getElementAfter().getLocation();
+                                    changeHistory.add(new CodeChange(commitId, changeType, changeDescription,
+                                            changeDate, changeAuthor, sourceLocation, targetLocation, ElementType.ATTRIBUTE));
+                                }
                             }
                         }
                     }
