@@ -123,7 +123,7 @@ public class ChangeHistoryToolbar implements Disposable {
         assert contents != null;
 
         DiffContent beforeContent = contents[0] == null ? DiffContentFactory.getInstance().createEmpty() : contents[0];
-        DiffContent afterContent = contents[1] == null ? DiffContentFactory.getInstance().createEmpty() : contents[1];
+        DiffContent afterContent = contents[2] == null ? DiffContentFactory.getInstance().createEmpty() : contents[2];
 
         SimpleDiffRequest request = new SimpleDiffRequest(entityChange.getChangeType().getTitle(),
                 beforeContent, afterContent, entityChange.getLocationInfoBefore().getFilePath(),
