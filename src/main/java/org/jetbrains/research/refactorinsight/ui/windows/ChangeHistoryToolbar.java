@@ -8,6 +8,7 @@ import com.intellij.diff.chains.DiffRequestProducerException;
 import com.intellij.diff.comparison.ComparisonManagerImpl;
 import com.intellij.diff.comparison.InnerFragmentsPolicy;
 import com.intellij.diff.contents.DiffContent;
+import com.intellij.diff.fragments.LineFragment;
 import com.intellij.diff.fragments.LineFragmentImpl;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.tools.util.text.LineOffsets;
@@ -138,20 +139,36 @@ public class ChangeHistoryToolbar implements Disposable {
                 !entityChange.getLocationInfoBefore().getFilePath().equals(entityChange.getLocationInfoAfter().getFilePath())) {
             //show an entity in the original file and in the target file the entity was move to
             //in case of composite refactorings such as Rename and Move the type might be equal RENAME, so we need to check if description contains Move
-            //the plugin only highlights the entity in both files because it doesn't seem possible to calculate a diff between two different files
             request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
                     (text1, text2, policy, innerChanges, i)
-                            -> Collections.singletonList(
-                            new LineFragmentImpl(
-                                    entityChange.getLocationInfoBefore().getStartLine() - 1,
-                                    entityChange.getLocationInfoBefore().getEndLine(),
-                                    entityChange.getLocationInfoAfter().getStartLine() - 1,
-                                    entityChange.getLocationInfoAfter().getEndLine(),
-                                    entityChange.getLocationInfoBefore().getStartOffset(),
-                                    entityChange.getLocationInfoBefore().getEndOffset(),
-                                    entityChange.getLocationInfoAfter().getStartOffset(),
-                                    entityChange.getLocationInfoAfter().getEndOffset()
-                            )));
+                            -> {
+                        int startLineBefore = entityChange.getLocationInfoBefore().getStartLine() - 1;
+                        int endLineBefore = entityChange.getLocationInfoBefore().getEndLine();
+                        int startLineAfter = entityChange.getLocationInfoAfter().getStartLine() - 1;
+                        int endLineAfter = entityChange.getLocationInfoAfter().getEndLine();
+
+                        InnerFragmentsPolicy fragmentsPolicy = innerChanges ? InnerFragmentsPolicy.WORDS : InnerFragmentsPolicy.NONE;
+                        LineOffsets offsets1 = LineOffsetsUtil.create(text1);
+                        LineOffsets offsets2 = LineOffsetsUtil.create(text2);
+
+                        ComparisonManagerImpl comparisonManager = ComparisonManagerImpl.getInstanceImpl();
+                        ArrayList<LineFragment> result = new ArrayList<>(comparisonManager.compareLinesInner(
+                                new Range(startLineBefore, endLineBefore, startLineAfter, endLineAfter),
+                                text1, text2, offsets1, offsets2, policy, fragmentsPolicy, indicator));
+
+                        //if there are changes in method body -> highlight them, otherwise highlight full method body
+                        return result.size() != 0 ? result : Collections.singletonList(
+                                new LineFragmentImpl(
+                                        entityChange.getLocationInfoBefore().getStartLine() - 1,
+                                        entityChange.getLocationInfoBefore().getEndLine(),
+                                        entityChange.getLocationInfoAfter().getStartLine() - 1,
+                                        entityChange.getLocationInfoAfter().getEndLine(),
+                                        entityChange.getLocationInfoBefore().getStartOffset(),
+                                        entityChange.getLocationInfoBefore().getEndOffset(),
+                                        entityChange.getLocationInfoAfter().getStartOffset(),
+                                        entityChange.getLocationInfoAfter().getEndOffset()
+                                ));
+                    });
         } else {
             boolean isAnnotationChange = entityChange.getChangeType().equals(ANNOTATION_CHANGE);
             boolean isRenameChange = entityChange.getChangeType().equals(RENAME);
