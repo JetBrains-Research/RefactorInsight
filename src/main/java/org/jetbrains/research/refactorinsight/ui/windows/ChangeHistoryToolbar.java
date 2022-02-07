@@ -153,15 +153,19 @@ public class ChangeHistoryToolbar implements Disposable {
                                     entityChange.getLocationInfoAfter().getEndOffset()
                             )));
         } else {
-            boolean isVariableOrAttributeOrAnnotation = type.equals(ElementType.ATTRIBUTE) || type.equals(ElementType.VARIABLE) ||
-                    entityChange.getChangeType().equals(ANNOTATION_CHANGE);
-            //correct lines for fields and variable to highlight only the lines that contain the corresponding change
+            boolean isAnnotationChange = entityChange.getChangeType().equals(ANNOTATION_CHANGE);
+            boolean isRenameChange = entityChange.getChangeType().equals(RENAME);
+            boolean isVariableOrAttributeChange = type.equals(ElementType.ATTRIBUTE) || type.equals(ElementType.VARIABLE);
+            //correct lines for fields, variables, and method signature to highlight only the lines that contain the corresponding change
             //calculate the diff only for the entity changes
-            int startLineBefore = isVariableOrAttributeOrAnnotation ?
-                    entityChange.getLocationInfoBefore().getStartLine() - 1 : entityChange.getLocationInfoBefore().getStartLine();
+            int lineCountToHighlight = 0;
+            if (isAnnotationChange) lineCountToHighlight += 1;
+            if (isRenameChange) lineCountToHighlight += 1;
+            if (isVariableOrAttributeChange) lineCountToHighlight += 1;
+
+            int startLineBefore = entityChange.getLocationInfoBefore().getStartLine() - lineCountToHighlight;
             int endLineBefore = entityChange.getLocationInfoBefore().getEndLine();
-            int startLineAfter = isVariableOrAttributeOrAnnotation ?
-                    entityChange.getLocationInfoAfter().getStartLine() - 1 : entityChange.getLocationInfoAfter().getStartLine();
+            int startLineAfter = entityChange.getLocationInfoAfter().getStartLine() - lineCountToHighlight;
             int endLineAfter = entityChange.getLocationInfoAfter().getEndLine();
 
             request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
