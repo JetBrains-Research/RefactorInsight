@@ -175,14 +175,30 @@ public class ChangeHistoryToolbar implements Disposable {
             boolean isVariableOrAttributeChange = type.equals(ElementType.ATTRIBUTE) || type.equals(ElementType.VARIABLE);
             //correct lines for fields, variables, and method signature to highlight only the lines that contain the corresponding change
             //calculate the diff only for the entity changes
-            int lineCountToHighlight = 0;
-            if (isAnnotationChange) lineCountToHighlight += 1;
-            if (isRenameChange) lineCountToHighlight += 1;
-            if (isVariableOrAttributeChange) lineCountToHighlight += 1;
+            int lineCountToHighlightBefore = 0;
+            int lineCountToHighlightAfter = 0;
+            if (isRenameChange || isVariableOrAttributeChange) {
+                lineCountToHighlightBefore += 1;
+                lineCountToHighlightAfter += 1;
+            }
 
-            int startLineBefore = entityChange.getLocationInfoBefore().getStartLine() - lineCountToHighlight;
+            //correct lines to highlight the annotation change depending on its type -- add, remove, modify
+            if (isAnnotationChange) {
+                if (entityChange.getDescription().contains("Add")) {
+                    lineCountToHighlightBefore -= 1;
+                    lineCountToHighlightAfter += 1;
+                } else if (entityChange.getDescription().contains("Remove")) {
+                    lineCountToHighlightBefore += 1;
+                    lineCountToHighlightAfter -= 1;
+                } else if (entityChange.getDescription().contains("Modify")) {
+                    lineCountToHighlightBefore += 1;
+                    lineCountToHighlightAfter += 1;
+                }
+            }
+
+            int startLineBefore = entityChange.getLocationInfoBefore().getStartLine() - lineCountToHighlightBefore;
             int endLineBefore = entityChange.getLocationInfoBefore().getEndLine();
-            int startLineAfter = entityChange.getLocationInfoAfter().getStartLine() - lineCountToHighlight;
+            int startLineAfter = entityChange.getLocationInfoAfter().getStartLine() - lineCountToHighlightAfter;
             int endLineAfter = entityChange.getLocationInfoAfter().getEndLine();
 
             request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
