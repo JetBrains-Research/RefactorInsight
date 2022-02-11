@@ -84,7 +84,7 @@ public class ChangeHistoryAction extends AnAction implements DumbAware {
         VirtualFile virtualFile = method.getContainingFile().getVirtualFile();
         VirtualFile contentRootForFile = ProjectFileIndex.getInstance(project).getContentRootForFile(virtualFile);
         if (contentRootForFile != null) {
-            String projectPath = contentRootForFile.getPath();
+            String projectPath = project.getBasePath() == null ? contentRootForFile.getPath() : project.getBasePath();
             String filePath = virtualFile.getPath().replace(projectPath + "/", "");
             List<CodeChange> methodChangeHistory = changeHistoryService.getHistoryForMethod(
                     project,
@@ -105,7 +105,7 @@ public class ChangeHistoryAction extends AnAction implements DumbAware {
             VirtualFile virtualFile = enclosingMethod.getContainingFile().getVirtualFile();
             VirtualFile contentRootForFile = ProjectFileIndex.getInstance(project).getContentRootForFile(virtualFile);
             if (contentRootForFile != null) {
-                String projectPath = contentRootForFile.getPath();
+                String projectPath = project.getBasePath() == null ? contentRootForFile.getPath() : project.getBasePath();
                 String filePath = virtualFile.getPath().replace(projectPath + "/", "");
                 int numberOfMethodStartLine = getNumberOfElementStartLine(enclosingMethod.getContainingFile(), enclosingMethod.getTextOffset());
                 int numberOfVariableStartLine = getNumberOfElementStartLine(variable.getContainingFile(), variable.getTextOffset());
@@ -129,7 +129,7 @@ public class ChangeHistoryAction extends AnAction implements DumbAware {
         VirtualFile virtualFile = attribute.getContainingFile().getVirtualFile();
         VirtualFile contentRootForFile = ProjectFileIndex.getInstance(project).getContentRootForFile(virtualFile);
         if (contentRootForFile != null) {
-            String projectPath = contentRootForFile.getPath();
+            String projectPath = project.getBasePath() == null ? contentRootForFile.getPath() : project.getBasePath();
             String filePath = virtualFile.getPath().replace(projectPath + "/", "");
             int numberOfVariableStartLine = getNumberOfElementStartLine(attribute.getContainingFile(), attribute.getTextOffset());
 
