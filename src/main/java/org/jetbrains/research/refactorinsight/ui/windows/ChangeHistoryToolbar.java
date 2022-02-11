@@ -171,13 +171,14 @@ public class ChangeHistoryToolbar implements Disposable {
                     });
         } else {
             boolean isAnnotationChange = entityChange.getChangeType().equals(ANNOTATION_CHANGE);
-            boolean isRenameChange = entityChange.getChangeType().equals(RENAME);
+            boolean isSignatureChange = entityChange.getChangeType().equals(RENAME)
+                    || entityChange.getChangeType().equals(RETURN_TYPE_CHANGE) || entityChange.getChangeType().equals(PARAMETER_CHANGE);
             boolean isVariableOrAttributeChange = type.equals(ElementType.ATTRIBUTE) || type.equals(ElementType.VARIABLE);
             //correct lines for fields, variables, and method signature to highlight only the lines that contain the corresponding change
             //calculate the diff only for the entity changes
             int lineCountToHighlightBefore = 0;
             int lineCountToHighlightAfter = 0;
-            if (isRenameChange || isVariableOrAttributeChange) {
+            if (isSignatureChange || isVariableOrAttributeChange) {
                 lineCountToHighlightBefore += 1;
                 lineCountToHighlightAfter += 1;
             }
