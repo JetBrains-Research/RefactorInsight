@@ -114,11 +114,11 @@ public class ThreeSidedRange {
   private MergeConflictType getMergeConflictType(VisualisationType type) {
     switch (type) {
       case LEFT:
-        return new MergeConflictType(TextDiffType.MODIFIED, true, false);
+        return new MergeConflictType(MergeConflictType.Type.MODIFIED, true, false);
       case RIGHT:
-        return new MergeConflictType(TextDiffType.INSERTED, false, true);
+        return new MergeConflictType(MergeConflictType.Type.INSERTED, false, true);
       default:
-        return new MergeConflictType(TextDiffType.MODIFIED, true, true);
+        return new MergeConflictType(MergeConflictType.Type.MODIFIED, true, true);
     }
   }
 }
