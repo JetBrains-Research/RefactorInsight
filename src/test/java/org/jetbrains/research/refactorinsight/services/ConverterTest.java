@@ -1,8 +1,8 @@
 package org.jetbrains.research.refactorinsight.services;
 
-import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
 import static org.jetbrains.research.refactorinsight.utils.StringUtils.*;
+import static org.junit.Assert.assertTrue;
 
 import com.intellij.diff.fragments.LineFragmentImpl;
 import org.jetbrains.research.refactorinsight.adapters.RefactoringType;

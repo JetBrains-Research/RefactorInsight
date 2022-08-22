@@ -32,7 +32,6 @@ import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TitlePanel;
-import com.intellij.openapi.ui.WindowWrapper;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.Pair;
@@ -97,14 +96,13 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
         .map(i -> i.generate(getDiffContents(changes, i, project)))
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
-    DiffRequestChain chain = new SimpleDiffRequestChain(requests);
-    final int index = refactoringInfos.stream()
-        .filter(showable).collect(Collectors.toList()).indexOf(info);
-    if (index != -1) {
-      chain.setIndex(index);
-      chain.putUserData(DiffUserDataKeysEx.FORCE_DIFF_TOOL, SimpleDiffTool.INSTANCE);
-      DiffManager.getInstance().showDiff(project, chain,
-                                         new DiffDialogHints(WindowWrapper.Mode.FRAME));
+
+      final int index = refactoringInfos.stream()
+              .filter(showable).collect(Collectors.toList()).indexOf(info);
+      if (index != -1) {
+        DiffRequestChain chain = new SimpleDiffRequestChain(requests, index);
+        chain.putUserData(DiffUserDataKeysEx.FORCE_DIFF_TOOL, SimpleDiffTool.INSTANCE);
+        DiffManager.getInstance().showDiff(project, chain, DiffDialogHints.DEFAULT);
     }
   }
 

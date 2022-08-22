@@ -1,10 +1,10 @@
 plugins {
     java
-    id("org.jetbrains.intellij") version "1.6.0"
+    id("org.jetbrains.intellij") version "1.8.0"
 }
 
 group = "org.jetbrains.research.refactorinsight"
-version = "2022.1-1.0"
+version = "2022.2-1.0"
 
 repositories {
     mavenCentral()
@@ -20,11 +20,20 @@ dependencies {
     implementation("org.kohsuke:github-api:1.95")
     implementation(group = "com.github.tsantalis", name = "refactoring-miner", version = "2.0")
     testImplementation("junit:junit:4.13")
-    testImplementation(group = "org.mockito", name = "mockito-core", version = "3.3.3")
+    testImplementation(group = "org.mockito", name = "mockito-core", version = "4.7.0")
 }
 
 intellij {
-    version.set("2022.1")
+    version.set("2022.2.1")
     plugins.set(listOf("com.intellij.java", "git4idea", "github"))
     downloadSources.set(true)
+}
+
+tasks {
+    withType<JavaCompile> {
+        options.encoding = "UTF-8"
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
+        options.compilerArgs.add("-Xlint:all")
+    }
 }
