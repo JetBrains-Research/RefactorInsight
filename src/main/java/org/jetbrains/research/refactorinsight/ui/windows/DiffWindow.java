@@ -97,11 +97,11 @@ public class DiffWindow extends com.intellij.diff.DiffExtension {
         .map(i -> i.generate(getDiffContents(changes, i, project)))
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
-    DiffRequestChain chain = new SimpleDiffRequestChain(requests);
+
     final int index = refactoringInfos.stream()
         .filter(showable).collect(Collectors.toList()).indexOf(info);
     if (index != -1) {
-      chain.setIndex(index);
+      DiffRequestChain chain = new SimpleDiffRequestChain(requests, index);
       chain.putUserData(DiffUserDataKeysEx.FORCE_DIFF_TOOL, SimpleDiffTool.INSTANCE);
       DiffManager.getInstance().showDiff(project, chain,
                                          new DiffDialogHints(WindowWrapper.Mode.FRAME));
