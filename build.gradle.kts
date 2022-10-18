@@ -1,10 +1,10 @@
 plugins {
     java
-    id("org.jetbrains.intellij") version "1.6.0"
+    id("org.jetbrains.intellij") version "1.8.0"
 }
 
 group = "org.jetbrains.research.refactorinsight"
-version = "2022.1-1.0"
+version = "2022.2-1.0"
 
 repositories {
     mavenCentral()
@@ -24,7 +24,7 @@ dependencies {
 }
 
 intellij {
-    version.set("2022.1")
+    version.set("2022.2")
     plugins.set(listOf("com.intellij.java", "git4idea", "github"))
     downloadSources.set(true)
 }

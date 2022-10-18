@@ -245,7 +245,7 @@ public class RefactoringHistoryToolbar {
     if ((content = toolWindow.getContentManager().findContent(methodName)) != null) {
       content.setComponent(tree);
     } else {
-      ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+      ContentFactory contentFactory = ContentFactory.getInstance();
       content = contentFactory.createContent(tree, methodName, false);
       toolWindow.getContentManager().addContent(content);
     }
