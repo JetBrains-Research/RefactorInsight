@@ -2,7 +2,7 @@
     <id>org.jetbrains.research.refactorinsight</id>
     <name>RefactorInsight</name>
     <vendor>JetBrains</vendor>
-    <version>2022.2-1.0</version>
+    <version>2022.3-1.0</version>
 
     <description><![CDATA[
     <p>Enhances IDE representation of code changes with refactoring information.</p>
@@ -16,6 +16,11 @@
       ]]></description>
 
     <change-notes><![CDATA[
+        <h4>2022.3-1.0</h4>
+        <ul>
+            <li>Add compatibility with IDEA 2022.3</li>
+        </ul>
+
         <h4>2022.2-1.0</h4>
         <ul>
             <li>Add compatibility with IDEA 2022.2</li>
