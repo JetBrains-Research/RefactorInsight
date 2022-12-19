@@ -19,7 +19,7 @@ dependencies {
     implementation("org.kohsuke:github-api:1.95")
     implementation(group = "com.github.tsantalis", name = "refactoring-miner", version = "2.0")
     testImplementation("junit:junit:4.13.2")
-    testImplementation(group = "org.mockito", name = "mockito-core", version = "3.3.3")
+    testImplementation(group = "org.mockito", name = "mockito-core", version = "4.10.0")
 }
 
 intellij {
