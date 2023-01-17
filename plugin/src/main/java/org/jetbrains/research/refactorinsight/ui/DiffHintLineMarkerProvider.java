@@ -23,42 +23,46 @@ import com.intellij.util.Function;
 import icons.RefactorInsightIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.research.refactorinsight.ui.windows.DiffWindow;
 
 import javax.swing.Icon;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.List;
-
 public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
     private static final String DIFF_WINDOW_CLASS_NAME_PREFIX = DiffContentFactoryImpl.class.getName() + "$";
-
     @Override
     public @Nullable("null means disabled")
     @GutterName String getName() {
         return "RefactorInsight gutter";
     }
-
     @Override
     public @Nullable Icon getIcon() {
         return RefactorInsightIcons.toggle;
     }
-
     @Override
     public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement element) {
         return null;
     }
-
     @Override
     public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> elements,
                                        @NotNull Collection<? super LineMarkerInfo<?>> result) {
+        String commitId = extractCommitId(elements.get(0));
         for (PsiElement element : elements) {
             //TODO: add plugin's gutter close to lines containing refactoring changes in code diffs
-            VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
-            if (virtualFile.getClass().getName().startsWith(DIFF_WINDOW_CLASS_NAME_PREFIX) && isIdentifier(element)) {
+            if (isIdentifier(element)) {
                 RefactoringInfoHint info = new RefactoringInfoHint(element, e -> "Refactoring detected");
                 result.add(info);
             }
         }
+    }
+
+    private String extractCommitId(PsiElement element) {
+        VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
+        if (virtualFile.getClass().getName().startsWith(DIFF_WINDOW_CLASS_NAME_PREFIX)) {
+            return virtualFile.getUserData(Keys.COMMIT_ID);
+        }
+        return null;
     }
 
     private boolean isIdentifier(PsiElement element) {
@@ -71,9 +75,7 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
         }
         return false;
     }
-
     private static class RefactoringInfoHint extends MergeableLineMarkerInfo<PsiElement> {
-
         RefactoringInfoHint(@NotNull final PsiElement element, Function<? super PsiElement, String> tooltipProvider) {
             super(element,
                     element.getTextRange(),
@@ -83,39 +85,32 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
                     GutterIconRenderer.Alignment.LEFT,
                     () -> tooltipProvider.fun(element));
         }
-
         @Override
         public boolean canMergeWith(@NotNull MergeableLineMarkerInfo<?> info) {
             return info instanceof RefactoringInfoHint;
         }
-
         @Override
         public Icon getCommonIcon(@NotNull List<? extends MergeableLineMarkerInfo<?>> infos) {
             return RefactorInsightIcons.toggle;
         }
-
         @NotNull
         @Override
         public Function<? super PsiElement, String> getCommonTooltip(@NotNull List<? extends MergeableLineMarkerInfo<?>> infos) {
             return __ -> "Refactoring detected";
         }
     }
-
     private static class MyIconGutterHandler implements GutterIconNavigationHandler<PsiElement> {
         static final MyIconGutterHandler INSTANCE = new MyIconGutterHandler();
-
         @Override
         public void navigate(MouseEvent e, PsiElement nameIdentifier) {
             final PsiElement listOwner = nameIdentifier.getParent();
             final PsiFile containingFile = listOwner.getContainingFile();
             final VirtualFile virtualFile = PsiUtilCore.getVirtualFile(listOwner);
-
             if (virtualFile != null && containingFile != null) {
                 final JBPopup popup = createTextPopup();
                 popup.show(new RelativePoint(e));
             }
         }
-
         @NotNull
         private static JBPopup createTextPopup() {
             //TODO: show refactoring description
