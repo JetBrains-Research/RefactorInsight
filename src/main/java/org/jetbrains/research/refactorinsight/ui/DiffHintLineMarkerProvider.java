@@ -24,6 +24,7 @@ import icons.RefactorInsightIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.psi.KtNamedFunction;
+import org.jetbrains.research.refactorinsight.ui.windows.DiffWindow;
 
 import javax.swing.Icon;
 import java.awt.event.MouseEvent;
@@ -52,14 +53,22 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
     @Override
     public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> elements,
                                        @NotNull Collection<? super LineMarkerInfo<?>> result) {
+        String commitId = extractCommitId(elements.get(0));
         for (PsiElement element : elements) {
             //TODO: add plugin's gutter close to lines containing refactoring changes in code diffs
-            VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
-            if (virtualFile.getClass().getName().startsWith(DIFF_WINDOW_CLASS_NAME_PREFIX) && isIdentifier(element)) {
+            if (isIdentifier(element)) {
                 RefactoringInfoHint info = new RefactoringInfoHint(element, e -> "Refactoring detected");
                 result.add(info);
             }
         }
+    }
+
+    private String extractCommitId(PsiElement element) {
+        VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
+        if (virtualFile.getClass().getName().startsWith(DIFF_WINDOW_CLASS_NAME_PREFIX)) {
+            return virtualFile.getUserData(DiffWindow.COMMIT_ID);
+        }
+        return null;
     }
 
     private boolean isIdentifier(PsiElement element) {
