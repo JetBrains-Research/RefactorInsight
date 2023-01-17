@@ -1,5 +1,6 @@
 package org.jetbrains.research.refactorinsight.data.types.variables;
 
+import gr.uom.java.xmi.UMLOperation;
 import gr.uom.java.xmi.diff.RenameVariableRefactoring;
 import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.Group;
@@ -14,7 +15,7 @@ public class RenameVariableHandler extends Handler {
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     RenameVariableRefactoring ref = (RenameVariableRefactoring) refactoring;
     String id = ref.getOperationAfter().getClassName() + ".";
-    if ((ref.getOperationAfter().isConstructor() || ref.getOperationAfter().isSetter())
+    if ((ref.getOperationAfter().isConstructor() || ((UMLOperation) ref.getOperationAfter()).isSetter())
         && ref.getRenamedVariable().isParameter()) {
       id += ref.getRenamedVariable().getVariableName();
     } else {

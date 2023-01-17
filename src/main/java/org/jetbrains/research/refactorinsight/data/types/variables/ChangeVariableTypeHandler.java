@@ -1,6 +1,7 @@
 package org.jetbrains.research.refactorinsight.data.types.variables;
 
 import gr.uom.java.xmi.UMLOperation;
+import gr.uom.java.xmi.VariableDeclarationContainer;
 import gr.uom.java.xmi.diff.ChangeVariableTypeRefactoring;
 import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.Group;
@@ -14,7 +15,7 @@ public class ChangeVariableTypeHandler extends Handler {
   @Override
   public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
     ChangeVariableTypeRefactoring ref = (ChangeVariableTypeRefactoring) refactoring;
-    final UMLOperation operationAfter = ref.getOperationAfter();
+    final UMLOperation operationAfter = (UMLOperation) ref.getOperationAfter();
     String id = operationAfter.getClassName() + ".";
     if ((operationAfter.isSetter() || operationAfter.isConstructor())
         && ref.getChangedTypeVariable().isParameter()) {

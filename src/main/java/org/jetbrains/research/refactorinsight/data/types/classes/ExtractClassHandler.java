@@ -30,7 +30,7 @@ public class ExtractClassHandler extends Handler {
 
     if (ref.getAttributeOfExtractedClassTypeInOriginalClass() != null) {
       info.setThreeSided(true);
-      ref.getExtractedOperations().forEach(operation -> info.addMarking(
+      ref.getExtractedOperations().keySet().forEach(operation -> info.addMarking(
           new CodeRange(operation.codeRange()),
           new CodeRange(ref.getExtractedClass().codeRange()),
           new CodeRange(ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange()),
@@ -39,7 +39,7 @@ public class ExtractClassHandler extends Handler {
           RefactoringLine.MarkingOption.NONE,
           true));
 
-      ref.getExtractedAttributes().forEach(operation -> info.addMarking(
+      ref.getExtractedAttributes().keySet().forEach(operation -> info.addMarking(
           new CodeRange(operation.codeRange()),
           new CodeRange(ref.getExtractedClass().codeRange()),
           new CodeRange(ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange()),
@@ -66,11 +66,11 @@ public class ExtractClassHandler extends Handler {
           RefactoringLine.MarkingOption.EXTRACT,
           true);
     } else {
-      ref.getExtractedOperations().forEach(operation -> info.addMarking(
+      ref.getExtractedOperations().keySet().forEach(operation -> info.addMarking(
           new CodeRange(operation.codeRange()),
           new CodeRange(ref.getExtractedClass().codeRange()), true));
 
-      ref.getExtractedAttributes().forEach(operation -> info.addMarking(
+      ref.getExtractedAttributes().keySet().forEach(operation -> info.addMarking(
           new CodeRange(operation.codeRange()),
           new CodeRange(ref.getExtractedClass().codeRange()), true));
     }

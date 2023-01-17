@@ -5,6 +5,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameterList;
 import gr.uom.java.xmi.UMLOperation;
 import gr.uom.java.xmi.UMLType;
+import gr.uom.java.xmi.VariableDeclarationContainer;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 
@@ -87,7 +88,7 @@ public class StringUtils {
    * @param operation retrieved from RefactoringMiner.
    * @return a String signature of the operation.
    */
-  public static String calculateSignature(UMLOperation operation) {
+  public static String calculateSignature(VariableDeclarationContainer operation) {
     StringBuilder builder = new StringBuilder();
     List<String> parameterTypeList = new ArrayList<>();
     for (UMLType type : operation.getParameterTypeList()) {
