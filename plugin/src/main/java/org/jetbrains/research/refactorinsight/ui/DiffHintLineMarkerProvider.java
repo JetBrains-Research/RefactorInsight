@@ -6,29 +6,35 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor;
 import com.intellij.codeInsight.daemon.MergeableLineMarkerInfo;
 import com.intellij.diff.DiffContentFactoryImpl;
+import com.intellij.icons.AllIcons;
 import com.intellij.lang.Language;
 import com.intellij.lang.java.JavaLanguage;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiIdentifier;
-import com.intellij.psi.PsiMethod;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.LeafElement;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.Function;
+import com.intellij.util.ui.JBEmptyBorder;
 import icons.RefactorInsightIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
+import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
+import org.jetbrains.research.refactorinsight.services.MiningService;
 import org.jetbrains.research.refactorinsight.ui.windows.DiffWindow;
 
-import javax.swing.Icon;
+import javax.swing.*;
 import java.awt.event.MouseEvent;
-import java.util.Collection;
+import java.util.*;
 import java.util.List;
+
 public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
     private static final String DIFF_WINDOW_CLASS_NAME_PREFIX = DiffContentFactoryImpl.class.getName() + "$";
     @Override
@@ -47,41 +53,84 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
     @Override
     public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> elements,
                                        @NotNull Collection<? super LineMarkerInfo<?>> result) {
-        String commitId = extractCommitId(elements.get(0));
+        if (elements.isEmpty()) return;
+        List<RefactoringInfo> refactoringInfos = getRefactoringInfos(elements.get(0));
+        if (refactoringInfos == null) return;
+
+        boolean isRight = isRightPartOfDiff(elements.get(0));
+        Map<Integer, Set<RefactoringInfo>> refactoringsMap = new HashMap<>();
+
         for (PsiElement element : elements) {
-            //TODO: add plugin's gutter close to lines containing refactoring changes in code diffs
-            if (isIdentifier(element)) {
-                RefactoringInfoHint info = new RefactoringInfoHint(element, e -> "Refactoring detected");
-                result.add(info);
+            if (!isIdentifier(element)) continue;
+
+            int lineNumber = getLineNumber(element);
+            int textOffset = element.getTextOffset();
+            for (RefactoringInfo refactoringInfo : refactoringInfos) {
+                refactoringsMap.putIfAbsent(lineNumber, new HashSet<>());
+                if (refactoringInfo.containsElement(lineNumber, textOffset, isRight) &&
+                        !refactoringsMap.get(lineNumber).contains(refactoringInfo)) {
+                    RefactoringInfoHint info = new RefactoringInfoHint(element, e -> "Refactoring detected", refactoringInfo);
+                    result.add(info);
+                    refactoringsMap.get(lineNumber).add(refactoringInfo);
+                }
             }
         }
     }
 
-    private String extractCommitId(PsiElement element) {
+    private int getLineNumber(PsiElement element) {
+        FileViewProvider fileViewProvider = element.getContainingFile().getViewProvider();
+        Document document = fileViewProvider.getDocument();
+        int textOffset = element.getTextOffset();
+        return document.getLineNumber(textOffset);
+    }
+
+    private boolean isRightPartOfDiff(PsiElement element) {
         VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
+        return virtualFile.getUserData(Keys.CHILD_COMMIT_ID) == null;
+    }
+
+    private List<RefactoringInfo> getRefactoringInfos(PsiElement element) {
+        VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
+        String commitId;
         if (virtualFile.getClass().getName().startsWith(DIFF_WINDOW_CLASS_NAME_PREFIX)) {
-            return virtualFile.getUserData(Keys.COMMIT_ID);
+            if (virtualFile.getUserData(Keys.CHILD_COMMIT_ID) == null)
+                commitId = virtualFile.getUserData(Keys.COMMIT_ID);
+            else
+                commitId = virtualFile.getUserData(Keys.CHILD_COMMIT_ID);
+            if (commitId == null) return null;
+            MiningService miner = MiningService.getInstance(element.getProject());
+            RefactoringEntry entry = miner.get(commitId);
+            if (entry == null) return null;
+            return entry.getRefactorings().stream().filter(ref -> fromSameFile(element, ref)).toList();
         }
         return null;
+    }
+
+    private boolean fromSameFile(PsiElement element, RefactoringInfo refactoringInfo) {
+        String elementPath = element.getContainingFile().getVirtualFile().getPath();
+        String refactoringClassPath = refactoringInfo.getRightPath();
+        return elementPath.endsWith(refactoringClassPath);
     }
 
     private boolean isIdentifier(PsiElement element) {
         Language elementLanguage = element.getLanguage();
         PsiElement elementParent = element.getParent();
         if (elementLanguage.equals(JavaLanguage.INSTANCE)) {
-            return element instanceof PsiIdentifier && elementParent instanceof PsiMethod;
+            return element instanceof PsiIdentifier;
         } else if ("kotlin".equalsIgnoreCase(elementLanguage.getID())) {
             return element instanceof LeafElement leaf && "IDENTIFIER".equals(leaf.getElementType().toString());
         }
         return false;
     }
+
     private static class RefactoringInfoHint extends MergeableLineMarkerInfo<PsiElement> {
-        RefactoringInfoHint(@NotNull final PsiElement element, Function<? super PsiElement, String> tooltipProvider) {
+
+        RefactoringInfoHint(@NotNull final PsiElement element, Function<? super PsiElement, String> tooltipProvider, RefactoringInfo refactoringInfo) {
             super(element,
                     element.getTextRange(),
                     RefactorInsightIcons.toggle,
                     tooltipProvider,
-                    MyIconGutterHandler.INSTANCE,
+                    new MyIconGutterHandler(refactoringInfo),
                     GutterIconRenderer.Alignment.LEFT,
                     () -> tooltipProvider.fun(element));
         }
@@ -99,22 +148,49 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
             return __ -> "Refactoring detected";
         }
     }
+
     private static class MyIconGutterHandler implements GutterIconNavigationHandler<PsiElement> {
-        static final MyIconGutterHandler INSTANCE = new MyIconGutterHandler();
+
+        private final RefactoringInfo refactoringInfo;
+
+        MyIconGutterHandler(RefactoringInfo refactoringInfo) {
+            this.refactoringInfo = refactoringInfo;
+        }
+
         @Override
         public void navigate(MouseEvent e, PsiElement nameIdentifier) {
             final PsiElement listOwner = nameIdentifier.getParent();
             final PsiFile containingFile = listOwner.getContainingFile();
             final VirtualFile virtualFile = PsiUtilCore.getVirtualFile(listOwner);
+
             if (virtualFile != null && containingFile != null) {
-                final JBPopup popup = createTextPopup();
+                final JBPopup popup = createTextPopup(nameIdentifier.getProject());
                 popup.show(new RelativePoint(e));
             }
         }
+
         @NotNull
-        private static JBPopup createTextPopup() {
-            //TODO: show refactoring description
-            return JBPopupFactory.getInstance().createMessage("Changes");
+        private JBPopup createTextPopup(Project project) {
+            return JBPopupFactory.getInstance()
+                    .createComponentPopupBuilder(createComponent(project), null)
+                    .createPopup();
+        }
+
+        @NotNull
+        private JComponent createComponent(Project project) {
+            JButton button = new JButton();
+            button.setIcon(AllIcons.Actions.Diff);
+            button.addActionListener(e -> {
+                final Collection<Change> changes = new ArrayList<>(); //TODO: add changes
+                DiffWindow.showDiff(changes, refactoringInfo, project, refactoringInfo.getEntry().getRefactorings());
+            });
+            button.setSize(26, 24);
+            button.setBorder(new JBEmptyBorder(1, 2, 1, 2));
+            JLabel text = new JLabel(refactoringInfo.getType());
+            JPanel panel = new JPanel();
+            panel.add(text);
+            panel.add(button);
+            return panel;
         }
     }
 }

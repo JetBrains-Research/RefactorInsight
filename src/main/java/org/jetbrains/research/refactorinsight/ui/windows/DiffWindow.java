@@ -79,6 +79,8 @@ public class DiffWindow extends DiffExtension {
       Key.create("refactoringMiner.isRefactoringDiff");
   public static final Key<String> COMMIT_ID =
           Key.create("refactoringMiner.commitId");
+  public static final Key<String> CHILD_COMMIT_ID =
+          Key.create("refactoringMiner.commitId");
 
   /**
    * Requests diff window to show specific refactoring with two editors.
@@ -297,6 +299,8 @@ public class DiffWindow extends DiffExtension {
               // revision after changes
               ((TwosideTextDiffViewer) viewer).getEditor2().getVirtualFile()
                       .putUserData(COMMIT_ID, change.getAfterRevision().getRevisionNumber().asString());
+              ((TwosideTextDiffViewer) viewer).getEditor1().getVirtualFile()
+                      .putUserData(CHILD_COMMIT_ID, change.getAfterRevision().getRevisionNumber().asString());
           }
         }
     }
