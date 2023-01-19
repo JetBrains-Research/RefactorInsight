@@ -10,8 +10,10 @@ import com.intellij.diff.requests.SimpleDiffRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.intellij.diff.util.ThreeSide;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
@@ -57,6 +59,16 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
   public void prepareRanges(List<RefactoringLine> lineMarkings) {
     ranges = lineMarkings.stream().map(RefactoringLine::getThreeSidedRange)
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public boolean containsElement(int lineNumber, int textOffset, boolean isRight) {
+    Function<ThreeSidedRange, Integer> startLineExtractor = isRight
+            ? r -> r.fragment.getStartLine(ThreeSide.RIGHT)
+            : r -> r.fragment.getStartLine(ThreeSide.LEFT);
+    List<Integer> startLines = ranges.stream().map(startLineExtractor).toList();
+    //TODO: check textOffset
+    return startLines.contains(lineNumber);
   }
 
   @Override

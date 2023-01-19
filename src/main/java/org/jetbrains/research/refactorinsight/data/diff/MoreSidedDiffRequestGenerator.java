@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.NotNull;
@@ -94,6 +95,14 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
       offsetFunction.accept(line);
     }
     lineMarkings.add(line);
+  }
+
+  @Override
+  public boolean containsElement(int lineNumber, int textOffset, boolean isRight) {
+    Function<MoreSidedRange, Integer> startLineExtractor = isRight ? l -> l.startLineRight : l -> l.startLineLeft;
+    List<Integer> startLines = lines.stream().map(startLineExtractor).toList();
+    //TODO: check textOffset
+    return startLines.contains(lineNumber);
   }
 
   /**

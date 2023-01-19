@@ -96,6 +96,25 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
         .collect(Collectors.toList());
   }
 
+  @Override
+  public boolean containsElement(int lineNumber, int textOffset, boolean isRight) {
+    for (LineFragment lineFragment : fragments) {
+      int startLine = isRight ? lineFragment.getStartLine2() : lineFragment.getStartLine1();
+
+      if (startLine == lineNumber) {
+        List<DiffFragment> diffFragments = lineFragment.getInnerFragments();
+        if (diffFragments == null || diffFragments.isEmpty()) return true;
+
+        for (DiffFragment fragment : diffFragments) {
+          int startOffset = isRight ? fragment.getStartOffset2() : fragment.getStartOffset1();
+          int endOffset = isRight ? fragment.getEndOffset2() : fragment.getEndOffset1();
+          if (startOffset <= textOffset && textOffset <= endOffset) return true;
+        }
+      }
+    }
+    return false;
+  }
+
   /**
    * Serializes an {@link TwoSidedDiffRequestGenerator} instance.
    *
