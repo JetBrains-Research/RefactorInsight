@@ -13,7 +13,8 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.vcs.changes.Change;
+import com.intellij.openapi.vcs.VcsException;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
@@ -22,10 +23,11 @@ import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.Function;
 import com.intellij.util.ui.JBEmptyBorder;
+import git4idea.GitCommit;
+import git4idea.history.GitHistoryUtils;
 import icons.RefactorInsightIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.kotlin.psi.KtNamedFunction;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.services.MiningService;
@@ -119,12 +121,10 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
 
     private boolean isIdentifier(PsiElement element) {
         Language elementLanguage = element.getLanguage();
-        PsiElement elementParent = element.getParent();
         if (elementLanguage.equals(JavaLanguage.INSTANCE)) {
             return element instanceof PsiIdentifier;
         } else if ("kotlin".equalsIgnoreCase(elementLanguage.getID())) {
-            return element instanceof LeafElement leaf && "IDENTIFIER".equals(leaf.getElementType().toString()) &&
-                    elementParent.getClass().getName().equals(KtNamedFunction.class.getName());
+            return element instanceof LeafElement leaf && "IDENTIFIER".equals(leaf.getElementType().toString());
         }
         return false;
     }
@@ -190,8 +190,17 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
             JButton button = new JButton();
             button.setIcon(AllIcons.Actions.Diff);
             button.addActionListener(e -> {
-                final Collection<Change> changes = new ArrayList<>(); //TODO: add changes
-                DiffWindow.showDiff(changes, refactoringInfo, project, refactoringInfo.getEntry().getRefactorings());
+                try {
+                    String basePath = project.getBasePath();
+                    if (basePath == null) return;
+                    VirtualFile root = LocalFileSystem.getInstance().findFileByPath(basePath);
+                    if (root == null) return;
+                    List<GitCommit> history = GitHistoryUtils.history(project, root, refactoringInfo.getCommitId(), "-1");
+                    if (history.isEmpty()) return;
+                    DiffWindow.showDiff(history.get(0).getChanges(), refactoringInfo, project, refactoringInfo.getEntry().getRefactorings());
+                } catch (VcsException | NoSuchElementException ex) {
+                    throw new RuntimeException(ex);
+                }
             });
             button.setSize(26, 24);
             button.setBorder(new JBEmptyBorder(1, 2, 1, 2));
