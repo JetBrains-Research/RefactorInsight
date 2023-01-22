@@ -18,6 +18,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import git4idea.repo.GitRepository;
 import org.eclipse.jgit.lib.Repository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,7 +33,7 @@ public class SingleCommitRefactoringTask extends Task.Backgroundable {
   private final VcsCommitMetadata commit;
   private final GitWindow window;
   private final MiningService service;
-  private final Repository myRepository;
+  private final GitRepository myRepository;
   private boolean canceled = false;
   private final Logger logger = Logger.getInstance(SingleCommitRefactoringTask.class);
 

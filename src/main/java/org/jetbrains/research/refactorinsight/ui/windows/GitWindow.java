@@ -1,5 +1,6 @@
 package org.jetbrains.research.refactorinsight.ui.windows;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.changes.ui.ChangesTree;
 import com.intellij.ui.Gray;
@@ -105,7 +106,8 @@ public class GitWindow {
 
       if (miner.get(commitId) == null) {
         VcsCommitMetadata metadata = table.getModel().getCommitMetadata(index);
-        miner.mineAtCommit(metadata, project, this);
+        ApplicationManager.getApplication().invokeAndWait(() ->
+                miner.mineAtCommit(metadata, project, this));
       }
     }
   }

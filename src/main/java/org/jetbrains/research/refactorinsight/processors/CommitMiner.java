@@ -38,7 +38,7 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
   private final ExecutorService pool;
   private final Map<String, RefactoringEntry> map;
   private final Project myProject;
-  private final Repository myRepository;
+  private final GitRepository myRepository;
   private final AtomicInteger commitsDone;
   private final ProgressIndicator progressIndicator;
   private final int limit;
@@ -75,7 +75,7 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
    */
   public static Runnable mineAtCommit(String commitHash, String commitParentHash, long commitTimestamp,
                                       Map<String, RefactoringEntry> map,
-                                      Project project, Repository repository) {
+                                      Project project, GitRepository repository) {
     return getRunnableToDetectRefactorings(map, commitHash, commitParentHash, commitTimestamp, repository, project);
   }
 
@@ -92,7 +92,7 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
    */
   private static Runnable getRunnableToDetectRefactorings(Map<String, RefactoringEntry> map, String commitHash,
                                                           String commitParentHash, long commitTimestamp,
-                                                          Repository repository, Project project) {
+                                                          GitRepository repository, Project project) {
     return () -> {
       GitHistoryKotlinRMiner kminer = new GitHistoryKotlinRMiner();
       GitHistoryRefactoringMiner jminer = new GitHistoryRefactoringMinerImpl();
@@ -106,7 +106,8 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
           }
         });
 
-        kminer.detectAtCommit(repository, commitHash,
+        //TODO: use git4idea instead of eclipse jdt in kotlinrminer
+/*        kminer.detectAtCommit(repository, commitHash,
             new org.jetbrains.research.kotlinrminer.api.RefactoringHandler() {
               @Override
               public void handle(String commitId,
@@ -119,7 +120,7 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
                     () -> map.put(commitId, convertedKtRefactorings)
                 );
               }
-            });
+            });*/
       } catch (Exception e) {
         e.printStackTrace();
       }

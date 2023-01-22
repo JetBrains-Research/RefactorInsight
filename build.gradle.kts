@@ -17,9 +17,9 @@ dependencies {
     implementation("org.eclipse.jdt:org.eclipse.jdt.core:3.16.0")
     implementation("org.apache.commons:commons-text:1.10.0")
     implementation("org.kohsuke:github-api:1.313")
-    implementation(group = "com.github.tsantalis", name = "refactoring-miner", version = "2.3.2") {
-        exclude("org.slf4j", "slf4j-log4j12")
-    }
+    implementation("io.github.java-diff-utils:java-diff-utils:4.11")
+    // for testing purposes -- path to custom build of the intellij-psi branch of RefactoringMiner
+    implementation(files("PATH"))
     implementation("org.slf4j:slf4j-jdk14:1.7.30")
     testImplementation("junit:junit:4.13.2")
     testImplementation(group = "org.mockito", name = "mockito-core", version = "4.10.0")

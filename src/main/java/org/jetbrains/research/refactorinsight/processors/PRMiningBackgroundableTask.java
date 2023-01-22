@@ -11,6 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
 import com.intellij.util.ExceptionUtil;
 import com.intellij.vcs.log.VcsFullCommitDetails;
+import git4idea.repo.GitRepository;
 import org.eclipse.jgit.lib.Repository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +30,7 @@ public class PRMiningBackgroundableTask extends Task.Backgroundable {
   private final Project project;
   private final PRFileEditor prFileEditor;
   private final MiningService service;
-  private final Repository myRepository;
+  private final GitRepository myRepository;
   private boolean canceled = false;
   private final Logger logger = Logger.getInstance(PRMiningBackgroundableTask.class);
   List<VcsFullCommitDetails> commitDetails;

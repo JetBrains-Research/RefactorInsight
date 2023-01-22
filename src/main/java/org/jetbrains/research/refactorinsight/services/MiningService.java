@@ -56,7 +56,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   private MyState innerState = new MyState();
   private SingleCommitRefactoringTask task = null;
   private PRMiningBackgroundableTask prTask = null;
-  private Repository myRepository = null;
+  private GitRepository myRepository = null;
 
   public MiningService() {
   }
@@ -84,13 +84,13 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     }
   }
 
-  public Repository getRepository() {
+  public GitRepository getRepository() {
     return myRepository;
   }
 
-  private static Repository openRepository(final String path) {
+  private static GitRepository openRepository(final String path, Project project) {
     try {
-      return new GitServiceImpl().openRepository(path);
+      return new GitServiceImpl().openRepository(project, path);
     } catch (Exception e) {
       e.printStackTrace();
       return null;
@@ -137,7 +137,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
    */
   public void mineRepo(GitRepository repository, int limit) {
     if (myRepository == null) {
-      myRepository = openRepository(repository.getProject().getBasePath());
+      myRepository = openRepository(repository.getProject().getBasePath(), repository.getProject());
     }
     ProgressManager.getInstance()
         .run(new Task.Backgroundable(repository.getProject(), RefactorInsightBundle.message("mining"), true) {
@@ -211,7 +211,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
       task.cancel();
     }
     if (myRepository == null) {
-      myRepository = openRepository(project.getBasePath());
+      myRepository = openRepository(project.getBasePath(), project);
     }
 
     task = new SingleCommitRefactoringTask(project, commit, window);
@@ -228,7 +228,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
   public void mineAtCommitFromPR(List<VcsFullCommitDetails> commitDetails,
                                  Project project, PRFileEditor scrollPane) {
     if (myRepository == null) {
-      myRepository = openRepository(project.getBasePath());
+      myRepository = openRepository(project.getBasePath(), project);
     }
     prTask = new PRMiningBackgroundableTask(project, commitDetails, scrollPane);
     ProgressManager.getInstance().run(prTask);
