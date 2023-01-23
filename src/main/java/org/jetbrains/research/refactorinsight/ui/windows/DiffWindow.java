@@ -6,11 +6,7 @@ import com.intellij.diff.chains.SimpleDiffRequestChain;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.contents.DocumentContent;
 import com.intellij.diff.requests.DiffRequest;
-import com.intellij.diff.tools.simple.SimpleDiffTool;
-import com.intellij.diff.tools.simple.SimpleDiffViewer;
-import com.intellij.diff.tools.simple.SimpleThreesideDiffChange;
-import com.intellij.diff.tools.simple.SimpleThreesideDiffViewer;
-import com.intellij.diff.tools.simple.ThreesideDiffChangeBase;
+import com.intellij.diff.tools.simple.*;
 import com.intellij.diff.tools.util.base.DiffViewerListener;
 import com.intellij.diff.tools.util.base.IgnorePolicy;
 import com.intellij.diff.tools.util.side.TwosideTextDiffViewer;
@@ -27,6 +23,7 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TitlePanel;
 import com.intellij.openapi.ui.WindowWrapper;
@@ -42,23 +39,17 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.panels.Wrapper;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.research.refactorinsight.folding.RefactoringFolder;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.diff.MoreSidedDiffRequestGenerator.MoreSidedRange;
 import org.jetbrains.research.refactorinsight.data.diff.ThreeSidedRange;
+import org.jetbrains.research.refactorinsight.folding.RefactoringFolder;
 
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
-import java.awt.Component;
-import java.awt.Dimension;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -103,8 +94,10 @@ public class DiffWindow extends DiffExtension {
     if (index != -1) {
       DiffRequestChain chain = new SimpleDiffRequestChain(requests, index);
       chain.putUserData(DiffUserDataKeysEx.FORCE_DIFF_TOOL, SimpleDiffTool.INSTANCE);
-      DiffManager.getInstance().showDiff(project, chain,
-                                         new DiffDialogHints(WindowWrapper.Mode.FRAME));
+      ExternalSystemApiUtil.executeOnEdt(false, () ->
+              DiffManager.getInstance().showDiff(project, chain,
+                      new DiffDialogHints(WindowWrapper.Mode.FRAME))
+      );
     }
   }
 
