@@ -80,7 +80,8 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
                 refactoringsMap.putIfAbsent(lineNumber, new HashSet<>());
                 if (refactoringInfo.containsElement(lineNumber, textOffset, isRight) &&
                         !refactoringsMap.get(lineNumber).contains(refactoringInfo)) {
-                    RefactoringInfoHint info = new RefactoringInfoHint(element, e -> "Refactoring detected", refactoringInfo);
+                    RefactoringInfoHint info = new RefactoringInfoHint(element,
+                            e -> RefactorInsightBundle.message("refactoring.detected.hint"), refactoringInfo);
                     result.add(info);
                     refactoringsMap.get(lineNumber).add(refactoringInfo);
                 }
@@ -135,7 +136,8 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
 
     private static class RefactoringInfoHint extends MergeableLineMarkerInfo<PsiElement> {
 
-        RefactoringInfoHint(@NotNull final PsiElement element, Function<? super PsiElement, String> tooltipProvider, RefactoringInfo refactoringInfo) {
+        RefactoringInfoHint(@NotNull final PsiElement element, Function<? super PsiElement, String> tooltipProvider,
+                            RefactoringInfo refactoringInfo) {
             super(element,
                     element.getTextRange(),
                     RefactorInsightIcons.toggle,
@@ -158,7 +160,7 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
         @NotNull
         @Override
         public Function<? super PsiElement, String> getCommonTooltip(@NotNull List<? extends MergeableLineMarkerInfo<?>> infos) {
-            return __ -> "Refactoring detected";
+            return __ -> RefactorInsightBundle.message("refactoring.detected.hint");
         }
     }
 
