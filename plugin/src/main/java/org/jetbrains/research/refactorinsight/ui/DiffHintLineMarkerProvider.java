@@ -197,6 +197,7 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
             });
             button.setSize(26, 24);
             button.setBorder(new JBEmptyBorder(1, 2, 1, 2));
+            button.setToolTipText("Show Diff");
             JLabel text = new JLabel(refactoringInfo.getType());
             JPanel panel = new JPanel();
             panel.add(text);
