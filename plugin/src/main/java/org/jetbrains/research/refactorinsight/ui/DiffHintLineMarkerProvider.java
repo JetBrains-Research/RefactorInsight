@@ -9,15 +9,19 @@ import com.intellij.diff.DiffContentFactoryImpl;
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.Language;
 import com.intellij.lang.java.JavaLanguage;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.psi.FileViewProvider;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.impl.source.tree.LeafElement;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.ui.awt.RelativePoint;
@@ -28,6 +32,7 @@ import git4idea.history.GitHistoryUtils;
 import icons.RefactorInsightIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.services.MiningService;
@@ -36,7 +41,6 @@ import org.jetbrains.research.refactorinsight.ui.windows.DiffWindow;
 import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.util.*;
-import java.util.List;
 
 public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
     private static final String DIFF_WINDOW_CLASS_NAME_PREFIX = DiffContentFactoryImpl.class.getName() + "$";
@@ -180,9 +184,10 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
 
         @NotNull
         private JComponent createComponent(Project project) {
-            JButton button = new JButton();
-            button.setIcon(AllIcons.Actions.Diff);
-            button.addActionListener(e -> {
+            JButton showDiffButton = new JButton();
+            showDiffButton.setIcon(AllIcons.Actions.Diff);
+
+            showDiffButton.addActionListener(e -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 try {
                     String basePath = project.getBasePath();
                     if (basePath == null) return;
@@ -190,18 +195,20 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
                     if (root == null) return;
                     List<GitCommit> history = GitHistoryUtils.history(project, root, refactoringInfo.getCommitId(), "-1");
                     if (history.isEmpty()) return;
+
                     DiffWindow.showDiff(history.get(0).getChanges(), refactoringInfo, project, refactoringInfo.getEntry().getRefactorings());
-                } catch (VcsException | NoSuchElementException ex) {
+                } catch (VcsException ex) {
                     throw new RuntimeException(ex);
                 }
-            });
-            button.setSize(26, 24);
-            button.setBorder(new JBEmptyBorder(1, 2, 1, 2));
-            button.setToolTipText("Show Diff");
-            JLabel text = new JLabel(refactoringInfo.getType());
+            }));
+
+            showDiffButton.setSize(26, 24);
+            showDiffButton.setBorder(new JBEmptyBorder(1, 2, 1, 2));
+            showDiffButton.setToolTipText(RefactorInsightBundle.message("show.diff.tooltip"));
+            JLabel refactoringDescription = new JLabel(refactoringInfo.getType());
             JPanel panel = new JPanel();
-            panel.add(text);
-            panel.add(button);
+            panel.add(refactoringDescription);
+            panel.add(showDiffButton);
             return panel;
         }
     }
