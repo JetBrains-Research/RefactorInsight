@@ -48,6 +48,8 @@ public abstract class DiffRequestGenerator {
     return lineMarkings;
   }
 
+  public abstract boolean containsElement(int lineNumber, int textOffset, boolean isRight);
+
   /**
    * Corrects each line if needed.
    *

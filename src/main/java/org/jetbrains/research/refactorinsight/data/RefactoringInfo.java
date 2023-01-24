@@ -295,6 +295,10 @@ public class RefactoringInfo {
     return requestGenerator.getMarkings();
   }
 
+  public boolean containsElement(int lineNumber, int textOffset, boolean isRight) {
+    return requestGenerator.containsElement(lineNumber, textOffset, isRight);
+  }
+
   public long getTimestamp() {
     return entry.getTimeStamp();
   }
