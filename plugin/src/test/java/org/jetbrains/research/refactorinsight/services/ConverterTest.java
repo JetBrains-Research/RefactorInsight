@@ -1,27 +1,20 @@
 package org.jetbrains.research.refactorinsight.services;
 
+import com.intellij.diff.fragments.LineFragmentImpl;
+import org.jetbrains.research.refactorinsight.data.Group;
+import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
+import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
+import org.jetbrains.research.refactorinsight.diff.MoreSidedDiffRequestGenerator;
+import org.jetbrains.research.refactorinsight.diff.ThreeSidedDiffRequestGenerator;
+import org.jetbrains.research.refactorinsight.diff.TwoSidedDiffRequestGenerator;
+import org.junit.Test;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
 import static org.jetbrains.research.refactorinsight.utils.StringUtils.*;
-
-import com.intellij.diff.fragments.LineFragmentImpl;
-import org.jetbrains.research.refactorinsight.common.data.Group;
-import org.jetbrains.research.refactorinsight.common.data.RefactoringEntry;
-import org.jetbrains.research.refactorinsight.common.data.RefactoringInfo;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.jetbrains.research.refactorinsight.common.diff.MoreSidedDiffRequestGenerator;
-import org.jetbrains.research.refactorinsight.common.diff.ThreeSidedDiffRequestGenerator;
-import org.jetbrains.research.refactorinsight.common.diff.TwoSidedDiffRequestGenerator;
-import org.jetbrains.research.refactorinsight.folding.FoldingDescriptor;
-import org.jetbrains.research.refactorinsight.processors.RefactoringType;
-import org.junit.Test;
 
 public class ConverterTest {
 

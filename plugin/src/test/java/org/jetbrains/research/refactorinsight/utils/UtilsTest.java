@@ -55,7 +55,7 @@ public class UtilsTest {
     PsiType type = mock(PsiType.class);
     when(parameter.getType()).thenReturn(type);
     when(type.getPresentableText()).thenReturn("String");
-    assertEquals("testClass.testMethod(String, String)", StringUtils.calculateSignature(psiMethod));
+    assertEquals("testClass.testMethod(String, String)", SignatureUtils.calculateSignature(psiMethod));
   }
 
   @Test
