@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.jetbrains.intellij.IntelliJPluginExtension
 
 plugins {
@@ -22,7 +23,8 @@ subprojects {
     }
 
     tasks.withType<Test> {
-        useJUnitPlatform()
+        useJUnit()
+        testLogging.exceptionFormat = FULL
     }
 }
 
