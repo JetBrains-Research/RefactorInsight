@@ -8,6 +8,7 @@ import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.diff.MoreSidedDiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.diff.ThreeSidedDiffRequestGenerator;
 import org.jetbrains.research.refactorinsight.diff.TwoSidedDiffRequestGenerator;
+import org.jetbrains.research.refactorinsight.folding.FoldingDescriptor;
 import org.junit.Test;
 
 import java.util.*;
@@ -114,12 +115,11 @@ public class ConverterTest {
                 .setMoreSided(false)
                 .setChanged(false)
                 .setIncludes(new HashSet<>())
-                //TODO .setFoldingDescriptorMid(new FoldingDescriptor(1, 2, 3))
+                .setFoldingDescriptorMid(new FoldingDescriptor(1, 2, 3))
                 .setRequestGenerator(new TwoSidedDiffRequestGenerator(Collections.singletonList(
                         new LineFragmentImpl(1, 2, 3, 4, 0, 0, 0, 0))));
         //Test case 3
         String moreSidedString = String.join(delimiter(INFO),
-                "59",
                 "nameBef", "nameAft", "elemBef", "elemAft", "detBef", "detAft",
                 "left/path.java", "mid/path.java", "right/path.java",
                 "6",
@@ -144,8 +144,8 @@ public class ConverterTest {
                 .setMoreSided(true)
                 .setChanged(true)
                 .setIncludes(new HashSet<>())
-                //TODO   .setFoldingDescriptorBefore(new FoldingDescriptor(12, 13, 14))
-                //TODO .setFoldingDescriptorAfter(new FoldingDescriptor(15, 16, 17))
+                .setFoldingDescriptorBefore(new FoldingDescriptor(12, 13, 14))
+                .setFoldingDescriptorAfter(new FoldingDescriptor(15, 16, 17))
                 .setRequestGenerator(new MoreSidedDiffRequestGenerator(Collections.singletonList(
                         new MoreSidedDiffRequestGenerator.MoreSidedRange(1, 2, 3, 4,
                                 0, 0, 0, 0, "extraction/left/path.java"))));
