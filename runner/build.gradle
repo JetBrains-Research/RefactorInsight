@@ -15,7 +15,9 @@ dependencies {
     implementation(group: 'com.github.tsantalis', name: 'refactoring-miner', version: '2.3.2') {
         exclude group: "org.slf4j", module: "slf4j-log4j12"
     }
+    implementation("org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r")
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0"
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0"
 }
