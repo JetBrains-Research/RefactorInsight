@@ -1,14 +1,15 @@
 package org.jetbrains.research.refactorinsight.processors;
 
-import org.jetbrains.research.refactorinsight.common.Handler;
-import org.jetbrains.research.refactorinsight.data.types.attributes.*;
-import org.jetbrains.research.refactorinsight.data.types.classes.*;
-import org.jetbrains.research.refactorinsight.data.types.methods.*;
-import org.jetbrains.research.refactorinsight.data.types.packages.MoveSourceFolderJavaHandler;
-import org.jetbrains.research.refactorinsight.data.types.packages.MoveSourceFolderKotlinHandler;
-import org.jetbrains.research.refactorinsight.data.types.packages.RenamePackageJavaHandler;
-import org.jetbrains.research.refactorinsight.data.types.packages.RenamePackageKotlinHandler;
-import org.jetbrains.research.refactorinsight.data.types.variables.*;
+import org.jetbrains.research.refactorinsight.data.JavaRefactoringHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.*;
+import org.jetbrains.research.refactorinsight.data.classes.*;
+import org.jetbrains.research.refactorinsight.data.methods.*;
+import org.jetbrains.research.refactorinsight.data.packages.*;
+import org.jetbrains.research.refactorinsight.data.variables.*;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoringHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.classes.*;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.*;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.packages.*;
 
 public enum RefactoringType {
     EXTRACT_OPERATION("Extract Method", new ExtractOperationJavaHandler(), new ExtractOperationKotlinHandler()),
@@ -73,10 +74,10 @@ public enum RefactoringType {
     RENAME_AND_CHANGE_VARIABLE_TYPE("Rename and Change Variable Type", null, null);
 
     private final String name;
-    private final Handler javaHandler;
-    private final Handler kotlinHandler;
+    private final JavaRefactoringHandler javaHandler;
+    private final KotlinRefactoringHandler kotlinHandler;
 
-    RefactoringType(String name, Handler javaHandler, Handler kotlinHandler) {
+    RefactoringType(String name, JavaRefactoringHandler javaHandler, KotlinRefactoringHandler kotlinHandler) {
         this.name = name;
         this.javaHandler = javaHandler;
         this.kotlinHandler = kotlinHandler;
@@ -86,11 +87,11 @@ public enum RefactoringType {
         return this.name;
     }
 
-    public Handler getJavaHandler() {
+    public JavaRefactoringHandler getJavaHandler() {
         return this.javaHandler;
     }
 
-    public Handler getKotlinHandler() {
+    public KotlinRefactoringHandler getKotlinHandler() {
         return this.kotlinHandler;
     }
 

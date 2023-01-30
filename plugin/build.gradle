@@ -1,26 +1,29 @@
 plugins {
-    id 'org.jetbrains.intellij' version '0.7.2'
+    id 'java'
+    id 'org.jetbrains.intellij' version '1.10.1'
 }
 
 group = rootProject.group
 version = rootProject.version
 
-intellij {
-    version = '2021.2'
-    plugins = ['java', 'git4idea', "github"]
-    downloadSources true
-    buildSearchableOptions.enabled false
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://cache-redirector.jetbrains.com/intellij-dependencies' }
 }
 
 dependencies {
     implementation(project(":common"))
     implementation(project(":java-impl"))
     implementation(project(":kotlin-impl"))
-    implementation 'com.github.JetBrains-Research:kotlinRMiner:v1.2'
-    compile group: 'com.github.tsantalis', name: 'refactoring-miner', version: '2.0'
-    testImplementation('junit:junit:4.13')
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    implementation 'org.jetbrains.research.kotlinrminer:kotlinRMiner-ide:1.2.1'
+    implementation(group: 'com.github.tsantalis', name: 'refactoring-miner', version: '2.3.2') {
+        exclude group: "org.slf4j", module: "slf4j-log4j12"
+    }
+    implementation("org.slf4j:slf4j-jdk14:1.7.30")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r")
+    testImplementation('junit:junit:4.13.2')
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.10.0'
 }
 
 test {
