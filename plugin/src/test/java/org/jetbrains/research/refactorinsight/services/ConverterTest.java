@@ -14,9 +14,9 @@ import org.junit.Test;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.TestCase.assertEquals;
 import static org.jetbrains.research.refactorinsight.utils.StringUtils.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ConverterTest {
 
