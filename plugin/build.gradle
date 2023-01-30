@@ -26,10 +26,6 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.10.0'
 }
 
-test {
-    useJUnitPlatform()
-}
-
 runIde {
     maxHeapSize = "4g"
 }
