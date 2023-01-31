@@ -31,7 +31,7 @@ import org.jetbrains.research.refactorinsight.folding.handlers.FoldingHandler;
 import org.jetbrains.research.refactorinsight.folding.handlers.InlineOperationFoldingHandler;
 import org.jetbrains.research.refactorinsight.folding.handlers.MoveOperationFoldingHandler;
 import org.jetbrains.research.refactorinsight.services.MiningService;
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,21 +40,21 @@ import java.util.stream.Collectors;
  * Folds discovered refactorings in code diffs.
  */
 public class RefactoringFolder {
-  static Map<RefactoringType, FoldingHandler> foldingHandlers;
+  static Map<String, FoldingHandler> foldingHandlers;
 
   static {
-    foldingHandlers = new EnumMap<>(RefactoringType.class);
+    foldingHandlers = new HashMap<>();
     FoldingHandler moveOperationHandler = new MoveOperationFoldingHandler();
-    foldingHandlers.put(RefactoringType.MOVE_OPERATION, moveOperationHandler);
-    foldingHandlers.put(RefactoringType.PULL_UP_OPERATION, moveOperationHandler);
-    foldingHandlers.put(RefactoringType.PUSH_DOWN_OPERATION, moveOperationHandler);
-    foldingHandlers.put(RefactoringType.MOVE_AND_RENAME_OPERATION, moveOperationHandler);
+    foldingHandlers.put(RefactoringType.MOVE_OPERATION.getName(), moveOperationHandler);
+    foldingHandlers.put(RefactoringType.PULL_UP_OPERATION.getName(), moveOperationHandler);
+    foldingHandlers.put(RefactoringType.PUSH_DOWN_OPERATION.getName(), moveOperationHandler);
+    foldingHandlers.put(RefactoringType.MOVE_AND_RENAME_OPERATION.getName(), moveOperationHandler);
     FoldingHandler inlineOperationHandler = new InlineOperationFoldingHandler();
-    foldingHandlers.put(RefactoringType.INLINE_OPERATION, inlineOperationHandler);
-    foldingHandlers.put(RefactoringType.MOVE_AND_INLINE_OPERATION, inlineOperationHandler);
+    foldingHandlers.put(RefactoringType.INLINE_OPERATION.getName(), inlineOperationHandler);
+    foldingHandlers.put(RefactoringType.MOVE_AND_INLINE_OPERATION.getName(), inlineOperationHandler);
     FoldingHandler extractOperationHandler = new ExtractOperationFoldingHandler();
-    foldingHandlers.put(RefactoringType.EXTRACT_OPERATION, extractOperationHandler);
-    foldingHandlers.put(RefactoringType.EXTRACT_AND_MOVE_OPERATION, extractOperationHandler);
+    foldingHandlers.put(RefactoringType.EXTRACT_OPERATION.getName(), extractOperationHandler);
+    foldingHandlers.put(RefactoringType.EXTRACT_AND_MOVE_OPERATION.getName(), extractOperationHandler);
   }
 
   private RefactoringFolder() {}

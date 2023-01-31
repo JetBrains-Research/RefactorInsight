@@ -19,7 +19,7 @@ public class MoveOperationJavaHandler extends JavaRefactoringHandler {
     public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
         final MoveOperationRefactoring ref = (MoveOperationRefactoring) refactoring;
 
-        if (!Objects.equals(info.getType(), RefactoringType.MOVE_AND_RENAME_OPERATION.name())) {
+        if (!Objects.equals(info.getType(), RefactoringType.MOVE_AND_RENAME_OPERATION.getDisplayName())) {
             List<AbstractStatement> statementsBefore =
                     ref.getOriginalOperation().getBody().getCompositeStatement().getStatements();
             List<AbstractStatement> statementsAfter =

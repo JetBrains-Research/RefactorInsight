@@ -73,7 +73,7 @@ public class ConverterTest {
                 "", "", "",
                 "");
         RefactoringInfo noMarkingsInfo = new RefactoringInfo()
-                .setType(RefactoringType.ADD_ATTRIBUTE_ANNOTATION.name())
+                .setType(RefactoringType.ADD_ATTRIBUTE_ANNOTATION.getDisplayName())
                 .setNameBefore("nameBef")
                 .setNameAfter("nameAft")
                 .setElementBefore("elemBef")
@@ -99,7 +99,7 @@ public class ConverterTest {
                 "", "1/2/3", "",
                 "");
         RefactoringInfo oneMarkingInfo = new RefactoringInfo()
-                .setType(RefactoringType.ADD_PARAMETER.name())
+                .setType(RefactoringType.ADD_PARAMETER.getDisplayName())
                 .setNameBefore("nameBef")
                 .setNameAfter("nameAft")
                 .setElementBefore("elemBef")
