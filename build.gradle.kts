@@ -3,7 +3,7 @@ import org.jetbrains.intellij.IntelliJPluginExtension
 
 plugins {
     java
-    id("org.jetbrains.intellij") version "1.10.1"
+    id("org.jetbrains.intellij") version "1.12.0"
     id("org.jetbrains.kotlin.jvm") version "1.8.0"
 }
 
@@ -35,3 +35,9 @@ val configureIntelliJ: Action<IntelliJPluginExtension> = Action {
 }
 
 intellij(configureIntelliJ)
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
