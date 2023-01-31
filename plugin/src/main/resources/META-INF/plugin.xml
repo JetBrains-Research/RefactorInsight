@@ -104,7 +104,6 @@
         <projectService serviceImplementation="org.jetbrains.research.refactorinsight.services.WindowService"/>
         <projectService serviceImplementation="org.jetbrains.research.refactorinsight.services.SettingsState"/>
 
-        <errorHandler implementation="org.jetbrains.research.refactorinsight.reporter.RefactorInsightErrorReporter"/>
         <fileEditorProvider implementation="org.jetbrains.research.refactorinsight.pullrequests.PRFileEditorProvider"/>
         <vcsLogCustomColumn implementation="org.jetbrains.research.refactorinsight.ui.windows.RefactoringColumn"/>
         <codeInsight.lineMarkerProvider implementationClass="org.jetbrains.research.refactorinsight.ui.DiffHintLineMarkerProvider"

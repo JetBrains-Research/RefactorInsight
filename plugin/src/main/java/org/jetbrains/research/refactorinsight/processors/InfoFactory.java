@@ -20,7 +20,7 @@ public class InfoFactory {
     public RefactoringInfo create(Refactoring refactoring) {
         final JavaRefactoringHandler handler = RefactoringType.valueOf(refactoring.getRefactoringType().name()).getJavaHandler();
         RefactoringInfo refactoringInfo = handler.handle(refactoring);
-        refactoringInfo.setType(refactoring.getRefactoringType().name());
+        refactoringInfo.setType(refactoring.getRefactoringType().getDisplayName());
         return refactoringInfo;
     }
 
@@ -33,7 +33,7 @@ public class InfoFactory {
     public RefactoringInfo create(org.jetbrains.research.kotlinrminer.ide.Refactoring refactoring) throws RefactoringProcessingException {
         final KotlinRefactoringHandler handler = RefactoringType.valueOf(refactoring.getRefactoringType().name()).getKotlinHandler();
         RefactoringInfo refactoringInfo = handler.handle(refactoring);
-        refactoringInfo.setType(refactoring.getRefactoringType().name());
+        refactoringInfo.setType(refactoring.getRefactoringType().getDisplayName());
         return refactoringInfo;
     }
 

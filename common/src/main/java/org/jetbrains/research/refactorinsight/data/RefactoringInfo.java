@@ -475,17 +475,16 @@ public class RefactoringInfo {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof RefactoringInfo)) {
+        if (!(o instanceof RefactoringInfo that)) {
             return false;
         }
 
-        RefactoringInfo that = (RefactoringInfo) o;
         return this.getNameAfter().equals(that.getNameAfter())
                 && this.getNameBefore().equals(that.getNameBefore())
                 && Objects.equals(this.getDetailsAfter(), that.getDetailsAfter())
                 && Objects.equals(this.getDetailsBefore(), that.getDetailsBefore())
                 && Objects.equals(this.getElementBefore(), that.getElementBefore())
-                && this.type == that.getType()
+                && Objects.equals(this.type, that.getType())
                 && this.group == that.getGroup();
     }
 
