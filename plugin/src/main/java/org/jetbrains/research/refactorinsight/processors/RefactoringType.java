@@ -1,15 +1,97 @@
 package org.jetbrains.research.refactorinsight.processors;
 
 import org.jetbrains.research.refactorinsight.data.JavaRefactoringHandler;
-import org.jetbrains.research.refactorinsight.data.attributes.*;
-import org.jetbrains.research.refactorinsight.data.classes.*;
-import org.jetbrains.research.refactorinsight.data.methods.*;
-import org.jetbrains.research.refactorinsight.data.packages.*;
-import org.jetbrains.research.refactorinsight.data.variables.*;
+import org.jetbrains.research.refactorinsight.data.attributes.AddAttributeAnnotationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.AddAttributeModifierJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.ChangeAttributeAccessModifierJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.ChangeAttributeTypeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.EncapsulateAttributeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.ExtractAttributeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.InlineAttributeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.MergeAttributeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.ModifyAttributeAnnotationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.MoveAttributeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.MoveRenameAttributeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.PullUpAttributeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.PushDownAttributeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.RemoveAttributeAnnotationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.RemoveAttributeModifierJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.RenameAttributeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.ReplaceAttributeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.attributes.SplitAttributeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.classes.AddClassAnnotationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.classes.AddClassModifierJavaHandler;
+import org.jetbrains.research.refactorinsight.data.classes.ChangeClassAccessModifierJavaHandler;
+import org.jetbrains.research.refactorinsight.data.classes.ChangeTypeDeclarationKindJavaHandler;
+import org.jetbrains.research.refactorinsight.data.classes.CollapseHierarchyJavaHandler;
+import org.jetbrains.research.refactorinsight.data.classes.ExtractClassJavaHandler;
+import org.jetbrains.research.refactorinsight.data.classes.ExtractSuperClassJavaHandler;
+import org.jetbrains.research.refactorinsight.data.classes.MergeClassJavaHandler;
+import org.jetbrains.research.refactorinsight.data.classes.ModifyClassAnnotationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.classes.MoveClassJavaHandler;
+import org.jetbrains.research.refactorinsight.data.classes.MoveRenameClassJavaHandler;
+import org.jetbrains.research.refactorinsight.data.classes.RemoveClassAnnotationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.classes.RemoveClassModifierJavaHandler;
+import org.jetbrains.research.refactorinsight.data.classes.RenameClassJavaHandler;
+import org.jetbrains.research.refactorinsight.data.classes.SplitClassJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.AddMethodAnnotationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.AddMethodModifierJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.AddParameterAnnotationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.AddParameterJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.AddThrownExceptionTypeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.ChangeMethodAccessModifierJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.ChangeReturnTypeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.ChangeThrownExceptionTypeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.ExtractOperationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.InlineOperationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.InvertConditionJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.MergeCatchJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.MergeConditionalJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.ModifyMethodAnnotationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.ModifyParameterAnnotationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.MoveOperationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.PullUpOperationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.PushDownOperationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.RemoveMethodAnnotationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.RemoveMethodModifierJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.RemoveParameterAnnotationJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.RemoveParameterJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.RemoveThrownExceptionTypeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.RenameMethodJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.ReorderParameterJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.ReplaceAnonymousWithLambdaJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.ReplaceLoopWithPipelineJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.ReplacePipelineWithLoopJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.SplitConditionalJavaHandler;
+import org.jetbrains.research.refactorinsight.data.packages.MergePackageJavaHandler;
+import org.jetbrains.research.refactorinsight.data.packages.MoveSourceFolderJavaHandler;
+import org.jetbrains.research.refactorinsight.data.packages.RenamePackageJavaHandler;
+import org.jetbrains.research.refactorinsight.data.packages.SplitPackageJavaHandler;
+import org.jetbrains.research.refactorinsight.data.variables.AddVariableModifierJavaHandler;
+import org.jetbrains.research.refactorinsight.data.variables.ChangeVariableTypeJavaHandler;
+import org.jetbrains.research.refactorinsight.data.variables.ExtractVariableJavaHandler;
+import org.jetbrains.research.refactorinsight.data.variables.InlineVariableJavaHandler;
+import org.jetbrains.research.refactorinsight.data.variables.MergeVariableJavaHandler;
+import org.jetbrains.research.refactorinsight.data.variables.RemoveVariableModifierJavaHandler;
+import org.jetbrains.research.refactorinsight.data.variables.RenameVariableJavaHandler;
+import org.jetbrains.research.refactorinsight.data.variables.SplitVariableJavaHandler;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoringHandler;
-import org.jetbrains.research.refactorinsight.kotlin.impl.data.classes.*;
-import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.*;
-import org.jetbrains.research.refactorinsight.kotlin.impl.data.packages.*;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.classes.ExtractClassKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.classes.ExtractSuperClassKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.classes.MoveClassKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.classes.MoveRenameClassKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.classes.RenameClassKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.AddParameterKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.ExtractOperationKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.InlineOperationKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.MoveOperationKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.PullUpOperationKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.PushDownOperationKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.RemoveParameterKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.RenameMethodKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.ReorderParameterKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.packages.MoveSourceFolderKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.packages.RenamePackageKotlinHandler;
 
 public enum RefactoringType {
     EXTRACT_OPERATION("Extract Method", new ExtractOperationJavaHandler(), new ExtractOperationKotlinHandler()),
@@ -71,7 +153,42 @@ public enum RefactoringType {
     REORDER_PARAMETER("Reorder Parameter", new ReorderParameterJavaHandler(), new ReorderParameterKotlinHandler()),
     RENAME_AND_CHANGE_ATTRIBUTE_TYPE("Rename and Change Attribute Type", null, null),
     RENAME_AND_CHANGE_PARAMETER_TYPE("Rename and Change Parameter Type", null, null),
-    RENAME_AND_CHANGE_VARIABLE_TYPE("Rename and Change Variable Type", null, null);
+    RENAME_AND_CHANGE_VARIABLE_TYPE("Rename and Change Variable Type", null, null),
+    ADD_THROWN_EXCEPTION_TYPE("Add Thrown Exception Type",new AddThrownExceptionTypeJavaHandler(), null),
+    REMOVE_THROWN_EXCEPTION_TYPE("Remove Thrown Exception Type",new RemoveThrownExceptionTypeJavaHandler(), null),
+    CHANGE_THROWN_EXCEPTION_TYPE("Change Thrown Exception Type",new ChangeThrownExceptionTypeJavaHandler(), null),
+    CHANGE_OPERATION_ACCESS_MODIFIER("Change Method Access Modifier", new ChangeMethodAccessModifierJavaHandler(), null),
+    CHANGE_ATTRIBUTE_ACCESS_MODIFIER("Change Attribute Access Modifier", new ChangeAttributeAccessModifierJavaHandler(), null),
+    ENCAPSULATE_ATTRIBUTE("Encapsulate Attribute", new EncapsulateAttributeJavaHandler(), null),
+    PARAMETERIZE_ATTRIBUTE("Parameterize Attribute", new RenameVariableJavaHandler(), null),
+    REPLACE_ATTRIBUTE_WITH_VARIABLE("Replace Attribute with Variable", new RenameVariableJavaHandler(), null),
+    ADD_METHOD_MODIFIER("Add Method Modifier", new AddMethodModifierJavaHandler(), null),
+    REMOVE_METHOD_MODIFIER("Remove Method Modifier", new RemoveMethodModifierJavaHandler(), null),
+    ADD_ATTRIBUTE_MODIFIER("Add Attribute Modifier", new AddAttributeModifierJavaHandler(), null),
+    REMOVE_ATTRIBUTE_MODIFIER("Remove Attribute Modifier", new RemoveAttributeModifierJavaHandler(), null),
+    ADD_VARIABLE_MODIFIER("Add Variable Modifier", new AddVariableModifierJavaHandler(), null),
+    REMOVE_VARIABLE_MODIFIER("Remove Variable Modifier", new RemoveVariableModifierJavaHandler(), null),
+    ADD_PARAMETER_MODIFIER("Add Parameter Modifier", new AddVariableModifierJavaHandler(), null),
+    REMOVE_PARAMETER_MODIFIER("Remove Parameter Modifier", new RemoveVariableModifierJavaHandler(), null),
+    ADD_CLASS_MODIFIER("Add Class Modifier", new AddClassModifierJavaHandler(), null),
+    REMOVE_CLASS_MODIFIER("Remove Class Modifier", new RemoveClassModifierJavaHandler(), null),
+    CHANGE_CLASS_ACCESS_MODIFIER("Change Class Access Modifier", new ChangeClassAccessModifierJavaHandler(), null),
+    MOVE_PACKAGE("Move Package", new RenamePackageJavaHandler(), null),
+    SPLIT_PACKAGE("Split Package", new SplitPackageJavaHandler(), null),
+    MERGE_PACKAGE("Merge Package", new MergePackageJavaHandler(), null),
+    LOCALIZE_PARAMETER("Localize Parameter", new RenameVariableJavaHandler(), null),
+    CHANGE_TYPE_DECLARATION_KIND("Change Type Declaration Kind", new ChangeTypeDeclarationKindJavaHandler(), null),
+    COLLAPSE_HIERARCHY("Collapse Hierarchy", new CollapseHierarchyJavaHandler(), null),
+    REPLACE_LOOP_WITH_PIPELINE("Replace Loop with Pipeline", new ReplaceLoopWithPipelineJavaHandler(), null),
+    REPLACE_ANONYMOUS_WITH_LAMBDA("Replace Anonymous with Lambda", new ReplaceAnonymousWithLambdaJavaHandler(), null),
+    MERGE_CLASS("Merge Class", new MergeClassJavaHandler(), null),
+    INLINE_ATTRIBUTE("Inline Attribute", new InlineAttributeJavaHandler(), null),
+    REPLACE_PIPELINE_WITH_LOOP("Replace Pipeline with Loop", new ReplacePipelineWithLoopJavaHandler(), null),
+    SPLIT_CLASS("Split Class", new SplitClassJavaHandler(), null),
+    SPLIT_CONDITIONAL("Split Conditional", new SplitConditionalJavaHandler(), null),
+    INVERT_CONDITIONAL("Invert Condition", new InvertConditionJavaHandler(), null),
+    MERGE_CONDITIONAL("Merge Conditional", new MergeConditionalJavaHandler(), null),
+    MERGE_CATCH("Merge Catch", new MergeCatchJavaHandler(), null);
 
     private final String name;
     private final JavaRefactoringHandler javaHandler;
