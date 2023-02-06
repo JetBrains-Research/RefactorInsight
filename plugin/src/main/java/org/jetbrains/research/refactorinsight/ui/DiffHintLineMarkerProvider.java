@@ -1,10 +1,6 @@
 package org.jetbrains.research.refactorinsight.ui;
 
-import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
-import com.intellij.codeInsight.daemon.GutterName;
-import com.intellij.codeInsight.daemon.LineMarkerInfo;
-import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor;
-import com.intellij.codeInsight.daemon.MergeableLineMarkerInfo;
+import com.intellij.codeInsight.daemon.*;
 import com.intellij.diff.DiffContentFactoryImpl;
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.Language;
@@ -13,20 +9,20 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.ui.popup.PopupStep;
+import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
+import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.impl.source.tree.LeafElement;
-import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.ui.awt.RelativePoint;
-import com.intellij.util.Function;
-import com.intellij.util.ui.JBEmptyBorder;
+import com.intellij.util.SmartList;
 import git4idea.GitCommit;
 import git4idea.history.GitHistoryUtils;
 import icons.RefactorInsightIcons;
@@ -39,11 +35,9 @@ import org.jetbrains.research.refactorinsight.services.MiningService;
 import org.jetbrains.research.refactorinsight.ui.windows.DiffWindow;
 
 import javax.swing.*;
-import java.awt.event.MouseEvent;
 import java.util.*;
-
-import static org.jetbrains.research.refactorinsight.ui.Keys.CHILD_COMMIT_ID;
-import static org.jetbrains.research.refactorinsight.ui.Keys.COMMIT_ID;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
     private static final String DIFF_WINDOW_CLASS_NAME_PREFIX = DiffContentFactoryImpl.class.getName() + "$";
@@ -72,23 +66,25 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
         if (refactoringInfos == null) return;
 
         boolean isRight = isRightPartOfDiff(elements.get(0));
-        Map<Integer, Set<RefactoringInfo>> refactoringsMap = new HashMap<>();
+        Map<Integer, Set<RefactoringWithPsiElement>> lineToRefactorings = new HashMap<>();
 
         for (PsiElement element : elements) {
             if (!isIdentifier(element)) continue;
-
             int lineNumber = getLineNumber(element);
             int textOffset = element.getTextOffset();
             for (RefactoringInfo refactoringInfo : refactoringInfos) {
-                refactoringsMap.putIfAbsent(lineNumber, new HashSet<>());
-                if (refactoringInfo.containsElement(lineNumber, textOffset, isRight) &&
-                        !refactoringsMap.get(lineNumber).contains(refactoringInfo)) {
-                    RefactoringInfoHint info = new RefactoringInfoHint(element,
-                            e -> RefactorInsightBundle.message("refactoring.detected.hint"), refactoringInfo);
-                    result.add(info);
-                    refactoringsMap.get(lineNumber).add(refactoringInfo);
+                if (refactoringInfo.containsElement(lineNumber, textOffset, isRight)) {
+                    RefactoringWithPsiElement refactoringWithPsiElement =
+                            new RefactoringWithPsiElement(refactoringInfo, element);
+                    lineToRefactorings.computeIfAbsent(lineNumber, __ -> new LinkedHashSet<>())
+                            .add(refactoringWithPsiElement);
                 }
             }
+        }
+        for (Set<RefactoringWithPsiElement> value : lineToRefactorings.values()) {
+            var psiElements = value.stream().map(it -> it.element).collect(Collectors.toSet());
+            var refactorings = value.stream().map(it -> it.info).toList();
+            result.add(new RefactoringInfoHint(new SmartList<>(psiElements), refactorings));
         }
     }
 
@@ -108,10 +104,10 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
         VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
         String commitId;
         if (virtualFile.getClass().getName().startsWith(DIFF_WINDOW_CLASS_NAME_PREFIX)) {
-            if (virtualFile.getUserData(CHILD_COMMIT_ID) == null)
-                commitId = virtualFile.getUserData(COMMIT_ID);
+            if (virtualFile.getUserData(Keys.CHILD_COMMIT_ID) == null)
+                commitId = virtualFile.getUserData(Keys.COMMIT_ID);
             else
-                commitId = virtualFile.getUserData(CHILD_COMMIT_ID);
+                commitId = virtualFile.getUserData(Keys.CHILD_COMMIT_ID);
             if (commitId == null) return null;
             MiningService miner = MiningService.getInstance(element.getProject());
             RefactoringEntry entry = miner.get(commitId);
@@ -137,91 +133,115 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
         return false;
     }
 
-    private static class RefactoringInfoHint extends MergeableLineMarkerInfo<PsiElement> {
-
-        RefactoringInfoHint(@NotNull final PsiElement element, Function<? super PsiElement, String> tooltipProvider,
-                            RefactoringInfo refactoringInfo) {
-            super(element,
-                    element.getTextRange(),
-                    RefactorInsightIcons.toggle,
-                    tooltipProvider,
-                    new MyIconGutterHandler(refactoringInfo),
-                    GutterIconRenderer.Alignment.LEFT,
-                    () -> tooltipProvider.fun(element));
+    private record RefactoringWithPsiElement(RefactoringInfo info, PsiElement element) {
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof RefactoringWithPsiElement other && info.equals(other.info);
         }
 
         @Override
-        public boolean canMergeWith(@NotNull MergeableLineMarkerInfo<?> info) {
-            return info instanceof RefactoringInfoHint;
-        }
-
-        @Override
-        public Icon getCommonIcon(@NotNull List<? extends MergeableLineMarkerInfo<?>> infos) {
-            return RefactorInsightIcons.toggle;
-        }
-
-        @NotNull
-        @Override
-        public Function<? super PsiElement, String> getCommonTooltip(@NotNull List<? extends MergeableLineMarkerInfo<?>> infos) {
-            return __ -> RefactorInsightBundle.message("refactoring.detected.hint");
+        public int hashCode() {
+            return info.hashCode();
         }
     }
 
-    private static class MyIconGutterHandler implements GutterIconNavigationHandler<PsiElement> {
-
-        private final RefactoringInfo refactoringInfo;
-
-        MyIconGutterHandler(RefactoringInfo refactoringInfo) {
-            this.refactoringInfo = refactoringInfo;
+    private static class RefactoringInfoHint extends LineMarkerInfo<PsiElement> {
+        public RefactoringInfoHint(List<PsiElement> psiElements, List<RefactoringInfo> refactoringInfos) {
+            super(psiElements.get(0),
+                    getCommonTextRange(psiElements),
+                    RefactorInsightIcons.toggle,
+                    __ -> RefactorInsightBundle.message("refactoring.detected.hint"),
+                    getCommonNavigationHandler(refactoringInfos),
+                    GutterIconRenderer.Alignment.LEFT,
+                    () -> RefactorInsightBundle.message("refactoring.detected.hint"));
         }
 
-        @Override
-        public void navigate(MouseEvent e, PsiElement nameIdentifier) {
-            final PsiElement listOwner = nameIdentifier.getParent();
-            final PsiFile containingFile = listOwner.getContainingFile();
-            final VirtualFile virtualFile = PsiUtilCore.getVirtualFile(listOwner);
-
-            if (virtualFile != null && containingFile != null) {
-                final JBPopup popup = createTextPopup(nameIdentifier.getProject());
-                popup.show(new RelativePoint(e));
+        private static TextRange getCommonTextRange(List<PsiElement> psiElements) {
+            int startOffset = Integer.MAX_VALUE;
+            int endOffset = Integer.MIN_VALUE;
+            for (PsiElement element : psiElements) {
+                startOffset = Math.min(startOffset, element.getTextRange().getStartOffset());
+                endOffset = Math.max(endOffset, element.getTextRange().getEndOffset());
             }
+            return TextRange.create(startOffset, endOffset);
         }
 
-        @NotNull
-        private JBPopup createTextPopup(Project project) {
-            return JBPopupFactory.getInstance()
-                    .createComponentPopupBuilder(createComponent(project), null)
-                    .createPopup();
+        private static GutterIconNavigationHandler<PsiElement> getCommonNavigationHandler(
+                List<RefactoringInfo> refactoringInfos) {
+            return (mouseEvent, psiElement) -> {
+                BaseListPopupStep<RefactoringInfo> step = new BaseListPopupStep<>(
+                        RefactorInsightBundle.message("refactoring.list.title"), refactoringInfos) {
+                    @Override
+                    public Icon getIconFor(final RefactoringInfo info) {
+                        switch (info.getGroup()) {
+                            case METHOD -> {
+                                return AllIcons.Nodes.Method;
+                            }
+                            case CLASS -> {
+                                return AllIcons.Nodes.Class;
+                            }
+                            case ATTRIBUTE -> {
+                                return AllIcons.Nodes.ObjectTypeAttribute;
+                            }
+                            case VARIABLE -> {
+                                return AllIcons.Nodes.Variable;
+                            }
+                            case INTERFACE -> {
+                                return AllIcons.Nodes.Interface;
+                            }
+                            case ABSTRACT -> {
+                                return AllIcons.Nodes.AbstractClass;
+                            }
+                            case PACKAGE -> {
+                                return AllIcons.Nodes.Package;
+                            }
+                            default -> {
+                                return RefactorInsightIcons.toggle;
+                            }
+                        }
+                    }
+
+                    @Override
+                    @NotNull
+                    public String getTextFor(final RefactoringInfo info) {
+                        return StringUtil.first(info.getType(), 100, true).replace('\n', ' ');
+                    }
+
+                    @Override
+                    public PopupStep<?> onChosen(final RefactoringInfo info, final boolean finalChoice) {
+                        return doFinalStep(() -> showDiff(psiElement, info));
+                    }
+                };
+                JBPopupFactory.getInstance().createListPopup(step).show(new RelativePoint(mouseEvent));
+            };
         }
 
-        @NotNull
-        private JComponent createComponent(Project project) {
-            JButton showDiffButton = new JButton();
-            showDiffButton.setIcon(AllIcons.Actions.Diff);
-
-            showDiffButton.addActionListener(e -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
+        private static void showDiff(final PsiElement psiElement, RefactoringInfo refactoringInfo) {
+            ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 try {
+                    Project project = psiElement.getProject();
                     String basePath = project.getBasePath();
                     if (basePath == null) return;
                     VirtualFile root = LocalFileSystem.getInstance().findFileByPath(basePath);
                     if (root == null) return;
-                    List<GitCommit> history = GitHistoryUtils.history(project, root, refactoringInfo.getCommitId(), "-1");
+                    List<GitCommit> history = GitHistoryUtils.history(
+                            project,
+                            root,
+                            refactoringInfo.getCommitId(),
+                            "-1"
+                    );
                     if (history.isEmpty()) return;
 
-                    DiffWindow.showDiff(history.get(0).getChanges(), refactoringInfo, project, refactoringInfo.getEntry().getRefactorings());
+                    DiffWindow.showDiff(
+                            history.get(0).getChanges(),
+                            refactoringInfo,
+                            project,
+                            refactoringInfo.getEntry().getRefactorings()
+                    );
                 } catch (VcsException ex) {
                     throw new RuntimeException(ex);
                 }
-            }));
-
-            showDiffButton.setSize(26, 24);
-            showDiffButton.setBorder(new JBEmptyBorder(1, 2, 1, 2));
-            showDiffButton.setToolTipText(RefactorInsightBundle.message("show.diff.tooltip"));
-            JLabel refactoringDescription = new JLabel(refactoringInfo.getType());
-            JPanel panel = new JPanel();
-            panel.add(refactoringDescription);
-            panel.add(showDiffButton);
-            return panel;
+            });
         }
     }
 }
