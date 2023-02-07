@@ -7,6 +7,7 @@ import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.diff.VisualizationType;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.FoldingBuilder;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoringHandler;
 
@@ -31,6 +32,8 @@ public class ExtractOperationKotlinHandler extends KotlinRefactoringHandler {
         for (UMLType type : ref.getExtractedOperation().getParameterTypeList()) {
             parameterTypeList.add(type.toString());
         }
+
+        info.setFoldingDescriptorMid(FoldingBuilder.fromMethod(ref.getExtractedOperation()));
 
         String extractedMethod = StringUtils
                 .calculateSignatureWithoutClassName(ref.getExtractedOperation().getName(), parameterTypeList);

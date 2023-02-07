@@ -2,6 +2,7 @@ package org.jetbrains.research.refactorinsight.data.methods;
 
 import gr.uom.java.xmi.decomposition.AbstractStatement;
 import gr.uom.java.xmi.diff.PullUpOperationRefactoring;
+import org.jetbrains.research.refactorinsight.data.FoldingBuilder;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.util.JavaUtils;
@@ -21,6 +22,9 @@ public class PullUpOperationJavaHandler extends JavaRefactoringHandler {
         List<AbstractStatement> statementsAfter =
                 ref.getMovedOperation().getBody().getCompositeStatement().getStatements();
         info.setChanged(!JavaUtils.isStatementsEqualJava(statementsBefore, statementsAfter));
+
+        info.setFoldingDescriptorBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
+        info.setFoldingDescriptorAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
 
         String classBefore = ref.getOriginalOperation().getClassName();
         String classAfter = ref.getMovedOperation().getClassName();

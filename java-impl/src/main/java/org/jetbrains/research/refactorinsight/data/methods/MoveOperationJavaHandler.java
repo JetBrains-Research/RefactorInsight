@@ -2,11 +2,8 @@ package org.jetbrains.research.refactorinsight.data.methods;
 
 import gr.uom.java.xmi.decomposition.AbstractStatement;
 import gr.uom.java.xmi.diff.MoveOperationRefactoring;
-import org.jetbrains.research.refactorinsight.data.Group;
-import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.data.RefactoringLine;
+import org.jetbrains.research.refactorinsight.data.*;
 import org.jetbrains.research.refactorinsight.data.util.JavaUtils;
-import org.jetbrains.research.refactorinsight.data.JavaRefactoringHandler;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
 
@@ -26,6 +23,9 @@ public class MoveOperationJavaHandler extends JavaRefactoringHandler {
                     ref.getMovedOperation().getBody().getCompositeStatement().getStatements();
             info.setChanged(!JavaUtils.isStatementsEqualJava(statementsBefore, statementsAfter));
         }
+
+        info.setFoldingDescriptorBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
+        info.setFoldingDescriptorAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
 
         String classBefore = ref.getOriginalOperation().getClassName();
         String classAfter = ref.getMovedOperation().getClassName();

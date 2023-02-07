@@ -8,6 +8,7 @@ import org.jetbrains.research.kotlinrminer.ide.uml.UMLOperation;
 import org.jetbrains.research.refactorinsight.RefactoringProcessingException;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.FoldingBuilder;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoringHandler;
 
 import java.util.List;
@@ -33,6 +34,9 @@ public class PullUpOperationKotlinHandler extends KotlinRefactoringHandler {
         List<AbstractStatement> statementsAfter =
                 ref.getMovedOperation().getBody().getCompositeStatement().getStatements();
         info.setChanged(!isStatementsEqualKotlin(statementsBefore, statementsAfter));
+
+        info.setFoldingDescriptorBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
+        info.setFoldingDescriptorAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
 
         String classBefore = originalOperation.getClassName();
         String classAfter = ref.getMovedOperation().getClassName();

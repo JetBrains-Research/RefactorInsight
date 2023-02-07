@@ -7,6 +7,7 @@ import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoringHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.FoldingBuilder;
 
 import java.util.List;
 
@@ -28,8 +29,12 @@ public class MoveOperationKotlinHandler extends KotlinRefactoringHandler {
             info.setChanged(!isStatementsEqualKotlin(statementsBefore, statementsAfter));
         }
 
+        info.setFoldingDescriptorBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
+        info.setFoldingDescriptorAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
+
         String classBefore = ref.getOriginalOperation().getClassName();
         String classAfter = ref.getMovedOperation().getClassName();
+
 
         return info.setGroup(Group.METHOD)
                 .setDetailsBefore(classBefore)

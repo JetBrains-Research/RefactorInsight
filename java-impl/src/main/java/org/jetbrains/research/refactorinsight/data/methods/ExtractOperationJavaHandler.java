@@ -2,13 +2,10 @@ package org.jetbrains.research.refactorinsight.data.methods;
 
 import gr.uom.java.xmi.UMLType;
 import gr.uom.java.xmi.diff.ExtractOperationRefactoring;
-import org.jetbrains.research.refactorinsight.data.Group;
-import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.data.RefactoringLine;
+import org.jetbrains.research.refactorinsight.data.*;
 import org.jetbrains.research.refactorinsight.diff.VisualizationType;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 import org.jetbrains.research.refactorinsight.data.util.JavaUtils;
-import org.jetbrains.research.refactorinsight.data.JavaRefactoringHandler;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
 
@@ -27,6 +24,8 @@ public class ExtractOperationJavaHandler extends JavaRefactoringHandler {
         for (UMLType type : ref.getExtractedOperation().getParameterTypeList()) {
             parameterTypeList.add(type.toString());
         }
+
+        info.setFoldingDescriptorMid(FoldingBuilder.fromMethod(ref.getExtractedOperation()));
 
         String extractedMethod = StringUtils
                 .calculateSignatureWithoutClassName(ref.getExtractedOperation().getName(), parameterTypeList);

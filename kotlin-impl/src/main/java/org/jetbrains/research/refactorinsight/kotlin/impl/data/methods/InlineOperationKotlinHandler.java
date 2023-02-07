@@ -5,6 +5,7 @@ import org.jetbrains.research.kotlinrminer.ide.diff.refactoring.InlineOperationR
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.FoldingBuilder;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoringHandler;
 
 import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.KotlinUtils.calculateSignatureForKotlinMethod;
@@ -35,6 +36,8 @@ public class InlineOperationKotlinHandler extends KotlinRefactoringHandler {
                 .addMarking(createCodeRangeFromKotlin(ref.getTargetOperationCodeRangeBeforeInline()),
                         createCodeRangeFromKotlin(ref.getTargetOperationCodeRangeAfterInline()),
                         false);
+
+        info.setFoldingDescriptorMid(FoldingBuilder.fromMethod(ref.getInlinedOperation()));
 
         if (ref.getInlinedOperation().codeRange().getFilePath()
                 .equals(ref.getTargetOperationAfterInline().codeRange().getFilePath())) {

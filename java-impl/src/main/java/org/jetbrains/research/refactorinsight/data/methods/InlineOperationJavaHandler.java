@@ -1,11 +1,8 @@
 package org.jetbrains.research.refactorinsight.data.methods;
 
 import gr.uom.java.xmi.diff.InlineOperationRefactoring;
-import org.jetbrains.research.refactorinsight.data.Group;
-import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.data.RefactoringLine;
+import org.jetbrains.research.refactorinsight.data.*;
 import org.jetbrains.research.refactorinsight.data.util.JavaUtils;
-import org.jetbrains.research.refactorinsight.data.JavaRefactoringHandler;
 import org.refactoringminer.api.Refactoring;
 
 public class InlineOperationJavaHandler extends JavaRefactoringHandler {
@@ -31,6 +28,8 @@ public class InlineOperationJavaHandler extends JavaRefactoringHandler {
                 .addMarking(JavaUtils.createCodeRangeFromJava(ref.getTargetOperationCodeRangeBeforeInline()),
                         JavaUtils.createCodeRangeFromJava(ref.getTargetOperationCodeRangeAfterInline()),
                         false);
+
+        info.setFoldingDescriptorMid(FoldingBuilder.fromMethod(ref.getInlinedOperation()));
 
         if (ref.getInlinedOperation().codeRange().getFilePath()
                 .equals(ref.getTargetOperationAfterInline().codeRange().getFilePath())) {

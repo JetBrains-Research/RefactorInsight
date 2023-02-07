@@ -6,6 +6,7 @@ import org.jetbrains.research.kotlinrminer.ide.diff.refactoring.PushDownOperatio
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.FoldingBuilder;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoringHandler;
 
 import java.util.List;
@@ -25,6 +26,9 @@ public class PushDownOperationKotlinHandler extends KotlinRefactoringHandler {
         List<AbstractStatement> statementsAfter =
                 ref.getMovedOperation().getBody().getCompositeStatement().getStatements();
         info.setChanged(!isStatementsEqualKotlin(statementsBefore, statementsAfter));
+
+        info.setFoldingDescriptorBefore(FoldingBuilder.fromMethod(ref.getOriginalOperation()));
+        info.setFoldingDescriptorAfter(FoldingBuilder.fromMethod(ref.getMovedOperation()));
 
         String classBefore = ref.getOriginalOperation().getClassName();
         String classAfter = ref.getMovedOperation().getClassName();
