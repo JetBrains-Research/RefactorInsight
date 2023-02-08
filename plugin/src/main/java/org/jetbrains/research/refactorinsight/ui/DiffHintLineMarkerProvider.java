@@ -63,7 +63,7 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
                                        @NotNull Collection<? super LineMarkerInfo<?>> result) {
         if (elements.isEmpty()) return;
         List<RefactoringInfo> refactoringInfos = getRefactoringInfos(elements.get(0));
-        if (refactoringInfos == null) return;
+        if (refactoringInfos == null || refactoringInfos.isEmpty()) return;
 
         boolean isRight = isRightPartOfDiff(elements.get(0));
         Map<Integer, Set<RefactoringWithPsiElement>> lineToRefactorings = new HashMap<>();
@@ -104,7 +104,8 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
         VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
         String commitId;
         if (virtualFile.getClass().getName().startsWith(DIFF_WINDOW_CLASS_NAME_PREFIX)) {
-            if (virtualFile.getUserData(Keys.CHILD_COMMIT_ID) == null)
+            boolean isRight = virtualFile.getUserData(Keys.CHILD_COMMIT_ID) == null;
+            if (isRight)
                 commitId = virtualFile.getUserData(Keys.COMMIT_ID);
             else
                 commitId = virtualFile.getUserData(Keys.CHILD_COMMIT_ID);
@@ -112,14 +113,14 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
             MiningService miner = MiningService.getInstance(element.getProject());
             RefactoringEntry entry = miner.get(commitId);
             if (entry == null) return null;
-            return entry.getRefactorings().stream().filter(ref -> fromSameFile(element, ref)).toList();
+            return entry.getRefactorings().stream().filter(ref -> fromSameFile(element, ref, isRight)).toList();
         }
         return null;
     }
 
-    private boolean fromSameFile(PsiElement element, RefactoringInfo refactoringInfo) {
+    private boolean fromSameFile(PsiElement element, RefactoringInfo refactoringInfo, boolean isRight) {
         String elementPath = element.getContainingFile().getVirtualFile().getPath();
-        String refactoringClassPath = refactoringInfo.getRightPath();
+        String refactoringClassPath = isRight ? refactoringInfo.getRightPath() : refactoringInfo.getLeftPath();
         return elementPath.endsWith(refactoringClassPath);
     }
 

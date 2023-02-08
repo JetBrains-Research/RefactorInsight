@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -98,21 +99,9 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
 
     @Override
     public boolean containsElement(int lineNumber, int textOffset, boolean isRight) {
-        for (LineFragment lineFragment : fragments) {
-            int startLine = isRight ? lineFragment.getStartLine2() : lineFragment.getStartLine1();
-
-            if (startLine == lineNumber) {
-                List<DiffFragment> diffFragments = lineFragment.getInnerFragments();
-                if (diffFragments == null || diffFragments.isEmpty()) return true;
-
-                for (DiffFragment fragment : diffFragments) {
-                    int startOffset = isRight ? fragment.getStartOffset2() : fragment.getStartOffset1();
-                    int endOffset = isRight ? fragment.getEndOffset2() : fragment.getEndOffset1();
-                    if (startOffset <= textOffset && textOffset <= endOffset) return true;
-                }
-            }
-        }
-        return false;
+        Function<LineFragment, Integer> startLineExtractor = isRight ? LineFragment::getStartLine2 : LineFragment::getStartLine1;
+        List<Integer> startLines = fragments.stream().map(startLineExtractor).toList();
+        return startLines.contains(lineNumber);
     }
 
     /**

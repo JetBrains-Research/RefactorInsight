@@ -66,7 +66,6 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
                 ? r -> r.fragment.getStartLine(ThreeSide.RIGHT)
                 : r -> r.fragment.getStartLine(ThreeSide.LEFT);
         List<Integer> startLines = ranges.stream().map(startLineExtractor).toList();
-        //TODO: check textOffset
         return startLines.contains(lineNumber);
     }
 

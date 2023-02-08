@@ -8,6 +8,7 @@ import org.jetbrains.research.refactorinsight.folding.FoldingDescriptor;
 import org.jetbrains.research.refactorinsight.utils.Utils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
