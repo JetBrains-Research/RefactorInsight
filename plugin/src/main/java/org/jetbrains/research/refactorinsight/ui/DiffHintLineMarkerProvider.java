@@ -67,17 +67,20 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
 
         boolean isRight = isRightPartOfDiff(elements.get(0));
         Map<Integer, Set<RefactoringWithPsiElement>> lineToRefactorings = new HashMap<>();
+        Set<RefactoringInfo> usedRefactorings = new HashSet<>();
 
         for (PsiElement element : elements) {
             if (!isIdentifier(element)) continue;
             int lineNumber = getLineNumber(element);
             int textOffset = element.getTextOffset();
             for (RefactoringInfo refactoringInfo : refactoringInfos) {
-                if (refactoringInfo.containsElement(lineNumber, textOffset, isRight)) {
+                if (refactoringInfo.containsElement(lineNumber, textOffset, isRight) &&
+                        !usedRefactorings.contains(refactoringInfo)) {
                     RefactoringWithPsiElement refactoringWithPsiElement =
                             new RefactoringWithPsiElement(refactoringInfo, element);
                     lineToRefactorings.computeIfAbsent(lineNumber, __ -> new LinkedHashSet<>())
                             .add(refactoringWithPsiElement);
+                    usedRefactorings.add(refactoringInfo);
                 }
             }
         }
