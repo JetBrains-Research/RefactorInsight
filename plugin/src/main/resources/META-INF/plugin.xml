@@ -151,6 +151,13 @@
             <add-to-group group-id="Github.PullRequest.Changes.Toolbar" anchor="after"
                           relative-to-action="ChangesView.GroupBy"/>
         </action>
+
+        <action id="actions.HideNonFunctionalChangesAction"
+                class="org.jetbrains.research.refactorinsight.actions.HideNonFunctionalChangesAction"
+                icon="RefactorInsightIcons.toggle"
+                text="Hide non-functional Refactorings" description="actions.HideNonFunctionalChangesAction">
+            <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>
+        </action>
     </actions>
 
     <projectListeners>
