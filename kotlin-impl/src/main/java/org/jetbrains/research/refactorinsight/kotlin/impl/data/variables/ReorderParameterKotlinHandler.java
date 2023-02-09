@@ -1,4 +1,4 @@
-package org.jetbrains.research.refactorinsight.kotlin.impl.data.methods;
+package org.jetbrains.research.refactorinsight.kotlin.impl.data.variables;
 
 import org.jetbrains.research.kotlinrminer.ide.Refactoring;
 import org.jetbrains.research.kotlinrminer.ide.decomposition.VariableDeclaration;

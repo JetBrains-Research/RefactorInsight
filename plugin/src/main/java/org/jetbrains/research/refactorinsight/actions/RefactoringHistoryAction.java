@@ -27,7 +27,7 @@ import org.jetbrains.research.refactorinsight.services.MiningService;
 import org.jetbrains.research.refactorinsight.ui.windows.HistoryType;
 import org.jetbrains.research.refactorinsight.ui.windows.RefactoringHistoryToolbar;
 import org.jetbrains.research.refactorinsight.utils.SignatureUtils;
-import org.jetbrains.research.refactorinsight.utils.Utils;
+import org.jetbrains.research.refactorinsight.utils.VcsUtils;
 
 /**
  * Represents the `Show Refactoring History` action.
@@ -154,7 +154,7 @@ public class RefactoringHistoryAction extends AnAction {
      * @return a new method refactorings toolbar window.
      */
     public RefactoringHistoryToolbar getToolbarWindow(Project project) {
-        if (refactoringHistoryToolbar == null || Utils.manager == null) {
+        if (refactoringHistoryToolbar == null || VcsUtils.manager == null) {
             refactoringHistoryToolbar = new RefactoringHistoryToolbar(project);
         }
         return refactoringHistoryToolbar;

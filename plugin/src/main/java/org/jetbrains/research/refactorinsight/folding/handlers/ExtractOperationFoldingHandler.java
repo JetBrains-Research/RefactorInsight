@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.processors.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.folding.FoldingDescriptor;
-import org.jetbrains.research.refactorinsight.utils.Utils;
+import org.jetbrains.research.refactorinsight.utils.TextUtils;
 
 import java.io.File;
 import java.util.Collections;
@@ -23,7 +23,7 @@ public class ExtractOperationFoldingHandler implements FoldingHandler {
         }
         FoldingDescriptor descriptor = info.getFoldingDescriptorMid();
         if (!descriptor.hasHintText()) {
-            String hintText = "Extracted from " + Utils.functionSimpleName(info.getNameBefore());
+            String hintText = "Extracted from " + TextUtils.functionSimpleName(info.getNameBefore());
             if (Objects.equals(info.getType(), RefactoringType.EXTRACT_AND_MOVE_OPERATION.getName())) {
                 hintText += " in " + info.getLeftPath().substring(info.getLeftPath().lastIndexOf(File.separatorChar) + 1);
             }

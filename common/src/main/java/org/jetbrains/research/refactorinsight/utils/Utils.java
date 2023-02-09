@@ -1,14 +1,6 @@
 package org.jetbrains.research.refactorinsight.utils;
 
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Pair;
-import com.intellij.openapi.vcs.FilePath;
-import com.intellij.openapi.vcs.LocalFilePath;
-import com.intellij.openapi.vcs.VcsException;
-import git4idea.GitContentRevision;
-import git4idea.GitRevisionNumber;
-//TODO import gr.uom.java.xmi.decomposition.AbstractStatement;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 
 import java.util.ArrayList;
@@ -170,62 +162,6 @@ public class Utils {
         } else {
             return path;
         }
-    }
-
-    /**
-     * Checks and corrects the ranges returned by RefactoringMiner.
-     *
-     * @param info    refactoring info
-     * @param project the open project
-     * @return the corrected RefactoringInfo
-     */
-    public static RefactoringInfo check(RefactoringInfo info, Project project) {
-        //check for refactorings without line markings
-        // such as move source folder or rename package
-        if (info.getLeftPath() == null || info.getRightPath() == null) {
-            return info;
-        }
-
-        FilePath beforePath = new LocalFilePath(
-                project.getBasePath() + "/"
-                        + info.getLeftPath(), false);
-        FilePath midPath = !info.isThreeSided() ? null : new LocalFilePath(
-                project.getBasePath() + "/"
-                        + info.getMidPath(), false);
-        FilePath afterPath = new LocalFilePath(
-                project.getBasePath() + "/"
-                        + info.getRightPath(), false);
-        GitRevisionNumber afterNumber = new GitRevisionNumber(info.getCommitId());
-        GitRevisionNumber beforeNumber = new GitRevisionNumber(info.getParent());
-
-
-        try {
-            String after = GitContentRevision
-                    .createRevision(afterPath, afterNumber, project).getContent();
-
-            if (!info.isMoreSided()) {
-                String before = GitContentRevision
-                        .createRevision(beforePath, beforeNumber, project).getContent();
-                String mid = !info.isThreeSided() ? null : GitContentRevision
-                        .createRevision(midPath, afterNumber, project).getContent();
-
-                info.correctLines(before, mid, after);
-            } else {
-                List<String> befores = new ArrayList<>();
-                for (Pair<String, Boolean> pathPair : info.getMoreSidedLeftPaths()) {
-                    GitRevisionNumber number = pathPair.second ? afterNumber : beforeNumber;
-                    FilePath filePath =
-                            new LocalFilePath(project.getBasePath() + "/" + fixPath(pathPair.first), false);
-                    befores.add(
-                            GitContentRevision.createRevision(filePath, number, project).getContent());
-                }
-                info.correctMoreSidedLines(befores, after);
-            }
-        } catch (VcsException e) {
-            e.printStackTrace();
-        }
-
-        return info;
     }
 
     /**

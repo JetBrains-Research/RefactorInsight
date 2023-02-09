@@ -16,5 +16,5 @@ public class Keys {
     public static final Key<String> COMMIT_ID =
             Key.create("refactoringMiner.commitId");
     public static final Key<String> CHILD_COMMIT_ID =
-            Key.create("refactoringMiner.commitId");
+            Key.create("refactoringMiner.childCommitId");
 }

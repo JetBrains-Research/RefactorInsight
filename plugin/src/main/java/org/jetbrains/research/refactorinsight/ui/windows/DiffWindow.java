@@ -53,7 +53,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.jetbrains.research.refactorinsight.utils.Utils.fixPath;
+import static org.jetbrains.research.refactorinsight.utils.TextUtils.fixPath;
 
 /**
  * Deals with refactoring diff requests.
@@ -273,16 +273,16 @@ public class DiffWindow extends DiffExtension {
     }
 
     private void putCommitIdData(FrameDiffTool.DiffViewer viewer, @NotNull DiffRequest request) {
-        if (viewer instanceof TwosideTextDiffViewer) {
+        if (viewer instanceof TwosideTextDiffViewer twosideTextDiffViewer) {
             Change change = request.getUserData(ChangeDiffRequestProducer.CHANGE_KEY);
             if (change != null && change.getBeforeRevision() != null && change.getAfterRevision() != null) {
                 // revision before changes
-                ((TwosideTextDiffViewer) viewer).getEditor1().getVirtualFile()
+                twosideTextDiffViewer.getEditor1().getVirtualFile()
                         .putUserData(Keys.COMMIT_ID, change.getBeforeRevision().getRevisionNumber().asString());
                 // revision after changes
-                ((TwosideTextDiffViewer) viewer).getEditor2().getVirtualFile()
+                twosideTextDiffViewer.getEditor2().getVirtualFile()
                         .putUserData(Keys.COMMIT_ID, change.getAfterRevision().getRevisionNumber().asString());
-                ((TwosideTextDiffViewer) viewer).getEditor1().getVirtualFile()
+                twosideTextDiffViewer.getEditor1().getVirtualFile()
                         .putUserData(Keys.CHILD_COMMIT_ID, change.getAfterRevision().getRevisionNumber().asString());
             }
         }
@@ -439,13 +439,14 @@ public class DiffWindow extends DiffExtension {
 
         @Override
         protected void onAfterRediff() {
+            /*TODO: check if it actually works
             List<SimpleThreesideDiffChange> oldMarkings = viewer.getChanges();
             oldMarkings.forEach(ThreesideDiffChangeBase::destroy);
             oldMarkings.clear();
             oldMarkings.addAll(ranges.stream()
                     .map(r -> r.getDiffChange(viewer))
                     .collect(Collectors.toList())
-            );
+            );*/
             hideToolbarActions(viewer.getComponent());
         }
     }

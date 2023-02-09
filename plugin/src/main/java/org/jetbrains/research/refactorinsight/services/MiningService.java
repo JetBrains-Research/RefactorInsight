@@ -36,7 +36,8 @@ import org.jetbrains.research.refactorinsight.processors.PRMiningBackgroundableT
 import org.jetbrains.research.refactorinsight.processors.SingleCommitRefactoringTask;
 import org.jetbrains.research.refactorinsight.pullrequests.PRFileEditor;
 import org.jetbrains.research.refactorinsight.ui.windows.GitWindow;
-import org.jetbrains.research.refactorinsight.utils.Utils;
+import org.jetbrains.research.refactorinsight.utils.TextUtils;
+import org.jetbrains.research.refactorinsight.utils.VcsUtils;
 import org.refactoringminer.util.GitServiceImpl;
 
 /**
@@ -76,11 +77,11 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
 
     @Override
     public void loadState(MyState state) {
-        if (Utils.version().equals(state.refactoringsMap.version)) {
+        if (TextUtils.version().equals(state.refactoringsMap.version)) {
             innerState = state;
         } else {
             innerState = new MyState();
-            innerState.refactoringsMap.version = Utils.version();
+            innerState.refactoringsMap.version = TextUtils.version();
         }
     }
 
@@ -105,7 +106,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     public void mineAll(GitRepository repository) {
         int limit = Integer.MAX_VALUE;
         try {
-            limit = Utils.getCommitCount(repository);
+            limit = VcsUtils.getCommitCount(repository);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -121,7 +122,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
     public void mineRepo(GitRepository repository) {
         int limit = SettingsState.getInstance(repository.getProject()).commitLimit;
         try {
-            limit = Math.min(Utils.getCommitCount(repository), limit);
+            limit = Math.min(VcsUtils.getCommitCount(repository), limit);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

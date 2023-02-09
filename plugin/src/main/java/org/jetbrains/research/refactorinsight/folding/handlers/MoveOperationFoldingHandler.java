@@ -5,10 +5,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.folding.FoldingDescriptor;
-import org.jetbrains.research.refactorinsight.utils.Utils;
+import org.jetbrains.research.refactorinsight.utils.TextUtils;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +26,7 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
         if (!descriptor.hasHintText()) {
             String details = "";
             if (info.getRightPath().equals(info.getLeftPath())) {
-                details = Utils.skipPackages(isBefore ? info.getDetailsAfter() : info.getDetailsBefore());
+                details = TextUtils.skipPackages(isBefore ? info.getDetailsAfter() : info.getDetailsBefore());
             }
 
             if (details.isEmpty()) {

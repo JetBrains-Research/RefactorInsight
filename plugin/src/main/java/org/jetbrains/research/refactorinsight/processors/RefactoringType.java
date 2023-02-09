@@ -81,15 +81,15 @@ import org.jetbrains.research.refactorinsight.kotlin.impl.data.classes.ExtractSu
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.classes.MoveClassKotlinHandler;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.classes.MoveRenameClassKotlinHandler;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.classes.RenameClassKotlinHandler;
-import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.AddParameterKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.variables.AddParameterKotlinHandler;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.ExtractOperationKotlinHandler;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.InlineOperationKotlinHandler;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.MoveOperationKotlinHandler;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.PullUpOperationKotlinHandler;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.PushDownOperationKotlinHandler;
-import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.RemoveParameterKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.variables.RemoveParameterKotlinHandler;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.RenameMethodKotlinHandler;
-import org.jetbrains.research.refactorinsight.kotlin.impl.data.methods.ReorderParameterKotlinHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.variables.ReorderParameterKotlinHandler;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.packages.MoveSourceFolderKotlinHandler;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.packages.RenamePackageKotlinHandler;
 

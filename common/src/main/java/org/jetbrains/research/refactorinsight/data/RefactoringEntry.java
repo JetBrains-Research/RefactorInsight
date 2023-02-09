@@ -89,15 +89,10 @@ public class RefactoringEntry implements Serializable {
         combineRelatedExtractSuperClass();
         combineRelatedExtractClass();
 
-        HashMap<String, List<RefactoringInfo>> groups = new HashMap<>();
-        refactorings.forEach(r -> {
-            if (r.getGroupId() != null) {
-                List<RefactoringInfo> list = groups.getOrDefault(r.getGroupId(), new ArrayList<>());
-                list.add(r);
-                groups.put(r.getGroupId(), list);
-            }
-            r.setEntry(this);
-        });
+        Map<String, List<RefactoringInfo>> groups = refactorings.stream()
+                .map(r -> r.setEntry(this))
+                .filter(r -> r.getGroupId() != null)
+                .collect(Collectors.groupingBy(RefactoringInfo::getGroupId));
 
         groups.forEach((k, v) -> {
             if (v.size() > 1) {
@@ -107,11 +102,12 @@ public class RefactoringEntry implements Serializable {
                     return;
                 }
 
-                v.remove(info);
                 v.forEach(r -> {
-                    info.addIncludedRefactoring(r.getName());
-                    info.addAllMarkings(r);
-                    r.setHidden(true);
+                    if (!info.equals(r)) {
+                        info.addIncludedRefactoring(r.getName());
+                        info.addAllMarkings(r);
+                        r.setHidden(true);
+                    }
                 });
             }
         });

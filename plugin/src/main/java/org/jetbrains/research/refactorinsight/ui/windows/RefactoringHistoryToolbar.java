@@ -47,7 +47,8 @@ import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.ui.tree.TreeUtils;
 import org.jetbrains.research.refactorinsight.ui.tree.renderers.HistoryToolbarRenderer;
-import org.jetbrains.research.refactorinsight.utils.Utils;
+import org.jetbrains.research.refactorinsight.utils.TextUtils;
+import org.jetbrains.research.refactorinsight.utils.VcsUtils;
 
 /**
  * Generates and holds the history toolbar.
@@ -68,7 +69,7 @@ public class RefactoringHistoryToolbar {
     public RefactoringHistoryToolbar(Project project) {
         this.project = project;
         toolWindowManager = ToolWindowManager.getInstance(project);
-        Utils.manager = toolWindowManager;
+        VcsUtils.manager = toolWindowManager;
         toolWindow =
                 toolWindowManager.registerToolWindow(RefactorInsightBundle.message("history"),
                         true, ToolWindowAnchor.BOTTOM);
@@ -92,7 +93,7 @@ public class RefactoringHistoryToolbar {
         } else {
             JBSplitter splitter = new JBSplitter(false, (float) 0.35);
             List<RefactoringInfo> refactoringInfos = new ArrayList<>(refactorings);
-            Utils.chronologicalOrder(refactoringInfos);
+            TextUtils.chronologicalOrder(refactoringInfos);
 
             Tree tree =
                     createTree(refactoringInfos, methodsHistory, attributesHistory);
@@ -161,7 +162,7 @@ public class RefactoringHistoryToolbar {
         mainComponent.setSize(splitter.getSecondComponent().getSize());
         splitter.setSecondComponent(new VcsLogPanel(logManager, openLogTab));
 
-        Utils.disposeWithVcsLogManager(project, () -> {
+        VcsUtils.disposeWithVcsLogManager(project, () -> {
             setSecondComponent(splitter);
             Disposer.dispose(openLogTab);
         });
@@ -228,7 +229,7 @@ public class RefactoringHistoryToolbar {
                                 ? obj.substring(obj.lastIndexOf(".") + 1)
                                 : obj.substring(obj.lastIndexOf("|") + 1));
                 List<RefactoringInfo> infos = new ArrayList<>(refs);
-                Utils.chronologicalOrder(infos);
+                TextUtils.chronologicalOrder(infos);
                 createRefactoringsTree(infos, m);
                 child.add(m);
             }
