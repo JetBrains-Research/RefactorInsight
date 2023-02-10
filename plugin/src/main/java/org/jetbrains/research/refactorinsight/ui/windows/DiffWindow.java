@@ -9,6 +9,7 @@ import com.intellij.diff.requests.DiffRequest;
 import com.intellij.diff.tools.simple.*;
 import com.intellij.diff.tools.util.base.DiffViewerListener;
 import com.intellij.diff.tools.util.base.IgnorePolicy;
+import com.intellij.diff.tools.util.side.OnesideTextDiffViewer;
 import com.intellij.diff.tools.util.side.TwosideTextDiffViewer;
 import com.intellij.diff.util.DiffUserDataKeysEx;
 import com.intellij.ide.highlighter.JavaClassFileType;
@@ -284,6 +285,13 @@ public class DiffWindow extends DiffExtension {
                         .putUserData(Keys.COMMIT_ID, change.getAfterRevision().getRevisionNumber().asString());
                 twosideTextDiffViewer.getEditor1().getVirtualFile()
                         .putUserData(Keys.CHILD_COMMIT_ID, change.getAfterRevision().getRevisionNumber().asString());
+            }
+        } else if (viewer instanceof OnesideTextDiffViewer) {
+            Change change = request.getUserData(ChangeDiffRequestProducer.CHANGE_KEY);
+            if (change != null && change.getType() == Change.Type.NEW &&  change.getAfterRevision() != null) {
+                ((OnesideTextDiffViewer) viewer).getEditor().getVirtualFile().putUserData(Keys.COMMIT_ID, change.getAfterRevision().getRevisionNumber().asString());
+            } else if (change != null && change.getType() == Change.Type.DELETED &&  change.getBeforeRevision() != null) {
+                ((OnesideTextDiffViewer) viewer).getEditor().getVirtualFile().putUserData(Keys.COMMIT_ID, change.getBeforeRevision().getRevisionNumber().asString());
             }
         }
     }
