@@ -21,11 +21,12 @@ import static org.jetbrains.research.refactorinsight.utils.Utils.fixPath;
  * Stores the information needed for displaying one refactoring:
  * diff request generator, name, ui node strings, paths, the group where it belongs,
  * if it is hidden, three-sided or a more-sided refactoring.
- * Contains also information about any refactoring that it implies (used when combining refactorings).
+ * It also contains information about any refactoring that it implies (used when combining refactorings).
  * Here, each refactoring is added to the refactoring history map used in `Show Refactoring History` action.
  */
 public class RefactoringInfo {
 
+    private String projectPath;
     private transient RefactoringEntry entry;
     private transient String groupId;
     private transient List<Pair<String, Boolean>> moreSidedLeftPaths = new ArrayList<>();
@@ -122,6 +123,11 @@ public class RefactoringInfo {
         );
     }
 
+    public RefactoringInfo setProjectPath(String projectPath) {
+        this.projectPath = projectPath;
+        return this;
+    }
+
     public RefactoringInfo setRequestGenerator(DiffRequestGenerator requestGenerator) {
         this.requestGenerator = requestGenerator;
         return this;
@@ -159,6 +165,7 @@ public class RefactoringInfo {
                         .forEach(name -> {
                             Set<RefactoringInfo> infos = map.getOrDefault(name, new HashSet<>());
                             RefactoringInfo info = new RefactoringInfo()
+                                    .setProjectPath(projectPath)
                                     .setGroup(group)
                                     .setNameBefore(getNameBefore())
                                     .setNameAfter(getNameAfter())
@@ -192,7 +199,8 @@ public class RefactoringInfo {
     private void changeMethodsSignature(Map<String, Set<RefactoringInfo>> map) {
         map.keySet().stream()
                 .filter(x -> !x.contains("|"))
-                .filter(x -> x.contains(".")).filter(x -> x.substring(0, x.lastIndexOf("."))
+                .filter(x -> x.contains("."))
+                .filter(x -> x.substring(0, x.lastIndexOf("."))
                         .equals(getNameBefore()))
                 .forEach(signature -> {
                     String methodName = signature.substring(signature.lastIndexOf(".") + 1);
@@ -556,5 +564,9 @@ public class RefactoringInfo {
     public RefactoringInfo setFoldingDescriptorAfter(FoldingDescriptor positions) {
         foldingPositions[2] = positions;
         return this;
+    }
+
+    public String getProjectPath() {
+        return projectPath;
     }
 }

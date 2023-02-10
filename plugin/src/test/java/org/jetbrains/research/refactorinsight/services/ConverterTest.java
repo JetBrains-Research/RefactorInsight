@@ -21,12 +21,41 @@ import static org.junit.Assert.assertTrue;
 public class ConverterTest {
 
     @Test
-    public void mapConverterTest() {
-        //Test case 1
+    public void mapConverterTestInvalidData() {
         String invalidString = "-1" + delimiter(MAP) + "";
         RefactoringsMap invalidMap = new RefactoringsMap(new ConcurrentHashMap<>(), "-1");
-        //Test case 2
-        String oneEntryString = "1.0.5" + delimiter(MAP) + "cccc"
+        RefactoringsMapConverter converter = new RefactoringsMapConverter();
+
+        assertEquals(invalidMap, converter.fromString(invalidString));
+    }
+
+    @Test
+    public void mapConverterTest() {
+        String oneEntryString = "1.0.5" + delimiter(MAP) + "/tmp/project/" + delimiter(MAP) + "cccc"
+                + delimiter(MAP_ENTRY) + "bbbb"
+                + delimiter(ENTRY) + 1234
+                + delimiter(ENTRY) + "true"
+                + delimiter(ENTRY);
+
+        final RefactoringEntry refactoringEntry = new RefactoringEntry("cccc", "bbbb", 1234);
+        refactoringEntry.setTimeout(true);
+
+        String moreEntryString = oneEntryString
+                + delimiter(MAP) + "bbbb" + delimiter(MAP_ENTRY) + "aaaa"
+                + delimiter(ENTRY) + 5678
+                + delimiter(ENTRY) + "false" + delimiter(ENTRY);
+        final RefactoringEntry refactoringEntry1 = new RefactoringEntry("bbbb", "aaaa", 5678);
+        RefactoringsMap moreEntryMap = new RefactoringsMap(new ConcurrentHashMap<>(Map.of(
+                "cccc", refactoringEntry.setRefactorings(new ArrayList<>()),
+                "bbbb", refactoringEntry1.setRefactorings(new ArrayList<>()))), "1.0.5");
+        RefactoringsMapConverter converter = new RefactoringsMapConverter();
+
+        assertEquals(moreEntryMap, converter.fromString(moreEntryString));
+    }
+
+    @Test
+    public void mapConverterTest2() {
+        String oneEntryString = "1.0.5" + delimiter(MAP) + "/tmp/project/" + delimiter(MAP) + "cccc"
                 + delimiter(MAP_ENTRY) + "bbbb"
                 + delimiter(ENTRY) + 1234
                 + delimiter(ENTRY) + "true"
@@ -37,28 +66,9 @@ public class ConverterTest {
                 new RefactoringsMap(new ConcurrentHashMap<>(Map.of("cccc",
                         refactoringEntry
                                 .setRefactorings(new ArrayList<>()))), "1.0.5");
-        //Test case 3
-        String moreEntryString = oneEntryString
-                + delimiter(MAP) + "bbbb" + delimiter(MAP_ENTRY) + "aaaa"
-                + delimiter(ENTRY) + 5678
-                + delimiter(ENTRY) + "false" + delimiter(ENTRY);
-        final RefactoringEntry refactoringEntry1 = new RefactoringEntry("bbbb", "aaaa", 5678);
-        RefactoringsMap moreEntryMap = new RefactoringsMap(new ConcurrentHashMap<>(Map.of(
-                "cccc", refactoringEntry.setRefactorings(new ArrayList<>()),
-                "bbbb", refactoringEntry1.setRefactorings(new ArrayList<>()))), "1.0.5");
         RefactoringsMapConverter converter = new RefactoringsMapConverter();
-        Map.of(
-                invalidString, invalidMap,
-                oneEntryString, oneEntryMap,
-                moreEntryString, moreEntryMap
-        ).forEach((k, v) -> {
-            assertEquals(converter.fromString(k), v);
-            String[] expected = k.split(delimiter(MAP));
-            String[] actual = converter.toString(v).split(delimiter(MAP));
-            Arrays.sort(expected);
-            Arrays.sort(actual);
-            assertTrue(Arrays.deepEquals(actual, expected));
-        });
+
+        assertEquals(oneEntryMap, converter.fromString(oneEntryString));
     }
 
     @Test

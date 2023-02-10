@@ -27,8 +27,8 @@ public class AddParameterKotlinHandler extends KotlinRefactoringHandler {
                 .setNameAfter(calculateSignatureForKotlinMethod(ref.getOperationAfter()))
                 .setElementAfter(null)
                 .setElementBefore(ref.getParameter().getVariableDeclaration().toQualifiedString())
-                .addMarking(createCodeRangeFromKotlin(ref.getOperationBefore().codeRange()),
-                        createCodeRangeFromKotlin(ref.getOperationAfter().codeRange()),
+                .addMarking(createCodeRangeFromKotlin(ref.getOperationBefore().codeRange(), info),
+                        createCodeRangeFromKotlin(ref.getOperationAfter().codeRange(), info),
                         line -> line.addOffset(
                                         createLocationInfoFromKotlin(ref.getParameter().getVariableDeclaration().getLocationInfo()),
                                         RefactoringLine.MarkingOption.ADD)

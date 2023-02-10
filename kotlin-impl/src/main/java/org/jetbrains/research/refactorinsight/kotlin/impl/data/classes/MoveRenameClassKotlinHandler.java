@@ -29,8 +29,8 @@ public class MoveRenameClassKotlinHandler extends KotlinRefactoringHandler {
         String[] nameSpaceAfter = ref.getRenamedClass().getName().split("\\.");
         String classNameAfter = nameSpaceAfter[nameSpaceAfter.length - 1];
 
-        info.addMarking(createCodeRangeFromKotlin(ref.getOriginalClass().codeRange()),
-                        createCodeRangeFromKotlin(ref.getRenamedClass().codeRange()),
+        info.addMarking(createCodeRangeFromKotlin(ref.getOriginalClass().codeRange(), info),
+                        createCodeRangeFromKotlin(ref.getRenamedClass().codeRange(), info),
                         (line) -> line.setWord(new String[]{classNameBefore, null, classNameAfter}),
                         RefactoringLine.MarkingOption.COLLAPSE,
                         false)
@@ -62,15 +62,15 @@ public class MoveRenameClassKotlinHandler extends KotlinRefactoringHandler {
         if ((!left.equals(originalClassName) && packageBefore.contains(left))
                 || (!right.equals(movedClassName) && packageAfter.contains(right))) {
             return info
-                    .addMarking(createCodeRangeFromKotlin(ref.getOriginalClass().codeRange()),
-                            createCodeRangeFromKotlin(ref.getRenamedClass().codeRange()),
+                    .addMarking(createCodeRangeFromKotlin(ref.getOriginalClass().codeRange(), info),
+                            createCodeRangeFromKotlin(ref.getRenamedClass().codeRange(), info),
                             null,
                             RefactoringLine.MarkingOption.COLLAPSE,
                             false);
         }
 
-        return info.addMarking(createCodeRangeFromKotlin(ref.getOriginalClass().codeRange()),
-                createCodeRangeFromKotlin(ref.getRenamedClass().codeRange()),
+        return info.addMarking(createCodeRangeFromKotlin(ref.getOriginalClass().codeRange(), info),
+                createCodeRangeFromKotlin(ref.getRenamedClass().codeRange(), info),
                 (line) -> line.setWord(new String[]{packageBefore, null, packageAfter}),
                 RefactoringLine.MarkingOption.PACKAGE,
                 false);

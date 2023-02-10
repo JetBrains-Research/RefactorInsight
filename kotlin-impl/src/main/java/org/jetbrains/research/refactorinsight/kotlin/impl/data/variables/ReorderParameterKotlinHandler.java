@@ -32,8 +32,8 @@ public class ReorderParameterKotlinHandler extends KotlinRefactoringHandler {
                     if (!x.first.getVariableDeclaration().getType()
                             .equals(x.second.getVariableDeclaration().getType())
                             || !x.first.getVariableName().equals(x.second.getVariableName())) {
-                        info.addMarking(createCodeRangeFromKotlin(x.first.codeRange()),
-                                createCodeRangeFromKotlin(x.second.codeRange()),
+                        info.addMarking(createCodeRangeFromKotlin(x.first.codeRange(), info),
+                                createCodeRangeFromKotlin(x.second.codeRange(), info),
                                 true);
                     }
                 });

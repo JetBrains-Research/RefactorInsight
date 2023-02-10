@@ -44,8 +44,8 @@ public class PullUpOperationKotlinHandler extends KotlinRefactoringHandler {
         return info.setGroup(Group.METHOD)
                 .setDetailsBefore(classBefore)
                 .setDetailsAfter(classAfter)
-                .addMarking(createCodeRangeFromKotlin(originalOperation.codeRange()),
-                        createCodeRangeFromKotlin(ref.getMovedOperation().codeRange()),
+                .addMarking(createCodeRangeFromKotlin(originalOperation.codeRange(), info),
+                        createCodeRangeFromKotlin(ref.getMovedOperation().codeRange(), info),
                         true)
                 .setNameBefore(calculateSignatureForKotlinMethod(originalOperation))
                 .setNameAfter(calculateSignatureForKotlinMethod(ref.getMovedOperation()));

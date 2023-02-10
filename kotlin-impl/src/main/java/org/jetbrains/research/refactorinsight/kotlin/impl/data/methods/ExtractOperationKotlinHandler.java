@@ -48,9 +48,9 @@ public class ExtractOperationKotlinHandler extends KotlinRefactoringHandler {
                     .setElementAfter(null)
                     .setNameBefore(calculateSignatureForKotlinMethod(ref.getSourceOperationBeforeExtraction()))
                     .setNameAfter(calculateSignatureForKotlinMethod(ref.getSourceOperationAfterExtraction()))
-                    .addMarking(createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation()),
-                            createCodeRangeFromKotlin(ref.getExtractedCodeRangeToExtractedOperation()),
-                            createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation()),
+                    .addMarking(createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation(), info),
+                            createCodeRangeFromKotlin(ref.getExtractedCodeRangeToExtractedOperation(), info),
+                            createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation(), info),
                             VisualizationType.LEFT,
                             null,
                             RefactoringLine.MarkingOption.NONE,
@@ -58,9 +58,9 @@ public class ExtractOperationKotlinHandler extends KotlinRefactoringHandler {
 
             ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
                     info.addMarking(
-                            createCodeRangeFromKotlin(ref.getSourceOperationCodeRangeBeforeExtraction()),
-                            createCodeRangeFromKotlin(ref.getExtractedOperation().getBody().getCompositeStatement().codeRange()),
-                            createCodeRangeFromKotlin(invocation),
+                            createCodeRangeFromKotlin(ref.getSourceOperationCodeRangeBeforeExtraction(), info),
+                            createCodeRangeFromKotlin(ref.getExtractedOperation().getBody().getCompositeStatement().codeRange(), info),
+                            createCodeRangeFromKotlin(invocation, info),
                             VisualizationType.RIGHT,
                             refactoringLine -> refactoringLine.setWord(new String[]{
                                     null,
@@ -77,17 +77,17 @@ public class ExtractOperationKotlinHandler extends KotlinRefactoringHandler {
                     .setElementAfter(null)
                     .setNameBefore(calculateSignatureForKotlinMethod(ref.getSourceOperationBeforeExtraction()))
                     .setNameAfter(calculateSignatureForKotlinMethod(ref.getSourceOperationAfterExtraction()))
-                    .addMarking(createCodeRangeFromKotlin(ref.getSourceOperationCodeRangeBeforeExtraction()),
-                            createCodeRangeFromKotlin(ref.getSourceOperationCodeRangeAfterExtraction()),
+                    .addMarking(createCodeRangeFromKotlin(ref.getSourceOperationCodeRangeBeforeExtraction(), info),
+                            createCodeRangeFromKotlin(ref.getSourceOperationCodeRangeAfterExtraction(), info),
                             false)
-                    .addMarking(createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation()),
-                            createCodeRangeFromKotlin(ref.getExtractedCodeRangeToExtractedOperation()),
+                    .addMarking(createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation(), info),
+                            createCodeRangeFromKotlin(ref.getExtractedCodeRangeToExtractedOperation(), info),
                             true);
 
             ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
                     info.addMarking(
-                            createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation()),
-                            createCodeRangeFromKotlin(invocation),
+                            createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation(), info),
+                            createCodeRangeFromKotlin(invocation, info),
                             null,
                             RefactoringLine.MarkingOption.ADD,
                             true)

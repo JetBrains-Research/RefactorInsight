@@ -35,18 +35,18 @@ public class ExtractClassKotlinHandler extends KotlinRefactoringHandler {
         if (ref.getAttributeOfExtractedClassTypeInOriginalClass() != null) {
             info.setThreeSided(true);
             ref.getExtractedOperations().forEach(operation -> info.addMarking(
-                    createCodeRangeFromKotlin(operation.codeRange()),
-                    createCodeRangeFromKotlin(ref.getExtractedClass().codeRange()),
-                    createCodeRangeFromKotlin(ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange()),
+                    createCodeRangeFromKotlin(operation.codeRange(), info),
+                    createCodeRangeFromKotlin(ref.getExtractedClass().codeRange(), info),
+                    createCodeRangeFromKotlin(ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange(), info),
                     VisualizationType.LEFT,
                     null,
                     RefactoringLine.MarkingOption.NONE,
                     true));
 
             ref.getExtractedAttributes().forEach(operation -> info.addMarking(
-                    createCodeRangeFromKotlin(operation.codeRange()),
-                    createCodeRangeFromKotlin(ref.getExtractedClass().codeRange()),
-                    createCodeRangeFromKotlin(ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange()),
+                    createCodeRangeFromKotlin(operation.codeRange(), info),
+                    createCodeRangeFromKotlin(ref.getExtractedClass().codeRange(), info),
+                    createCodeRangeFromKotlin(ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange(), info),
                     VisualizationType.LEFT,
                     null,
                     RefactoringLine.MarkingOption.NONE,
@@ -56,9 +56,9 @@ public class ExtractClassKotlinHandler extends KotlinRefactoringHandler {
             String[] nameSpace = ref.getExtractedClass().getName().split("\\.");
             String className = nameSpace[nameSpace.length - 1];
 
-            info.addMarking(createCodeRangeFromKotlin(ref.getOriginalClass().codeRange()),
-                    createCodeRangeFromKotlin(ref.getExtractedClass().codeRange()),
-                    createCodeRangeFromKotlin(ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange()),
+            info.addMarking(createCodeRangeFromKotlin(ref.getOriginalClass().codeRange(), info),
+                    createCodeRangeFromKotlin(ref.getExtractedClass().codeRange(), info),
+                    createCodeRangeFromKotlin(ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange(), info),
                     VisualizationType.RIGHT,
                     refactoringLine -> refactoringLine.setWord(new String[]{
                             null,
@@ -69,12 +69,12 @@ public class ExtractClassKotlinHandler extends KotlinRefactoringHandler {
                     true);
         } else {
             ref.getExtractedOperations().forEach(operation -> info.addMarking(
-                    createCodeRangeFromKotlin(operation.codeRange()),
-                    createCodeRangeFromKotlin(ref.getExtractedClass().codeRange()), true));
+                    createCodeRangeFromKotlin(operation.codeRange(), info),
+                    createCodeRangeFromKotlin(ref.getExtractedClass().codeRange(), info), true));
 
             ref.getExtractedAttributes().forEach(operation -> info.addMarking(
-                    createCodeRangeFromKotlin(operation.codeRange()),
-                    createCodeRangeFromKotlin(ref.getExtractedClass().codeRange()), true));
+                    createCodeRangeFromKotlin(operation.codeRange(), info),
+                    createCodeRangeFromKotlin(ref.getExtractedClass().codeRange(), info), true));
         }
 
         return info;

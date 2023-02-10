@@ -66,7 +66,8 @@ public class TextUtils {
 
         try {
             String after = GitContentRevision
-                    .createRevision(afterPath, afterNumber, project).getContent();
+                    .createRevision(afterPath, afterNumber, project)
+                    .getContent();
 
             if (!info.isMoreSided()) {
                 String before = GitContentRevision

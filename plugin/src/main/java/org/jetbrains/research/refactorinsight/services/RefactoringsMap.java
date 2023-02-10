@@ -35,4 +35,12 @@ public class RefactoringsMap {
         return Objects.equals(map, that.map)
                 && Objects.equals(version, that.version);
     }
+
+    @Override
+    public String toString() {
+        return "RefactoringsMap{" +
+                "map=" + map +
+                ", version='" + version + '\'' +
+                '}';
+    }
 }

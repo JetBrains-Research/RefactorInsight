@@ -39,8 +39,8 @@ public class MoveOperationKotlinHandler extends KotlinRefactoringHandler {
         return info.setGroup(Group.METHOD)
                 .setDetailsBefore(classBefore)
                 .setDetailsAfter(classAfter)
-                .addMarking(createCodeRangeFromKotlin(ref.getOriginalOperation().codeRange()),
-                        createCodeRangeFromKotlin(ref.getMovedOperation().codeRange()),
+                .addMarking(createCodeRangeFromKotlin(ref.getOriginalOperation().codeRange(), info),
+                        createCodeRangeFromKotlin(ref.getMovedOperation().codeRange(), info),
                         refactoringLine -> refactoringLine.setWord(new String[]{
                                 ref.getOriginalOperation().getName(),
                                 null,

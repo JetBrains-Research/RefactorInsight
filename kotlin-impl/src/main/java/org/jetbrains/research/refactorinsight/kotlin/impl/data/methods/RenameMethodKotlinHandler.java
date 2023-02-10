@@ -41,8 +41,8 @@ public class RenameMethodKotlinHandler extends KotlinRefactoringHandler {
                 .setNameAfter(calculateSignatureForKotlinMethod(ref.getRenamedOperation()));
 
         return info.addMarking(
-                createCodeRangeFromKotlin(ref.getOriginalOperation().codeRange()),
-                createCodeRangeFromKotlin(ref.getRenamedOperation().codeRange()),
+                createCodeRangeFromKotlin(ref.getOriginalOperation().codeRange(), info),
+                createCodeRangeFromKotlin(ref.getRenamedOperation().codeRange(), info),
                 refactoringLine -> refactoringLine.setWord(new String[]{ref.getOriginalOperation().getName(),
                         null,
                         ref.getRenamedOperation().getName()

@@ -20,8 +20,8 @@ public class InlineOperationKotlinHandler extends KotlinRefactoringHandler {
                 (InlineOperationRefactoring) refactoring;
 
         ref.getInlinedOperationInvocations().forEach(c ->
-                info.addMarking(createCodeRangeFromKotlin(c.codeRange()),
-                        createCodeRangeFromKotlin(ref.getInlinedCodeRangeInTargetOperation()),
+                info.addMarking(createCodeRangeFromKotlin(c.codeRange(), info),
+                        createCodeRangeFromKotlin(ref.getInlinedCodeRangeInTargetOperation(), info),
                         true));
         String classNameBefore = ref.getTargetOperationBeforeInline().getClassName();
         String classNameAfter = ref.getTargetOperationAfterInline().getClassName();
@@ -33,16 +33,16 @@ public class InlineOperationKotlinHandler extends KotlinRefactoringHandler {
                 .setElementAfter(null)
                 .setNameBefore(calculateSignatureForKotlinMethod(ref.getTargetOperationBeforeInline()))
                 .setNameAfter(calculateSignatureForKotlinMethod(ref.getTargetOperationAfterInline()))
-                .addMarking(createCodeRangeFromKotlin(ref.getTargetOperationCodeRangeBeforeInline()),
-                        createCodeRangeFromKotlin(ref.getTargetOperationCodeRangeAfterInline()),
+                .addMarking(createCodeRangeFromKotlin(ref.getTargetOperationCodeRangeBeforeInline(), info),
+                        createCodeRangeFromKotlin(ref.getTargetOperationCodeRangeAfterInline(), info),
                         false);
 
         info.setFoldingDescriptorMid(FoldingBuilder.fromMethod(ref.getInlinedOperation()));
 
         if (ref.getInlinedOperation().codeRange().getFilePath()
                 .equals(ref.getTargetOperationAfterInline().codeRange().getFilePath())) {
-            info.addMarking(createCodeRangeFromKotlin(ref.getInlinedOperationCodeRange()),
-                    createCodeRangeFromKotlin(ref.getInlinedCodeRangeInTargetOperation()),
+            info.addMarking(createCodeRangeFromKotlin(ref.getInlinedOperationCodeRange(), info),
+                    createCodeRangeFromKotlin(ref.getInlinedCodeRangeInTargetOperation(), info),
                     null,
                     RefactoringLine.MarkingOption.REMOVE,
                     false);

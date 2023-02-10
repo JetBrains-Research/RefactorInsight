@@ -136,7 +136,7 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
                                                    Project project, List<T> refactorings) {
         RefactoringEntry entry = new RefactoringEntry(commitHash, commitParentHash, commitTimestamp);
         List<RefactoringInfo> infos = refactorings.stream()
-                .map(INFO_FACTORY::create)
+                .map(refactoring -> INFO_FACTORY.create(refactoring, project.getBasePath()))
                 .filter(Objects::nonNull)
                 .map(info -> info.setEntry(entry))
                 .toList();

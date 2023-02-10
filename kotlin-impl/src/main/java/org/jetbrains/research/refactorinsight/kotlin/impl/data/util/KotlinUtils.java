@@ -6,6 +6,7 @@ import org.jetbrains.research.kotlinrminer.ide.uml.UMLOperation;
 import org.jetbrains.research.kotlinrminer.ide.uml.UMLType;
 import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.adapters.LocationInfo;
+import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +28,13 @@ public class KotlinUtils {
         return builder.toString();
     }
 
-    public static CodeRange createCodeRangeFromKotlin(org.jetbrains.research.kotlinrminer.ide.diff.CodeRange codeRange) {
+    public static CodeRange createCodeRangeFromKotlin(org.jetbrains.research.kotlinrminer.ide.diff.CodeRange codeRange, RefactoringInfo info) {
+        final String filePath = codeRange.getFilePath().startsWith(info.getProjectPath()) ?
+                codeRange.getFilePath().substring(info.getProjectPath().length()) :
+                codeRange.getFilePath();
         return new CodeRange(codeRange.getStartLine(), codeRange.getEndLine(),
                 codeRange.getStartColumn(), codeRange.getEndColumn(),
-                codeRange.getFilePath());
+                filePath);
     }
 
     public static LocationInfo createLocationInfoFromKotlin(org.jetbrains.research.kotlinrminer.ide.decomposition.LocationInfo locationInfo) {

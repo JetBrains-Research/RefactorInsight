@@ -12,11 +12,11 @@ import org.refactoringminer.api.Refactoring;
  */
 public class InfoFactory {
     @Nullable
-    public RefactoringInfo create(Object refactoring) {
+    public RefactoringInfo create(Object refactoring, String projectPath) {
         if (refactoring instanceof Refactoring javaRefactoring) {
-            return create(javaRefactoring);
+            return create(javaRefactoring, projectPath);
         } else if (refactoring instanceof org.jetbrains.research.kotlinrminer.ide.Refactoring kotlinRefactoring) {
-            return create(kotlinRefactoring);
+            return create(kotlinRefactoring, projectPath);
         } else if (refactoring == null) {
             throw new NullPointerException("refactoring is null");
         } else {
@@ -28,12 +28,14 @@ public class InfoFactory {
      * Creates a relevant {@link RefactoringInfo} instance for a given Refactoring provided by RefactoringMiner.
      *
      * @param refactoring to be analyzed.
+     * @param projectPath
      * @return resulting RefactoringInfo.
      */
     @Nullable
-    public RefactoringInfo create(Refactoring refactoring) {
+    public RefactoringInfo create(Refactoring refactoring, String projectPath) {
         final JavaRefactoringHandler handler = RefactoringType.valueOf(refactoring.getRefactoringType().name()).getJavaHandler();
-        return handler == null ? null : handler.handle(refactoring)
+        return handler == null ? null : handler.handle(refactoring, projectPath)
+                .setProjectPath(projectPath)
                 .setType(refactoring.getRefactoringType().getDisplayName());
     }
 
@@ -41,13 +43,14 @@ public class InfoFactory {
      * Creates a relevant {@link RefactoringInfo} instance for a given Refactoring provided by kotlinRMiner.
      *
      * @param refactoring to be analyzed.
+     * @param projectPath
      * @return resulting RefactoringInfo.
      */
     @Nullable
-    public RefactoringInfo create(org.jetbrains.research.kotlinrminer.ide.Refactoring refactoring) {
+    public RefactoringInfo create(org.jetbrains.research.kotlinrminer.ide.Refactoring refactoring, String projectPath) {
         final KotlinRefactoringHandler handler = RefactoringType.valueOf(refactoring.getRefactoringType().name()).getKotlinHandler();
         try {
-            return handler == null ? null : handler.handle(refactoring)
+            return handler == null ? null : handler.handle(refactoring, projectPath)
                     .setType(refactoring.getRefactoringType().getDisplayName());
         } catch (RefactoringProcessingException e) {
             throw new RuntimeException(e);

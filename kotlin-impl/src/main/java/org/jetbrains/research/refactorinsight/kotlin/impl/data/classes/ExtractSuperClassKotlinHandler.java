@@ -35,7 +35,7 @@ public class ExtractSuperClassKotlinHandler extends KotlinRefactoringHandler {
         String className = nameSpace[nameSpace.length - 1];
 
         ref.getUMLSubclassSet().forEach(subClass ->
-                info.addMarking(createCodeRangeFromKotlin(subClass.codeRange()), null,
+                info.addMarking(createCodeRangeFromKotlin(subClass.codeRange(), info), null,
                         line -> line.setWord(new String[]{className, null, null}),
                         RefactoringLine.MarkingOption.COLLAPSE, true));
 

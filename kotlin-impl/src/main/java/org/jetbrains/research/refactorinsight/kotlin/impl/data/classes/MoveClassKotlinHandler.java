@@ -54,15 +54,15 @@ public class MoveClassKotlinHandler extends KotlinRefactoringHandler {
                 || (!right.equals(movedClassName) && packageAfter.contains(right))) {
             String finalOriginalClassName = originalClassName;
             String finalMovedClassName = movedClassName;
-            return info.addMarking(createCodeRangeFromKotlin(ref.getOriginalClass().codeRange()),
-                    createCodeRangeFromKotlin(ref.getMovedClass().codeRange()),
+            return info.addMarking(createCodeRangeFromKotlin(ref.getOriginalClass().codeRange(), info),
+                    createCodeRangeFromKotlin(ref.getMovedClass().codeRange(), info),
                     (line) -> line.setWord(new String[]{finalOriginalClassName, null, finalMovedClassName}),
                     RefactoringLine.MarkingOption.COLLAPSE,
                     false);
         }
 
-        return info.addMarking(createCodeRangeFromKotlin(ref.getOriginalClass().codeRange()),
-                createCodeRangeFromKotlin(ref.getMovedClass().codeRange()),
+        return info.addMarking(createCodeRangeFromKotlin(ref.getOriginalClass().codeRange(), info),
+                createCodeRangeFromKotlin(ref.getMovedClass().codeRange(), info),
                 (line) -> line.setWord(new String[]{packageBefore, null, packageAfter}),
                 RefactoringLine.MarkingOption.PACKAGE,
                 true);
