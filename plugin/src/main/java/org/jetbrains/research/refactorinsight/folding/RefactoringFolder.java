@@ -155,7 +155,7 @@ public class RefactoringFolder {
     editor.getFoldingModel().runBatchFoldingOperation(() -> {
       for (FoldingDescriptor foldingDescriptor : folds) {
         FoldRegion value = editor.getFoldingModel()
-            .addFoldRegion(foldingDescriptor.getFoldingStartOffset(), foldingDescriptor.getFoldingEndOffset(), "");
+            .addFoldRegion(foldingDescriptor.getFoldingStartOffset(), foldingDescriptor.getFoldingEndOffset(), "refactoring");
         if (value != null) {
           value.setExpanded(false);
           value.setInnerHighlightersMuted(true);

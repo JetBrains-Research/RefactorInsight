@@ -1,35 +1,28 @@
 package org.jetbrains.research.refactorinsight.actions;
 
-import com.intellij.diff.tools.util.FoldingModelSupport;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.FoldRegion;
 import com.intellij.openapi.project.DumbAwareToggleAction;
-import com.intellij.openapi.project.Project;
-import com.intellij.vcs.log.ui.MainVcsLogUi;
-import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
-import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
-import org.jetbrains.research.refactorinsight.services.MiningService;
 
 public class HideNonFunctionalChangesAction extends DumbAwareToggleAction {
-    private FoldingModelSupport myFoldingSupport;
+    boolean hide = false;
 
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
-        Project project = e.getRequiredData(PlatformDataKeys.PROJECT);
-        return false;
+        return hide;
     }
 
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-        Project project = e.getRequiredData(PlatformDataKeys.PROJECT);
-//        MainVcsLogUi vcsLogUi = e.getRequiredData(VcsLogInternalDataKeys.MAIN_UI);
-//        VcsLogGraphTable table = vcsLogUi.getTable();
-//        MiningService miner = MiningService.getInstance(project);
-//
-//        int index = table.getSelectionModel().getAnchorSelectionIndex();
-//        String commitId = table.getModel().getCommitId(index).getHash().asString();
-//        RefactoringEntry entry = miner.get(commitId);
+        hide = state;
+        Editor editor = e.getRequiredData(CommonDataKeys.EDITOR);
+        editor.getFoldingModel().runBatchFoldingOperation(() -> {
+            for (FoldRegion foldRegion : editor.getFoldingModel().getAllFoldRegions()) {
+                if (foldRegion.getPlaceholderText().equals("refactoring")) foldRegion.setExpanded(!hide);
+            }
+        });
     }
 }
