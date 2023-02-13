@@ -2,12 +2,13 @@
     <id>org.jetbrains.research.refactorinsight</id>
     <name>RefactorInsight</name>
     <vendor>JetBrains</vendor>
-    <version>2022.3-1.0</version>
+    <version>2022.3-2.0</version>
 
     <description><![CDATA[
     <p>Enhances IDE representation of code changes with refactoring information.</p>
     <ul>
         <li>Supports Java and Kotlin.</li>
+        <li>Marks refactoring changes in code diffs with a gutter.</li>
         <li>Folds refactorings in diffs and shows hints with their descriptions.</li>
         <li>Detects refactorings in Pull Requests.</li>
         <li>Detects refactorings at any specific commit selected in the Git Log tab.</li>
@@ -16,6 +17,12 @@
       ]]></description>
 
     <change-notes><![CDATA[
+        <h4>2022.3-2.0</h4>
+        <ul>
+            <li>Mark refactoring changes in code diffs with a gutter.</li>
+            <li>Detect more refactoring types.</li>
+        </ul>
+
         <h4>2022.3-1.0</h4>
         <ul>
             <li>Add compatibility with IDEA 2022.3</li>
