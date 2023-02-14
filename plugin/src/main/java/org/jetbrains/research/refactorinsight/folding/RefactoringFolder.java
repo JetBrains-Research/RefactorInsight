@@ -23,13 +23,10 @@ import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.github.pullrequest.comment.GHPRDiffReviewSupport;
+import org.jetbrains.research.refactorinsight.folding.handlers.*;
 import org.jetbrains.research.refactorinsight.processors.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.folding.handlers.ExtractOperationFoldingHandler;
-import org.jetbrains.research.refactorinsight.folding.handlers.FoldingHandler;
-import org.jetbrains.research.refactorinsight.folding.handlers.InlineOperationFoldingHandler;
-import org.jetbrains.research.refactorinsight.folding.handlers.MoveOperationFoldingHandler;
 import org.jetbrains.research.refactorinsight.services.MiningService;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +52,9 @@ public class RefactoringFolder {
     FoldingHandler extractOperationHandler = new ExtractOperationFoldingHandler();
     foldingHandlers.put(RefactoringType.EXTRACT_OPERATION.getName(), extractOperationHandler);
     foldingHandlers.put(RefactoringType.EXTRACT_AND_MOVE_OPERATION.getName(), extractOperationHandler);
+    FoldingHandler moveClassHandler = new MoveClassFoldingHandler();
+    foldingHandlers.put(RefactoringType.MOVE_CLASS.getName(), moveClassHandler);
+    foldingHandlers.put(RefactoringType.MOVE_RENAME_CLASS.getName(), moveClassHandler);
   }
 
   private RefactoringFolder() {}
@@ -155,7 +155,7 @@ public class RefactoringFolder {
     editor.getFoldingModel().runBatchFoldingOperation(() -> {
       for (FoldingDescriptor foldingDescriptor : folds) {
         FoldRegion value = editor.getFoldingModel()
-            .addFoldRegion(foldingDescriptor.getFoldingStartOffset(), foldingDescriptor.getFoldingEndOffset(), "refactoring");
+            .addFoldRegion(foldingDescriptor.getFoldingStartOffset(), foldingDescriptor.getFoldingEndOffset(), foldingDescriptor.getHintText());
         if (value != null) {
           value.setExpanded(false);
           value.setInnerHighlightersMuted(true);
