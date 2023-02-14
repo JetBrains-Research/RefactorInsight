@@ -1,11 +1,8 @@
 package org.jetbrains.research.refactorinsight.data.classes;
 
 import gr.uom.java.xmi.diff.MoveAndRenameClassRefactoring;
-import org.jetbrains.research.refactorinsight.data.Group;
-import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.data.RefactoringLine;
+import org.jetbrains.research.refactorinsight.data.*;
 import org.jetbrains.research.refactorinsight.data.util.JavaUtils;
-import org.jetbrains.research.refactorinsight.data.JavaRefactoringHandler;
 import org.refactoringminer.api.Refactoring;
 
 public class MoveRenameClassJavaHandler extends JavaRefactoringHandler {
@@ -34,8 +31,8 @@ public class MoveRenameClassJavaHandler extends JavaRefactoringHandler {
                         false)
                 .setNameBefore(ref.getOriginalClassName())
                 .setNameAfter(ref.getRenamedClassName())
-                .setDetailsBefore(ref.getOriginalClass().getPackageName())
-                .setDetailsAfter(ref.getRenamedClass().getPackageName());
+                .setDetailsBefore(ref.getOriginalClass().getName())
+                .setDetailsAfter(ref.getRenamedClass().getName());
 
         String packageBefore = ref.getOriginalClass().getPackageName();
         String packageAfter = ref.getRenamedClass().getPackageName();
@@ -55,6 +52,9 @@ public class MoveRenameClassJavaHandler extends JavaRefactoringHandler {
                 ? originalClassName.substring(originalClassName.lastIndexOf(".") + 1) : originalClassName;
         movedClassName = movedClassName.contains(".")
                 ? movedClassName.substring(movedClassName.lastIndexOf(".") + 1) : movedClassName;
+
+        info.setFoldingDescriptorBefore(FoldingBuilder.fromClass(ref.getOriginalClass()));
+        info.setFoldingDescriptorAfter(FoldingBuilder.fromClass(ref.getMovedClass()));
 
         //check if it is inner class
         if ((!left.equals(originalClassName) && packageBefore.contains(left))
