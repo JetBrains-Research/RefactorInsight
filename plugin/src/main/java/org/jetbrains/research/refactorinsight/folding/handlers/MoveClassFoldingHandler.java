@@ -4,7 +4,7 @@ import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.folding.FoldingDescriptor;
-import org.jetbrains.research.refactorinsight.utils.Utils;
+import org.jetbrains.research.refactorinsight.utils.TextUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +19,7 @@ public class MoveClassFoldingHandler implements FoldingHandler{
         }
         FoldingDescriptor descriptor = isBefore ? info.getFoldingDescriptorBefore() : info.getFoldingDescriptorAfter();
         if (!descriptor.hasHintText()) {
-            String details = Utils.skipPackages(isBefore ? info.getDetailsAfter() : info.getDetailsBefore());
+            String details = TextUtils.skipPackages(isBefore ? info.getDetailsAfter() : info.getDetailsBefore());
             String hintText = "Moved" + (isBefore ? " to " : " from ") + details;
             descriptor.addHintText(hintText);
         }
