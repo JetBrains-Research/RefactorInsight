@@ -13,7 +13,6 @@ import org.jetbrains.research.refactorinsight.folding.RefactoringFolder;
 
 public class HideNonFunctionalChangesAction extends CheckboxAction {
     boolean hide = true;
-    boolean init = false;
 
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
@@ -22,11 +21,6 @@ public class HideNonFunctionalChangesAction extends CheckboxAction {
 
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-        if (!init) {
-            FrameDiffTool.DiffViewer viewer = e.getRequiredData(DiffDataKeys.DIFF_VIEWER);
-            ImportFolder.foldImports(viewer);
-            init = true;
-        }
         hide = state;
         Editor editor = e.getRequiredData(CommonDataKeys.EDITOR);
         editor.getFoldingModel().runBatchFoldingOperation(() -> {

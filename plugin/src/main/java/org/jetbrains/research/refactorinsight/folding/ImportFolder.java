@@ -1,12 +1,17 @@
 package org.jetbrains.research.refactorinsight.folding;
 
 import com.intellij.diff.FrameDiffTool;
+import com.intellij.diff.contents.DocumentContent;
 import com.intellij.diff.fragments.LineFragment;
 import com.intellij.diff.tools.simple.SimpleDiffChange;
 import com.intellij.diff.tools.simple.SimpleDiffViewer;
 import com.intellij.diff.util.Side;
+import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.FoldRegion;
+import com.intellij.openapi.progress.EmptyProgressIndicator;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
@@ -34,13 +39,33 @@ public class ImportFolder {
         Project project = diffViewer.getProject();
         if (project == null) return;
 
-        List<SimpleDiffChange> changes = diffViewer.getDiffChanges();
-        addFold(project, diffViewer.getEditor1(), changes, Side.LEFT);
-        addFold(project, diffViewer.getEditor2(), changes, Side.RIGHT);
+        DocumentContent content1 = diffViewer.getContent1();
+        DocumentContent content2 = diffViewer.getContent2();
+        final Document document1 = content1.getDocument();
+        final Document document2 = content2.getDocument();
+
+        CharSequence[] texts = ReadAction.compute(() -> new CharSequence[]{
+                document1.getImmutableCharSequence(),
+                document2.getImmutableCharSequence()
+        });
+
+        ProgressIndicator indicator = new EmptyProgressIndicator();
+        List<LineFragment> lineFragments = diffViewer.getTextDiffProvider().compare(texts[0], texts[1], indicator);
+        if (lineFragments == null) return;
+
+        List<SimpleDiffChange> changes = new ArrayList<>();
+        for (LineFragment fragment : lineFragments) {
+            changes.add(new SimpleDiffChange(changes.size(), fragment));
+        }
+
+        modifyEditor(project, diffViewer.getEditor1(), changes, Side.LEFT);
+        modifyEditor(project, diffViewer.getEditor2(), changes, Side.RIGHT);
     }
 
-    private static void addFold(@NotNull Project project, @NotNull Editor editor,
-                                @NotNull List<SimpleDiffChange> changes, @NotNull Side side) {
+    private static void modifyEditor(@NotNull Project project,
+                                     @NotNull Editor editor,
+                                     @NotNull List<SimpleDiffChange> changes,
+                                     @NotNull Side side) {
         PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
         if (psiFile == null) return;
 
@@ -73,7 +98,8 @@ public class ImportFolder {
         });
     }
 
-    private static TextRange getRangeOfChange(@NotNull TextRange elementTextRange, @NotNull List<SimpleDiffChange> changes,
+    private static TextRange getRangeOfChange(@NotNull TextRange elementTextRange,
+                                              @NotNull List<SimpleDiffChange> changes,
                                               @NotNull Side side) {
         for (SimpleDiffChange change : changes) {
             LineFragment fragment = change.getFragment();

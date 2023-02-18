@@ -42,6 +42,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.diff.MoreSidedDiffRequestGenerator.MoreSidedRange;
 import org.jetbrains.research.refactorinsight.diff.ThreeSidedRange;
+import org.jetbrains.research.refactorinsight.folding.ImportFolder;
 import org.jetbrains.research.refactorinsight.folding.RefactoringFolder;
 import org.jetbrains.research.refactorinsight.ui.Keys;
 
@@ -189,6 +190,8 @@ public class DiffWindow extends DiffExtension {
 
         //Check diff viewer type for refactoring
         Boolean isRefactoring = request.getUserData(Keys.REFACTORING);
+
+        ImportFolder.foldImports(viewer);
 
         //Fold Move Method refactorings in the base diff that contains the information about all changes in the file.
         if (isRefactoring == null) {
