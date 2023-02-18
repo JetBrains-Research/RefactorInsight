@@ -28,9 +28,8 @@ import org.jetbrains.research.refactorinsight.processors.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.services.MiningService;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +37,7 @@ import java.util.stream.Collectors;
  */
 public class RefactoringFolder {
   static Map<String, FoldingHandler> foldingHandlers;
+  static Set<FoldRegion> foldRegions;
 
   static {
     foldingHandlers = new HashMap<>();
@@ -55,6 +55,7 @@ public class RefactoringFolder {
     FoldingHandler moveClassHandler = new MoveClassFoldingHandler();
     foldingHandlers.put(RefactoringType.MOVE_CLASS.getName(), moveClassHandler);
     foldingHandlers.put(RefactoringType.MOVE_RENAME_CLASS.getName(), moveClassHandler);
+    foldRegions = new HashSet<>();
   }
 
   private RefactoringFolder() {}
@@ -99,6 +100,10 @@ public class RefactoringFolder {
     } else if (viewerBase instanceof ThreesideTextDiffViewer) {
       foldRefactorings(foldableRefactorings, (ThreesideTextDiffViewer) viewerBase, project);
     }
+  }
+
+  public static boolean isRefactoringFoldRegion(FoldRegion region) {
+    return foldRegions.contains(region);
   }
 
   /**
@@ -155,11 +160,12 @@ public class RefactoringFolder {
     editor.getFoldingModel().runBatchFoldingOperation(() -> {
       for (FoldingDescriptor foldingDescriptor : folds) {
         FoldRegion value = editor.getFoldingModel()
-            .addFoldRegion(foldingDescriptor.getFoldingStartOffset(), foldingDescriptor.getFoldingEndOffset(), foldingDescriptor.getHintText());
+            .addFoldRegion(foldingDescriptor.getFoldingStartOffset(), foldingDescriptor.getFoldingEndOffset(), "");
         if (value != null) {
           value.setExpanded(false);
           value.setInnerHighlightersMuted(true);
         }
+        foldRegions.add(value);
 
         RendererWrapper renderer = new RendererWrapper(new HintRenderer(foldingDescriptor.getHintText()), false);
         editor.getInlayModel().addBlockElement(

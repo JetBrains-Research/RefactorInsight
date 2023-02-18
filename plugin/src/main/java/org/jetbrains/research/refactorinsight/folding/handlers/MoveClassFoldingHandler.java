@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MoveClassFoldingHandler implements FoldingHandler{
+public class MoveClassFoldingHandler implements FoldingHandler {
     @Override
     public @NotNull List<FoldingDescriptor> getFolds(@NotNull RefactoringInfo info, @NotNull PsiFile file, boolean isBefore) {
         String path = isBefore ? info.getLeftPath() : info.getRightPath();
