@@ -23,6 +23,7 @@ import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.github.pullrequest.comment.GHPRDiffReviewSupport;
+import org.jetbrains.research.refactorinsight.actions.HideNonFunctionalChangesAction;
 import org.jetbrains.research.refactorinsight.folding.handlers.*;
 import org.jetbrains.research.refactorinsight.processors.RefactoringType;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
@@ -162,7 +163,8 @@ public class RefactoringFolder {
         FoldRegion value = editor.getFoldingModel()
             .addFoldRegion(foldingDescriptor.getFoldingStartOffset(), foldingDescriptor.getFoldingEndOffset(), "");
         if (value != null) {
-          value.setExpanded(false);
+          boolean hide = HideNonFunctionalChangesAction.isHide();
+          value.setExpanded(!hide);
           value.setInnerHighlightersMuted(true);
         }
         foldRegions.add(value);
