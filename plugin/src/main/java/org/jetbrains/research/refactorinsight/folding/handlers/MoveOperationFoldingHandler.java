@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.jetbrains.research.kotlinrminer.common.RefactoringType.*;
+import static org.jetbrains.research.refactorinsight.utils.TextUtils.getMovedDirection;
 
 public class MoveOperationFoldingHandler implements FoldingHandler {
     @NotNull
@@ -65,15 +66,9 @@ public class MoveOperationFoldingHandler implements FoldingHandler {
                 throw new AssertionError("Folds of different types");
             }
 
-            if (hints.stream().allMatch(hint -> hint.startsWith("from"))) {
-                hintText += "from ";
-                hints = hints.stream().map(hint -> hint.substring("from ".length())).collect(Collectors.toList());
-            } else if (hints.stream().allMatch(hint -> hint.startsWith("to"))) {
-                hintText += "to ";
-                hints = hints.stream().map(hint -> hint.substring("to ".length())).collect(Collectors.toList());
-            } else {
-                throw new AssertionError("Folds of different types");
-            }
+            String movedDirection = getMovedDirection(hints);
+            hintText += movedDirection;
+            hints = hints.stream().map(hint -> hint.substring(movedDirection.length())).collect(Collectors.toList());
 
             boolean isNotChanged = false;
             if (hints.stream().allMatch(hint -> hint.endsWith("without changes"))) {

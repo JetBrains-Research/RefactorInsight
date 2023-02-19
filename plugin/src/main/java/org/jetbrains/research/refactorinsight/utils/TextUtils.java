@@ -142,4 +142,14 @@ public class TextUtils {
                 ).collect(Collectors.toList()))
                 .hashCode();
     }
+
+    public static String getMovedDirection(List<String> hints) {
+        if (hints.stream().allMatch(hint -> hint.startsWith("from"))) {
+            return "from ";
+        } else if (hints.stream().allMatch(hint -> hint.startsWith("to"))) {
+            return "to ";
+        } else {
+            throw new AssertionError("Folds of different types");
+        }
+    }
 }

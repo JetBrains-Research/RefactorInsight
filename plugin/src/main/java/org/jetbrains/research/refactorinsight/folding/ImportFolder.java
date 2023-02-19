@@ -16,18 +16,18 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.research.refactorinsight.actions.HideNonFunctionalChangesAction;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Folds discovered imports in code diffs when Hide Non-functional Changes Checkbox Action is enabled.
+ */
 public class ImportFolder {
-    static Set<FoldRegion> foldRegions;
-
-    static {
-        foldRegions = new HashSet<>();
-    }
+    static Set<FoldRegion> foldRegions = new HashSet<>();
 
     public static boolean isImportFoldRegion(FoldRegion region) {
         return foldRegions.contains(region);
@@ -90,7 +90,8 @@ public class ImportFolder {
                 FoldRegion value = editor.getFoldingModel()
                         .addFoldRegion(range.getStartOffset(), range.getEndOffset(), "");
                 if (value != null) {
-                    value.setExpanded(false);
+                    boolean hide = HideNonFunctionalChangesAction.isHide();
+                    value.setExpanded(!hide);
                     value.setInnerHighlightersMuted(true);
                 }
                 foldRegions.add(value);
