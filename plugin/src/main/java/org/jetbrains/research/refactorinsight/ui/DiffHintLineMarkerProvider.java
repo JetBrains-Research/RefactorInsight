@@ -8,6 +8,7 @@ import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
+import com.intellij.openapi.editor.markup.MarkupEditorFilter;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.PopupStep;
@@ -29,6 +30,7 @@ import icons.RefactorInsightIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
+import org.jetbrains.research.refactorinsight.actions.HideNonFunctionalChangesAction;
 import org.jetbrains.research.refactorinsight.data.RefactoringEntry;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.services.MiningService;
@@ -158,6 +160,11 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
                     getCommonNavigationHandler(refactoringInfos),
                     GutterIconRenderer.Alignment.LEFT,
                     () -> RefactorInsightBundle.message("refactoring.detected.hint"));
+        }
+
+        @Override
+        public @NotNull MarkupEditorFilter getEditorFilter() {
+            return editor -> !HideNonFunctionalChangesAction.isHide();
         }
 
         private static TextRange getCommonTextRange(List<PsiElement> psiElements) {
