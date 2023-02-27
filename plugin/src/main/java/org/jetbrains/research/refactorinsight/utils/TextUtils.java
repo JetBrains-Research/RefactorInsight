@@ -110,9 +110,10 @@ public class TextUtils {
      */
     @NotNull
     public static String functionSimpleName(@NotNull String qualifiedName) {
-        int nameBegin = qualifiedName.lastIndexOf('.') + 1;
-        int nameEnd = qualifiedName.indexOf('(', nameBegin);
-        return qualifiedName.substring(nameBegin, nameEnd) + "()";
+        int nameEnd = qualifiedName.indexOf('(');
+        String prefix = qualifiedName.substring(0, nameEnd);
+        int nameBegin = prefix.lastIndexOf('.') + 1;
+        return prefix.substring(nameBegin) + "()";
     }
 
     /**
