@@ -28,8 +28,8 @@ public class AddVariableModifierJavaHandler extends JavaRefactoringHandler {
                 .setElementAfter(null)
                 .addMarking(
                         createCodeRangeFromJava(ref.getVariableBefore().codeRange()),
-                        createCodeRangeFromJava(ref.getVariableAfter().codeRange()),
-                        line -> line.addOffset(createLocationInfoFromJava(ref.getVariableAfter().getLocationInfo()), ADD)
+                        createCodeRangeFromJava(ref.getAddedModifier().codeRange()),
+                        line -> line.addOffset(createLocationInfoFromJava(ref.getAddedModifier().getLocationInfo()), ADD)
                                 .setHasColumns(false),
                         NONE,
                         true);

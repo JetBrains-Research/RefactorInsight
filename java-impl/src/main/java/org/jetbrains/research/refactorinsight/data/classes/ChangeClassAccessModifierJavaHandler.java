@@ -29,12 +29,9 @@ public class ChangeClassAccessModifierJavaHandler extends JavaRefactoringHandler
                 .setNameBefore(ref.getClassBefore().getName())
                 .setNameAfter(ref.getClassAfter().getName())
                 .addMarking(
-                        createCodeRangeFromJava(ref.getClassBefore().codeRange()),
-                        createCodeRangeFromJava(ref.getClassAfter().codeRange()),
-                        line -> line.addOffset(
-                                createLocationInfoFromJava(ref.getClassAfter().getLocationInfo()), RefactoringLine.MarkingOption.ADD),
-                        RefactoringLine.MarkingOption.ADD,
-                        false);
+                        createCodeRangeFromJava(ref.getOldModifier().codeRange()),
+                        createCodeRangeFromJava(ref.getNewModifier().codeRange()),
+                        true);
     }
 
 }

@@ -27,9 +27,9 @@ public class RemoveAttributeModifierJavaHandler extends JavaRefactoringHandler {
                 .setElementBefore(ref.getModifier())
                 .setElementAfter(null)
                 .addMarking(
-                        createCodeRangeFromJava(ref.getAttributeBefore().codeRange()),
+                        createCodeRangeFromJava(ref.getRemovedModifier().codeRange()),
                         createCodeRangeFromJava(ref.getAttributeAfter().codeRange()),
-                        line -> line.addOffset(createLocationInfoFromJava(ref.getAttributeBefore().getLocationInfo()), REMOVE)
+                        line -> line.addOffset(createLocationInfoFromJava(ref.getRemovedModifier().getLocationInfo()), REMOVE)
                                 .setHasColumns(false),
                         NONE,
                         true);

@@ -12,7 +12,7 @@ group = rootProject.group
 version = rootProject.version
 
 dependencies {
-    implementation(group: 'com.github.tsantalis', name: 'refactoring-miner', version: '2.3.2') {
+    implementation(group: 'com.github.tsantalis', name: 'refactoring-miner', version: '2.4.0') {
         exclude group: "org.slf4j", module: "slf4j-log4j12"
     }
     implementation("org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r")

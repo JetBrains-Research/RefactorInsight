@@ -26,9 +26,9 @@ public class RemoveMethodModifierJavaHandler extends JavaRefactoringHandler {
                 .setElementBefore(ref.getModifier())
                 .setElementAfter(null)
                 .addMarking(
-                        createCodeRangeFromJava(ref.getOperationBefore().codeRange()),
+                        createCodeRangeFromJava(ref.getRemovedModifier().codeRange()),
                         createCodeRangeFromJava(ref.getOperationAfter().codeRange()),
-                        line -> line.addOffset(createLocationInfoFromJava(ref.getOperationAfter().getLocationInfo()), REMOVE)
+                        line -> line.addOffset(createLocationInfoFromJava(ref.getRemovedModifier().getLocationInfo()), REMOVE)
                                 .setHasColumns(false),
                         NONE, true)
                 .setNameBefore(JavaUtils.calculateSignatureForJavaMethod(ref.getOperationBefore()))

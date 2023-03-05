@@ -22,8 +22,8 @@ public class ChangeMethodAccessModifierJavaHandler extends JavaRefactoringHandle
                 .setDetailsAfter(classNameAfter)
                 .setNameBefore(JavaUtils.calculateSignatureForJavaMethod(ref.getOperationBefore()))
                 .setNameAfter(JavaUtils.calculateSignatureForJavaMethod(ref.getOperationAfter()))
-                .addMarking(createCodeRangeFromJava(ref.getOperationBefore().codeRange()),
-                        createCodeRangeFromJava(ref.getOperationAfter().codeRange()),
+                .addMarking(createCodeRangeFromJava(ref.getOldModifier().codeRange()),
+                        createCodeRangeFromJava(ref.getNewModifier().codeRange()),
                         true);
     }
     
