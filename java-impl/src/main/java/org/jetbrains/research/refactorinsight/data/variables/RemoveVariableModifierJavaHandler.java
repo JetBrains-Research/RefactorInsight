@@ -27,9 +27,9 @@ public class RemoveVariableModifierJavaHandler extends JavaRefactoringHandler {
                 .setElementBefore(ref.getModifier())
                 .setElementAfter(null)
                 .addMarking(
-                        createCodeRangeFromJava(ref.getVariableBefore().codeRange()),
+                        createCodeRangeFromJava(ref.getRemovedModifier().codeRange()),
                         createCodeRangeFromJava(ref.getVariableAfter().codeRange()),
-                        line -> line.addOffset(createLocationInfoFromJava(ref.getVariableBefore().getLocationInfo()), REMOVE)
+                        line -> line.addOffset(createLocationInfoFromJava(ref.getRemovedModifier().getLocationInfo()), REMOVE)
                                 .setHasColumns(false),
                         NONE,
                         true);

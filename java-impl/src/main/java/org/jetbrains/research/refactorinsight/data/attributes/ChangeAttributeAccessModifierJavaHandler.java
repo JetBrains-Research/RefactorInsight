@@ -19,10 +19,10 @@ public class ChangeAttributeAccessModifierJavaHandler extends JavaRefactoringHan
         return info.setGroup(Group.ATTRIBUTE)
                 .setDetailsBefore(classNameBefore)
                 .setDetailsAfter(classNameAfter)
-                .setNameBefore(ref.getOriginalAccessModifier())
-                .setNameAfter(ref.getChangedAccessModifier())
-                .addMarking(createCodeRangeFromJava(ref.getAttributeBefore().getType().codeRange()),
-                        createCodeRangeFromJava(ref.getAttributeAfter().getType().codeRange()),
+                .setNameBefore(ref.getAttributeBefore().getVariableDeclaration().toQualifiedString())
+                .setNameAfter(ref.getAttributeAfter().getVariableDeclaration().toQualifiedString())
+                .addMarking(createCodeRangeFromJava(ref.getOldModifier().codeRange()),
+                        createCodeRangeFromJava(ref.getNewModifier().codeRange()),
                         true);
     }
 

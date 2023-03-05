@@ -31,10 +31,10 @@ public class RemoveClassModifierJavaHandler extends JavaRefactoringHandler {
                 .setElementBefore(ref.getModifier())
                 .setElementAfter(null)
                 .addMarking(
-                        createCodeRangeFromJava(ref.getClassBefore().codeRange()),
+                        createCodeRangeFromJava(ref.getRemovedModifier().codeRange()),
                         createCodeRangeFromJava(ref.getClassAfter().codeRange()),
                         line -> line.addOffset(
-                                        createLocationInfoFromJava(ref.getClassBefore().getLocationInfo()), ADD)
+                                        createLocationInfoFromJava(ref.getRemovedModifier().getLocationInfo()), ADD)
                                 .setHasColumns(false),
                         NONE,
                         true);

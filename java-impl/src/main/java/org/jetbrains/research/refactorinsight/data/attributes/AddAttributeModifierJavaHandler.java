@@ -28,8 +28,8 @@ public class AddAttributeModifierJavaHandler extends JavaRefactoringHandler {
                 .setElementAfter(null)
                 .addMarking(
                         createCodeRangeFromJava(ref.getAttributeBefore().codeRange()),
-                        createCodeRangeFromJava(ref.getAttributeAfter().codeRange()),
-                        line -> line.addOffset(createLocationInfoFromJava(ref.getAttributeAfter().getLocationInfo()), ADD) // modifier location - ?
+                        createCodeRangeFromJava(ref.getAddedModifier().codeRange()),
+                        line -> line.addOffset(createLocationInfoFromJava(ref.getAddedModifier().getLocationInfo()), ADD)
                                 .setHasColumns(false),
                         NONE,
                         true);

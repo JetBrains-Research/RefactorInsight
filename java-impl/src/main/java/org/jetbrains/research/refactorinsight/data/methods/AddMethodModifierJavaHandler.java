@@ -28,8 +28,8 @@ public class AddMethodModifierJavaHandler extends JavaRefactoringHandler {
                 .setElementAfter(null)
                 .addMarking(
                         createCodeRangeFromJava(ref.getOperationBefore().codeRange()),
-                        createCodeRangeFromJava(ref.getOperationAfter().codeRange()),
-                        line -> line.addOffset(createLocationInfoFromJava(ref.getOperationAfter().getLocationInfo()), ADD)
+                        createCodeRangeFromJava(ref.getAddedModifier().codeRange()),
+                        line -> line.addOffset(createLocationInfoFromJava(ref.getAddedModifier().getLocationInfo()), ADD)
                                 .setHasColumns(false),
                         NONE, true)
                 .setNameBefore(JavaUtils.calculateSignatureForJavaMethod(ref.getOperationBefore()))

@@ -33,9 +33,9 @@ public class AddClassModifierJavaHandler extends JavaRefactoringHandler {
                 .setElementAfter(null)
                 .addMarking(
                         createCodeRangeFromJava(ref.getClassBefore().codeRange()),
-                        createCodeRangeFromJava(ref.getClassAfter().codeRange()),
+                        createCodeRangeFromJava(ref.getAddedModifier().codeRange()),
                         line -> line.addOffset(
-                                        createLocationInfoFromJava(ref.getClassAfter().getLocationInfo()), ADD)
+                                        createLocationInfoFromJava(ref.getAddedModifier().getLocationInfo()), ADD)
                                 .setHasColumns(false),
                         NONE,
                         true);

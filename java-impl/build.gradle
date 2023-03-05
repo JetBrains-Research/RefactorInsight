@@ -8,7 +8,7 @@ version = rootProject.version
 dependencies {
     implementation project(':common')
     compileOnly 'org.jetbrains:annotations:22.0.0'
-    implementation(group: 'com.github.tsantalis', name: 'refactoring-miner', version: '2.3.2') {
+    implementation(group: 'com.github.tsantalis', name: 'refactoring-miner', version: '2.4.0') {
         exclude group: "org.slf4j", module: "slf4j-log4j12"
     }
 }
