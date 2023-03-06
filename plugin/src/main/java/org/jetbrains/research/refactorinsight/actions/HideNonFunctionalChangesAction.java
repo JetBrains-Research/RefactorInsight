@@ -13,7 +13,7 @@ import org.jetbrains.research.refactorinsight.folding.ImportFolder;
 import org.jetbrains.research.refactorinsight.folding.RefactoringFolder;
 
 public class HideNonFunctionalChangesAction extends CheckboxAction {
-    static private boolean hide = true;
+    static private boolean hide = false;
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
