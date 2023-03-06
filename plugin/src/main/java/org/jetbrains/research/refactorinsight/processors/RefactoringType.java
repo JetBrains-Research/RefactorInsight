@@ -63,6 +63,8 @@ import org.jetbrains.research.refactorinsight.data.methods.ReplaceAnonymousWithL
 import org.jetbrains.research.refactorinsight.data.methods.ReplaceLoopWithPipelineJavaHandler;
 import org.jetbrains.research.refactorinsight.data.methods.ReplacePipelineWithLoopJavaHandler;
 import org.jetbrains.research.refactorinsight.data.methods.SplitConditionalJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.SplitMethodJavaHandler;
+import org.jetbrains.research.refactorinsight.data.methods.MergeMethodJavaHandler;
 import org.jetbrains.research.refactorinsight.data.packages.MergePackageJavaHandler;
 import org.jetbrains.research.refactorinsight.data.packages.MoveSourceFolderJavaHandler;
 import org.jetbrains.research.refactorinsight.data.packages.RenamePackageJavaHandler;
@@ -188,7 +190,9 @@ public enum RefactoringType {
     SPLIT_CONDITIONAL("Split Conditional", new SplitConditionalJavaHandler(), null),
     INVERT_CONDITIONAL("Invert Condition", new InvertConditionJavaHandler(), null),
     MERGE_CONDITIONAL("Merge Conditional", new MergeConditionalJavaHandler(), null),
-    MERGE_CATCH("Merge Catch", new MergeCatchJavaHandler(), null);
+    MERGE_CATCH("Merge Catch", new MergeCatchJavaHandler(), null),
+    MERGE_METHOD("Merge Method", new MergeMethodJavaHandler(), null),
+    SPLIT_METHOD("Split Method", new SplitMethodJavaHandler(), null);
 
     private final String name;
     private final JavaRefactoringHandler javaHandler;
