@@ -3,6 +3,7 @@ package org.jetbrains.research.refactorinsight.data.util;
 import gr.uom.java.xmi.UMLOperation;
 import gr.uom.java.xmi.UMLType;
 import gr.uom.java.xmi.VariableDeclarationContainer;
+import gr.uom.java.xmi.decomposition.AbstractCodeFragment;
 import gr.uom.java.xmi.decomposition.AbstractStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.CodeRange;
@@ -10,6 +11,7 @@ import org.jetbrains.research.refactorinsight.adapters.LocationInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.jetbrains.research.refactorinsight.utils.StringUtils.calculateSignatureWithoutClassName;
 
@@ -65,6 +67,22 @@ public class JavaUtils {
                 .append(".")
                 .append(calculateSignatureWithoutClassName(operation.getName(), parameterTypeList));
         return builder.toString();
+    }
+
+    public static String joinCodeFragments(Set<AbstractCodeFragment> codeFragments) {
+        StringBuilder fragmentsStringBuilder = new StringBuilder();
+        int i = 0;
+        for (AbstractCodeFragment fragment : codeFragments) {
+            String fragmentString = fragment.getString();
+            String newFragment = fragmentString.contains("\n") ?
+                    fragmentString.substring(0, fragmentString.indexOf("\n")) : fragmentString;
+            fragmentsStringBuilder.append(newFragment);
+            if (i < codeFragments.size() - 1) {
+                fragmentsStringBuilder.append(", ");
+            }
+            i++;
+        }
+        return fragmentsStringBuilder.toString();
     }
 
 }
