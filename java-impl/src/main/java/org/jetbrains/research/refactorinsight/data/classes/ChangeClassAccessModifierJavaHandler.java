@@ -4,11 +4,9 @@ import gr.uom.java.xmi.diff.ChangeClassAccessModifierRefactoring;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.JavaRefactoringHandler;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.data.RefactoringLine;
 import org.refactoringminer.api.Refactoring;
 
 import static org.jetbrains.research.refactorinsight.data.util.JavaUtils.createCodeRangeFromJava;
-import static org.jetbrains.research.refactorinsight.data.util.JavaUtils.createLocationInfoFromJava;
 
 public class ChangeClassAccessModifierJavaHandler extends JavaRefactoringHandler {
     @Override

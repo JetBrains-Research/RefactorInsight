@@ -15,12 +15,12 @@ public class InvertConditionJavaHandler extends JavaRefactoringHandler {
         InvertConditionRefactoring ref = (InvertConditionRefactoring) refactoring;
 
         String conditionalString = ref.getOriginalConditional().getString();
-        String oldConditional = (conditionalString.contains("\n") ? conditionalString.substring(0,
-                conditionalString.indexOf("\n")) : conditionalString);
+        String oldConditional = conditionalString.contains("\n") ? conditionalString.substring(0,
+                conditionalString.indexOf("\n")) : conditionalString;
 
         String invertConditionalString = ref.getInvertedConditional().getString();
-        String invertedConditional = (invertConditionalString.contains("\n") ? invertConditionalString.substring(0,
-                invertConditionalString.indexOf("\n")) : invertConditionalString);
+        String invertedConditional = invertConditionalString.contains("\n") ? invertConditionalString.substring(0,
+                invertConditionalString.indexOf("\n")) : invertConditionalString;
 
         return info.setGroup(Group.METHOD)
                 .setNameBefore(calculateSignatureForVariableDeclarationContainer(ref.getOperationBefore()))

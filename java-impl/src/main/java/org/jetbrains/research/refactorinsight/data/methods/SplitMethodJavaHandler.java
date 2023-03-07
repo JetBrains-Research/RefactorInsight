@@ -1,7 +1,6 @@
 package org.jetbrains.research.refactorinsight.data.methods;
 
 import gr.uom.java.xmi.VariableDeclarationContainer;
-import gr.uom.java.xmi.decomposition.VariableDeclaration;
 import gr.uom.java.xmi.diff.SplitOperationRefactoring;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.JavaRefactoringHandler;
