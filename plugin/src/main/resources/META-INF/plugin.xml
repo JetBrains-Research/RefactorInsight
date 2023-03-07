@@ -2,7 +2,7 @@
     <id>org.jetbrains.research.refactorinsight</id>
     <name>RefactorInsight</name>
     <vendor>JetBrains</vendor>
-    <version>2022.3-2.0</version>
+    <version>2022.3-3.0</version>
 
     <description><![CDATA[
     <p>Enhances IDE representation of code changes with refactoring information.</p>
@@ -17,6 +17,13 @@
       ]]></description>
 
     <change-notes><![CDATA[
+        <h4>2022.3-3.0</h4>
+        <ul>
+            <li>Add a possibility to hide non-functional changes in code diffs.</li>
+            <li>Detect more refactoring types.</li>
+            <li>Minor bug fixes.</li>
+        </ul>
+
         <h4>2022.3-2.0</h4>
         <ul>
             <li>Mark refactoring changes in code diffs with a gutter.</li>
