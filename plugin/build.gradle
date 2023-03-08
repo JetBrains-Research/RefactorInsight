@@ -29,3 +29,15 @@ dependencies {
 runIde {
     maxHeapSize = "4g"
 }
+
+tasks {
+    buildSearchableOptions {
+        enabled = false
+    }
+
+    patchPluginXml {
+        version.set("${project.version}")
+        sinceBuild.set("221")
+        untilBuild.set("232.*")
+    }
+}

@@ -106,25 +106,23 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
                     }
                 });
 
-                ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                    try {
-                        List<Change> changes = new ArrayList<>();
-                        GitLogUtil.readFullDetailsForHashes(project,
-                                ProjectFileIndex.getInstance(project).getContentRootForFile(project.getProjectFile()),
-                                Collections.singletonList(commitHash),
-                                GitCommitRequirements.DEFAULT,
-                                c -> changes.addAll(c.getChanges()));
-                        ApplicationManager.getApplication().invokeLater(() -> {
-                            var refactorings = KotlinRMiner.INSTANCE.detectRefactorings(project, changes);
-                            refactorings.forEach(
-                                    r -> createRefactoringEntry(map, commitHash, commitParentHash,
-                                            commitTimestamp, project, refactorings)
-                            );
-                        });
-                    } catch (VcsException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                try {
+                    List<Change> changes = new ArrayList<>();
+                    GitLogUtil.readFullDetailsForHashes(project,
+                            ProjectFileIndex.getInstance(project).getContentRootForFile(project.getProjectFile()),
+                            Collections.singletonList(commitHash),
+                            GitCommitRequirements.DEFAULT,
+                            c -> changes.addAll(c.getChanges()));
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        var refactorings = KotlinRMiner.INSTANCE.detectRefactorings(project, changes);
+                        refactorings.forEach(
+                                r -> createRefactoringEntry(map, commitHash, commitParentHash,
+                                        commitTimestamp, project, refactorings)
+                        );
+                    });
+                } catch (VcsException e) {
+                    throw new RuntimeException(e);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
