@@ -38,8 +38,8 @@ public class ChangeVariableTypeJavaHandler extends JavaRefactoringHandler {
                 .setNameAfter(JavaUtils.calculateSignatureForVariableDeclarationContainer(ref.getOperationAfter()))
                 .setElementBefore(ref.getOriginalVariable().getVariableDeclaration().toQualifiedString())
                 .setElementAfter(ref.getChangedTypeVariable().getVariableDeclaration().toQualifiedString())
-                .addMarking(createCodeRangeFromJava(ref.getOriginalVariable().getVariableDeclaration().codeRange()),
-                        createCodeRangeFromJava(ref.getChangedTypeVariable().getVariableDeclaration().codeRange()),
+                .addMarking(createCodeRangeFromJava(ref.getOriginalVariable().getType().codeRange()),
+                        createCodeRangeFromJava(ref.getChangedTypeVariable().getType().codeRange()),
                         true);
 
     }
