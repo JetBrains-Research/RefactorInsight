@@ -1,10 +1,6 @@
 package org.jetbrains.research.refactorinsight.services;
 
-import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.Service;
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.components.State;
-import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.*;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -44,10 +40,9 @@ import org.refactoringminer.util.GitServiceImpl;
  * This is the MiningService.
  * It computes, process and stores the data retrieved from RefactoringMiner.
  * It can mine one specific commit, a fixed number of commits, or all commits in the repository.
- * it stores and persists the detected refactoring data in .idea/refactorings.xml file.
  */
 @State(name = "MiningRefactoringsState",
-        storages = {@Storage("refactorings.xml")})
+        storages = {@Storage(StoragePathMacros.CACHE_FILE)})
 @Service
 public class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
