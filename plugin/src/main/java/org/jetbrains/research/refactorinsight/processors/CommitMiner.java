@@ -6,8 +6,9 @@ import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.vcs.VcsException;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vcs.changes.Change;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.Consumer;
 import com.intellij.vcs.log.TimedVcsCommit;
 import git4idea.history.GitCommitRequirements;
@@ -96,52 +97,68 @@ public class CommitMiner implements Consumer<TimedVcsCommit> {
                                                             String commitParentHash, long commitTimestamp,
                                                             Repository repository, Project project) {
         return () -> {
-            GitHistoryRefactoringMiner jminer = new GitHistoryRefactoringMinerImpl();
-
-            try {
-                jminer.detectAtCommit(repository, commitHash, new RefactoringHandler() {
-                    @Override
-                    public void handle(String commitId, List<Refactoring> refactorings) {
-                        createRefactoringEntry(map, commitHash, commitParentHash, commitTimestamp, project, refactorings);
-                    }
-                });
-
-                try {
-                    List<Change> changes = new ArrayList<>();
-                    GitLogUtil.readFullDetailsForHashes(project,
-                            ProjectFileIndex.getInstance(project).getContentRootForFile(project.getProjectFile()),
-                            Collections.singletonList(commitHash),
-                            GitCommitRequirements.DEFAULT,
-                            c -> changes.addAll(c.getChanges()));
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        var refactorings = KotlinRMiner.INSTANCE.detectRefactorings(project, changes);
-                        refactorings.forEach(
-                                r -> createRefactoringEntry(map, commitHash, commitParentHash,
-                                        commitTimestamp, project, refactorings)
-                        );
-                    });
-                } catch (VcsException e) {
-                    throw new RuntimeException(e);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            detectJavaRefactorings(map, commitHash, commitParentHash, commitTimestamp, repository, project);
+            detectKotlinRefactorings(map, commitHash, commitParentHash, commitTimestamp, project);
         };
+    }
+
+    private static void detectJavaRefactorings(Map<String, RefactoringEntry> map, String commitHash,
+                                               String commitParentHash, long commitTimestamp,
+                                               Repository repository, Project project) {
+        try {
+            GitHistoryRefactoringMiner jminer = new GitHistoryRefactoringMinerImpl();
+            jminer.detectAtCommit(repository, commitHash, new RefactoringHandler() {
+                @Override
+                public void handle(String commitId, List<Refactoring> refactorings) {
+                    createRefactoringEntry(map, commitHash, commitParentHash, commitTimestamp, project, refactorings);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void detectKotlinRefactorings(Map<String, RefactoringEntry> map, String commitHash,
+                                                 String commitParentHash, long commitTimestamp, Project project) {
+        try {
+            List<Change> changes = new ArrayList<>();
+            Computable<VirtualFile> contentRootForFileComputable = () -> ProjectFileIndex.getInstance(project).getContentRootForFile(project.getProjectFile());
+            VirtualFile contentRootForFile = ApplicationManager.getApplication().runReadAction(contentRootForFileComputable);
+            GitLogUtil.readFullDetailsForHashes(project,
+                    contentRootForFile,
+                    Collections.singletonList(commitHash),
+                    GitCommitRequirements.DEFAULT,
+                    c -> changes.addAll(c.getChanges()));
+            ApplicationManager.getApplication().runReadAction(() -> {
+                var refactorings = KotlinRMiner.INSTANCE.detectRefactorings(project, changes);
+                createRefactoringEntry(map, commitHash, commitParentHash, commitTimestamp, project, refactorings);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static <T> void createRefactoringEntry(Map<String, RefactoringEntry> map, String commitHash,
                                                    String commitParentHash, long commitTimestamp,
                                                    Project project, List<T> refactorings) {
         RefactoringEntry entry = new RefactoringEntry(commitHash, commitParentHash, commitTimestamp);
-        List<RefactoringInfo> infos = refactorings.stream()
-                .map(refactoring -> INFO_FACTORY.create(refactoring, project.getBasePath()))
-                .filter(Objects::nonNull)
-                .map(info -> info.setEntry(entry))
-                .toList();
-
-        entry.setRefactorings(infos).combineRelated();
-        entry.getRefactorings().forEach(info -> TextUtils.check(info, project));
-        map.put(commitHash, entry);
+        if (refactorings.isEmpty()) {
+            entry.setRefactorings(Collections.emptyList());
+        } else {
+            List<RefactoringInfo> infos = refactorings.stream()
+                    .map(refactoring -> INFO_FACTORY.create(refactoring, project.getBasePath()))
+                    .filter(Objects::nonNull)
+                    .map(info -> info.setEntry(entry))
+                    .toList();
+            entry.setRefactorings(infos).combineRelated();
+            entry.getRefactorings().forEach(info -> TextUtils.check(info, project));
+        }
+        map.merge(commitHash, entry, (old, current) -> {
+            if (old.getRefactorings().isEmpty()) return current;
+            if (current.getRefactorings().isEmpty()) return old;
+            current.getRefactorings().addAll(old.getRefactorings());
+            return current;
+        });
     }
 
     /**

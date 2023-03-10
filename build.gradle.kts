@@ -29,7 +29,7 @@ subprojects {
 }
 
 val configureIntelliJ: Action<IntelliJPluginExtension> = Action {
-    version.set("IC-2022.3")
+    version.set("LATEST-EAP-SNAPSHOT")
     plugins.set(listOf("com.intellij.java", "Git4Idea", "org.jetbrains.plugins.github"))
     downloadSources.set(true)
 }

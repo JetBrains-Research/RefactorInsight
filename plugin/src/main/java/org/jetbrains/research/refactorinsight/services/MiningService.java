@@ -50,7 +50,7 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
             = new ConcurrentHashMap<>();
     private boolean mining = false;
     private MyState innerState = new MyState();
-    private SingleCommitRefactoringTask task = null;
+    private volatile SingleCommitRefactoringTask task = null;
     private PRMiningBackgroundableTask prTask = null;
     private Repository myRepository = null;
 
@@ -203,15 +203,14 @@ public class MiningService implements PersistentStateComponent<MiningService.MyS
      * @param window  to be updated.
      */
     public void mineAtCommit(VcsCommitMetadata commit, Project project, GitWindow window) {
-        if (task != null) {
-            task.cancel();
+        var previousTask = task;
+        if (previousTask != null) {
+            previousTask.cancel();
         }
         if (myRepository == null) {
             myRepository = openRepository(project.getBasePath());
         }
-
-        task = new SingleCommitRefactoringTask(project, commit, window);
-        ProgressManager.getInstance().run(task);
+        ProgressManager.getInstance().run(task = new SingleCommitRefactoringTask(project, commit, window));
     }
 
     /**
