@@ -16,6 +16,11 @@
       ]]></description>
 
     <change-notes><![CDATA[
+        <h4>2023.1-2.0</h4>
+        <ul>
+            <li>Bug fixes.</li>
+        </ul>
+
         <h4>2023.1-1.0</h4>
         <ul>
             <li>Add compatibility with IDEA 2023.1</li>

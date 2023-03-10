@@ -7,7 +7,7 @@
 
 RefactorInsight is a plugin for IntelliJ IDEA that enhances the representation of code changes with refactoring information in Java and Kotlin projects. RefactorInsight relies on [RefactoringMiner](https://github.com/tsantalis/RefactoringMiner) and [kotlinRMiner](https://github.com/JetBrains-Research/kotlinRMiner) for retrieval of refactorings.
 
-The plugin is compatible with IntelliJ IDEA 2022.3 and is [available for free](https://plugins.jetbrains.com/plugin/14704-refactorinsight) on JetBrains Marketplace.
+The plugin is compatible with IntelliJ IDEA 2023.1 and is [available for free](https://plugins.jetbrains.com/plugin/14704-refactorinsight) on JetBrains Marketplace.
 
 ### Table of contents
 * [Features](#features)
@@ -54,7 +54,6 @@ Double-click a leaf node in the tree to open the VCS log at that specific commit
 #### Settings
 By default, for performance reasons, refactorings are only retrieved from the last 100 commits in the project history. This number can be adjusted in the plugin's settings. Alternatively, you can use **Mine All Refactorings** on the **Tools** menu to go through _all_ commits in the history of your project.
 The plugin also keeps track of new commits and processes them.
-The detected code refactorings are stored in `.idea/refactorings.xml`. If this file is deleted, RefactorInsight mines refactorings again after you make a commit.
 
 ### Build instructions
 You need to install Java 17 and IntelliJ IDEA.

@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "org.jetbrains.research.refactorinsight"
-version = "2023.1-1.0"
+version = "2023.1-2.0"
 
 repositories {
     mavenCentral()
