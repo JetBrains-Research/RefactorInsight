@@ -18,7 +18,7 @@ import org.jetbrains.research.refactorinsight.ui.windows.GitWindow;
  * Provides useful information for all the refactoring tree git windows that are active.
  */
 @Service
-public class WindowService {
+public final class WindowService {
   private final Project project;
   private Map<VcsLogGraphTable, GitWindow> gitInfo = new HashMap<>();
 

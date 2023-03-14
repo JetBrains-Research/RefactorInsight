@@ -44,7 +44,7 @@ import org.refactoringminer.util.GitServiceImpl;
 @State(name = "MiningRefactoringsState",
         storages = {@Storage(StoragePathMacros.CACHE_FILE)})
 @Service
-public class MiningService implements PersistentStateComponent<MiningService.MyState> {
+public final class MiningService implements PersistentStateComponent<MiningService.MyState> {
 
     public static ConcurrentHashMap<String, Set<RefactoringInfo>> methodHistory
             = new ConcurrentHashMap<>();
