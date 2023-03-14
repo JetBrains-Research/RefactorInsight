@@ -100,6 +100,7 @@ public class TwoSidedDiffRequestGenerator extends DiffRequestGenerator {
     @Override
     public boolean containsElement(int lineNumber, int textOffset, boolean isRight) {
         Function<LineFragment, Integer> startLineExtractor = isRight ? LineFragment::getStartLine2 : LineFragment::getStartLine1;
+        if (fragments == null) return false;
         List<Integer> startLines = fragments.stream().map(startLineExtractor).toList();
         return startLines.contains(lineNumber);
     }

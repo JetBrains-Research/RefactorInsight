@@ -99,6 +99,7 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
     @Override
     public boolean containsElement(int lineNumber, int textOffset, boolean isRight) {
         Function<MoreSidedRange, Integer> startLineExtractor = isRight ? l -> l.startLineRight : l -> l.startLineLeft;
+        if (lines == null) return false;
         List<Integer> startLines = lines.stream().map(startLineExtractor).toList();
         return startLines.contains(lineNumber);
     }

@@ -107,6 +107,7 @@ public class DiffHintLineMarkerProvider extends LineMarkerProviderDescriptor {
 
     private List<RefactoringInfo> getRefactoringInfos(PsiElement element) {
         VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
+        if (virtualFile == null) return null;
         String commitId;
         if (virtualFile.getClass().getName().startsWith(DIFF_WINDOW_CLASS_NAME_PREFIX)) {
             boolean isRight = virtualFile.getUserData(Keys.CHILD_COMMIT_ID) == null;
