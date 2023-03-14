@@ -65,6 +65,7 @@ public class ThreeSidedDiffRequestGenerator extends DiffRequestGenerator {
         Function<ThreeSidedRange, Integer> startLineExtractor = isRight
                 ? r -> r.fragment.getStartLine(ThreeSide.RIGHT)
                 : r -> r.fragment.getStartLine(ThreeSide.LEFT);
+        if (ranges == null) return false;
         List<Integer> startLines = ranges.stream().map(startLineExtractor).toList();
         return startLines.contains(lineNumber);
     }
