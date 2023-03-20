@@ -99,4 +99,19 @@ public class StringUtils {
         }
         return last;
     }
+
+    /**
+     * Makes some refactoring names more intuitive for users.
+     */
+    public static String getPrettyName(String refactoringType) {
+        return switch (refactoringType) {
+            case "Replace Pipeline with Loop" -> "Replace Java Stream API with Loop";
+            case "Replace Loop with Pipeline" -> "Replace Loop with Java Stream API";
+            case "Encapsulate Attribute" -> "Make Field private and create getter";
+            case "Collapse Hierarchy" -> "Merge Class with its Superclass";
+            case "Localize Parameter" -> "Convert to Local Variable";
+            case "Parameterize Variable" -> "Convert to Method Parameter";
+            default -> refactoringType;
+        };
+    }
 }

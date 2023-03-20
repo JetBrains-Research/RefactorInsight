@@ -13,8 +13,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.jetbrains.research.refactorinsight.utils.StringUtils.INFO;
-import static org.jetbrains.research.refactorinsight.utils.StringUtils.delimiter;
+import static org.jetbrains.research.refactorinsight.utils.StringUtils.*;
 import static org.jetbrains.research.refactorinsight.utils.Utils.fixPath;
 
 /**
@@ -103,7 +102,6 @@ public class RefactoringInfo {
      */
     public String toString() {
         return String.join(delimiter(INFO),
-                // String.valueOf(type.ordinal()),
                 Stream.concat(
                                 Arrays.stream(uiStrings).flatMap(Arrays::stream),
                                 Arrays.stream(paths))
@@ -371,7 +369,7 @@ public class RefactoringInfo {
     }
 
     public RefactoringInfo setType(String type) {
-        this.type = type;
+        this.type = getPrettyName(type);
         return this;
     }
 

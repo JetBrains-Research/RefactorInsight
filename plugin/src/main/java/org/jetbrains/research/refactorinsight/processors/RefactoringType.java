@@ -95,6 +95,8 @@ import org.jetbrains.research.refactorinsight.kotlin.impl.data.variables.Reorder
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.packages.MoveSourceFolderKotlinHandler;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.packages.RenamePackageKotlinHandler;
 
+import static org.jetbrains.research.refactorinsight.utils.StringUtils.getPrettyName;
+
 public enum RefactoringType {
     EXTRACT_OPERATION("Extract Method", new ExtractOperationJavaHandler(), new ExtractOperationKotlinHandler()),
     RENAME_CLASS("Rename Class", new RenameClassJavaHandler(), new RenameClassKotlinHandler()),
@@ -195,17 +197,20 @@ public enum RefactoringType {
     SPLIT_METHOD("Split Method", new SplitMethodJavaHandler(), null);
 
     private final String name;
+
+    private final String prettyName;
     private final JavaRefactoringHandler javaHandler;
     private final KotlinRefactoringHandler kotlinHandler;
 
     RefactoringType(String name, JavaRefactoringHandler javaHandler, KotlinRefactoringHandler kotlinHandler) {
         this.name = name;
+        this.prettyName = getPrettyName(name);
         this.javaHandler = javaHandler;
         this.kotlinHandler = kotlinHandler;
     }
 
     public String getName() {
-        return this.name;
+        return prettyName;
     }
 
     public JavaRefactoringHandler getJavaHandler() {
@@ -218,6 +223,6 @@ public enum RefactoringType {
 
     @Override
     public String toString() {
-        return this.name;
+        return prettyName;
     }
 }

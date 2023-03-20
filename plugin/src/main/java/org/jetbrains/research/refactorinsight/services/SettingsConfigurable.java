@@ -24,7 +24,7 @@ public class SettingsConfigurable implements Configurable {
 
   @Override
   public String getDisplayName() {
-    return RefactorInsightBundle.message("setting");
+    return RefactorInsightBundle.message("name");
   }
 
   @Override

@@ -33,7 +33,7 @@ public class SingleCommitRefactoringTask extends CancellableRefactoringMiningTas
             VcsCommitMetadata commit,
             GitWindow window) {
         super(project,
-                String.format(RefactorInsightBundle.message("mining.at"), commit.getId().toShortString()));
+                String.format(RefactorInsightBundle.message("detect.at"), commit.getId().toShortString()));
         this.project = project;
         this.commit = commit;
         this.window = window;
