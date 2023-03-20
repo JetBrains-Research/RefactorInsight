@@ -14,13 +14,23 @@ public class InlineVariableJavaHandler extends JavaRefactoringHandler {
     public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
         InlineVariableRefactoring ref = (InlineVariableRefactoring) refactoring;
 
-        ref.getReferences().forEach( reference ->
-                info.addMarking(
-                        createCodeRangeFromJava(ref.getVariableDeclaration().codeRange()),
-                        createCodeRangeFromJava(reference.getFragment2().codeRange()),
-                        true
-                )
-        );
+        if (ref.getSubExpressionMappings().isEmpty()) {
+            ref.getReferences().forEach(reference ->
+                    info.addMarking(
+                            createCodeRangeFromJava(ref.getVariableDeclaration().codeRange()),
+                            createCodeRangeFromJava(reference.getFragment2().codeRange()),
+                            true
+                    )
+            );
+        } else {
+            ref.getSubExpressionMappings().forEach(leafMapping ->
+                    info.addMarking(
+                            createCodeRangeFromJava(leafMapping.getFragment1().codeRange()),
+                            createCodeRangeFromJava(leafMapping.getFragment2().codeRange()),
+                            true
+                    )
+            );
+        }
 
         return info.setGroup(Group.VARIABLE)
                 .setNameBefore(calculateSignatureForVariableDeclarationContainer(ref.getOperationBefore()))
