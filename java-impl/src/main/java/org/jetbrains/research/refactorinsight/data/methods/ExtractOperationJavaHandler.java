@@ -17,7 +17,7 @@ public class ExtractOperationJavaHandler extends JavaRefactoringHandler {
     @Override
     public RefactoringInfo specify(Refactoring refactoring, RefactoringInfo info) {
         ExtractOperationRefactoring ref = (ExtractOperationRefactoring) refactoring;
-        String classNameBefore = ref.getSourceOperationBeforeExtraction().getClassName();
+        String classNameBefore = ref.getSourceOperationAfterExtraction().getClassName();
         String classNameAfter = ref.getExtractedOperation().getClassName();
 
         List<String> parameterTypeList = new ArrayList<>();
@@ -32,33 +32,26 @@ public class ExtractOperationJavaHandler extends JavaRefactoringHandler {
 
         if (ref.getRefactoringType() == RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
             info.setGroup(Group.METHOD)
-                    .setThreeSided(true)
                     .setDetailsBefore(classNameBefore)
                     .setDetailsAfter(classNameAfter)
-                    .setElementBefore(extractedMethod)
-                    .setElementAfter(null)
-                    .setNameBefore(JavaUtils.calculateSignatureForVariableDeclarationContainer(ref.getSourceOperationBeforeExtraction()))
-                    .setNameAfter(JavaUtils.calculateSignatureForVariableDeclarationContainer(ref.getSourceOperationAfterExtraction()))
-                    .addMarking(JavaUtils.createCodeRangeFromJava(ref.getExtractedCodeRangeFromSourceOperation()),
-                            JavaUtils.createCodeRangeFromJava(ref.getExtractedCodeRangeToExtractedOperation()),
-                            JavaUtils.createCodeRangeFromJava(ref.getExtractedCodeRangeFromSourceOperation()),
-                            VisualizationType.LEFT,
+                    .setElementBefore(ref.getSourceOperationAfterExtraction().getName())
+                    .setElementAfter(extractedMethod)
+                    .setNameBefore(JavaUtils.calculateSignatureForVariableDeclarationContainer(ref.getSourceOperationAfterExtraction()))
+                    .setNameAfter(JavaUtils.calculateSignatureForVariableDeclarationContainer(ref.getExtractedOperation()))
+                    .addMarking(JavaUtils.createCodeRangeFromJava(ref.getSourceOperationAfterExtraction().codeRange()),
+                            JavaUtils.createCodeRangeFromJava(ref.getExtractedOperationCodeRange()),
                             null,
-                            RefactoringLine.MarkingOption.NONE,
+                            RefactoringLine.MarkingOption.ADD,
                             true);
 
             ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
-                    info.addMarking(JavaUtils.createCodeRangeFromJava(ref.getSourceOperationCodeRangeBeforeExtraction()),
-                            JavaUtils.createCodeRangeFromJava(ref.getExtractedOperation().getBody().getCompositeStatement().codeRange()),
+                    info.addMarking(
                             JavaUtils.createCodeRangeFromJava(invocation),
-                            VisualizationType.RIGHT,
-                            refactoringLine -> refactoringLine.setWord(new String[]{
-                                    null,
-                                    ref.getExtractedOperation().getName(),
-                                    null
-                            }),
-                            RefactoringLine.MarkingOption.EXTRACT,
-                            true));
+                            JavaUtils.createCodeRangeFromJava(ref.getExtractedOperationCodeRange()),
+                            null,
+                            RefactoringLine.MarkingOption.ADD,
+                            true)
+            );
             return info;
         } else {
             info.setGroup(Group.METHOD)
@@ -72,7 +65,9 @@ public class ExtractOperationJavaHandler extends JavaRefactoringHandler {
                             JavaUtils.createCodeRangeFromJava(ref.getSourceOperationCodeRangeAfterExtraction()),
                             false)
                     .addMarking(JavaUtils.createCodeRangeFromJava(ref.getExtractedCodeRangeFromSourceOperation()),
-                            JavaUtils.createCodeRangeFromJava(ref.getExtractedCodeRangeToExtractedOperation()),
+                            JavaUtils.createCodeRangeFromJava(ref.getExtractedOperationCodeRange()),
+                            null,
+                            RefactoringLine.MarkingOption.ADD,
                             true);
 
             ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->

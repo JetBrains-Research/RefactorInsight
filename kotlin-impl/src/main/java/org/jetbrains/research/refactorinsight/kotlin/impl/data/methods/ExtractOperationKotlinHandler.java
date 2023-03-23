@@ -6,16 +6,13 @@ import org.jetbrains.research.kotlinrminer.ide.uml.UMLType;
 import org.jetbrains.research.refactorinsight.data.Group;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
-import org.jetbrains.research.refactorinsight.diff.VisualizationType;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.FoldingBuilder;
-import org.jetbrains.research.refactorinsight.utils.StringUtils;
 import org.jetbrains.research.refactorinsight.kotlin.impl.data.KotlinRefactoringHandler;
+import org.jetbrains.research.refactorinsight.kotlin.impl.data.util.KotlinUtils;
+import org.jetbrains.research.refactorinsight.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.KotlinUtils.calculateSignatureForKotlinMethod;
-import static org.jetbrains.research.refactorinsight.kotlin.impl.data.util.KotlinUtils.createCodeRangeFromKotlin;
 
 public class ExtractOperationKotlinHandler extends KotlinRefactoringHandler {
 
@@ -41,60 +38,52 @@ public class ExtractOperationKotlinHandler extends KotlinRefactoringHandler {
         if (ref.getRefactoringType()
                 == org.jetbrains.research.kotlinrminer.common.RefactoringType.EXTRACT_AND_MOVE_OPERATION) {
             info.setGroup(Group.METHOD)
-                    .setThreeSided(true)
                     .setDetailsBefore(classNameBefore)
                     .setDetailsAfter(classNameAfter)
-                    .setElementBefore(extractedMethod)
-                    .setElementAfter(null)
-                    .setNameBefore(calculateSignatureForKotlinMethod(ref.getSourceOperationBeforeExtraction()))
-                    .setNameAfter(calculateSignatureForKotlinMethod(ref.getSourceOperationAfterExtraction()))
-                    .addMarking(createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation(), info),
-                            createCodeRangeFromKotlin(ref.getExtractedCodeRangeToExtractedOperation(), info),
-                            createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation(), info),
-                            VisualizationType.LEFT,
+                    .setElementBefore(ref.getSourceOperationAfterExtraction().getName())
+                    .setElementAfter(extractedMethod)
+                    .setNameBefore(KotlinUtils.calculateSignatureForKotlinMethod(ref.getSourceOperationAfterExtraction()))
+                    .setNameAfter(KotlinUtils.calculateSignatureForKotlinMethod(ref.getExtractedOperation()))
+                    .addMarking(KotlinUtils.createCodeRangeFromKotlin(ref.getSourceOperationAfterExtraction().codeRange(), info),
+                            KotlinUtils.createCodeRangeFromKotlin(ref.getExtractedOperationCodeRange(), info),
                             null,
-                            RefactoringLine.MarkingOption.NONE,
+                            RefactoringLine.MarkingOption.ADD,
                             true);
 
             ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
                     info.addMarking(
-                            createCodeRangeFromKotlin(ref.getSourceOperationCodeRangeBeforeExtraction(), info),
-                            createCodeRangeFromKotlin(ref.getExtractedOperation().getBody().getCompositeStatement().codeRange(), info),
-                            createCodeRangeFromKotlin(invocation, info),
-                            VisualizationType.RIGHT,
-                            refactoringLine -> refactoringLine.setWord(new String[]{
-                                    null,
-                                    ref.getExtractedOperation().getName(),
-                                    null
-                            }),
-                            RefactoringLine.MarkingOption.EXTRACT,
-                            true));
+                            KotlinUtils.createCodeRangeFromKotlin(invocation, info),
+                            KotlinUtils.createCodeRangeFromKotlin(ref.getExtractedOperationCodeRange(), info),
+                            null,
+                            RefactoringLine.MarkingOption.ADD,
+                            true)
+            );
         } else {
             info.setGroup(Group.METHOD)
                     .setDetailsBefore(classNameBefore)
                     .setDetailsAfter(classNameAfter)
                     .setElementBefore(extractedMethod)
                     .setElementAfter(null)
-                    .setNameBefore(calculateSignatureForKotlinMethod(ref.getSourceOperationBeforeExtraction()))
-                    .setNameAfter(calculateSignatureForKotlinMethod(ref.getSourceOperationAfterExtraction()))
-                    .addMarking(createCodeRangeFromKotlin(ref.getSourceOperationCodeRangeBeforeExtraction(), info),
-                            createCodeRangeFromKotlin(ref.getSourceOperationCodeRangeAfterExtraction(), info),
+                    .setNameBefore(KotlinUtils.calculateSignatureForKotlinMethod(ref.getSourceOperationBeforeExtraction()))
+                    .setNameAfter(KotlinUtils.calculateSignatureForKotlinMethod(ref.getSourceOperationAfterExtraction()))
+                    .addMarking(KotlinUtils.createCodeRangeFromKotlin(ref.getSourceOperationCodeRangeBeforeExtraction(), info),
+                            KotlinUtils.createCodeRangeFromKotlin(ref.getSourceOperationCodeRangeAfterExtraction(), info),
                             false)
-                    .addMarking(createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation(), info),
-                            createCodeRangeFromKotlin(ref.getExtractedCodeRangeToExtractedOperation(), info),
+                    .addMarking(KotlinUtils.createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation(), info),
+                            KotlinUtils.createCodeRangeFromKotlin(ref.getExtractedOperationCodeRange(), info),
+                            null,
+                            RefactoringLine.MarkingOption.ADD,
                             true);
 
             ref.getExtractedOperationInvocationCodeRanges().forEach(invocation ->
                     info.addMarking(
-                            createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation(), info),
-                            createCodeRangeFromKotlin(invocation, info),
+                            KotlinUtils.createCodeRangeFromKotlin(ref.getExtractedCodeRangeFromSourceOperation(), info),
+                            KotlinUtils.createCodeRangeFromKotlin(invocation, info),
                             null,
                             RefactoringLine.MarkingOption.ADD,
                             true)
             );
         }
-
         return info;
     }
-
 }

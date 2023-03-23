@@ -44,6 +44,7 @@ import org.jetbrains.research.refactorinsight.diff.MoreSidedDiffRequestGenerator
 import org.jetbrains.research.refactorinsight.diff.ThreeSidedRange;
 import org.jetbrains.research.refactorinsight.folding.ImportFolder;
 import org.jetbrains.research.refactorinsight.folding.RefactoringFolder;
+import org.jetbrains.research.refactorinsight.processors.RefactoringType;
 import org.jetbrains.research.refactorinsight.ui.Keys;
 
 import javax.swing.*;
@@ -150,8 +151,10 @@ public class DiffWindow extends DiffExtension {
             for (Change change : changes) {
                 if (change.getBeforeRevision() != null) {
                     if (change.getBeforeRevision().getFile().getPath().contains(info.getLeftPath())) {
+                        String content = RefactoringType.EXTRACT_AND_MOVE_OPERATION.getName().equals(info.getType()) ?
+                                change.getAfterRevision().getContent() : change.getBeforeRevision().getContent();
                         contents[0] = myDiffContentFactory.create(project,
-                                change.getBeforeRevision().getContent(),
+                                content,
                                 JavaClassFileType.INSTANCE);
                     }
                 }
