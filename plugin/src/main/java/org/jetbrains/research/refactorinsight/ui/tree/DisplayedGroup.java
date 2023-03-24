@@ -7,7 +7,9 @@ public enum DisplayedGroup {
     METHOD,
     CLASS,
     VARIABLE,
-    PACKAGE;
+    PARAMETER,
+    PACKAGE,
+    ANNOTATION;
 
     /**
      * Get displayed type of refactoring from internal representation.
@@ -16,9 +18,10 @@ public enum DisplayedGroup {
     public static DisplayedGroup fromInternalGroup(@NotNull Group group) {
         return switch (group) {
             case METHOD -> METHOD;
-            case ATTRIBUTE, VARIABLE -> VARIABLE;
+            case ATTRIBUTE, VARIABLE, PARAMETER -> VARIABLE;
             case ABSTRACT, INTERFACE, CLASS -> CLASS;
             case PACKAGE -> PACKAGE;
+            case ANNOTATION -> ANNOTATION;
         };
     }
 }

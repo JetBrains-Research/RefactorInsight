@@ -5,9 +5,11 @@ public enum Group {
     CLASS,
     ATTRIBUTE,
     VARIABLE,
+    PARAMETER,
     INTERFACE,
     ABSTRACT,
-    PACKAGE;
+    PACKAGE,
+    ANNOTATION;
 
     public static final Group[] values = Group.values();
 }

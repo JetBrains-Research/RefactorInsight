@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class TextUtils {
+    public final static String KT_EXTENSION = "kt";
+
     /**
      * Removes the extra part of the file path.
      *
@@ -152,5 +154,9 @@ public class TextUtils {
         } else {
             throw new AssertionError("Folds of different types");
         }
+    }
+
+    public static boolean isKotlinFile(String filePath) {
+        return filePath.endsWith(KT_EXTENSION);
     }
 }
