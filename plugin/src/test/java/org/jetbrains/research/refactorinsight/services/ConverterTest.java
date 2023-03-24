@@ -132,7 +132,7 @@ public class ConverterTest {
         String moreSidedString = String.join(delimiter(INFO),
                 "nameBef", "nameAft", "elemBef", "elemAft", "detBef", "detAft",
                 "left/path.java", "mid/path.java", "right/path.java",
-                "6",
+                "7",
                 "", "", "t", "t",
                 String.join(delimiter(RANGE), "1", "2", "3", "4", "0", "0", "0", "0", "extraction/left/path.java"),
                 "12/13/14", "", "15/16/17",
