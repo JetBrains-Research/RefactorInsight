@@ -48,6 +48,18 @@ public class ThreeSidedRange {
         this.type = type;
     }
 
+    public TextRange getLeft() {
+        return left.get(0);
+    }
+
+    public TextRange getMid() {
+        return mid.get(0);
+    }
+
+    public TextRange getRight() {
+        return right.get(0);
+    }
+
     private static List<TextRange> deStringify(String value) {
         String regex = delimiter(RANGE, true);
         String[] tokens = value.split(regex);

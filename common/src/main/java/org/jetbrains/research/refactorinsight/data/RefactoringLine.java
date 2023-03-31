@@ -143,22 +143,19 @@ public class RefactoringLine {
 
         if (hasColumns) {
             try {
-                int leftStartOffset = Utils.getOffset(leftText, lines[LEFT_START] + 1, 1);
                 left.add(new TextRange(
-                        Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]) - leftStartOffset,
-                        Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END]) - leftStartOffset
+                        Utils.getOffset(leftText, lines[LEFT_START] + 1, columns[LEFT_START]),
+                        Utils.getOffset(leftText, lines[LEFT_END], columns[LEFT_END])
                 ));
-                int midStartOffset = Utils.getOffset(midText, lines[MID_START] + 1, 1);
                 mid.add(new TextRange(
-                        Utils.getOffset(midText, lines[MID_START] + 1, columns[MID_START]) - midStartOffset,
-                        Utils.getOffset(midText, lines[MID_END], columns[MID_END]) - midStartOffset
+                        Utils.getOffset(midText, lines[MID_START] + 1, columns[MID_START]),
+                        Utils.getOffset(midText, lines[MID_END], columns[MID_END])
                 ));
-                int rightStartOffset = Utils.getOffset(rightText, lines[RIGHT_START] + 1, 1);
                 right.add(new TextRange(
                         Utils.getOffset(rightText, lines[RIGHT_START] + 1,
-                                columns[RIGHT_START]) - rightStartOffset,
+                                columns[RIGHT_START]),
                         Utils.getOffset(rightText, lines[RIGHT_END],
-                                columns[RIGHT_END]) - rightStartOffset
+                                columns[RIGHT_END])
                 ));
             } catch (Exception e) {
                 e.printStackTrace();

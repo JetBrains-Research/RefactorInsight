@@ -12,6 +12,7 @@ import com.intellij.diff.tools.util.base.IgnorePolicy;
 import com.intellij.diff.tools.util.side.OnesideTextDiffViewer;
 import com.intellij.diff.tools.util.side.TwosideTextDiffViewer;
 import com.intellij.diff.util.DiffUserDataKeysEx;
+import com.intellij.diff.util.ThreeSide;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.Disposable;
@@ -30,6 +31,7 @@ import com.intellij.openapi.ui.TitlePanel;
 import com.intellij.openapi.ui.WindowWrapper;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ContentRevision;
@@ -208,6 +210,33 @@ public class DiffWindow extends DiffExtension {
             SimpleThreesideDiffViewer myViewer = (SimpleThreesideDiffViewer) viewer;
             myViewer.getTextSettings().setExpandByDefault(false);
             myViewer.addListener(new MyThreeSidedDiffViewerListener(myViewer, threeSidedRanges));
+
+            EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
+            TextAttributes removedColors = scheme.getAttributes(TextAttributesKey.find("DIFF_DELETED"));
+            TextAttributes insertColors = scheme.getAttributes(TextAttributesKey.find("DIFF_INSERTED"));
+            threeSidedRanges.forEach(range -> {
+                TextRange rangeLeft = range.getLeft();
+                myViewer.getEditor(ThreeSide.LEFT).getMarkupModel().addRangeHighlighter(
+                        rangeLeft.getStartOffset(),
+                        rangeLeft.getEndOffset(),
+                        2,
+                        removedColors,
+                        HighlighterTargetArea.EXACT_RANGE);
+                TextRange rangeMid = range.getMid();
+                myViewer.getEditor(ThreeSide.BASE).getMarkupModel().addRangeHighlighter(
+                        rangeMid.getStartOffset(),
+                        rangeMid.getEndOffset(),
+                        2,
+                        insertColors,
+                        HighlighterTargetArea.EXACT_RANGE);
+                TextRange rangeRight = range.getRight();
+                myViewer.getEditor(ThreeSide.RIGHT).getMarkupModel().addRangeHighlighter(
+                        rangeRight.getStartOffset(),
+                        rangeRight.getEndOffset(),
+                        2,
+                        insertColors,
+                        HighlighterTargetArea.EXACT_RANGE);
+            });
             return;
         }
 
@@ -453,14 +482,15 @@ public class DiffWindow extends DiffExtension {
 
         @Override
         protected void onAfterRediff() {
-            /*TODO: check if it actually works
+            super.onAfterRediff();
+            // TODO: check if it actually works
             List<SimpleThreesideDiffChange> oldMarkings = viewer.getChanges();
             oldMarkings.forEach(ThreesideDiffChangeBase::destroy);
-            oldMarkings.clear();
-            oldMarkings.addAll(ranges.stream()
-                    .map(r -> r.getDiffChange(viewer))
-                    .collect(Collectors.toList())
-            );*/
+//            oldMarkings.clear();
+//            oldMarkings.addAll(ranges.stream()
+//                    .map(r -> r.getDiffChange(viewer))
+//                    .toList()
+//            );
             hideToolbarActions(viewer.getComponent());
         }
     }
