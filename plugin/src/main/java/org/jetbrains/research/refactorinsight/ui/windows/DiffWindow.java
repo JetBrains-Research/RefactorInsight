@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TitlePanel;
 import com.intellij.openapi.ui.WindowWrapper;
@@ -39,6 +40,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.panels.Wrapper;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.kotlin.idea.KotlinFileType;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.diff.MoreSidedDiffRequestGenerator.MoreSidedRange;
 import org.jetbrains.research.refactorinsight.diff.ThreeSidedRange;
@@ -57,6 +59,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.jetbrains.research.refactorinsight.utils.TextUtils.fixPath;
+import static org.jetbrains.research.refactorinsight.utils.TextUtils.isKotlinFile;
 
 /**
  * Deals with refactoring diff requests.
@@ -114,9 +117,11 @@ public class DiffWindow extends DiffExtension {
             for (Change change : changes) {
                 if (change.getAfterRevision() != null
                         && change.getAfterRevision().getFile().getPath().contains(info.getRightPath())) {
+                    FileType fileType = isKotlinFile(info.getRightPath()) ?
+                            KotlinFileType.INSTANCE : JavaClassFileType.INSTANCE;
                     contentList.add(myDiffContentFactory
                             .create(project, change.getAfterRevision().getContent(),
-                                    JavaClassFileType.INSTANCE));
+                                    fileType));
                     break;
                 }
             }
@@ -126,9 +131,11 @@ public class DiffWindow extends DiffExtension {
                             ? change.getAfterRevision() : change.getBeforeRevision();
                     if (revision != null
                             && revision.getFile().getPath().contains(fixPath(pathPair.first))) {
+                        FileType fileType = isKotlinFile(fixPath(pathPair.first)) ?
+                                KotlinFileType.INSTANCE : JavaClassFileType.INSTANCE;
                         contentList.add(myDiffContentFactory
                                 .create(project, revision.getContent(),
-                                        JavaClassFileType.INSTANCE));
+                                        fileType));
                         break;
                     }
                 }
@@ -151,25 +158,31 @@ public class DiffWindow extends DiffExtension {
             for (Change change : changes) {
                 if (change.getBeforeRevision() != null) {
                     if (change.getBeforeRevision().getFile().getPath().contains(info.getLeftPath())) {
+                        FileType fileType = isKotlinFile(info.getLeftPath()) ?
+                                KotlinFileType.INSTANCE : JavaClassFileType.INSTANCE;
                         String content = RefactoringType.EXTRACT_AND_MOVE_OPERATION.getName().equals(info.getType()) ?
                                 change.getAfterRevision().getContent() : change.getBeforeRevision().getContent();
                         contents[0] = myDiffContentFactory.create(project,
                                 content,
-                                JavaClassFileType.INSTANCE);
+                                fileType);
                     }
                 }
                 if (info.isThreeSided()
                         && change.getAfterRevision() != null
                         && change.getAfterRevision().getFile().getPath().contains(info.getMidPath())) {
+                    FileType fileType = isKotlinFile(info.getMidPath()) ?
+                            KotlinFileType.INSTANCE : JavaClassFileType.INSTANCE;
                     contents[1] = myDiffContentFactory.create(project,
                             change.getAfterRevision().getContent(),
-                            JavaClassFileType.INSTANCE);
+                            fileType);
                 }
                 if (change.getAfterRevision() != null
                         && change.getAfterRevision().getFile().getPath().contains(info.getRightPath())) {
+                    FileType fileType = isKotlinFile(info.getRightPath()) ?
+                            KotlinFileType.INSTANCE : JavaClassFileType.INSTANCE;
                     contents[2] = myDiffContentFactory.create(project,
                             change.getAfterRevision().getContent(),
-                            JavaClassFileType.INSTANCE);
+                            fileType);
                 }
             }
             return contents;
