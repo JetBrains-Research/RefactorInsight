@@ -6,6 +6,8 @@ import com.intellij.diff.fragments.LineFragment;
 import com.intellij.diff.tools.simple.SimpleDiffChange;
 import com.intellij.diff.tools.simple.SimpleDiffViewer;
 import com.intellij.diff.util.Side;
+import com.intellij.lang.Language;
+import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -16,6 +18,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.kotlin.psi.KtImportDirective;
 import org.jetbrains.research.refactorinsight.actions.HideNonFunctionalChangesAction;
 
 import java.util.ArrayList;
@@ -75,7 +78,7 @@ public class ImportFolder {
             public void visitElement(@NotNull PsiElement element) {
                 if (element.getTextLength() == 0) return;
 
-                if (element instanceof PsiImportStatement) {
+                if (isImport(element)) {
                     TextRange range = getRangeOfChange(element.getTextRange(), changes, side);
                     if (range != null) result.add(range);
                 }
@@ -97,6 +100,16 @@ public class ImportFolder {
                 foldRegions.add(value);
             }
         });
+    }
+
+    private static boolean isImport(PsiElement element) {
+        Language elementLanguage = element.getLanguage();
+        if (elementLanguage.equals(JavaLanguage.INSTANCE)) {
+            return element instanceof PsiImportStatement;
+        } else if ("kotlin".equalsIgnoreCase(elementLanguage.getID())) {
+            return element instanceof KtImportDirective;
+        }
+        return false;
     }
 
     private static TextRange getRangeOfChange(@NotNull TextRange elementTextRange,
