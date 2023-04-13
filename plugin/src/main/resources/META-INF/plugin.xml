@@ -142,6 +142,11 @@
         <codeInsight.lineMarkerProvider
                 implementationClass="org.jetbrains.research.refactorinsight.ui.DiffHintLineMarkerProvider"
                 language="kotlin"/>
+
+        <customVcsLogUiFactoryProvider
+                order="first"
+                implementation="org.jetbrains.research.refactorinsight.ui.RefactoringLogUiFactoryProvider"/>
+
     </extensions>
 
     <actions>
