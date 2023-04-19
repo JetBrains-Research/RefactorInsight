@@ -1,17 +1,22 @@
-<h1> <img align="left" width="50" height="50" src="https://s3-eu-west-1.amazonaws.com/public-resources.ml-labs.aws.intellij.net/static/refactor-insight/icon.svg" alt="RefactorInsight Icon"> RefactorInsight </h1>
-
 [![JB Research](https://jb.gg/badges/research-flat-square.svg)](https://research.jetbrains.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![pipeline status](https://github.com/JetBrains-Research/refactorinsight/workflows/Java%20CI%20with%20Gradle/badge.svg)](https://github.com/JetBrains-Research/refactorinsight/badges/master)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/14704-refactorinsight.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/14704-refactorinsight)
 
-RefactorInsight is a plugin for IntelliJ IDEA that enhances the representation of code changes with refactoring information in Java and Kotlin projects. RefactorInsight relies on [RefactoringMiner](https://github.com/tsantalis/RefactoringMiner) and [kotlinRMiner](https://github.com/JetBrains-Research/kotlinRMiner) for retrieval of refactorings.
+![Gradle IntelliJ Plugin](.github/readme/refactorinsight-plugin-logo.svg)
+
+### RefactorInsight Plugin
+
+RefactorInsight is a plugin for IntelliJ IDEA that enhances the representation of code changes with refactoring information in Java and Kotlin projects.
+
+RefactorInsight relies on [RefactoringMiner](https://github.com/tsantalis/RefactoringMiner) and [kotlinRMiner](https://github.com/JetBrains-Research/kotlinRMiner) for retrieval of refactorings.
 
 The plugin is compatible with IntelliJ IDEA 2023.1 and is [available for free](https://plugins.jetbrains.com/plugin/14704-refactorinsight) on JetBrains Marketplace.
 
 ### Table of contents
 * [Features](#features)
   * [Smart Diff](#smart-diff)
+  * [Hide non-functional changes](#hide-non-functional-changes)
   * [Refactorings in commits](#refactorings-in-commits)
   * [Refactorings in pull requests](#refactorings-in-pull-requests)
   * [Refactoring history of an object](#refactoring-history-of-an-object)
@@ -22,32 +27,37 @@ The plugin is compatible with IntelliJ IDEA 2023.1 and is [available for free](h
 ### Features
 #### Smart diff
 RefactorInsight labels code diffs with information about performed refactorings.
-It shows ![](assets/img/refactorinsight_toggle.svg) close to refactoring changes
+It shows ![](.github/readme/refactorinsight_toggle.svg) close to refactoring changes
 and opens the corresponding code diff by click.
 
-<img src="assets/img/refactorinsight_toggle_in_diff.png" alt="Code Diff" width="600">
+<img src=".github/readme/refactorinsight_toggle_in_diff.png" alt="Code Diff" width="600">
 
 To make reviewing bug fixes or new features easier, the plugin auto folds refactorings in code diffs and shows hints with short descriptions of each refactoring.
 Currently, it works for the following refactoring types: `Move Method`, `Pull Up/Push Down Method`, `Extract Method`, and `Inline Method`.
 
-<img src="assets/img/refactorinsight_hint.png" alt="Example" width="600">
+<img src=".github/readme/refactorinsight_hint.png" alt="Example" width="600">
+
+#### Hide non-functional changes
+RefactorInsight provides a possibility to collapse refactoring changes in code diffs allowing users to focus on functional changes.
+
+<img src=".github/readme/hide_non_functional_changes.png" alt="Example" width="600">
 
 #### Refactorings in commits
-To see refactorings in your Git repository, go to the **Git** tab in IntelliJ IDEA and click the toggle button ![](assets/img/refactorinsight_toggle.svg) on the right.
+To see refactorings in your Git repository, go to the **Git** tab in IntelliJ IDEA and click the toggle button ![](.github/readme/refactorinsight_toggle.svg) on the right.
 
-Click a commit and then the ![](assets/img/refactorinsight_toggle.svg) to see the refactorings detected in that commit. It looks like this:
+Click a commit and then the ![](.github/readme/refactorinsight_toggle.svg) to see the refactorings detected in that commit. It looks like this:
 
-<img src="assets/img/refactorinsight_main.png" alt="Example" width="900">
+<img src=".github/readme/refactorinsight_main.png" alt="Example" width="900">
 
 #### Refactorings in pull requests
-To see the refactorings in a specific pull request, go to the **Pull Requests** tab in IntelliJ IDEA, select any pull request and click ![](assets/img/refactorinsight_toggle.svg).
+To see the refactorings in a specific pull request, go to the **Pull Requests** tab in IntelliJ IDEA, select any pull request and click ![](.github/readme/refactorinsight_toggle.svg).
 
-<img src="assets/img/refactorinsight_pull_requests.png" alt="PullRequests" width="600">
+<img src=".github/readme/refactorinsight_pull_requests.png" alt="PullRequests" width="600">
 
 #### Refactoring history of an object
 To see the refactoring history of a method, class, or attribute, right-click the object's signature and select **Check Refactoring History**. Here is an example for a method named `Repl`:
 
-<img src="assets/img/refactorinsight_history.png" alt="RefactoringHistory" width="400">
+<img src=".github/readme/refactorinsight_history.png" alt="RefactoringHistory" width="400">
 
 Double-click a leaf node in the tree to open the VCS log at that specific commit and see a list of detected refactorings in that commit.
 
