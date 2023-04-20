@@ -1,14 +1,11 @@
 package org.jetbrains.research.refactorinsight.data.classes;
 
 import gr.uom.java.xmi.diff.ExtractClassRefactoring;
-import org.jetbrains.research.refactorinsight.data.Group;
-import org.jetbrains.research.refactorinsight.data.JavaRefactoringHandler;
-import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
-import org.jetbrains.research.refactorinsight.data.RefactoringLine;
-import org.jetbrains.research.refactorinsight.diff.VisualizationType;
+import org.jetbrains.research.refactorinsight.data.*;
 import org.refactoringminer.api.Refactoring;
 
 import static org.jetbrains.research.refactorinsight.data.util.JavaUtils.createCodeRangeFromJava;
+import static org.jetbrains.research.refactorinsight.data.util.JavaUtils.createLocationInfoFromJava;
 
 public class ExtractClassJavaHandler extends JavaRefactoringHandler {
 
@@ -25,59 +22,53 @@ public class ExtractClassJavaHandler extends JavaRefactoringHandler {
             info.setGroup(Group.CLASS);
         }
 
-        info.setDetailsBefore(ref.getOriginalClass().getPackageName())
-                .setDetailsAfter(ref.getExtractedClass().getPackageName())
+        info.setDetailsBefore(ref.getOriginalClass().getName())
+                .setDetailsAfter(ref.getExtractedClass().getName())
                 .setElementBefore(ref.getOriginalClass().getName())
                 .setElementAfter(ref.getExtractedClass().getName())
                 .setNameBefore(ref.getExtractedClass().getName())
                 .setNameAfter(ref.getExtractedClass().getName());
 
-        if (ref.getAttributeOfExtractedClassTypeInOriginalClass() != null) {
-            info.setThreeSided(true);
-            ref.getExtractedOperations().keySet().forEach(operation -> info.addMarking(
-                    createCodeRangeFromJava(operation.codeRange()),
-                    createCodeRangeFromJava(ref.getExtractedClass().codeRange()),
-                    createCodeRangeFromJava(ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange()),
-                    VisualizationType.LEFT,
-                    null,
-                    RefactoringLine.MarkingOption.NONE,
-                    true));
 
-            ref.getExtractedAttributes().keySet().forEach(operation -> info.addMarking(
-                    createCodeRangeFromJava(operation.codeRange()),
-                    createCodeRangeFromJava(ref.getExtractedClass().codeRange()),
-                    createCodeRangeFromJava(ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange()),
-                    VisualizationType.LEFT,
-                    null,
-                    RefactoringLine.MarkingOption.NONE,
-                    true));
+        ref.getExtractedAttributes().keySet().forEach(attribute -> info.addMarking(
+                createCodeRangeFromJava(attribute.codeRange()),
+                createCodeRangeFromJava(ref.getExtractedClass().codeRange()),
+                line -> line
+                        .addOffset(
+                                createLocationInfoFromJava(attribute.getLocationInfo()),
+                                RefactoringLine.MarkingOption.REMOVE),
+                RefactoringLine.MarkingOption.REMOVE,
+                false));
 
+        ref.getExtractedAttributes().values().forEach(attribute -> info.addMarking(
+                createCodeRangeFromJava(ref.getOriginalClass().codeRange()),
+                createCodeRangeFromJava(ref.getExtractedClass().codeRange()),
+                line -> line
+                        .addOffset(
+                                createLocationInfoFromJava(attribute.getLocationInfo()),
+                                RefactoringLine.MarkingOption.ADD),
+                RefactoringLine.MarkingOption.ADD,
+                false));
 
-            String[] nameSpace = ref.getExtractedClass().getName().split("\\.");
-            String className = nameSpace[nameSpace.length - 1];
+        ref.getExtractedOperations().keySet().forEach(operation -> info.addMarking(
+                createCodeRangeFromJava(operation.codeRange()),
+                createCodeRangeFromJava(ref.getExtractedClass().codeRange()),
+                line -> line
+                        .addOffset(
+                                createLocationInfoFromJava(operation.getLocationInfo()),
+                                RefactoringLine.MarkingOption.REMOVE),
+                RefactoringLine.MarkingOption.REMOVE,
+                false));
 
-            info.addMarking(
-                    createCodeRangeFromJava(ref.getOriginalClass().codeRange()),
-                    createCodeRangeFromJava(ref.getExtractedClass().codeRange()),
-                    createCodeRangeFromJava(ref.getAttributeOfExtractedClassTypeInOriginalClass().codeRange()),
-
-                    VisualizationType.RIGHT,
-                    refactoringLine -> refactoringLine.setWord(new String[]{
-                            null,
-                            className,
-                            null
-                    }),
-                    RefactoringLine.MarkingOption.EXTRACT,
-                    true);
-        } else {
-            ref.getExtractedOperations().keySet().forEach(operation -> info.addMarking(
-                    createCodeRangeFromJava(operation.codeRange()),
-                    createCodeRangeFromJava(ref.getExtractedClass().codeRange()), true));
-
-            ref.getExtractedAttributes().keySet().forEach(operation -> info.addMarking(
-                    createCodeRangeFromJava(operation.codeRange()),
-                    createCodeRangeFromJava(ref.getExtractedClass().codeRange()), true));
-        }
+        ref.getExtractedOperations().values().forEach(operation -> info.addMarking(
+                createCodeRangeFromJava(ref.getOriginalClass().codeRange()),
+                createCodeRangeFromJava(ref.getExtractedClass().codeRange()),
+                line -> line
+                        .addOffset(
+                                createLocationInfoFromJava(operation.getLocationInfo()),
+                                RefactoringLine.MarkingOption.ADD),
+                RefactoringLine.MarkingOption.ADD,
+                false));
         return info;
     }
 
