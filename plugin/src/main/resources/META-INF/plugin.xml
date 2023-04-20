@@ -145,12 +145,12 @@
     </extensions>
 
     <actions>
-        <action id="actions.GitLogToggleRefactoringViewAction"
-                class="org.jetbrains.research.refactorinsight.actions.GitLogToggleRefactoringViewAction"
-                icon="RefactorInsightIcons.toggle"
-                text="Show Refactorings" description="actions.GitLogToggleRefactoringViewAction">
-            <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>
-        </action>
+<!--        <action id="actions.GitLogToggleRefactoringViewAction"-->
+<!--                class="org.jetbrains.research.refactorinsight.actions.GitLogToggleRefactoringViewAction"-->
+<!--                icon="RefactorInsightIcons.toggle"-->
+<!--                text="Show Refactorings" description="actions.GitLogToggleRefactoringViewAction">-->
+<!--            <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="first"/>-->
+<!--        </action>-->
 
         <action id="RefAction" class="org.jetbrains.research.refactorinsight.actions.RefactoringAction"
                 text="Mine All Refactorings"
@@ -179,6 +179,11 @@
                 icon="RefactorInsightIcons.toggle"
                 text="Hide non-functional changes" description="Refactorings and imports">
             <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>
+        </action>
+
+        <action id="actions.ComboBoxRefactoringAction"
+                class="org.jetbrains.research.refactorinsight.actions.ComboBoxRefactoringAction">
+            <add-to-group group-id="Vcs.Log.ChangesBrowser.Toolbar" anchor="last"/>
         </action>
     </actions>
 
