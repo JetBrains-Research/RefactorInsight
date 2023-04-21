@@ -29,6 +29,7 @@ public class ExtractClassJavaHandler extends JavaRefactoringHandler {
                 .setNameBefore(ref.getExtractedClass().getName())
                 .setNameAfter(ref.getExtractedClass().getName());
 
+        info.setFoldingDescriptorAfter(FoldingBuilder.fromClass(ref.getExtractedClass()));
 
         ref.getExtractedAttributes().keySet().forEach(attribute -> info.addMarking(
                 createCodeRangeFromJava(attribute.codeRange()),

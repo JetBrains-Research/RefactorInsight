@@ -56,6 +56,9 @@ public class RefactoringFolder {
     FoldingHandler moveClassHandler = new MoveClassFoldingHandler();
     foldingHandlers.put(RefactoringType.MOVE_CLASS.getName(), moveClassHandler);
     foldingHandlers.put(RefactoringType.MOVE_RENAME_CLASS.getName(), moveClassHandler);
+    FoldingHandler extractClassHandler = new ExtractClassFoldingHandler();
+    foldingHandlers.put(RefactoringType.EXTRACT_CLASS.getName(), extractClassHandler);
+    foldingHandlers.put(RefactoringType.EXTRACT_SUBCLASS.getName(), extractClassHandler);
     foldRegions = new HashSet<>();
   }
 
