@@ -4,6 +4,9 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.JBColor;
+import com.intellij.util.ui.JBInsets;
+import com.intellij.util.ui.JBUI;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import org.jetbrains.annotations.Nls;
@@ -11,13 +14,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.services.WindowService;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.Arrays;
+
+import static java.awt.Font.*;
 
 public class ComboBoxRefactoringAction extends ComboBoxAction implements DumbAware {
 
     private enum Tab {
         FILES("Files"),
-        REFACTORING("Refactoring Insight");
+        REFACTORING("Refactorings");
         public final String label;
         Tab(String label) {
             this.label = label;
@@ -37,6 +43,25 @@ public class ComboBoxRefactoringAction extends ComboBoxAction implements DumbAwa
     public void update(@NotNull AnActionEvent e) {
         Presentation presentation = e.getPresentation();
         presentation.setText(getText(getValue()));
+    }
+
+    @Override
+    public @NotNull JComponent createCustomComponent(@NotNull Presentation presentation, @NotNull String place) {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+        ComboBoxButton button = createComboBoxButton(presentation);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setForeground(JBColor.BLUE);
+        button.setMargin(JBUI.emptyInsets());
+        JLabel label = new JLabel("Show:");
+        label.setFont(new Font("Default", PLAIN, 11));
+        GridBagConstraints constraints = new GridBagConstraints(
+                0, 0, 1, 1, 1, 1, GridBagConstraints.CENTER,
+                GridBagConstraints.BOTH, JBInsets.create(0, 0), 0, 0);
+        panel.add(label, constraints);
+        constraints.gridx = 1;
+        panel.add(button, constraints);
+        return panel;
     }
 
     @NotNull
