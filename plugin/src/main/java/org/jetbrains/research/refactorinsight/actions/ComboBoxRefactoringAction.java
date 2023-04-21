@@ -11,6 +11,7 @@ import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.research.refactorinsight.RefactorInsightBundle;
 import org.jetbrains.research.refactorinsight.services.WindowService;
 
 import javax.swing.*;
@@ -21,18 +22,18 @@ import static java.awt.Font.*;
 
 public class ComboBoxRefactoringAction extends ComboBoxAction implements DumbAware {
 
-    private enum Tab {
-        FILES("Files"),
-        REFACTORING("Refactorings");
+    private enum ListItem {
+        FILES(RefactorInsightBundle.message("ui.ChangesBrowserBase.ComboBoxAction.list.item.files")),
+        REFACTORING(RefactorInsightBundle.message("ui.ChangesBrowserBase.ComboBoxAction.list.item.refactorings"));
         public final String label;
-        Tab(String label) {
+        ListItem(String label) {
             this.label = label;
         }
     }
 
     private DefaultActionGroup myActions;
 
-    private Tab currentTab = Tab.FILES;
+    private ListItem currentListItem = ListItem.FILES;
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
@@ -53,8 +54,8 @@ public class ComboBoxRefactoringAction extends ComboBoxAction implements DumbAwa
         button.setBorder(BorderFactory.createEmptyBorder());
         button.setForeground(JBColor.BLUE);
         button.setMargin(JBUI.emptyInsets());
-        JLabel label = new JLabel("Show:");
-        label.setFont(new Font("Default", PLAIN, 11));
+        JLabel label = new JLabel(RefactorInsightBundle.message("ui.ChangesBrowserBase.ComboBoxAction.label.text"));
+        label.setFont(new Font("Default", PLAIN, button.getFont().getSize()));
         GridBagConstraints constraints = new GridBagConstraints(
                 0, 0, 1, 1, 1, 1, GridBagConstraints.CENTER,
                 GridBagConstraints.BOTH, JBInsets.create(0, 0), 0, 0);
@@ -69,33 +70,33 @@ public class ComboBoxRefactoringAction extends ComboBoxAction implements DumbAwa
     protected DefaultActionGroup createPopupActionGroup(@NotNull JComponent button, @NotNull DataContext context) {
         if (myActions == null) {
             myActions = new DefaultActionGroup();
-            for (Tab tab : Arrays.asList(Tab.FILES, Tab.REFACTORING)) {
-                myActions.add(new MyAction(tab));
+            for (ListItem listItem : Arrays.asList(ListItem.FILES, ListItem.REFACTORING)) {
+                myActions.add(new MyAction(listItem));
             }
         }
         return myActions;
     }
 
     @NotNull
-    private Tab getValue() {
-        return currentTab;
+    private ListItem getValue() {
+        return currentListItem;
     }
 
-    private void setValue(@NotNull Tab option) {
-        if (currentTab == option) return;
-        currentTab = option;
+    private void setValue(@NotNull ListItem option) {
+        if (currentListItem == option) return;
+        currentListItem = option;
     }
 
     @Nls
     @NotNull
-    private String getText(@NotNull Tab option) {
+    private String getText(@NotNull ListItem option) {
         return option.label;
     }
 
     private class MyAction extends AnAction implements Toggleable, DumbAware {
-        @NotNull private final Tab myOption;
+        @NotNull private final ListItem myOption;
 
-        MyAction(@NotNull Tab option) {
+        MyAction(@NotNull ListItem option) {
             super(getText(option));
             myOption = option;
         }
@@ -121,7 +122,7 @@ public class ComboBoxRefactoringAction extends ComboBoxAction implements DumbAwa
             setValue(myOption);
             Project project = e.getRequiredData(PlatformDataKeys.PROJECT);
             MainVcsLogUi vcsLogUi = e.getRequiredData(VcsLogInternalDataKeys.MAIN_UI);
-            boolean state = currentTab == Tab.REFACTORING;
+            boolean state = currentListItem == ListItem.REFACTORING;
             WindowService.getInstance(project).setSelected(vcsLogUi, state);
         }
     }
