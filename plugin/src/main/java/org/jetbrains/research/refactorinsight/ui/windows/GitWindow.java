@@ -8,6 +8,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBViewport;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.UIUtil;
+import com.intellij.vcs.log.CommitId;
 import com.intellij.vcs.log.VcsCommitMetadata;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.table.VcsLogGraphTable;
@@ -101,9 +102,10 @@ public class GitWindow {
   private void mineIfAbsent() {
     int index = table.getSelectionModel().getAnchorSelectionIndex();
     if (index >= 0) {
-      String commitId = table.getModel().getCommitId(index).getHash().asString();
-
-      if (miner.get(commitId) == null) {
+      CommitId commitId = table.getModel().getCommitId(index);
+      if (commitId == null) return;
+      String commitHash = commitId.getHash().asString();
+      if (miner.get(commitHash) == null) {
         VcsCommitMetadata metadata = table.getModel().getCommitMetadata(index);
         miner.mineAtCommit(metadata, project, this);
       }
