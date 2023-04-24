@@ -17,7 +17,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":java-impl"))
     implementation(project(":kotlin-impl"))
-    implementation("org.jetbrains.research.kotlinrminer:kotlinRMiner-ide:1.2.1")
+    implementation("org.jetbrains.research.kotlinrminer:kotlinRMiner-ide:2.1.1")
     implementation(group: 'com.github.tsantalis', name: 'refactoring-miner', version: '2.4.0') {
         exclude group: "org.slf4j", module: "slf4j-log4j12"
     }

@@ -13,6 +13,6 @@ repositories {
 
 dependencies {
     implementation(project(":common"))
-    implementation 'org.jetbrains.research.kotlinrminer:kotlinRMiner-ide:1.2.1'
+    implementation 'org.jetbrains.research.kotlinrminer:kotlinRMiner-ide:2.1.1'
     compileOnly 'org.jetbrains:annotations:22.0.0'
 }
