@@ -20,7 +20,7 @@ public class MoveClassFoldingHandler implements FoldingHandler {
             return Collections.emptyList();
         }
         FoldingDescriptor descriptor = isBefore ? info.getFoldingDescriptorBefore() : info.getFoldingDescriptorAfter();
-        if (!descriptor.hasHintText()) {
+        if (descriptor != null && !descriptor.hasHintText()) {
             String details = TextUtils.skipPackages(isBefore ? info.getDetailsAfter() : info.getDetailsBefore());
             String hintText = "Moved" + (isBefore ? " to " : " from ") + details;
             descriptor.addHintText(hintText);
