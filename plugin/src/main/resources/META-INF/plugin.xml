@@ -16,6 +16,14 @@
       ]]></description>
 
     <change-notes><![CDATA[
+        <h4>2023.1-4.0</h4>
+        <ul>
+            <li>Updated visualization of Extract Class/Method/Variable, and Move Method refactorings.</li>
+            <li>Several UI improvements.</li>
+            <li>New plugin icon.</li>
+            <li>Bug fixes.</li>
+        </ul>
+
         <h4>2023.1-3.0</h4>
         <ul>
             <li>Improve wording of UI messages.</li>
