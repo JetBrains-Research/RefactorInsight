@@ -3,7 +3,7 @@
 [![pipeline status](https://github.com/JetBrains-Research/refactorinsight/workflows/Java%20CI%20with%20Gradle/badge.svg)](https://github.com/JetBrains-Research/refactorinsight/badges/master)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/14704-refactorinsight.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/14704-refactorinsight)
 
-![Gradle IntelliJ Plugin](.github/readme/refactorinsight-plugin-logo.svg)
+![RefactorInsight Plugin](.github/readme/refactorinsight-plugin-logo.svg)
 
 ### RefactorInsight Plugin
 
@@ -40,14 +40,14 @@ Currently, it works for the following refactoring types: `Move Method`, `Pull Up
 #### Hide non-functional changes
 RefactorInsight provides a possibility to collapse refactoring changes in code diffs allowing users to focus on functional changes.
 
+To hide non-functional changes (refactorings) in the code diff, check the corresponding checkbox in the diff window settings.
+
 <img src=".github/readme/hide_non_functional_changes.png" alt="Example" width="600">
 
 #### Refactorings in commits
-To see refactorings in your Git repository, go to the **Git** tab in IntelliJ IDEA and click the toggle button ![](.github/readme/refactorinsight_toggle.svg) on the right.
+To see refactorings in your Git repository, go to the **Git/Log** tab in IntelliJ IDEA and choose `Refactorings` in the drop-down list next to `Show`.
 
-Click a commit and then the ![](.github/readme/refactorinsight_toggle.svg) to see the refactorings detected in that commit. It looks like this:
-
-<img src=".github/readme/refactorinsight_main.png" alt="Example" width="900">
+<img src=".github/readme/refactorinsight_git_log_tab.png" alt="Example" width="600">
 
 #### Refactorings in pull requests
 To see the refactorings in a specific pull request, go to the **Pull Requests** tab in IntelliJ IDEA, select any pull request and click ![](.github/readme/refactorinsight_toggle.svg).
