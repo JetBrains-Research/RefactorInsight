@@ -51,8 +51,10 @@ public class ComboBoxRefactoringAction extends ComboBoxAction implements DumbAwa
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
         ComboBoxButton button = createComboBoxButton(presentation);
-        button.setBorder(BorderFactory.createEmptyBorder());
         button.setForeground(JBColor.BLUE);
+        button.setOpaque(false);
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
         button.setMargin(JBUI.emptyInsets());
         JLabel label = new JLabel(RefactorInsightBundle.message("ui.ChangesBrowserBase.ComboBoxAction.label.text"));
         label.setFont(new Font("Default", PLAIN, button.getFont().getSize()));
