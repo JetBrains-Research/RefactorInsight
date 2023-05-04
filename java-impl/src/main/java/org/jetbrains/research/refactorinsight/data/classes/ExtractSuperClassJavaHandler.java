@@ -34,7 +34,7 @@ public class ExtractSuperClassJavaHandler extends JavaRefactoringHandler {
         String[] nameSpace = ref.getExtractedClass().getName().split("\\.");
         String className = nameSpace[nameSpace.length - 1];
 
-        ref.getUMLSubclassSetBefore().forEach(subClass ->
+        ref.getUMLSubclassSetAfter().forEach(subClass ->
                 info.addMarking(createCodeRangeFromJava(subClass.codeRange()), null, line ->
                         line.setWord(new String[]{className, null, null}), RefactoringLine.MarkingOption.COLLAPSE, true));
 
