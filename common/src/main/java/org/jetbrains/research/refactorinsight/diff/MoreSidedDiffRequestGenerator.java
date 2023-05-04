@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.research.refactorinsight.adapters.CodeRange;
 import org.jetbrains.research.refactorinsight.data.RefactoringInfo;
 import org.jetbrains.research.refactorinsight.data.RefactoringLine;
+import org.jetbrains.research.refactorinsight.ui.Keys;
 import org.jetbrains.research.refactorinsight.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -68,8 +69,8 @@ public class MoreSidedDiffRequestGenerator extends DiffRequestGenerator {
             }
             request = new SimpleDiffRequest(info.getName(),
                     contents[1], contents[0], "Subclasses", info.getRightPath());
-            request.putUserData(Key.create("refactoringMiner.isRefactoringDiff"), true);
-            request.putUserData(Key.create("refactoringMiner.List<MoreSidedDiffRequestGenerator.Data>"), lines);
+            request.putUserData(Keys.REFACTORING, true);
+            request.putUserData(Keys.MORESIDED_RANGES, lines);
             request.putUserData(DiffUserDataKeysEx.CUSTOM_DIFF_COMPUTER,
                     (text1, text2, policy, innerChanges, indicator)
                             -> new ArrayList<>());
