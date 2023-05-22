@@ -4,9 +4,9 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBInsets;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import org.jetbrains.annotations.Nls;
@@ -17,8 +17,6 @@ import org.jetbrains.research.refactorinsight.services.WindowService;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
-
-import static java.awt.Font.*;
 
 public class ComboBoxRefactoringAction extends ComboBoxAction implements DumbAware {
 
@@ -54,10 +52,10 @@ public class ComboBoxRefactoringAction extends ComboBoxAction implements DumbAwa
         button.setOpaque(false);
         button.setContentAreaFilled(false);
         button.setBorderPainted(false);
-        button.setForeground(JBColor.BLUE);
+        button.setForeground(UIUtil.getLabelForeground());
         button.setMargin(JBUI.emptyInsets());
         JLabel label = new JLabel(RefactorInsightBundle.message("ui.ChangesBrowserBase.ComboBoxAction.label.text"));
-        label.setFont(new Font("Default", PLAIN, button.getFont().getSize()));
+        label.setForeground(UIUtil.getLabelInfoForeground());
         GridBagConstraints constraints = new GridBagConstraints(
                 0, 0, 1, 1, 1, 1, GridBagConstraints.CENTER,
                 GridBagConstraints.BOTH, JBInsets.create(0, 0), 0, 0);
