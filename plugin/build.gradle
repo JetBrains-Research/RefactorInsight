@@ -39,6 +39,10 @@ tasks {
     patchPluginXml {
         version.set("${project.version}")
         sinceBuild.set("221")
-        untilBuild.set("232.*")
+        untilBuild.set("233.*")
+    }
+
+    runPluginVerifier {
+        ideVersions = Arrays.asList("2023.3.1")
     }
 }
