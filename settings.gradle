@@ -7,7 +7,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "refactorinsight"
+rootProject.name = "RefactorInsight"
 
 include('runner',
         'common',

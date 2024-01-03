@@ -11,7 +11,7 @@ RefactorInsight is a plugin for IntelliJ IDEA that enhances the representation o
 
 RefactorInsight relies on [RefactoringMiner](https://github.com/tsantalis/RefactoringMiner) and [kotlinRMiner](https://github.com/JetBrains-Research/kotlinRMiner) for retrieval of refactorings.
 
-The plugin is compatible with IntelliJ IDEA 2023.1 and is [available for free](https://plugins.jetbrains.com/plugin/14704-refactorinsight) on JetBrains Marketplace.
+The plugin is compatible with IntelliJ IDEA 2023.3 and is [available for free](https://plugins.jetbrains.com/plugin/14704-refactorinsight) on JetBrains Marketplace.
 
 ### Table of contents
 * [Features](#features)

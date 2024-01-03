@@ -16,6 +16,11 @@
       ]]></description>
 
     <change-notes><![CDATA[
+        <h4>2023.3-1.0</h4>
+        <ul>
+            <li>Add compatibility with IDEA 2023.3</li>
+        </ul>
+
         <h4>2023.1-4.0</h4>
         <ul>
             <li>Updated visualization of Extract Class/Method/Variable, and Move Method refactorings.</li>
